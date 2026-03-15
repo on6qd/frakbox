@@ -1,0 +1,65 @@
+{
+  "version": 2,
+  "last_updated": "2026-03-15",
+  "last_review_at_experiment": 0,
+  "review_every_n_experiments": 10,
+
+  "defaults": {
+    "min_sample_size": 5,
+    "min_consistency_pct": 60,
+    "min_abnormal_return_pct": 1.5,
+    "min_p_value": 0.05,
+    "position_size_pct": 5,
+    "measurement_horizons_days": [1, 3, 5, 10, 20],
+    "max_concurrent_experiments": 5,
+    "knowledge_revalidation_months": 12
+  },
+
+  "per_category": {},
+
+  "confidence_rubric": {
+    "note": "Confidence is computed from evidence, not assigned by feel. Score = sum of component scores, capped at 10.",
+    "components": {
+      "sample_size": {"5-7": 1, "8-14": 2, "15+": 3},
+      "consistency": {"60-69%": 1, "70-79%": 2, "80%+": 3},
+      "effect_vs_noise": {"avg/stdev 0.3-0.5": 1, "avg/stdev 0.5-1.0": 2, "avg/stdev 1.0+": 3},
+      "literature_support": {"none": 0, "partial": 1, "strong": 2}
+    },
+    "max_score": 10,
+    "note2": "A hypothesis with N=6, 65% consistency, avg/stdev=0.4, no literature = 1+1+1+0 = 3. This is low confidence and correctly so."
+  },
+
+  "confidence_calibration": {
+    "note": "Tracks whether confidence scores predict accuracy. Updated during self-reviews.",
+    "buckets": {
+      "1-3": {"predictions": 0, "correct": 0},
+      "4-6": {"predictions": 0, "correct": 0},
+      "7-10": {"predictions": 0, "correct": 0}
+    }
+  },
+
+  "confounders_tracked": [
+    "broad_market_direction",
+    "vix_level",
+    "sector_trend",
+    "survivorship_bias",
+    "selection_bias"
+  ],
+
+  "category_status": {},
+
+  "methodology_changelog": [
+    {
+      "version": 1,
+      "date": "2026-03-15",
+      "changes": "Initial methodology. All defaults are starting assumptions — no data yet to calibrate against.",
+      "reason": "Project launch"
+    },
+    {
+      "version": 2,
+      "date": "2026-03-15",
+      "changes": "Added: min_abnormal_return_pct (1.5%), min_p_value (0.05), confidence rubric (formula-based), survivorship/selection bias tracking, knowledge revalidation decay (12 months), magnitude-aware accuracy in self-review.",
+      "reason": "Methodology audit — statistical rigor and measurability gaps"
+    }
+  ]
+}
