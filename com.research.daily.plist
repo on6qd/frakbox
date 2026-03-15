@@ -11,12 +11,18 @@
         <string>/Users/bartdelepeleer/trading_bot2/daily_research.sh</string>
     </array>
 
-    <!-- Run at 8:00 AM and 4:00 PM ET (market hours) -->
+    <!-- Run at 9 AM, 1 PM, and 5 PM ET (14:03, 18:03, 22:03 UTC) -->
     <key>StartCalendarInterval</key>
     <array>
         <dict>
             <key>Hour</key>
             <integer>14</integer>
+            <key>Minute</key>
+            <integer>3</integer>
+        </dict>
+        <dict>
+            <key>Hour</key>
+            <integer>18</integer>
             <key>Minute</key>
             <integer>3</integer>
         </dict>

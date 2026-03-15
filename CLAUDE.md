@@ -199,6 +199,7 @@ Systematically work through these, mining history for each:
 - **Regulatory changes** — new regulations → affected industry price patterns
 - **M&A announcements** — acquirer vs target vs competitor reactions
 - **Short squeeze setups** — high short interest + catalyst → squeeze probability
+- **Cross-category interactions** — once 2+ categories have data, look for interaction effects (e.g., "do FDA rejections hit harder when VIX is elevated?", "do earnings surprises matter less during FOMC weeks?"). This is where novel findings live.
 
 ### Data Sources to Use
 - Web search for **event dates** (NOT for determining price impact — verify with backtest)
@@ -279,3 +280,9 @@ Systematically work through these, mining history for each:
 - Don't form hypotheses from web search narratives — verify with backtest data
 - Don't accept a single significant horizon as proof — check multiple testing
 - Only unexamined outcomes are failures
+
+## Operational Tools
+- `./health.sh` — quick status check: last session, session history, research progress, scheduler status
+- `./compact_notes.sh` — archive old research_notes.md entries when the journal exceeds 30 entries (prevents context bloat)
+- Session timeout: operations/research sessions cap at 30 min, event scans at 10 min
+- Crash detection: if a session doesn't complete, the next session is notified and an email is sent

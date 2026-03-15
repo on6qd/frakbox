@@ -20,30 +20,76 @@ TIMESTAMP=$(date +%Y-%m-%d_%H%M)
 LOG_FILE="$LOG_DIR/${TIMESTAMP}.log"
 SESSION_STATE="$LOG_DIR/session_state.json"
 
-HOUR=$(date -u +%H)
+# --- Session timeout / crash detection ---
+SESSION_TIMEOUT_MINUTES=30
+SCAN_TIMEOUT_MINUTES=10
 
-# Mark session as started (for crash recovery)
-if [ "$HOUR" -ge 17 ] && [ "$HOUR" -lt 19 ]; then
-  SESSION_TYPE="event_scan"
-elif [ "$HOUR" -lt 18 ]; then
-  SESSION_TYPE="operations"
-else
-  SESSION_TYPE="research"
+if [ -f "$SESSION_STATE" ]; then
+  PREV_STATUS=$(python3 -c "import json; d=json.load(open('$SESSION_STATE')); print(d.get('status','unknown'))" 2>/dev/null)
+  if [ "$PREV_STATUS" = "running" ]; then
+    PREV_STARTED=$(python3 -c "import json; d=json.load(open('$SESSION_STATE')); print(d.get('session_started',''))" 2>/dev/null)
+    PREV_TYPE=$(python3 -c "import json; d=json.load(open('$SESSION_STATE')); print(d.get('session_type','unknown'))" 2>/dev/null)
+    echo "WARNING: Previous session ($PREV_TYPE, started $PREV_STARTED) did not complete — marking as crashed." | tee "$LOG_DIR/crash_$(date +%Y-%m-%d_%H%M).log"
+
+    # Update previous session state
+    python3 -c "
+import json
+with open('$SESSION_STATE') as f:
+    d = json.load(f)
+d['status'] = 'crashed'
+d['detected_at'] = '$(date -Iseconds)'
+with open('$SESSION_STATE', 'w') as f:
+    json.dump(d, f, indent=2)
+"
+    # Send crash notification email
+    source venv/bin/activate
+    python3 -c "
+from email_report import send_email
+try:
+    send_email(
+        subject='[Research Bot] Session crashed: $PREV_TYPE',
+        body='<p>Previous session <b>$PREV_TYPE</b> (started $PREV_STARTED) did not complete.</p><p>Check logs for details.</p>'
+    )
+except Exception as e:
+    print(f'Could not send crash notification: {e}')
+" 2>/dev/null
+  fi
 fi
 
+# --- Determine session type ---
+HOUR=$(date -u +%H)
+
+if [ "$HOUR" -ge 17 ] && [ "$HOUR" -lt 19 ]; then
+  SESSION_TYPE="event_scan"
+  MAX_TURNS=15
+  TIMEOUT=$SCAN_TIMEOUT_MINUTES
+elif [ "$HOUR" -lt 18 ]; then
+  SESSION_TYPE="operations"
+  MAX_TURNS=50
+  TIMEOUT=$SESSION_TIMEOUT_MINUTES
+else
+  SESSION_TYPE="research"
+  MAX_TURNS=50
+  TIMEOUT=$SESSION_TIMEOUT_MINUTES
+fi
+
+# Mark session as started
 cat > "$SESSION_STATE" <<STATEEOF
 {
   "session_started": "$(date -Iseconds)",
   "session_type": "$SESSION_TYPE",
   "status": "running",
-  "log_file": "$LOG_FILE"
+  "log_file": "$LOG_FILE",
+  "max_turns": $MAX_TURNS
 }
 STATEEOF
 
-echo "=== Research cycle started $(date) — $SESSION_TYPE ===" | tee "$LOG_FILE"
+echo "=== Research cycle started $(date) — $SESSION_TYPE (max $MAX_TURNS turns, ${TIMEOUT}min timeout) ===" | tee "$LOG_FILE"
+
+# --- Snapshot research_queue.json before session (for post-session validation) ---
+cp research_queue.json "$LOG_DIR/rq_pre_${TIMESTAMP}.json" 2>/dev/null
 
 if [ "$SESSION_TYPE" = "event_scan" ]; then
-  # MIDDAY SESSION: Lightweight event scan — check headlines, no deep research
   SESSION_PROMPT="You are a researcher doing a quick event scan. Read CLAUDE.md for context.
 
 Read research_queue.json to see the event watchlist and any pending hypotheses.
@@ -63,7 +109,6 @@ Do NOT: research new categories, form hypotheses, run backtests, write post-mort
 This is a headline scan only."
 
 elif [ "$SESSION_TYPE" = "operations" ]; then
-  # MORNING SESSION: Operations — events, experiments, post-mortems
   SESSION_PROMPT="You are a researcher. Read CLAUDE.md for your full mission and methodology.
 
 Start by reading these files — they ARE your memory:
@@ -74,7 +119,7 @@ Start by reading these files — they ARE your memory:
 - patterns.json (statistical patterns from experiments)
 - logs/research_notes.md (journal of all previous sessions)
 
-Check logs/session_state.json — if the previous session status is 'running', it crashed. Note what it was doing and recover.
+Check logs/session_state.json — if the previous session status is 'crashed', note what it was doing and recover.
 
 Then: source venv/bin/activate && python run.py --status
 
@@ -93,7 +138,7 @@ THIS IS AN OPERATIONS SESSION. Focus on:
    - If action='retire', call record_dead_end() to retire the pattern.
 6. If there are pending hypotheses ready to activate AND events have triggered, place trades.
    - Check max_concurrent_experiments before activating.
-   - Position size is UNIFORM at 5% ($5,000) — do not vary by category.
+   - Position size is UNIFORM at 5% (\$5,000) — do not vary by category.
 7. Add newly discovered upcoming events to the watchlist.
 8. Set next_session_priorities for the evening research session.
 9. Send report: source venv/bin/activate && python email_report.py
@@ -101,7 +146,6 @@ THIS IS AN OPERATIONS SESSION. Focus on:
 
 Do NOT do deep research or literature reviews — that's for the evening session."
 else
-  # EVENING SESSION: Research — literature, backtesting, hypothesis formation
   SESSION_PROMPT="You are a researcher. Read CLAUDE.md for your full mission and methodology.
 
 Start by reading these files — they ARE your memory:
@@ -112,7 +156,7 @@ Start by reading these files — they ARE your memory:
 - patterns.json (statistical patterns from experiments)
 - logs/research_notes.md (journal of all previous sessions)
 
-Check logs/session_state.json — if the previous session status is 'running', it crashed. Note what it was doing and recover.
+Check logs/session_state.json — if the previous session status is 'crashed', note what it was doing and recover.
 
 Then: source venv/bin/activate && python run.py --status
 
@@ -159,17 +203,56 @@ THIS IS A RESEARCH SESSION. Focus on:
 Do NOT place trades or manage positions — that's for the morning session."
 fi
 
-claude -p "$SESSION_PROMPT" 2>&1 | tee -a "$LOG_FILE"
+# --- Run Claude with turn limit and timeout ---
+timeout "${TIMEOUT}m" claude --max-turns "$MAX_TURNS" -p "$SESSION_PROMPT" 2>&1 | tee -a "$LOG_FILE"
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -eq 124 ]; then
+  SESSION_END_STATUS="timed_out"
+  echo "WARNING: Session timed out after ${TIMEOUT} minutes" | tee -a "$LOG_FILE"
+else
+  SESSION_END_STATUS="completed"
+fi
+
+# --- Post-session validation ---
+# Check that the session actually did something useful
+VALIDATION_WARNINGS=""
+
+# For non-scan sessions, verify research_queue.json was updated
+if [ "$SESSION_TYPE" != "event_scan" ]; then
+  if diff -q research_queue.json "$LOG_DIR/rq_pre_${TIMESTAMP}.json" > /dev/null 2>&1; then
+    VALIDATION_WARNINGS="research_queue.json was not modified (session may not have set next priorities)"
+  fi
+fi
+
+# Check research_notes.md was appended (for research/operations sessions)
+if [ "$SESSION_TYPE" != "event_scan" ]; then
+  NOTES_LINES_BEFORE=$(wc -l < "$LOG_DIR/rq_pre_${TIMESTAMP}.json" 2>/dev/null || echo 0)
+  if ! grep -q "$TIMESTAMP" logs/research_notes.md 2>/dev/null && ! grep -q "$(date +%Y-%m-%d)" logs/research_notes.md 2>/dev/null; then
+    if [ -n "$VALIDATION_WARNINGS" ]; then
+      VALIDATION_WARNINGS="$VALIDATION_WARNINGS; "
+    fi
+    VALIDATION_WARNINGS="${VALIDATION_WARNINGS}research_notes.md may not have been updated"
+  fi
+fi
 
 # Mark session as completed
 cat > "$SESSION_STATE" <<STATEEOF
 {
   "session_started": "$(date -Iseconds)",
   "session_type": "$SESSION_TYPE",
-  "status": "completed",
+  "status": "$SESSION_END_STATUS",
   "log_file": "$LOG_FILE",
-  "session_ended": "$(date -Iseconds)"
+  "session_ended": "$(date -Iseconds)",
+  "max_turns": $MAX_TURNS,
+  "exit_code": $EXIT_CODE,
+  "validation_warnings": "$VALIDATION_WARNINGS"
 }
 STATEEOF
 
-echo "=== Research cycle finished $(date) ===" | tee -a "$LOG_FILE"
+# Log size for cost awareness
+LOG_SIZE=$(wc -c < "$LOG_FILE" 2>/dev/null || echo 0)
+echo "=== Research cycle finished $(date) — status: $SESSION_END_STATUS, log size: $LOG_SIZE bytes ===" | tee -a "$LOG_FILE"
+
+# Clean up pre-session snapshot
+rm -f "$LOG_DIR/rq_pre_${TIMESTAMP}.json"
