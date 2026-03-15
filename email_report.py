@@ -113,6 +113,22 @@ def build_daily_report():
     return html
 
 
+def send_email(subject, body):
+    """Send a simple HTML email. Used by shell scripts and internal notifications."""
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+    msg["From"] = GMAIL_ADDRESS
+    msg["To"] = REPORT_RECIPIENT
+
+    msg.attach(MIMEText(body, "html"))
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
+        server.sendmail(GMAIL_ADDRESS, REPORT_RECIPIENT, msg.as_string())
+
+    print(f"Email sent to {REPORT_RECIPIENT}: {subject}")
+
+
 def send_report(subject=None, body_html=None):
     """Send the daily report email."""
     if body_html is None:
@@ -120,19 +136,106 @@ def send_report(subject=None, body_html=None):
     if subject is None:
         subject = f"Research Report — {datetime.now().strftime('%Y-%m-%d')}"
 
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"] = GMAIL_ADDRESS
-    msg["To"] = REPORT_RECIPIENT
+    send_email(subject, body_html)
 
-    msg.attach(MIMEText(body_html, "html"))
 
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
-        server.sendmail(GMAIL_ADDRESS, REPORT_RECIPIENT, msg.as_string())
+def send_session_report(session_type, status, log_file, validation_warnings=""):
+    """Send a post-session summary email. Called by daily_research.sh after every run."""
+    import json
+    import os
 
-    print(f"Report sent to {REPORT_RECIPIENT}")
+    # Load current state for the report
+    research = get_research_summary()
+    knowledge = load_knowledge()
+    patterns = load_patterns()
+
+    # Read research_queue for priorities
+    rq = {}
+    try:
+        with open("research_queue.json") as f:
+            rq = json.load(f)
+    except Exception:
+        pass
+
+    queue_pending = len([t for t in rq.get("queue", []) if t.get("status") == "pending"])
+    queue_completed = len([t for t in rq.get("queue", []) if t.get("status") == "completed"])
+    watchlist_count = len(rq.get("event_watchlist", []))
+    next_priorities = rq.get("next_session_priorities", [])
+
+    # Read last N lines of the log for a session excerpt
+    log_tail = ""
+    try:
+        with open(log_file) as f:
+            lines = f.readlines()
+        # Get last 40 lines, skip very long ones
+        tail_lines = [l[:200] for l in lines[-40:]]
+        log_tail = "".join(tail_lines)
+    except Exception:
+        log_tail = "(could not read log)"
+
+    status_color = {"completed": "#2e7d32", "timed_out": "#e65100", "crashed": "#c62828"}.get(status, "#333")
+    status_emoji = {"completed": "OK", "timed_out": "TIMEOUT", "crashed": "CRASHED"}.get(status, status.upper())
+
+    subject = f"[{status_emoji}] {session_type} session — {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+
+    html = f"""
+    <html><body style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;">
+    <h2 style="color: {status_color};">{session_type.replace('_', ' ').title()} Session — {status_emoji}</h2>
+    <p>{datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
+
+    <h3>Session</h3>
+    <table style="border-collapse: collapse;">
+        <tr><td style="padding: 4px 12px;">Type</td><td style="padding: 4px 12px;"><b>{session_type}</b></td></tr>
+        <tr><td style="padding: 4px 12px;">Status</td><td style="padding: 4px 12px; color: {status_color};"><b>{status}</b></td></tr>
+        <tr><td style="padding: 4px 12px;">Log</td><td style="padding: 4px 12px;">{os.path.basename(log_file)}</td></tr>
+    </table>
+    """
+
+    if validation_warnings:
+        html += f'<p style="color: #e65100;"><b>Warnings:</b> {validation_warnings}</p>'
+
+    html += f"""
+    <h3>Research Progress</h3>
+    <table style="border-collapse: collapse;">
+        <tr><td style="padding: 4px 12px;">Hypotheses</td><td style="padding: 4px 12px;">{research['total_hypotheses']} total, {research['active']} active, {research['completed']} completed</td></tr>
+        <tr><td style="padding: 4px 12px;">Direction accuracy</td><td style="padding: 4px 12px;"><b>{research['direction_accuracy']}</b></td></tr>
+        <tr><td style="padding: 4px 12px;">Patterns</td><td style="padding: 4px 12px;">{research['patterns_discovered']}</td></tr>
+        <tr><td style="padding: 4px 12px;">Literature entries</td><td style="padding: 4px 12px;">{len(knowledge.get('literature', {}))}</td></tr>
+        <tr><td style="padding: 4px 12px;">Known effects</td><td style="padding: 4px 12px;">{len(knowledge.get('known_effects', {}))}</td></tr>
+        <tr><td style="padding: 4px 12px;">Dead ends</td><td style="padding: 4px 12px;">{len(knowledge.get('dead_ends', []))}</td></tr>
+        <tr><td style="padding: 4px 12px;">Research queue</td><td style="padding: 4px 12px;">{queue_pending} pending, {queue_completed} completed</td></tr>
+        <tr><td style="padding: 4px 12px;">Event watchlist</td><td style="padding: 4px 12px;">{watchlist_count} events</td></tr>
+    </table>
+    """
+
+    if next_priorities:
+        html += "<h3>Next Session Priorities</h3><ol>"
+        for p in next_priorities[:5]:
+            html += f"<li>{p}</li>"
+        html += "</ol>"
+
+    # Log excerpt
+    import html as html_mod
+    html += f"""
+    <h3>Session Log (tail)</h3>
+    <pre style="background: #f5f5f5; padding: 12px; font-size: 11px; overflow-x: auto; max-height: 400px; white-space: pre-wrap;">{html_mod.escape(log_tail)}</pre>
+
+    <hr style="margin-top: 30px;">
+    <p style="color: #888; font-size: 12px;">Automated session report — Stock Market Causal Research Project</p>
+    </body></html>
+    """
+
+    send_email(subject, html)
 
 
 if __name__ == "__main__":
-    send_report()
+    import sys
+    if len(sys.argv) >= 4 and sys.argv[1] == "--session":
+        # Called as: python email_report.py --session <type> <status> <log_file> [warnings]
+        session_type = sys.argv[2]
+        status = sys.argv[3]
+        log_file = sys.argv[4] if len(sys.argv) > 4 else ""
+        warnings = sys.argv[5] if len(sys.argv) > 5 else ""
+        send_session_report(session_type, status, log_file, warnings)
+    else:
+        send_report()

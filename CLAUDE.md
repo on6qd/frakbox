@@ -286,3 +286,4 @@ Systematically work through these, mining history for each:
 - `./compact_notes.sh` — archive old research_notes.md entries when the journal exceeds 30 entries (prevents context bloat)
 - Session timeout: operations/research sessions cap at 30 min, event scans at 10 min
 - Crash detection: if a session doesn't complete, the next session is notified and an email is sent
+- **Email reports are sent automatically** after every session by the shell script — do NOT send email from within sessions

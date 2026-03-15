@@ -141,9 +141,9 @@ THIS IS AN OPERATIONS SESSION. Focus on:
    - Position size is UNIFORM at 5% (\$5,000) — do not vary by category.
 7. Add newly discovered upcoming events to the watchlist.
 8. Set next_session_priorities for the evening research session.
-9. Send report: source venv/bin/activate && python email_report.py
-10. Append to logs/research_notes.md.
+9. Append to logs/research_notes.md.
 
+Email report is sent automatically after the session — do NOT send it yourself.
 Do NOT do deep research or literature reviews — that's for the evening session."
 else
   SESSION_PROMPT="You are a researcher. Read CLAUDE.md for your full mission and methodology.
@@ -197,9 +197,9 @@ THIS IS A RESEARCH SESSION. Focus on:
    - Fill in survivorship_bias_note and selection_bias_note (both REQUIRED).
 7. Check knowledge decay: run check_knowledge_decay() from self_review. Queue revalidation tasks for stale effects.
 8. Set priorities for the next (morning operations) session.
-9. Send report: source venv/bin/activate && python email_report.py
-10. Append to logs/research_notes.md: what you researched, what you found, what's next.
+9. Append to logs/research_notes.md: what you researched, what you found, what's next.
 
+Email report is sent automatically after the session — do NOT send it yourself.
 Do NOT place trades or manage positions — that's for the morning session."
 fi
 
@@ -253,6 +253,10 @@ STATEEOF
 # Log size for cost awareness
 LOG_SIZE=$(wc -c < "$LOG_FILE" 2>/dev/null || echo 0)
 echo "=== Research cycle finished $(date) — status: $SESSION_END_STATUS, log size: $LOG_SIZE bytes ===" | tee -a "$LOG_FILE"
+
+# --- Send post-session email report (every run, guaranteed) ---
+source venv/bin/activate 2>/dev/null
+python3 email_report.py --session "$SESSION_TYPE" "$SESSION_END_STATUS" "$LOG_FILE" "$VALIDATION_WARNINGS" 2>&1 | tee -a "$LOG_FILE" || echo "WARNING: Failed to send session report email" | tee -a "$LOG_FILE"
 
 # Clean up pre-session snapshot
 rm -f "$LOG_DIR/rq_pre_${TIMESTAMP}.json"
