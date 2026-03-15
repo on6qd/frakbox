@@ -74,37 +74,41 @@ def run_self_review(completed_hypotheses):
         report["changes_made"].append(calibration["recommendation"])
 
     # --- 2. Per-Category Performance (direction + magnitude) ---
+    # NOTE: Position sizes are UNIFORM for research integrity. This section only
+    # updates category status and flags categories for promotion or retirement.
+    # It does NOT adjust position sizes — that would optimize for P&L, not learning.
     category_analysis = _analyze_categories(completed_hypotheses)
     for cat_name, cat_data in category_analysis.items():
         m["category_status"][cat_name] = cat_data["status"]
 
-        # Adjust per-category settings if we have enough data
         if cat_data["total"] >= 5:
             if cat_name not in m["per_category"]:
                 m["per_category"][cat_name] = {}
 
-            # If accuracy is high, we can increase position size
-            if cat_data["accuracy"] >= 0.75 and cat_data["total"] >= 8:
-                old_size = m["per_category"].get(cat_name, {}).get("position_size_pct", m["defaults"]["position_size_pct"])
-                new_size = min(10, old_size + 1)
-                if new_size != old_size:
-                    m["per_category"][cat_name]["position_size_pct"] = new_size
-                    report["changes_made"].append(
-                        f"{cat_name}: increased position size to {new_size}% (accuracy {cat_data['accuracy']:.0%} over {cat_data['total']} tests)"
-                    )
+            # Check promotion criteria
+            promo = m.get("promotion_criteria", {})
+            min_tests = promo.get("min_live_tests", 3)
+            min_acc = promo.get("min_live_accuracy", 0.6)
+            min_mag = promo.get("min_live_magnitude_ratio", 0.3)
+            retire_tests = promo.get("retirement_min_tests", 5)
+            retire_acc = promo.get("retirement_max_accuracy", 0.3)
 
-            # If accuracy is low, reduce position size or flag for review
-            if cat_data["accuracy"] < 0.4:
-                m["per_category"][cat_name]["position_size_pct"] = 2
+            avg_mag = cat_data.get("avg_magnitude_ratio")
+
+            if (cat_data["accuracy"] >= min_acc and cat_data["total"] >= min_tests
+                    and (avg_mag is None or avg_mag >= min_mag)):
                 report["changes_made"].append(
-                    f"{cat_name}: reduced position size to 2% (accuracy only {cat_data['accuracy']:.0%})"
+                    f"{cat_name}: QUALIFIES FOR PROMOTION to known_effects — "
+                    f"{cat_data['accuracy']:.0%} accuracy over {cat_data['total']} tests, "
+                    f"avg magnitude ratio {avg_mag}. Run check_promotion_or_retirement() to promote."
                 )
 
             # If accuracy is terrible, mark category for retirement
-            if cat_data["accuracy"] < 0.3 and cat_data["total"] >= 8:
+            if cat_data["accuracy"] <= retire_acc and cat_data["total"] >= retire_tests:
                 m["category_status"][cat_name] = "retired"
                 report["changes_made"].append(
-                    f"{cat_name}: RETIRED — accuracy {cat_data['accuracy']:.0%} over {cat_data['total']} tests is below random chance"
+                    f"{cat_name}: RETIRED — accuracy {cat_data['accuracy']:.0%} over "
+                    f"{cat_data['total']} tests is below random chance. Record as dead end."
                 )
 
         report["findings"].append(

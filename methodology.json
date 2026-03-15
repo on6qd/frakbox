@@ -1,18 +1,103 @@
 {
-  "version": 2,
+  "version": 3,
   "last_updated": "2026-03-15",
   "last_review_at_experiment": 0,
   "review_every_n_experiments": 10,
 
   "defaults": {
-    "min_sample_size": 5,
+    "min_sample_size": 12,
+    "min_sample_size_exploratory": 5,
     "min_consistency_pct": 60,
     "min_abnormal_return_pct": 1.5,
     "min_p_value": 0.05,
     "position_size_pct": 5,
+    "position_size_uniform": true,
     "measurement_horizons_days": [1, 3, 5, 10, 20],
     "max_concurrent_experiments": 5,
     "knowledge_revalidation_months": 12
+  },
+
+  "out_of_sample": {
+    "note": "Historical instances MUST be split into discovery (70%) and validation (30%) sets. A pattern only qualifies for hypothesis formation if it holds in BOTH sets.",
+    "discovery_pct": 70,
+    "validation_pct": 30,
+    "min_validation_instances": 3,
+    "enforcement": "hard"
+  },
+
+  "multiple_testing_correction": {
+    "note": "With 14 categories x 5 horizons = 70 tests, p<0.05 yields ~3.5 false positives. Require significance at 2+ independent horizons OR use Bonferroni-adjusted threshold.",
+    "method": "multi_horizon",
+    "min_significant_horizons": 2,
+    "bonferroni_adjusted_p": 0.01,
+    "note2": "If only 1 horizon is significant, use bonferroni_adjusted_p (0.01) instead of 0.05. If 2+ horizons significant at 0.05, no correction needed."
+  },
+
+  "event_timing": {
+    "note": "Events happen at different times. An after-hours FDA decision moves the stock next morning, not same day. The reference price must account for this.",
+    "options": ["pre_market", "intraday", "after_hours", "unknown"],
+    "default": "unknown",
+    "reference_price_rules": {
+      "pre_market": "Use previous day close as reference. Day-0 close captures the reaction.",
+      "intraday": "Use previous day close as reference. Day-0 close captures partial reaction.",
+      "after_hours": "Use day-0 close as reference (before the event). Day-1 close captures the reaction.",
+      "unknown": "Use previous day close as reference. Note timing uncertainty in hypothesis."
+    }
+  },
+
+  "regime_conditioning": {
+    "note": "Effects may be regime-dependent. Always check if the pattern holds across different market environments.",
+    "regimes": {
+      "low_vol": {"vix_max": 20, "label": "calm"},
+      "mid_vol": {"vix_min": 20, "vix_max": 30, "label": "elevated"},
+      "high_vol": {"vix_min": 30, "label": "crisis"}
+    },
+    "requirement": "If backtesting has N>=15, subset by regime and report whether effect is regime-dependent. If regime-dependent, note which regime the hypothesis applies to."
+  },
+
+  "promotion_criteria": {
+    "note": "When does a live-tested pattern become a 'known effect'? These are the thresholds.",
+    "min_live_tests": 3,
+    "min_live_accuracy": 0.6,
+    "min_live_magnitude_ratio": 0.3,
+    "retirement_min_tests": 5,
+    "retirement_max_accuracy": 0.3,
+    "note2": "After min_live_tests successful live experiments with accuracy >= min_live_accuracy and avg magnitude_ratio >= min_live_magnitude_ratio, promote to known_effects in knowledge_base.json. After retirement_min_tests with accuracy <= retirement_max_accuracy, retire and record as dead end."
+  },
+
+  "pre_registration": {
+    "note": "Hypotheses are hashed at creation time. The hash covers: event_type, expected_symbol, expected_direction, expected_magnitude_pct, expected_timeframe_days. This prevents post-hoc adjustment of predictions.",
+    "fields_hashed": ["event_type", "expected_symbol", "expected_direction", "expected_magnitude_pct", "expected_timeframe_days"],
+    "enforcement": "Predictions are logged to results.jsonl at creation time, before any trade is placed."
+  },
+
+  "causal_mechanism_rubric": {
+    "note": "A valid causal mechanism must satisfy at least 2 of these 3 criteria. 'Stocks go up because they always do' is not a mechanism.",
+    "criteria": [
+      "Identifies specific economic actors and their incentives (e.g., 'index funds MUST buy added stocks due to tracking mandates')",
+      "Explains the transmission channel (e.g., 'FDA rejection removes revenue expectations for the drug, which was X% of projected revenue')",
+      "References an established economic principle or academic finding (e.g., 'post-earnings announcement drift is documented in Fama 1998')"
+    ],
+    "min_criteria_met": 2
+  },
+
+  "survivorship_bias_protocol": {
+    "note": "When backtesting events where companies could have failed (FDA rejections, earnings disasters, bankruptcies), actively search for delisted/failed companies.",
+    "requirement": "For event types involving potential company failure, include at least 2 delisted/bankrupt companies in the sample, OR explicitly document that no relevant delistings occurred and how you verified this.",
+    "high_risk_categories": ["fda_decision", "earnings_surprise", "dividend_changes", "regulatory_changes"]
+  },
+
+  "data_quality": {
+    "note": "measure_event_impact() can silently drop events with bad data. Track this.",
+    "max_drop_rate_pct": 30,
+    "requirement": "If more than 30% of attempted events fail to produce data, flag the backtest as unreliable and investigate data quality before forming hypotheses."
+  },
+
+  "web_search_protocol": {
+    "note": "Web search is for finding EVENT DATES, not for determining what happened. News articles cherry-pick dramatic examples.",
+    "use_for": ["Finding dates when specific events occurred", "Identifying upcoming scheduled events", "Literature review of academic papers"],
+    "do_not_use_for": ["Determining price impact (use measure_event_impact instead)", "Judging pattern reliability from anecdotes"],
+    "requirement": "After finding event dates via web search, ALWAYS verify the price impact with measure_event_impact(). Never form hypotheses based on news narratives alone."
   },
 
   "per_category": {},
@@ -43,7 +128,9 @@
     "vix_level",
     "sector_trend",
     "survivorship_bias",
-    "selection_bias"
+    "selection_bias",
+    "event_timing",
+    "market_regime"
   ],
 
   "category_status": {},
@@ -60,6 +147,12 @@
       "date": "2026-03-15",
       "changes": "Added: min_abnormal_return_pct (1.5%), min_p_value (0.05), confidence rubric (formula-based), survivorship/selection bias tracking, knowledge revalidation decay (12 months), magnitude-aware accuracy in self-review.",
       "reason": "Methodology audit — statistical rigor and measurability gaps"
+    },
+    {
+      "version": 3,
+      "date": "2026-03-15",
+      "changes": "Raised min_sample_size from 5 to 12 (added exploratory tier at 5). Added: out-of-sample split enforcement (70/30), multiple testing correction (require 2+ significant horizons or Bonferroni p<0.01), event timing protocol, regime conditioning, promotion/retirement criteria for live-tested patterns, pre-registration hashing, causal mechanism rubric (2 of 3 criteria), survivorship bias protocol (require delisted companies), data quality checks (max 30% drop rate), web search protocol (dates only — verify with backtest), uniform position sizing (removed P&L optimization loop).",
+      "reason": "Full methodology audit — addressing multiple testing, out-of-sample, event timing, regime conditioning, stopping criteria, pre-registration, and causal mechanism rigor"
     }
   ]
 }

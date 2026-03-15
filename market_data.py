@@ -40,12 +40,19 @@ def get_price_history(symbol, days=90):
     return prices
 
 
-def get_price_around_date(symbol, event_date, days_before=5, days_after=20, benchmark="SPY"):
+def get_price_around_date(symbol, event_date, days_before=5, days_after=20,
+                          benchmark="SPY", event_timing="unknown"):
     """
     Fetch prices around a specific event date and compute abnormal returns.
 
     Returns raw returns, benchmark returns, and abnormal returns (raw - benchmark)
     at 1d, 3d, 5d, 10d, 20d horizons.
+
+    Args:
+        event_timing: "pre_market", "intraday", "after_hours", or "unknown"
+            - pre_market/intraday/unknown: reference price = close of day BEFORE event
+            - after_hours: reference price = close of event day (before the event moved it)
+              Post-event returns start from next trading day.
     """
     event_dt = datetime.strptime(event_date, "%Y-%m-%d")
     start = event_dt - timedelta(days=days_before + 10)
@@ -64,10 +71,19 @@ def get_price_around_date(symbol, event_date, days_before=5, days_after=20, benc
     stock_by_date = {d.strftime("%Y-%m-%d"): round(row["Close"], 2) for d, row in stock_df.iterrows()}
     bench_by_date = {d.strftime("%Y-%m-%d"): round(row["Close"], 2) for d, row in bench_df.iterrows()}
 
-    # Split into pre and post
+    # Split into pre and post based on event timing
     stock_dates = sorted(stock_by_date.keys())
-    pre_dates = [d for d in stock_dates if d < event_date]
-    post_dates = [d for d in stock_dates if d >= event_date]
+
+    if event_timing == "after_hours":
+        # After-hours: event day close is the reference (before the event)
+        # Post-event starts from the NEXT trading day
+        pre_dates = [d for d in stock_dates if d <= event_date]
+        post_dates = [d for d in stock_dates if d > event_date]
+    else:
+        # Pre-market/intraday/unknown: day before event is reference
+        # Event day itself captures the reaction
+        pre_dates = [d for d in stock_dates if d < event_date]
+        post_dates = [d for d in stock_dates if d >= event_date]
 
     if not pre_dates or not post_dates:
         return {"error": "Not enough data around event date"}
@@ -79,6 +95,7 @@ def get_price_around_date(symbol, event_date, days_before=5, days_after=20, benc
         "symbol": symbol,
         "benchmark": benchmark,
         "event_date": event_date,
+        "event_timing": event_timing,
         "pre_event_price": pre_event_price,
     }
 
@@ -109,7 +126,8 @@ def get_price_around_date(symbol, event_date, days_before=5, days_after=20, benc
     return impact
 
 
-def measure_event_impact(symbol, event_dates, benchmark="SPY", sector_etf=None):
+def measure_event_impact(symbol, event_dates, benchmark="SPY", sector_etf=None,
+                         event_timing="unknown"):
     """
     Measure abnormal price impact across multiple instances of the same event type.
 
@@ -121,18 +139,32 @@ def measure_event_impact(symbol, event_dates, benchmark="SPY", sector_etf=None):
 
     Args:
         symbol: Ticker to measure
-        event_dates: List of "YYYY-MM-DD" strings
+        event_dates: List of "YYYY-MM-DD" strings, or list of dicts with
+                     {"date": "YYYY-MM-DD", "timing": "pre_market"|"after_hours"|...}
         benchmark: Market benchmark (default SPY)
         sector_etf: Optional sector ETF (e.g., XLV for healthcare, XLF for financials)
+        event_timing: Default timing if event_dates are strings (not dicts)
     """
     impacts = []
-    for date in event_dates:
+    errors = []
+    for date_entry in event_dates:
+        # Support both plain date strings and dicts with timing info
+        if isinstance(date_entry, dict):
+            date = date_entry["date"]
+            timing = date_entry.get("timing", event_timing)
+        else:
+            date = date_entry
+            timing = event_timing
+
         try:
-            impact = get_price_around_date(symbol, date, benchmark=benchmark)
+            impact = get_price_around_date(symbol, date, benchmark=benchmark,
+                                           event_timing=timing)
             if "error" not in impact:
                 # Optionally add sector-adjusted returns
                 if sector_etf and sector_etf != symbol:
-                    sector_impact = get_price_around_date(sector_etf, date, benchmark=benchmark)
+                    sector_impact = get_price_around_date(sector_etf, date,
+                                                         benchmark=benchmark,
+                                                         event_timing=timing)
                     if "error" not in sector_impact:
                         for h in ["1d", "3d", "5d", "10d", "20d"]:
                             raw_key = f"raw_{h}"
@@ -141,18 +173,37 @@ def measure_event_impact(symbol, event_dates, benchmark="SPY", sector_etf=None):
                                     impact[raw_key] - sector_impact[raw_key], 2
                                 )
                 impacts.append(impact)
-        except Exception:
+            else:
+                errors.append({"date": date, "error": impact["error"]})
+        except Exception as e:
+            errors.append({"date": date, "error": str(e)})
             continue
 
     if not impacts:
-        return {"error": "Could not measure any events", "attempted": len(event_dates)}
+        return {"error": "Could not measure any events", "attempted": len(event_dates),
+                "errors": errors}
+
+    # Data quality check
+    drop_rate = (len(event_dates) - len(impacts)) / len(event_dates) * 100
+    data_quality_warning = None
+    if drop_rate > 30:
+        data_quality_warning = (
+            f"WARNING: {drop_rate:.0f}% of events failed to produce data "
+            f"({len(impacts)}/{len(event_dates)} succeeded). "
+            f"Results may be unreliable — investigate data quality before forming hypotheses."
+        )
 
     stats = {
         "symbol": symbol,
         "benchmark": benchmark,
         "sector_etf": sector_etf,
+        "event_timing": event_timing,
         "events_measured": len(impacts),
         "events_attempted": len(event_dates),
+        "events_failed": len(errors),
+        "drop_rate_pct": round(drop_rate, 1),
+        "data_quality_warning": data_quality_warning,
+        "errors": errors if errors else None,
         "individual_impacts": impacts,
     }
 
@@ -176,6 +227,7 @@ def measure_event_impact(symbol, event_dates, benchmark="SPY", sector_etf=None):
                 stats[f"stdev_{key}"] = round(_stdev(returns), 2)
 
     # Statistical significance for abnormal returns
+    significant_horizons = []
     for horizon in ["1d", "3d", "5d", "10d", "20d"]:
         key = f"abnormal_{horizon}"
         returns = [i[key] for i in impacts if key in i]
@@ -189,6 +241,39 @@ def measure_event_impact(symbol, event_dates, benchmark="SPY", sector_etf=None):
                 stats[f"t_stat_{key}"] = round(t_stat, 3)
                 stats[f"p_value_{key}"] = round(p_value, 4)
                 stats[f"significant_{key}"] = p_value < 0.05
+                if p_value < 0.05:
+                    significant_horizons.append(horizon)
+
+    # Multiple testing correction summary
+    # With 5 horizons tested, a single p<0.05 hit has ~23% chance of being spurious.
+    # Require 2+ horizons significant at 0.05, OR 1 horizon significant at 0.01.
+    stats["significant_horizons"] = significant_horizons
+    stats["num_significant_horizons"] = len(significant_horizons)
+
+    if len(significant_horizons) >= 2:
+        stats["passes_multiple_testing"] = True
+        stats["multiple_testing_note"] = (
+            f"{len(significant_horizons)} horizons significant at p<0.05 — passes multi-horizon check."
+        )
+    elif len(significant_horizons) == 1:
+        # Check if the single significant horizon passes the stricter Bonferroni threshold
+        h = significant_horizons[0]
+        p = stats.get(f"p_value_abnormal_{h}", 1.0)
+        if p < 0.01:
+            stats["passes_multiple_testing"] = True
+            stats["multiple_testing_note"] = (
+                f"1 horizon ({h}) significant at p<0.01 — passes Bonferroni-adjusted threshold."
+            )
+        else:
+            stats["passes_multiple_testing"] = False
+            stats["multiple_testing_note"] = (
+                f"Only 1 horizon ({h}) significant at p={p:.4f}, which does not survive "
+                f"multiple testing correction (need p<0.01 for single-horizon or 2+ horizons at p<0.05). "
+                f"This may be a false positive."
+            )
+    else:
+        stats["passes_multiple_testing"] = False
+        stats["multiple_testing_note"] = "No horizons reached significance at p<0.05."
 
     return stats
 

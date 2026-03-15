@@ -9,6 +9,7 @@ A hypothesis requires:
   - Minimum sample size before we call it a pattern
 """
 
+import hashlib
 import json
 import os
 import tempfile
@@ -44,10 +45,92 @@ def save_patterns(patterns):
     _atomic_write(PATTERNS_FILE, patterns)
 
 
+def validate_causal_mechanism(mechanism_text, criteria_met):
+    """
+    Check that a causal mechanism meets the rubric (at least 2 of 3 criteria).
+
+    Args:
+        mechanism_text: The causal mechanism description
+        criteria_met: List of which criteria are satisfied, from:
+            - "actors_incentives": identifies specific economic actors and their incentives
+            - "transmission_channel": explains the transmission channel
+            - "academic_reference": references an established principle or finding
+
+    Returns:
+        (valid, message) tuple
+    """
+    valid_criteria = {"actors_incentives", "transmission_channel", "academic_reference"}
+    met = [c for c in criteria_met if c in valid_criteria]
+    if len(met) >= 2:
+        return True, f"Causal mechanism satisfies {len(met)}/3 criteria: {met}"
+    return False, (
+        f"Causal mechanism only satisfies {len(met)}/3 criteria: {met}. "
+        f"Need at least 2 of: actors_incentives, transmission_channel, academic_reference. "
+        f"'Stocks go up because they always do' is not a mechanism."
+    )
+
+
+def validate_out_of_sample(historical_evidence, discovery_indices, validation_indices):
+    """
+    Validate that historical evidence is properly split into discovery and validation sets.
+
+    Args:
+        historical_evidence: Full list of historical instances
+        discovery_indices: Indices used for pattern discovery
+        validation_indices: Indices used for validation (must not overlap with discovery)
+
+    Returns:
+        (valid, message, split_info) tuple
+    """
+    if not validation_indices:
+        return False, "No validation set provided. Must hold back at least 30% of instances.", None
+
+    overlap = set(discovery_indices) & set(validation_indices)
+    if overlap:
+        return False, f"Discovery and validation sets overlap at indices {overlap}.", None
+
+    total = len(historical_evidence)
+    val_pct = len(validation_indices) / total * 100
+
+    if len(validation_indices) < 3:
+        return False, (
+            f"Validation set has only {len(validation_indices)} instances (need at least 3). "
+            f"Total sample may be too small for proper out-of-sample testing."
+        ), None
+
+    split_info = {
+        "total_instances": total,
+        "discovery_count": len(discovery_indices),
+        "validation_count": len(validation_indices),
+        "validation_pct": round(val_pct, 1),
+        "discovery_indices": discovery_indices,
+        "validation_indices": validation_indices,
+    }
+
+    return True, f"Out-of-sample split: {len(discovery_indices)} discovery, {len(validation_indices)} validation ({val_pct:.0f}%)", split_info
+
+
+def _compute_prediction_hash(event_type, expected_symbol, expected_direction,
+                              expected_magnitude_pct, expected_timeframe_days):
+    """
+    Create a hash of the prediction fields for pre-registration.
+    This prevents post-hoc adjustment of predictions after seeing results.
+    """
+    payload = json.dumps({
+        "event_type": event_type,
+        "expected_symbol": expected_symbol,
+        "expected_direction": expected_direction,
+        "expected_magnitude_pct": expected_magnitude_pct,
+        "expected_timeframe_days": expected_timeframe_days,
+    }, sort_keys=True)
+    return hashlib.sha256(payload.encode()).hexdigest()[:16]
+
+
 def create_hypothesis(
     event_type,
     event_description,
     causal_mechanism,
+    causal_mechanism_criteria,
     expected_symbol,
     expected_direction,
     expected_magnitude_pct,
@@ -58,10 +141,13 @@ def create_hypothesis(
     confounders,
     market_regime_note,
     confidence,
+    out_of_sample_split,
+    survivorship_bias_note,
+    selection_bias_note,
     literature_reference=None,
-    out_of_sample_plan=None,
-    survivorship_bias_note=None,
-    selection_bias_note=None,
+    event_timing="unknown",
+    regime_note=None,
+    passes_multiple_testing=None,
 ):
     """
     Create a new hypothesis with full research backing.
@@ -70,6 +156,9 @@ def create_hypothesis(
         event_type: Category (e.g., "earnings_surprise", "fda_decision")
         event_description: The specific current event triggering this test
         causal_mechanism: WHY this should work — the explanatory chain
+        causal_mechanism_criteria: List of criteria met from the rubric:
+            ["actors_incentives", "transmission_channel", "academic_reference"]
+            Must satisfy at least 2 of 3.
         expected_symbol: Stock/ETF to trade
         expected_direction: "long" or "short"
         expected_magnitude_pct: Expected move in percent
@@ -83,40 +172,88 @@ def create_hypothesis(
                 "vix_level": float — VIX at time of hypothesis,
                 "sector_trend": "sector ETF direction over past month",
                 "sector_etf": "XLV/XLF/etc — which ETF was used for sector adjustment",
+                "event_timing": "pre_market/intraday/after_hours/unknown",
+                "market_regime": "calm/elevated/crisis based on VIX level",
                 "other": ["list of other potential confounders identified"]
             }
         market_regime_note: Current market context that could affect the outcome
-        confidence: 1-10 confidence score with justification
+        confidence: 1-10 confidence score from compute_confidence_score()
+        out_of_sample_split: Dict with keys:
+            {"discovery_indices": [...], "validation_indices": [...],
+             "discovery_consistency_pct": float, "validation_consistency_pct": float}
+            Pattern must hold in BOTH sets.
+        survivorship_bias_note: REQUIRED. How survivorship bias was addressed.
+        selection_bias_note: REQUIRED. How selection bias was addressed.
         literature_reference: Academic or established research supporting this
-        out_of_sample_plan: How we validated this isn't just in-sample overfitting
+        event_timing: "pre_market", "intraday", "after_hours", or "unknown"
+        regime_note: Whether effect is regime-dependent (from regime conditioning)
+        passes_multiple_testing: Boolean from measure_event_impact() results
     """
+    # Validate causal mechanism
+    valid, msg = validate_causal_mechanism(causal_mechanism, causal_mechanism_criteria)
+    if not valid:
+        raise ValueError(f"Causal mechanism validation failed: {msg}")
+
+    # Validate required bias notes
+    if not survivorship_bias_note:
+        raise ValueError("survivorship_bias_note is required. Explain how survivorship bias was addressed.")
+    if not selection_bias_note:
+        raise ValueError("selection_bias_note is required. Explain how selection bias was addressed.")
+
+    # Validate out-of-sample split
+    if not out_of_sample_split or not out_of_sample_split.get("validation_indices"):
+        raise ValueError(
+            "out_of_sample_split is required with discovery_indices and validation_indices. "
+            "Split historical evidence 70/30 and verify pattern holds in both sets."
+        )
+
+    # Warn if multiple testing correction failed
+    multiple_testing_warning = None
+    if passes_multiple_testing is False:
+        multiple_testing_warning = (
+            "WARNING: This hypothesis did not pass multiple testing correction. "
+            "The statistical significance may be a false positive. Proceed with extra caution."
+        )
+
+    # Pre-registration: hash the prediction before any trade is placed
+    prediction_hash = _compute_prediction_hash(
+        event_type, expected_symbol, expected_direction,
+        expected_magnitude_pct, expected_timeframe_days
+    )
+
     hypotheses = load_hypotheses()
 
     hypothesis = {
         "id": uuid.uuid4().hex[:8],
         "created": datetime.now().isoformat(),
+        "prediction_hash": prediction_hash,
         "status": "pending",  # pending -> active -> completed | invalidated
 
         # The thesis
         "event_type": event_type,
         "event_description": event_description,
         "causal_mechanism": causal_mechanism,
+        "causal_mechanism_criteria": causal_mechanism_criteria,
         "expected_symbol": expected_symbol,
         "expected_direction": expected_direction,
         "expected_magnitude_pct": expected_magnitude_pct,
         "expected_timeframe_days": expected_timeframe_days,
+        "event_timing": event_timing,
 
         # Research backing
         "historical_evidence": historical_evidence,
         "sample_size": sample_size,
         "consistency_pct": consistency_pct,
+        "out_of_sample_split": out_of_sample_split,
         "confounders": confounders,
         "market_regime_note": market_regime_note,
+        "regime_note": regime_note,
         "confidence": confidence,
         "literature_reference": literature_reference,
-        "out_of_sample_plan": out_of_sample_plan,
         "survivorship_bias_note": survivorship_bias_note,
         "selection_bias_note": selection_bias_note,
+        "passes_multiple_testing": passes_multiple_testing,
+        "multiple_testing_warning": multiple_testing_warning,
 
         # Filled when trade is placed
         "trade": None,
@@ -124,9 +261,28 @@ def create_hypothesis(
         "result": None,
     }
 
+    # Pre-registration: log the prediction to results.jsonl BEFORE any trade
+    _log_pre_registration(hypothesis)
+
     hypotheses.append(hypothesis)
     save_hypotheses(hypotheses)
     return hypothesis
+
+
+def _log_pre_registration(hypothesis):
+    """Log prediction to results.jsonl at creation time for pre-registration."""
+    with open(RESULTS_FILE, "a") as f:
+        f.write(json.dumps({
+            "type": "pre_registration",
+            "timestamp": datetime.now().isoformat(),
+            "id": hypothesis["id"],
+            "prediction_hash": hypothesis["prediction_hash"],
+            "event_type": hypothesis["event_type"],
+            "symbol": hypothesis["expected_symbol"],
+            "direction": hypothesis["expected_direction"],
+            "magnitude_pct": hypothesis["expected_magnitude_pct"],
+            "timeframe_days": hypothesis["expected_timeframe_days"],
+        }) + "\n")
 
 
 def activate_hypothesis(hypothesis_id, entry_price, position_size, order_id=None,
@@ -432,3 +588,75 @@ def record_dead_end(event_type, reason):
         "recorded": datetime.now().isoformat(),
     })
     save_knowledge(kb)
+
+
+def check_promotion_or_retirement(event_type):
+    """
+    Check if a pattern should be promoted to known_effects or retired as a dead end.
+
+    Uses thresholds from methodology.json promotion_criteria.
+
+    Returns:
+        {"action": "promote"|"retire"|"none", "reason": str, "stats": dict}
+    """
+    from self_review import load_methodology
+    m = load_methodology()
+    criteria = m.get("promotion_criteria", {})
+
+    min_tests = criteria.get("min_live_tests", 3)
+    min_acc = criteria.get("min_live_accuracy", 0.6)
+    min_mag = criteria.get("min_live_magnitude_ratio", 0.3)
+    retire_tests = criteria.get("retirement_min_tests", 5)
+    retire_acc = criteria.get("retirement_max_accuracy", 0.3)
+
+    patterns = load_patterns()
+    pattern = None
+    for p in patterns:
+        if p["event_type"] == event_type:
+            pattern = p
+            break
+
+    if not pattern:
+        return {"action": "none", "reason": "No pattern data yet.", "stats": None}
+
+    total = pattern["total_tests"]
+    accuracy = pattern["reliability_score"] or 0
+    experiments = pattern.get("experiments", [])
+    mag_ratios = [e.get("actual_pct", 0) / e.get("expected_pct", 1)
+                  for e in experiments if e.get("expected_pct", 0) != 0]
+    avg_mag_ratio = sum(abs(r) for r in mag_ratios) / len(mag_ratios) if mag_ratios else 0
+
+    stats = {
+        "total_tests": total,
+        "accuracy": accuracy,
+        "avg_magnitude_ratio": round(avg_mag_ratio, 2),
+    }
+
+    # Check promotion
+    if total >= min_tests and accuracy >= min_acc and avg_mag_ratio >= min_mag:
+        return {
+            "action": "promote",
+            "reason": (
+                f"Pattern qualifies for promotion: {total} live tests, "
+                f"{accuracy:.0%} accuracy, {avg_mag_ratio:.2f} avg magnitude ratio. "
+                f"Thresholds: {min_tests} tests, {min_acc:.0%} accuracy, {min_mag} magnitude."
+            ),
+            "stats": stats,
+        }
+
+    # Check retirement
+    if total >= retire_tests and accuracy <= retire_acc:
+        return {
+            "action": "retire",
+            "reason": (
+                f"Pattern should be retired: {total} live tests with only "
+                f"{accuracy:.0%} accuracy (threshold: {retire_acc:.0%} over {retire_tests} tests)."
+            ),
+            "stats": stats,
+        }
+
+    return {
+        "action": "none",
+        "reason": f"Pattern has {total} tests, {accuracy:.0%} accuracy — needs more data.",
+        "stats": stats,
+    }
