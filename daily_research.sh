@@ -1,13 +1,38 @@
 #!/bin/bash
 # Research cycle — invoked by launchd on the Mac Mini.
-# Three session types based on time of day:
-#   Morning (14:03 UTC / 9 AM ET): Operations — check events, manage experiments, post-mortems
-#   Midday (18:03 UTC / 1 PM ET): Event scan — lightweight headline check only
-#   Evening (22:03 UTC / 5 PM ET): Research — literature, backtesting, hypothesis formation
+# Three session types, passed as $1:
+#   operations  — check events, manage experiments, post-mortems
+#   event_scan  — lightweight headline check only
+#   research    — literature, backtesting, hypothesis formation
 #
-# The midday scan prevents missing time-sensitive events between sessions.
+# Usage:
+#   ./daily_research.sh operations
+#   ./daily_research.sh event_scan
+#   ./daily_research.sh research
+#
+# If no argument, falls back to clock-based detection (legacy).
 
-cd /Users/bartdelepeleer/trading_bot2
+set -euo pipefail
+
+cd "$(dirname "$0")"
+
+# --- Prevent overlapping sessions (macOS-compatible, no flock) ---
+LOCKFILE="/tmp/research_bot.lock"
+if ! mkdir "$LOCKFILE" 2>/dev/null; then
+  # Check if the lock is stale (older than 2 hours)
+  if [ -d "$LOCKFILE" ]; then
+    LOCK_AGE=$(( $(date +%s) - $(stat -f %m "$LOCKFILE") ))
+    if [ "$LOCK_AGE" -gt 7200 ]; then
+      echo "WARNING: Stale lock detected (${LOCK_AGE}s old), removing." >&2
+      rmdir "$LOCKFILE" 2>/dev/null || rm -rf "$LOCKFILE"
+      mkdir "$LOCKFILE"
+    else
+      echo "ERROR: Another session is already running (lockdir: $LOCKFILE, age: ${LOCK_AGE}s). Exiting." >&2
+      exit 1
+    fi
+  fi
+fi
+trap '"'"'rmdir "$LOCKFILE" 2>/dev/null'"'"' EXIT
 
 # Load secrets from .env
 set -a
@@ -20,18 +45,18 @@ TIMESTAMP=$(date +%Y-%m-%d_%H%M)
 LOG_FILE="$LOG_DIR/${TIMESTAMP}.log"
 SESSION_STATE="$LOG_DIR/session_state.json"
 
-# --- Session timeout / crash detection ---
-SESSION_TIMEOUT_MINUTES=30
-SCAN_TIMEOUT_MINUTES=10
+# --- Session timeout ---
+SESSION_TIMEOUT_MINUTES=50
+SCAN_TIMEOUT_MINUTES=12
 
+# --- Crash detection ---
 if [ -f "$SESSION_STATE" ]; then
-  PREV_STATUS=$(python3 -c "import json; d=json.load(open('$SESSION_STATE')); print(d.get('status','unknown'))" 2>/dev/null)
+  PREV_STATUS=$(python3 -c "import json; d=json.load(open('$SESSION_STATE')); print(d.get('status','unknown'))" 2>/dev/null || echo "unknown")
   if [ "$PREV_STATUS" = "running" ]; then
-    PREV_STARTED=$(python3 -c "import json; d=json.load(open('$SESSION_STATE')); print(d.get('session_started',''))" 2>/dev/null)
-    PREV_TYPE=$(python3 -c "import json; d=json.load(open('$SESSION_STATE')); print(d.get('session_type','unknown'))" 2>/dev/null)
+    PREV_STARTED=$(python3 -c "import json; d=json.load(open('$SESSION_STATE')); print(d.get('session_started',''))" 2>/dev/null || echo "unknown")
+    PREV_TYPE=$(python3 -c "import json; d=json.load(open('$SESSION_STATE')); print(d.get('session_type','unknown'))" 2>/dev/null || echo "unknown")
     echo "WARNING: Previous session ($PREV_TYPE, started $PREV_STARTED) did not complete — marking as crashed." | tee "$LOG_DIR/crash_$(date +%Y-%m-%d_%H%M).log"
 
-    # Update previous session state
     python3 -c "
 import json
 with open('$SESSION_STATE') as f:
@@ -57,21 +82,31 @@ except Exception as e:
 fi
 
 # --- Determine session type ---
-HOUR=$(date -u +%H)
-
-if [ "$HOUR" -ge 17 ] && [ "$HOUR" -lt 19 ]; then
-  SESSION_TYPE="event_scan"
-  MAX_TURNS=15
-  TIMEOUT=$SCAN_TIMEOUT_MINUTES
-elif [ "$HOUR" -lt 18 ]; then
-  SESSION_TYPE="operations"
-  MAX_TURNS=50
-  TIMEOUT=$SESSION_TIMEOUT_MINUTES
+if [ "${1:-}" = "operations" ] || [ "${1:-}" = "event_scan" ] || [ "${1:-}" = "research" ]; then
+  SESSION_TYPE="$1"
 else
-  SESSION_TYPE="research"
-  MAX_TURNS=50
-  TIMEOUT=$SESSION_TIMEOUT_MINUTES
+  # Legacy fallback: infer from UTC hour (assumes EDT: ET = UTC-4)
+  HOUR=$(date -u +%H)
+  if [ "$HOUR" -ge 16 ] && [ "$HOUR" -lt 20 ]; then
+    SESSION_TYPE="event_scan"
+  elif [ "$HOUR" -lt 16 ]; then
+    SESSION_TYPE="operations"
+  else
+    SESSION_TYPE="research"
+  fi
+  echo "WARNING: No session type argument provided, inferred '$SESSION_TYPE' from clock (UTC hour $HOUR)." | tee -a "$LOG_FILE"
 fi
+
+case "$SESSION_TYPE" in
+  event_scan)
+    MAX_TURNS=15
+    TIMEOUT=$SCAN_TIMEOUT_MINUTES
+    ;;
+  operations|research)
+    MAX_TURNS=80
+    TIMEOUT=$SESSION_TIMEOUT_MINUTES
+    ;;
+esac
 
 # Mark session as started
 cat > "$SESSION_STATE" <<STATEEOF
@@ -90,7 +125,7 @@ echo "=== Research cycle started $(date) — $SESSION_TYPE (max $MAX_TURNS turns
 cp research_queue.json "$LOG_DIR/rq_pre_${TIMESTAMP}.json" 2>/dev/null
 
 if [ "$SESSION_TYPE" = "event_scan" ]; then
-  SESSION_PROMPT="You are a researcher doing a quick event scan. Read CLAUDE.md for context.
+  SESSION_PROMPT="You are a researcher doing a quick event scan. Read CLAUDE.md for context. For detailed methodology, see METHODOLOGY.md.
 
 Read research_queue.json to see the event watchlist and any pending hypotheses.
 Read hypotheses.json for pending hypotheses ready to activate.
@@ -109,7 +144,7 @@ Do NOT: research new categories, form hypotheses, run backtests, write post-mort
 This is a headline scan only."
 
 elif [ "$SESSION_TYPE" = "operations" ]; then
-  SESSION_PROMPT="You are a researcher. Read CLAUDE.md for your full mission and methodology.
+  SESSION_PROMPT="You are a researcher. Read CLAUDE.md for your mission overview and METHODOLOGY.md for detailed methodology.
 
 Start by reading these files — they ARE your memory:
 - research_queue.json (what the previous session wants you to focus on)
@@ -132,7 +167,10 @@ THIS IS AN OPERATIONS SESSION. Focus on:
    - What confounders were present?
    - Did the causal mechanism hold?
    - Update the hypothesis result with abnormal returns, not raw returns.
-4. Is a self-review due? (from self_review import needs_review, check_knowledge_decay)
+   - Fill in ALL structured post-mortem fields: timing_accuracy, mechanism_validated,
+     confounder_attribution, surprise_factor (these are required, not optional).
+4. Is a self-review due? (from self_review import needs_review, needs_bootstrap_review, check_knowledge_decay)
+   - Bootstrap review triggers at 3 experiments (before the regular 10-experiment review).
 5. Check promotion/retirement: run research.check_promotion_or_retirement() for categories with enough data.
    - If action='promote', call record_known_effect() to promote the pattern.
    - If action='retire', call record_dead_end() to retire the pattern.
@@ -140,13 +178,14 @@ THIS IS AN OPERATIONS SESSION. Focus on:
    - Check max_concurrent_experiments before activating.
    - Position size is UNIFORM at 5% (\$5,000) — do not vary by category.
 7. Add newly discovered upcoming events to the watchlist.
-8. Set next_session_priorities for the evening research session.
+8. Set next_session_priorities for the evening research session — use set_next_session_priorities()
+   with structured handoffs (what you attempted, what you found, what's blocked, what's next).
 9. Append to logs/research_notes.md.
 
 Email report is sent automatically after the session — do NOT send it yourself.
 Do NOT do deep research or literature reviews — that's for the evening session."
 else
-  SESSION_PROMPT="You are a researcher. Read CLAUDE.md for your full mission and methodology.
+  SESSION_PROMPT="You are a researcher. Read CLAUDE.md for your mission overview and METHODOLOGY.md for detailed methodology.
 
 Start by reading these files — they ARE your memory:
 - research_queue.json (what the previous session wants you to focus on)
@@ -164,9 +203,14 @@ THIS IS A RESEARCH SESSION. Focus on:
 
 1. Check next_session_priorities in research_queue.json — execute research tasks.
 2. What's the most valuable research question right now? Check the queue. If empty, pick the most promising unexplored direction.
+   - Respect depends_on: don't start a task whose dependency isn't completed yet.
 3. Do the research:
    - Literature review first: what's already known? Use record_literature().
    - Backtest with market_data.measure_event_impact() using real data.
+   - USE MULTI-SYMBOL BACKTESTS: pass event_dates as list of {'symbol': 'AAPL', 'date': '2024-01-15'}
+     dicts to test across multiple stocks. A pattern on one stock is not a general effect.
+   - CHECK POWER ANALYSIS: look at recommended_n_* fields. If sample_sufficient is False,
+     you need more historical instances before the result is reliable.
    - CHECK STATISTICAL SIGNIFICANCE: look at p_value and t_stat fields in the results.
    - CHECK MULTIPLE TESTING: look at passes_multiple_testing field. If False, the pattern may be
      a false positive. Need 2+ horizons significant at p<0.05, or 1 horizon at p<0.01.
@@ -180,10 +224,11 @@ THIS IS A RESEARCH SESSION. Focus on:
    - Note selection bias concerns (are dramatic examples overrepresented?).
    - Record dead ends with record_dead_end() — don't waste future sessions.
 4. OUT-OF-SAMPLE VALIDATION (required before forming hypotheses):
-   - Split historical instances: 70% discovery, 30% validation.
-   - Verify the pattern holds in BOTH sets.
-   - Use validate_out_of_sample() from research.py.
+   - Use TEMPORAL splits: older events = discovery, newer events = validation.
+   - validate_out_of_sample() auto-splits by date if events have 'date' fields.
+   - Or pass discovery_cutoff_date to split explicitly.
    - Minimum 3 instances in the validation set.
+   - DO NOT use random index splits — they allow look-ahead bias.
 5. REGIME CONDITIONING (when N>=15):
    - Subset backtests by VIX regime (calm <20, elevated 20-30, crisis >30).
    - Note if the effect is regime-dependent in the hypothesis.
@@ -196,7 +241,8 @@ THIS IS A RESEARCH SESSION. Focus on:
    - Causal mechanism satisfies at least 2 of 3 rubric criteria (see methodology.json).
    - Fill in survivorship_bias_note and selection_bias_note (both REQUIRED).
 7. Check knowledge decay: run check_knowledge_decay() from self_review. Queue revalidation tasks for stale effects.
-8. Set priorities for the next (morning operations) session.
+8. Set priorities for the next (morning operations) session — use set_next_session_priorities()
+   with structured handoffs (what you attempted, what you found, what's blocked, what's next).
 9. Append to logs/research_notes.md: what you researched, what you found, what's next.
 
 Email report is sent automatically after the session — do NOT send it yourself.
@@ -204,7 +250,7 @@ Do NOT place trades or manage positions — that's for the morning session."
 fi
 
 # --- Run Claude with turn limit and timeout ---
-timeout "${TIMEOUT}m" claude --max-turns "$MAX_TURNS" -p "$SESSION_PROMPT" 2>&1 | tee -a "$LOG_FILE"
+timeout "${TIMEOUT}m" claude --agent financial-researcher --max-turns "$MAX_TURNS" -p "$SESSION_PROMPT" 2>&1 | tee -a "$LOG_FILE"
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -eq 124 ]; then
@@ -215,7 +261,6 @@ else
 fi
 
 # --- Post-session validation ---
-# Check that the session actually did something useful
 VALIDATION_WARNINGS=""
 
 # For non-scan sessions, verify research_queue.json was updated
@@ -227,8 +272,7 @@ fi
 
 # Check research_notes.md was appended (for research/operations sessions)
 if [ "$SESSION_TYPE" != "event_scan" ]; then
-  NOTES_LINES_BEFORE=$(wc -l < "$LOG_DIR/rq_pre_${TIMESTAMP}.json" 2>/dev/null || echo 0)
-  if ! grep -q "$TIMESTAMP" logs/research_notes.md 2>/dev/null && ! grep -q "$(date +%Y-%m-%d)" logs/research_notes.md 2>/dev/null; then
+  if ! grep -q "$(date +%Y-%m-%d)" logs/research_notes.md 2>/dev/null; then
     if [ -n "$VALIDATION_WARNINGS" ]; then
       VALIDATION_WARNINGS="$VALIDATION_WARNINGS; "
     fi
@@ -236,26 +280,61 @@ if [ "$SESSION_TYPE" != "event_scan" ]; then
   fi
 fi
 
-# Mark session as completed
+# Mark session as completed — preserve original start time
+LOG_SIZE=$(wc -c < "$LOG_FILE" 2>/dev/null || echo 0)
+SESSION_STARTED=$(python3 -c "import json; print(json.load(open('$SESSION_STATE')).get('session_started',''))" 2>/dev/null || echo "$(date -Iseconds)")
+
 cat > "$SESSION_STATE" <<STATEEOF
 {
-  "session_started": "$(date -Iseconds)",
+  "session_started": "$SESSION_STARTED",
   "session_type": "$SESSION_TYPE",
   "status": "$SESSION_END_STATUS",
   "log_file": "$LOG_FILE",
   "session_ended": "$(date -Iseconds)",
   "max_turns": $MAX_TURNS,
   "exit_code": $EXIT_CODE,
+  "log_size_bytes": $LOG_SIZE,
   "validation_warnings": "$VALIDATION_WARNINGS"
 }
 STATEEOF
 
-# Log size for cost awareness
-LOG_SIZE=$(wc -c < "$LOG_FILE" 2>/dev/null || echo 0)
 echo "=== Research cycle finished $(date) — status: $SESSION_END_STATUS, log size: $LOG_SIZE bytes ===" | tee -a "$LOG_FILE"
 
-# --- Send post-session email report (every run, guaranteed) ---
+# --- Structured session log (append to sessions.jsonl) ---
 source venv/bin/activate 2>/dev/null
+python3 -c "
+import json
+entry = {
+    'date': '$(date -Iseconds)',
+    'type': '$SESSION_TYPE',
+    'status': '$SESSION_END_STATUS',
+    'max_turns': $MAX_TURNS,
+    'exit_code': $EXIT_CODE,
+    'log_file': '$LOG_FILE',
+    'log_size_bytes': $LOG_SIZE,
+    'validation_warnings': '$VALIDATION_WARNINGS' or None,
+}
+with open('logs/sessions.jsonl', 'a') as f:
+    f.write(json.dumps(entry) + '\n')
+" 2>/dev/null
+
+# --- Weekly research diagnostic (if due) ---
+python3 -c "
+import json, os
+from datetime import datetime, timedelta
+from self_review import load_methodology, run_weekly_research_diagnostic
+
+m = load_methodology()
+last_diag = m.get('last_weekly_diagnostic', '')
+if not last_diag or last_diag < (datetime.now() - timedelta(days=7)).isoformat():
+    print('Running weekly research diagnostic...')
+    report = run_weekly_research_diagnostic()
+    print(json.dumps(report, indent=2))
+else:
+    print('Weekly diagnostic not due yet.')
+" 2>&1 | tee -a "$LOG_FILE"
+
+# --- Send post-session email report (every run, guaranteed) ---
 python3 email_report.py --session "$SESSION_TYPE" "$SESSION_END_STATUS" "$LOG_FILE" "$VALIDATION_WARNINGS" 2>&1 | tee -a "$LOG_FILE" || echo "WARNING: Failed to send session report email" | tee -a "$LOG_FILE"
 
 # Clean up pre-session snapshot

@@ -4,4 +4,4 @@ __pycache__/
 *.pyc
 logs/*.log
 logs/session_state.json
-.claude/
+.claude/settings.local.json

@@ -1,8 +1,11 @@
 {
-  "version": 3,
+  "version": 4,
   "last_updated": "2026-03-15",
   "last_review_at_experiment": 0,
   "review_every_n_experiments": 10,
+  "last_weekly_diagnostic": null,
+  "bootstrap_review_threshold": 3,
+  "bootstrap_review_completed": false,
 
   "defaults": {
     "min_sample_size": 12,
@@ -18,11 +21,13 @@
   },
 
   "out_of_sample": {
-    "note": "Historical instances MUST be split into discovery (70%) and validation (30%) sets. A pattern only qualifies for hypothesis formation if it holds in BOTH sets.",
+    "note": "Historical instances MUST be split into discovery (70%) and validation (30%) sets using TEMPORAL splits. Older events = discovery, newer events = validation. This prevents look-ahead bias that random splits allow.",
+    "split_type": "temporal",
     "discovery_pct": 70,
     "validation_pct": 30,
     "min_validation_instances": 3,
-    "enforcement": "hard"
+    "enforcement": "hard",
+    "note2": "validate_out_of_sample() auto-splits by date if events have 'date' fields, or use discovery_cutoff_date for explicit control. Index-based splits are deprecated — use only as a last resort."
   },
 
   "multiple_testing_correction": {
@@ -111,7 +116,7 @@
       "literature_support": {"none": 0, "partial": 1, "strong": 2}
     },
     "max_score": 10,
-    "note2": "A hypothesis with N=6, 65% consistency, avg/stdev=0.4, no literature = 1+1+1+0 = 3. This is low confidence and correctly so."
+    "note2": "A hypothesis with N=6, 65% consistency, avg/stdev=0.4, no literature = 1+1+1+0 = 3. This is low confidence and correctly so. Use literature_strength='partial' or 'strong' in compute_confidence_score() to award 1 or 2 points respectively."
   },
 
   "confidence_calibration": {
@@ -153,6 +158,12 @@
       "date": "2026-03-15",
       "changes": "Raised min_sample_size from 5 to 12 (added exploratory tier at 5). Added: out-of-sample split enforcement (70/30), multiple testing correction (require 2+ significant horizons or Bonferroni p<0.01), event timing protocol, regime conditioning, promotion/retirement criteria for live-tested patterns, pre-registration hashing, causal mechanism rubric (2 of 3 criteria), survivorship bias protocol (require delisted companies), data quality checks (max 30% drop rate), web search protocol (dates only — verify with backtest), uniform position sizing (removed P&L optimization loop).",
       "reason": "Full methodology audit — addressing multiple testing, out-of-sample, event timing, regime conditioning, stopping criteria, pre-registration, and causal mechanism rigor"
+    },
+    {
+      "version": 4,
+      "date": "2026-03-15",
+      "changes": "Multi-symbol backtest support (event_dates can now contain {symbol, date} dicts). Temporal out-of-sample splits (older=discovery, newer=validation — index splits deprecated). Replaced hand-rolled p-value with scipy.stats.ttest_1samp. Added power analysis (recommended_n fields in backtest output). Added cross-event contamination detection. Fixed sector-adjusted returns circular reference for large ETF constituents. Added task IDs and deduplication to research queue. Added idempotency keys to prevent duplicate hypotheses on crash+rerun. Added confounder enforcement and analysis in self-review. Added check_related_dead_ends() for negative result utilization. Added weekly research diagnostic. Structured session logs (sessions.jsonl). Raised turn limits from 50 to 80 for operations/research sessions. Split CLAUDE.md into operational reference + METHODOLOGY.md.",
+      "reason": "Infrastructure audit — 16 fixes for research loop reliability, statistical correctness, and cross-session coherence"
     }
   ]
 }

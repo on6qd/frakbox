@@ -70,18 +70,56 @@ def validate_causal_mechanism(mechanism_text, criteria_met):
     )
 
 
-def validate_out_of_sample(historical_evidence, discovery_indices, validation_indices):
+def validate_out_of_sample(historical_evidence, discovery_cutoff_date=None,
+                           discovery_indices=None, validation_indices=None):
     """
     Validate that historical evidence is properly split into discovery and validation sets.
 
+    PREFERRED: Use temporal splits (discovery_cutoff_date) to avoid look-ahead bias.
+    Train on older events, validate on newer events.
+
     Args:
-        historical_evidence: Full list of historical instances
-        discovery_indices: Indices used for pattern discovery
-        validation_indices: Indices used for validation (must not overlap with discovery)
+        historical_evidence: List of dicts, each with at least a "date" field for temporal splits
+        discovery_cutoff_date: "YYYY-MM-DD" — events before this = discovery, after = validation.
+            If provided, discovery_indices and validation_indices are ignored.
+        discovery_indices: (Legacy) Indices for pattern discovery
+        validation_indices: (Legacy) Indices for validation
 
     Returns:
         (valid, message, split_info) tuple
     """
+    total = len(historical_evidence)
+
+    if discovery_cutoff_date:
+        # Temporal split — preferred method
+        discovery_idx = []
+        validation_idx = []
+        for i, ev in enumerate(historical_evidence):
+            ev_date = ev.get("date", "")
+            if not ev_date:
+                return False, f"Event at index {i} has no 'date' field. Temporal splits require dates.", None
+            if ev_date < discovery_cutoff_date:
+                discovery_idx.append(i)
+            else:
+                validation_idx.append(i)
+        discovery_indices = discovery_idx
+        validation_indices = validation_idx
+        split_type = "temporal"
+
+    elif discovery_indices is None and validation_indices is None:
+        # Auto-split: sort by date, first 70% = discovery, last 30% = validation
+        dated = [(i, ev.get("date", "")) for i, ev in enumerate(historical_evidence)]
+        if not all(d for _, d in dated):
+            return False, "Cannot auto-split: not all events have 'date' fields.", None
+        dated.sort(key=lambda x: x[1])
+        cutoff = int(len(dated) * 0.7)
+        discovery_indices = [i for i, _ in dated[:cutoff]]
+        validation_indices = [i for i, _ in dated[cutoff:]]
+        split_type = "temporal_auto"
+
+    else:
+        split_type = "index_based"
+
     if not validation_indices:
         return False, "No validation set provided. Must hold back at least 30% of instances.", None
 
@@ -89,7 +127,6 @@ def validate_out_of_sample(historical_evidence, discovery_indices, validation_in
     if overlap:
         return False, f"Discovery and validation sets overlap at indices {overlap}.", None
 
-    total = len(historical_evidence)
     val_pct = len(validation_indices) / total * 100
 
     if len(validation_indices) < 3:
@@ -99,6 +136,7 @@ def validate_out_of_sample(historical_evidence, discovery_indices, validation_in
         ), None
 
     split_info = {
+        "split_type": split_type,
         "total_instances": total,
         "discovery_count": len(discovery_indices),
         "validation_count": len(validation_indices),
@@ -107,7 +145,13 @@ def validate_out_of_sample(historical_evidence, discovery_indices, validation_in
         "validation_indices": validation_indices,
     }
 
-    return True, f"Out-of-sample split: {len(discovery_indices)} discovery, {len(validation_indices)} validation ({val_pct:.0f}%)", split_info
+    if discovery_cutoff_date:
+        split_info["cutoff_date"] = discovery_cutoff_date
+
+    return True, (
+        f"Out-of-sample split ({split_type}): {len(discovery_indices)} discovery, "
+        f"{len(validation_indices)} validation ({val_pct:.0f}%)"
+    ), split_info
 
 
 def _compute_prediction_hash(event_type, expected_symbol, expected_direction,
@@ -124,6 +168,54 @@ def _compute_prediction_hash(event_type, expected_symbol, expected_direction,
         "expected_timeframe_days": expected_timeframe_days,
     }, sort_keys=True)
     return hashlib.sha256(payload.encode()).hexdigest()[:16]
+
+
+def _compute_idempotency_key(event_type, expected_symbol, event_description):
+    """
+    Compute an idempotency key to prevent duplicate hypothesis creation on crash+rerun.
+    """
+    payload = json.dumps({
+        "event_type": event_type,
+        "expected_symbol": expected_symbol,
+        "event_description": event_description,
+    }, sort_keys=True)
+    return hashlib.sha256(payload.encode()).hexdigest()[:16]
+
+
+def check_related_dead_ends(category):
+    """
+    Check knowledge base for dead ends related to this category.
+
+    Searches for dead ends whose event_type contains the category as a substring,
+    shares a common prefix, or is semantically adjacent.
+
+    Args:
+        category: Event type being researched (e.g., "earnings_surprise")
+
+    Returns:
+        List of related dead end dicts, or empty list if none found.
+    """
+    kb = load_knowledge()
+    dead_ends = kb.get("dead_ends", [])
+
+    if not dead_ends:
+        return []
+
+    related = []
+    # Extract the root category for prefix matching (e.g., "earnings" from "earnings_surprise")
+    root = category.split("_")[0] if "_" in category else category
+
+    for de in dead_ends:
+        de_type = de.get("event_type", "")
+        de_root = de_type.split("_")[0] if "_" in de_type else de_type
+        # Match: same category, shared prefix, or substring match
+        if (de_type == category
+                or de_root == root
+                or category in de_type
+                or de_type in category):
+            related.append(de)
+
+    return related
 
 
 def create_hypothesis(
@@ -148,6 +240,8 @@ def create_hypothesis(
     event_timing="unknown",
     regime_note=None,
     passes_multiple_testing=None,
+    backtest_symbols=None,
+    backtest_events=None,
 ):
     """
     Create a new hypothesis with full research backing.
@@ -159,28 +253,30 @@ def create_hypothesis(
         causal_mechanism_criteria: List of criteria met from the rubric:
             ["actors_incentives", "transmission_channel", "academic_reference"]
             Must satisfy at least 2 of 3.
-        expected_symbol: Stock/ETF to trade
+        expected_symbol: Stock/ETF to trade in the live test
         expected_direction: "long" or "short"
         expected_magnitude_pct: Expected move in percent
         expected_timeframe_days: Days for the move to play out
         historical_evidence: List of past instances with dates and outcomes
         sample_size: Number of historical instances studied
         consistency_pct: What % of historical instances showed the expected effect
-        confounders: Known confounding variables as a dict:
+        confounders: Known confounding variables as a dict. MUST include all keys
+            from methodology.json confounders_tracked:
             {
-                "market_trend": "bull/bear/flat — SPY direction over past month",
-                "vix_level": float — VIX at time of hypothesis,
-                "sector_trend": "sector ETF direction over past month",
-                "sector_etf": "XLV/XLF/etc — which ETF was used for sector adjustment",
+                "broad_market_direction": "bull/bear/flat",
+                "vix_level": float,
+                "sector_trend": "description",
+                "survivorship_bias": "how addressed",
+                "selection_bias": "how addressed",
                 "event_timing": "pre_market/intraday/after_hours/unknown",
-                "market_regime": "calm/elevated/crisis based on VIX level",
-                "other": ["list of other potential confounders identified"]
+                "market_regime": "calm/elevated/crisis",
             }
         market_regime_note: Current market context that could affect the outcome
         confidence: 1-10 confidence score from compute_confidence_score()
         out_of_sample_split: Dict with keys:
             {"discovery_indices": [...], "validation_indices": [...],
-             "discovery_consistency_pct": float, "validation_consistency_pct": float}
+             "discovery_consistency_pct": float, "validation_consistency_pct": float,
+             "split_type": "temporal"|"temporal_auto"|"index_based"}
             Pattern must hold in BOTH sets.
         survivorship_bias_note: REQUIRED. How survivorship bias was addressed.
         selection_bias_note: REQUIRED. How selection bias was addressed.
@@ -188,6 +284,9 @@ def create_hypothesis(
         event_timing: "pre_market", "intraday", "after_hours", or "unknown"
         regime_note: Whether effect is regime-dependent (from regime conditioning)
         passes_multiple_testing: Boolean from measure_event_impact() results
+        backtest_symbols: List of symbols used in multi-symbol backtest
+            (e.g., ["AAPL", "MSFT", "NVDA"]). Shows pattern is general, not stock-specific.
+        backtest_events: List of {"symbol", "date"} dicts from the multi-symbol backtest.
     """
     # Validate causal mechanism
     valid, msg = validate_causal_mechanism(causal_mechanism, causal_mechanism_criteria)
@@ -207,6 +306,28 @@ def create_hypothesis(
             "Split historical evidence 70/30 and verify pattern holds in both sets."
         )
 
+    # Validate confounders contain all tracked fields
+    from self_review import load_methodology
+    m = load_methodology()
+    tracked = m.get("confounders_tracked", [])
+    missing_confounders = [c for c in tracked if c not in confounders]
+    confounder_warnings = []
+    if missing_confounders:
+        confounder_warnings.append(
+            f"Missing confounders: {missing_confounders}. "
+            f"All confounders from methodology.json should be recorded, "
+            f"even if the value is 'unknown' or 'not applicable'."
+        )
+
+    # Check for related dead ends
+    dead_end_warnings = []
+    related_dead_ends = check_related_dead_ends(event_type)
+    if related_dead_ends:
+        dead_end_warnings = [
+            f"Related dead end: {de['event_type']} — {de['reason']}"
+            for de in related_dead_ends
+        ]
+
     # Warn if multiple testing correction failed
     multiple_testing_warning = None
     if passes_multiple_testing is False:
@@ -221,12 +342,18 @@ def create_hypothesis(
         expected_magnitude_pct, expected_timeframe_days
     )
 
+    # Idempotency check: don't create duplicate hypotheses on crash+rerun
+    idempotency_key = _compute_idempotency_key(event_type, expected_symbol, event_description)
     hypotheses = load_hypotheses()
+    for existing in hypotheses:
+        if existing.get("idempotency_key") == idempotency_key:
+            return existing  # Already created — return existing
 
     hypothesis = {
         "id": uuid.uuid4().hex[:8],
         "created": datetime.now().isoformat(),
         "prediction_hash": prediction_hash,
+        "idempotency_key": idempotency_key,
         "status": "pending",  # pending -> active -> completed | invalidated
 
         # The thesis
@@ -239,6 +366,10 @@ def create_hypothesis(
         "expected_magnitude_pct": expected_magnitude_pct,
         "expected_timeframe_days": expected_timeframe_days,
         "event_timing": event_timing,
+
+        # Multi-symbol backtest evidence
+        "backtest_symbols": backtest_symbols,
+        "backtest_events": backtest_events,
 
         # Research backing
         "historical_evidence": historical_evidence,
@@ -254,6 +385,10 @@ def create_hypothesis(
         "selection_bias_note": selection_bias_note,
         "passes_multiple_testing": passes_multiple_testing,
         "multiple_testing_warning": multiple_testing_warning,
+
+        # Warnings from validation checks
+        "confounder_warnings": confounder_warnings if confounder_warnings else None,
+        "dead_end_warnings": dead_end_warnings if dead_end_warnings else None,
 
         # Filled when trade is placed
         "trade": None,
@@ -271,6 +406,18 @@ def create_hypothesis(
 
 def _log_pre_registration(hypothesis):
     """Log prediction to results.jsonl at creation time for pre-registration."""
+    # Idempotency: check if already logged
+    if os.path.exists(RESULTS_FILE):
+        with open(RESULTS_FILE) as f:
+            for line in f:
+                try:
+                    entry = json.loads(line.strip())
+                    if (entry.get("type") == "pre_registration"
+                            and entry.get("id") == hypothesis["id"]):
+                        return  # Already logged
+                except (json.JSONDecodeError, KeyError):
+                    continue
+
     with open(RESULTS_FILE, "a") as f:
         f.write(json.dumps({
             "type": "pre_registration",
@@ -282,6 +429,7 @@ def _log_pre_registration(hypothesis):
             "direction": hypothesis["expected_direction"],
             "magnitude_pct": hypothesis["expected_magnitude_pct"],
             "timeframe_days": hypothesis["expected_timeframe_days"],
+            "backtest_symbols": hypothesis.get("backtest_symbols"),
         }) + "\n")
 
 
@@ -319,13 +467,32 @@ def activate_hypothesis(hypothesis_id, entry_price, position_size, order_id=None
 
 
 def complete_hypothesis(hypothesis_id, exit_price, actual_return_pct, post_mortem,
-                        spy_return_pct=None, sector_etf_return_pct=None):
+                        spy_return_pct=None, sector_etf_return_pct=None,
+                        confounders_at_exit=None,
+                        timing_accuracy=None, mechanism_validated=None,
+                        confounder_attribution=None, surprise_factor=None):
     """
     Record the outcome of a hypothesis test.
 
     IMPORTANT: actual_return_pct is the RAW return. We compute abnormal return here
     by subtracting what SPY did over the same period. This is the only way to know
     if the event actually caused the price move vs the whole market moving.
+
+    Args:
+        confounders_at_exit: Dict of confounder values at exit time for comparison
+            with entry confounders. E.g., {"vix_level": 22.5, "market_regime": "calm"}
+        timing_accuracy: str — did the move happen in the expected window?
+            e.g., "Move occurred in first 2 days of 5-day window" or
+            "Move was delayed — didn't start until day 4"
+        mechanism_validated: str — did the theorized causal channel actually operate?
+            e.g., "Yes — index fund buying visible in volume data" or
+            "No — move was driven by unrelated earnings revision"
+        confounder_attribution: str — what % of the observed move can be attributed
+            to the event vs. other factors?
+            e.g., "~70% event-driven, ~30% sector momentum (XLV up 2% same period)"
+        surprise_factor: str — what was the most unexpected aspect?
+            e.g., "Reversal happened faster than historical average" or
+            "Effect was 3x larger than backtest suggested — possible regime sensitivity"
 
     post_mortem should contain:
         - What actually happened vs what was expected
@@ -358,6 +525,12 @@ def complete_hypothesis(hypothesis_id, exit_price, actual_return_pct, post_morte
                 "direction_correct": direction_correct,
                 "magnitude_ratio": abs(abnormal_return / expected_return) if expected_return != 0 else None,
                 "post_mortem": post_mortem,
+                "confounders_at_exit": confounders_at_exit,
+                # Structured post-mortem fields (all required for quality post-mortems)
+                "timing_accuracy": timing_accuracy,
+                "mechanism_validated": mechanism_validated,
+                "confounder_attribution": confounder_attribution,
+                "surprise_factor": surprise_factor,
             }
             log_result(h)
             _update_pattern(h)
@@ -439,6 +612,19 @@ def get_completed_hypotheses():
 def log_result(hypothesis):
     """Append a completed hypothesis to the results log."""
     r = hypothesis["result"]
+
+    # Idempotency: check if already logged
+    if os.path.exists(RESULTS_FILE):
+        with open(RESULTS_FILE) as f:
+            for line in f:
+                try:
+                    entry = json.loads(line.strip())
+                    if (entry.get("type") != "pre_registration"
+                            and entry.get("id") == hypothesis["id"]):
+                        return  # Already logged
+                except (json.JSONDecodeError, KeyError):
+                    continue
+
     with open(RESULTS_FILE, "a") as f:
         f.write(json.dumps({
             "timestamp": datetime.now().isoformat(),
@@ -456,6 +642,8 @@ def log_result(hypothesis):
             "sample_size": hypothesis["sample_size"],
             "consistency_pct": hypothesis["consistency_pct"],
             "post_mortem": r["post_mortem"],
+            "backtest_symbols": hypothesis.get("backtest_symbols"),
+            "confounders_at_exit": r.get("confounders_at_exit"),
         }) + "\n")
 
 
@@ -582,6 +770,13 @@ def record_known_effect(event_type, effect):
 def record_dead_end(event_type, reason):
     """Record a research direction that didn't pan out, so we don't revisit it."""
     kb = load_knowledge()
+    # Deduplication: don't re-record the same dead end
+    for existing in kb["dead_ends"]:
+        if existing.get("event_type") == event_type:
+            existing["reason"] = reason
+            existing["updated"] = datetime.now().isoformat()
+            save_knowledge(kb)
+            return
     kb["dead_ends"].append({
         "event_type": event_type,
         "reason": reason,

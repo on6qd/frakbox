@@ -7,7 +7,7 @@
 # the oldest (all except last 20) get moved to research_notes_archive.md
 # and a one-line summary of each is left in place.
 
-cd /Users/bartdelepeleer/trading_bot2
+cd "$(dirname "$0")"
 
 NOTES="logs/research_notes.md"
 ARCHIVE="logs/research_notes_archive.md"

@@ -1,13 +1,23 @@
 {
   "queue": [
     {
+      "id": "seed-000",
+      "category": "pipeline_calibration",
+      "question": "Sanity check: test 3-5 known historical events with well-documented outcomes (e.g., Lehman 2008-09-15 -> XLF crash, TSLA S&P 500 addition 2020-12-21 -> run-up, COVID crash 2020-03-12 -> broad market) using measure_event_impact(). Verify that our measurements produce the expected direction and approximate magnitude. This calibrates trust in the data pipeline before doing real research.",
+      "priority": 0,
+      "status": "pending",
+      "reasoning": "Before investing sessions in real research, verify the measurement pipeline produces sensible results. If Lehman doesn't show a negative abnormal return for financials, nothing else we measure can be trusted.",
+      "added": "2026-03-15"
+    },
+    {
       "id": "seed-001",
       "category": "earnings_surprise",
       "question": "What is the magnitude and duration of post-earnings announcement drift (PEAD) for S&P 500 stocks that beat consensus EPS by >10%? Is the effect still tradeable after decades of being published?",
       "priority": 1,
       "status": "pending",
       "reasoning": "PEAD is the most robustly documented anomaly in academic finance (Ball & Brown 1968, Bernard & Thomas 1989). Starting here gives us a well-studied baseline to calibrate our methodology against known results before exploring less-charted territory.",
-      "added": "2026-03-15"
+      "added": "2026-03-15",
+      "depends_on": "seed-000"
     },
     {
       "id": "seed-002",
@@ -30,8 +40,8 @@
   ],
   "event_watchlist": [],
   "next_session_priorities": [
-    "Begin with seed-001 (PEAD): do literature review first, then backtest with measure_event_impact() on recent earnings surprises. This is a calibration exercise — compare your findings to published PEAD magnitudes.",
-    "If time remains, start literature review for seed-002 (index rebalancing).",
-    "Do NOT try to cover all three seeds in one session. Depth over breadth."
+    "Begin with seed-000 (pipeline calibration): test 3-5 known historical events with well-documented outcomes using measure_event_impact(). Verify the data pipeline produces sensible results before investing in real research.",
+    "Only after seed-000 is complete, begin seed-001 (PEAD): literature review first, then backtest.",
+    "Do NOT skip calibration. If the pipeline can't reproduce Lehman -> XLF crash, nothing else is trustworthy."
   ]
 }

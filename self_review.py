@@ -44,6 +44,125 @@ def needs_review(completed_count):
     return completed_count >= last_review + interval
 
 
+def needs_bootstrap_review(completed_count):
+    """Check if it's time for an early bootstrap review (at 3 experiments).
+
+    The bootstrap review runs once — after the first 3 completed experiments —
+    to verify the data pipeline works and catch silent failures before investing
+    in 10 experiments with broken tooling.
+    """
+    m = load_methodology()
+    bootstrap_threshold = m.get("bootstrap_review_threshold", 3)
+    already_done = m.get("bootstrap_review_completed", False)
+    return completed_count >= bootstrap_threshold and not already_done
+
+
+def run_bootstrap_review(completed_hypotheses):
+    """
+    Early pipeline health check after first few experiments.
+
+    Does NOT update methodology parameters (too few data points).
+    Instead checks:
+    - Did measure_event_impact() return usable data?
+    - Are abnormal returns plausible (not all zero, not all identical)?
+    - Are post-mortem fields being filled in?
+    - Are structured post-mortem fields present?
+    - Is the research queue advancing?
+
+    Returns a report dict.
+    """
+    m = load_methodology()
+    report = {
+        "timestamp": datetime.now().isoformat(),
+        "type": "bootstrap_review",
+        "experiments_analyzed": len(completed_hypotheses),
+        "findings": [],
+        "warnings": [],
+    }
+
+    if len(completed_hypotheses) < 1:
+        report["findings"].append("No completed experiments to review.")
+        return report
+
+    # Check 1: Are abnormal returns populated and non-trivial?
+    abnormal_returns = []
+    for h in completed_hypotheses:
+        r = h.get("result", {})
+        abn = r.get("abnormal_return_pct")
+        if abn is not None:
+            abnormal_returns.append(abn)
+
+    if not abnormal_returns:
+        report["warnings"].append(
+            "CRITICAL: No abnormal returns recorded in any experiment. "
+            "Check that spy_return_pct is being passed to complete_hypothesis()."
+        )
+    elif all(a == 0 for a in abnormal_returns):
+        report["warnings"].append(
+            "WARNING: All abnormal returns are exactly 0. "
+            "This suggests SPY data is missing or identical to stock data."
+        )
+    else:
+        report["findings"].append(
+            f"Abnormal returns look plausible: range [{min(abnormal_returns):.2f}%, "
+            f"{max(abnormal_returns):.2f}%] across {len(abnormal_returns)} experiments."
+        )
+
+    # Check 2: Are post-mortem fields being filled in?
+    empty_postmortems = 0
+    missing_structured = 0
+    for h in completed_hypotheses:
+        r = h.get("result", {})
+        if not r.get("post_mortem"):
+            empty_postmortems += 1
+        if not r.get("timing_accuracy") or not r.get("mechanism_validated"):
+            missing_structured += 1
+
+    if empty_postmortems > 0:
+        report["warnings"].append(
+            f"{empty_postmortems}/{len(completed_hypotheses)} experiments have empty post-mortems. "
+            f"Post-mortems are the primary research output — they must be substantive."
+        )
+    if missing_structured > 0:
+        report["warnings"].append(
+            f"{missing_structured}/{len(completed_hypotheses)} experiments are missing structured "
+            f"post-mortem fields (timing_accuracy, mechanism_validated). Fill these in."
+        )
+
+    # Check 3: Are magnitude ratios reasonable?
+    mag_ratios = [h.get("result", {}).get("magnitude_ratio") for h in completed_hypotheses
+                  if h.get("result", {}).get("magnitude_ratio") is not None]
+    if mag_ratios:
+        avg_mag = sum(mag_ratios) / len(mag_ratios)
+        if avg_mag > 5:
+            report["warnings"].append(
+                f"Average magnitude ratio is {avg_mag:.1f}x — predictions are wildly off "
+                f"(predicting small moves but seeing large ones). Check expected_magnitude_pct."
+            )
+        report["findings"].append(f"Average magnitude ratio: {avg_mag:.2f}x")
+
+    # Check 4: Is research queue advancing?
+    import os
+    queue_file = os.path.join(os.path.dirname(__file__), "research_queue.json")
+    if os.path.exists(queue_file):
+        import json
+        with open(queue_file) as f:
+            rq = json.load(f)
+        completed_tasks = sum(1 for t in rq.get("queue", []) if t.get("status") == "completed")
+        if completed_tasks == 0:
+            report["warnings"].append(
+                "No research tasks marked as completed yet. "
+                "Are sessions completing tasks via complete_research_task()?"
+            )
+
+    # Mark bootstrap as done
+    m["bootstrap_review_completed"] = True
+    m["bootstrap_review_date"] = datetime.now().isoformat()
+    save_methodology(m)
+
+    return report
+
+
 def run_self_review(completed_hypotheses):
     """
     Analyze all completed experiments and update methodology.
@@ -131,7 +250,12 @@ def run_self_review(completed_hypotheses):
                 f"Adjusted default min_sample_size from {old} to {sample_finding['new_min_sample']}"
             )
 
-    # --- 5. Update version and changelog ---
+    # --- 5. Confounder Analysis ---
+    confounder_finding = _analyze_confounders(completed_hypotheses)
+    if confounder_finding:
+        report["findings"].append(confounder_finding)
+
+    # --- 6. Update version and changelog ---
     m["version"] += 1
     m["last_updated"] = datetime.now().strftime("%Y-%m-%d")
     m["last_review_at_experiment"] = len(completed_hypotheses)
@@ -320,12 +444,72 @@ def _analyze_categories(hypotheses):
     return result
 
 
+def _analyze_confounders(hypotheses):
+    """
+    Check which confounder conditions correlate with correct/incorrect outcomes.
+
+    Looks at confounders recorded at hypothesis creation time and checks if
+    specific conditions (e.g., high VIX, bear market) systematically predict
+    experiment failure.
+    """
+    # Collect confounder values for correct vs incorrect predictions
+    vix_correct = []
+    vix_incorrect = []
+    regime_results = {}  # regime -> {"correct": N, "total": N}
+
+    for h in hypotheses:
+        confounders = h.get("confounders", {})
+        correct = h.get("result", {}).get("direction_correct", False)
+
+        # VIX analysis
+        vix = confounders.get("vix_level")
+        if isinstance(vix, (int, float)):
+            if correct:
+                vix_correct.append(vix)
+            else:
+                vix_incorrect.append(vix)
+
+        # Regime analysis
+        regime = confounders.get("market_regime", "unknown")
+        if regime not in regime_results:
+            regime_results[regime] = {"correct": 0, "total": 0}
+        regime_results[regime]["total"] += 1
+        if correct:
+            regime_results[regime]["correct"] += 1
+
+    findings = []
+
+    # VIX analysis
+    if vix_correct and vix_incorrect:
+        avg_vix_correct = sum(vix_correct) / len(vix_correct)
+        avg_vix_incorrect = sum(vix_incorrect) / len(vix_incorrect)
+        if abs(avg_vix_correct - avg_vix_incorrect) > 3:
+            findings.append(
+                f"VIX confounder: correct predictions avg VIX={avg_vix_correct:.1f}, "
+                f"incorrect avg VIX={avg_vix_incorrect:.1f}. "
+                f"{'Higher' if avg_vix_incorrect > avg_vix_correct else 'Lower'} VIX "
+                f"correlates with worse predictions."
+            )
+
+    # Regime analysis
+    for regime, data in regime_results.items():
+        if data["total"] >= 3:
+            acc = data["correct"] / data["total"]
+            findings.append(
+                f"Regime '{regime}': {acc:.0%} accuracy over {data['total']} tests"
+            )
+
+    if not findings:
+        return None
+
+    return "Confounder analysis: " + "; ".join(findings)
+
+
 def check_knowledge_decay():
     """
     Check the knowledge base for effects that haven't been revalidated recently.
     Returns a list of event types that need revalidation.
     """
-    import os
     KNOWLEDGE_FILE = os.path.join(os.path.dirname(__file__), "knowledge_base.json")
     if not os.path.exists(KNOWLEDGE_FILE):
         return []
@@ -351,12 +535,18 @@ def check_knowledge_decay():
     return stale
 
 
-def compute_confidence_score(sample_size, consistency_pct, avg_return, stdev_return, has_literature=False):
+def compute_confidence_score(sample_size, consistency_pct, avg_return, stdev_return,
+                             has_literature=False, literature_strength=None):
     """
     Compute confidence score from evidence using the rubric in methodology.json.
     Returns an integer 1-10.
 
     This replaces vibes-based confidence assignment. Use this when forming hypotheses.
+
+    Args:
+        literature_strength: "none", "partial", or "strong". If provided, overrides
+            has_literature. "partial" = 1 point, "strong" = 2 points.
+            For backward compatibility, has_literature=True is treated as "partial".
     """
     score = 0
 
@@ -386,8 +576,10 @@ def compute_confidence_score(sample_size, consistency_pct, avg_return, stdev_ret
         elif snr >= 0.3:
             score += 1
 
-    # Literature support (max 1 here, keeping total ≤ 10)
-    if has_literature:
+    # Literature support (max 2, matching methodology.json rubric)
+    if literature_strength == "strong":
+        score += 2
+    elif literature_strength == "partial" or has_literature:
         score += 1
 
     return max(1, min(10, score))
@@ -414,3 +606,123 @@ def _analyze_sample_size_impact(hypotheses):
         finding += " — raising minimum recommended"
 
     return {"finding": finding, "recommendation": recommendation, "new_min_sample": new_min}
+
+
+def run_weekly_research_diagnostic():
+    """
+    Weekly check on research quality — distinct from per-experiment self-review.
+
+    Checks whether the research loop is making progress:
+    - Are research tasks being completed?
+    - Is the knowledge base growing?
+    - Are hypotheses being formed with increasing rigor?
+    - Are sessions producing useful output?
+
+    Returns a report dict.
+    """
+    import os
+
+    KNOWLEDGE_FILE = os.path.join(os.path.dirname(__file__), "knowledge_base.json")
+    HYPOTHESES_FILE = os.path.join(os.path.dirname(__file__), "hypotheses.json")
+    QUEUE_FILE = os.path.join(os.path.dirname(__file__), "research_queue.json")
+    SESSIONS_LOG = os.path.join(os.path.dirname(__file__), "logs", "sessions.jsonl")
+
+    report = {
+        "timestamp": datetime.now().isoformat(),
+        "type": "weekly_research_diagnostic",
+        "findings": [],
+        "recommendations": [],
+    }
+
+    # Knowledge base growth
+    if os.path.exists(KNOWLEDGE_FILE):
+        with open(KNOWLEDGE_FILE) as f:
+            kb = json.load(f)
+        lit_count = len(kb.get("literature", {}))
+        effects_count = len(kb.get("known_effects", {}))
+        dead_ends_count = len(kb.get("dead_ends", []))
+        report["findings"].append(
+            f"Knowledge base: {lit_count} literature entries, {effects_count} known effects, "
+            f"{dead_ends_count} dead ends."
+        )
+        if lit_count == 0:
+            report["recommendations"].append(
+                "No literature reviews recorded yet. Start with well-studied effects "
+                "(PEAD, index inclusion) to calibrate methodology."
+            )
+        if dead_ends_count == 0 and lit_count > 3:
+            report["recommendations"].append(
+                "No dead ends recorded. Are we recording negative results? "
+                "Every research category should eventually produce dead ends."
+            )
+
+    # Research queue throughput
+    if os.path.exists(QUEUE_FILE):
+        with open(QUEUE_FILE) as f:
+            rq = json.load(f)
+        pending = sum(1 for t in rq.get("queue", []) if t.get("status") == "pending")
+        completed = sum(1 for t in rq.get("queue", []) if t.get("status") == "completed")
+        total = len(rq.get("queue", []))
+        report["findings"].append(
+            f"Research queue: {pending} pending, {completed} completed out of {total} total."
+        )
+        if pending > 10:
+            report["recommendations"].append(
+                f"Research queue has {pending} pending tasks. Consider prioritizing or dropping low-value ones."
+            )
+
+    # Hypothesis rigor trend
+    if os.path.exists(HYPOTHESES_FILE):
+        with open(HYPOTHESES_FILE) as f:
+            hyps = json.load(f)
+        if hyps:
+            # Sort by creation date, check if confidence is trending up
+            sorted_hyps = sorted(hyps, key=lambda h: h.get("created", ""))
+            confidences = [h.get("confidence", 0) for h in sorted_hyps]
+            if len(confidences) >= 6:
+                first_half = confidences[:len(confidences)//2]
+                second_half = confidences[len(confidences)//2:]
+                avg_first = sum(first_half) / len(first_half)
+                avg_second = sum(second_half) / len(second_half)
+                if avg_second > avg_first + 0.5:
+                    report["findings"].append(
+                        f"Confidence trending up: {avg_first:.1f} → {avg_second:.1f}. "
+                        f"Research quality may be improving."
+                    )
+                elif avg_second < avg_first - 0.5:
+                    report["recommendations"].append(
+                        f"Confidence trending down: {avg_first:.1f} → {avg_second:.1f}. "
+                        f"Are we lowering our standards or exploring harder categories?"
+                    )
+
+    # Session health (from structured session log)
+    if os.path.exists(SESSIONS_LOG):
+        week_ago = (datetime.now() - timedelta(days=7)).isoformat()
+        recent_sessions = []
+        with open(SESSIONS_LOG) as f:
+            for line in f:
+                try:
+                    entry = json.loads(line.strip())
+                    if entry.get("date", "") >= week_ago:
+                        recent_sessions.append(entry)
+                except (json.JSONDecodeError, KeyError):
+                    continue
+        if recent_sessions:
+            completed_sessions = sum(1 for s in recent_sessions if s.get("status") == "completed")
+            timed_out = sum(1 for s in recent_sessions if s.get("status") == "timed_out")
+            report["findings"].append(
+                f"Sessions (7d): {len(recent_sessions)} total, {completed_sessions} completed, "
+                f"{timed_out} timed out."
+            )
+            if timed_out > len(recent_sessions) * 0.3:
+                report["recommendations"].append(
+                    f"{timed_out}/{len(recent_sessions)} sessions timed out. "
+                    f"Consider increasing turn limits or splitting work into smaller tasks."
+                )
+
+    # Update methodology with last diagnostic date
+    m = load_methodology()
+    m["last_weekly_diagnostic"] = datetime.now().isoformat()
+    save_methodology(m)
+
+    return report

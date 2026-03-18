@@ -8,8 +8,28 @@ minus what the benchmark (SPY) did over the same period. This isolates the event
 effect from broad market moves.
 """
 
+import math
 import yfinance as yf
 from datetime import datetime, timedelta
+from scipy.stats import ttest_1samp, norm
+
+
+# Approximate weights of large constituents in sector ETFs.
+# Used to warn about circular reference in sector-adjusted returns.
+# Updated periodically — does not need to be exact.
+SECTOR_ETF_MAJOR_CONSTITUENTS = {
+    "XLK": {"AAPL": 0.22, "MSFT": 0.21, "NVDA": 0.06},
+    "XLV": {"LLY": 0.12, "UNH": 0.10, "JNJ": 0.07, "ABBV": 0.07},
+    "XLF": {"BRK-B": 0.14, "JPM": 0.10, "V": 0.08, "MA": 0.07},
+    "XLE": {"XOM": 0.23, "CVX": 0.17},
+    "XLY": {"AMZN": 0.22, "TSLA": 0.15, "HD": 0.09},
+    "XLC": {"META": 0.22, "GOOGL": 0.12, "GOOG": 0.10},
+    "XLI": {"GE": 0.05, "CAT": 0.05, "RTX": 0.05},
+    "XLP": {"PG": 0.15, "COST": 0.11, "WMT": 0.10, "KO": 0.10},
+    "XLU": {"NEE": 0.15, "SO": 0.08, "DUK": 0.07},
+    "XLRE": {"PLD": 0.13, "AMT": 0.10, "EQIX": 0.08},
+    "XLB": {"LIN": 0.18, "SHW": 0.08, "FCX": 0.07},
+}
 
 
 def get_price_history(symbol, days=90):
@@ -99,9 +119,9 @@ def get_price_around_date(symbol, event_date, days_before=5, days_after=20,
         "pre_event_price": pre_event_price,
     }
 
-    for horizon_label, horizon_idx in [("1d", 1), ("3d", 3), ("5d", 5), ("10d", 10), ("20d", 20)]:
-        if len(post_dates) > horizon_idx - 1:
-            target_date = post_dates[min(horizon_idx, len(post_dates) - 1)]
+    for horizon_label, horizon_idx in [("1d", 0), ("3d", 2), ("5d", 4), ("10d", 9), ("20d", 19)]:
+        if len(post_dates) > horizon_idx:
+            target_date = post_dates[horizon_idx]
 
             # Raw return
             post_price = stock_by_date[target_date]
@@ -126,57 +146,100 @@ def get_price_around_date(symbol, event_date, days_before=5, days_after=20,
     return impact
 
 
-def measure_event_impact(symbol, event_dates, benchmark="SPY", sector_etf=None,
-                         event_timing="unknown"):
+def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_etf=None,
+                         event_timing="unknown", known_events=None):
     """
     Measure abnormal price impact across multiple instances of the same event type.
+
+    Supports two calling conventions:
+    1. Single-symbol: measure_event_impact("AAPL", ["2024-01-15", "2024-04-20"])
+    2. Multi-symbol:  measure_event_impact(event_dates=[
+           {"symbol": "AAPL", "date": "2024-01-15"},
+           {"symbol": "MSFT", "date": "2024-04-20", "timing": "after_hours"},
+       ])
 
     For each event, computes:
     - Raw return (what the stock did)
     - Benchmark return (what SPY did — controls for market-wide moves)
     - Abnormal return (raw - benchmark — the event-specific effect)
-    - Optionally: sector-adjusted return (raw - sector ETF)
+    - Optionally: sector-adjusted return (raw - sector ETF, corrected for large constituents)
 
     Args:
-        symbol: Ticker to measure
-        event_dates: List of "YYYY-MM-DD" strings, or list of dicts with
-                     {"date": "YYYY-MM-DD", "timing": "pre_market"|"after_hours"|...}
+        symbol: Ticker to measure (None for multi-symbol mode)
+        event_dates: List of date strings, or list of dicts with symbol/date/timing keys
         benchmark: Market benchmark (default SPY)
         sector_etf: Optional sector ETF (e.g., XLV for healthcare, XLF for financials)
         event_timing: Default timing if event_dates are strings (not dicts)
+        known_events: Optional list of {"symbol", "date"} dicts for contamination checking.
+                      If provided, flags events where another known event falls within
+                      the measurement window.
     """
+    if event_dates is None:
+        return {"error": "event_dates is required"}
+
     impacts = []
     errors = []
+    symbols_seen = set()
+
     for date_entry in event_dates:
-        # Support both plain date strings and dicts with timing info
+        # Resolve symbol and date from the entry
         if isinstance(date_entry, dict):
+            event_symbol = date_entry.get("symbol", symbol)
             date = date_entry["date"]
             timing = date_entry.get("timing", event_timing)
+        elif isinstance(date_entry, (list, tuple)) and len(date_entry) == 2:
+            event_symbol, date = date_entry
+            timing = event_timing
         else:
+            event_symbol = symbol
             date = date_entry
             timing = event_timing
 
+        if event_symbol is None:
+            errors.append({"date": date, "error": "No symbol specified"})
+            continue
+
+        symbols_seen.add(event_symbol)
+
         try:
-            impact = get_price_around_date(symbol, date, benchmark=benchmark,
+            impact = get_price_around_date(event_symbol, date, benchmark=benchmark,
                                            event_timing=timing)
             if "error" not in impact:
-                # Optionally add sector-adjusted returns
-                if sector_etf and sector_etf != symbol:
+                # Sector-adjusted returns with circular reference correction
+                if sector_etf and sector_etf != event_symbol:
                     sector_impact = get_price_around_date(sector_etf, date,
                                                          benchmark=benchmark,
                                                          event_timing=timing)
                     if "error" not in sector_impact:
+                        # Check for circular reference: is this stock a major constituent?
+                        weight = SECTOR_ETF_MAJOR_CONSTITUENTS.get(sector_etf, {}).get(event_symbol, 0)
                         for h in ["1d", "3d", "5d", "10d", "20d"]:
                             raw_key = f"raw_{h}"
                             if raw_key in impact and raw_key in sector_impact:
-                                impact[f"sector_adj_{h}"] = round(
-                                    impact[raw_key] - sector_impact[raw_key], 2
-                                )
+                                sector_return = sector_impact[raw_key]
+                                if weight > 0.05:
+                                    # Correct for circular reference:
+                                    # sector_return includes the stock's own move
+                                    # Remove the stock's contribution to get a clean sector return
+                                    stock_return = impact[raw_key]
+                                    adjusted_sector = (sector_return - weight * stock_return) / (1 - weight)
+                                    impact[f"sector_adj_{h}"] = round(
+                                        impact[raw_key] - adjusted_sector, 2
+                                    )
+                                else:
+                                    impact[f"sector_adj_{h}"] = round(
+                                        impact[raw_key] - sector_return, 2
+                                    )
+                        if weight > 0.05:
+                            impact["sector_adjustment_note"] = (
+                                f"{event_symbol} is ~{weight:.0%} of {sector_etf}. "
+                                f"Sector return adjusted to remove {event_symbol}'s contribution."
+                            )
                 impacts.append(impact)
             else:
-                errors.append({"date": date, "error": impact["error"]})
+                errors.append({"date": date, "symbol": event_symbol, "error": impact["error"]})
         except Exception as e:
-            errors.append({"date": date, "error": str(e)})
+            errors.append({"date": date, "symbol": event_symbol, "error": str(e)})
             continue
 
     if not impacts:
@@ -194,7 +257,9 @@ def measure_event_impact(symbol, event_dates, benchmark="SPY", sector_etf=None,
         )
 
     stats = {
-        "symbol": symbol,
+        "symbol": symbol if symbol else None,
+        "symbols": sorted(symbols_seen),
+        "multi_symbol": len(symbols_seen) > 1,
         "benchmark": benchmark,
         "sector_etf": sector_etf,
         "event_timing": event_timing,
@@ -226,27 +291,20 @@ def measure_event_impact(symbol, event_dates, benchmark="SPY", sector_etf=None,
                 stats[f"max_{key}"] = round(max(returns), 2)
                 stats[f"stdev_{key}"] = round(_stdev(returns), 2)
 
-    # Statistical significance for abnormal returns
+    # Statistical significance for abnormal returns using scipy
     significant_horizons = []
     for horizon in ["1d", "3d", "5d", "10d", "20d"]:
         key = f"abnormal_{horizon}"
         returns = [i[key] for i in impacts if key in i]
         if len(returns) >= 3:
-            avg = sum(returns) / len(returns)
-            sd = _stdev(returns)
-            n = len(returns)
-            if sd > 0:
-                t_stat = avg / (sd / (n ** 0.5))
-                p_value = _t_test_p_value(t_stat, n - 1)
-                stats[f"t_stat_{key}"] = round(t_stat, 3)
-                stats[f"p_value_{key}"] = round(p_value, 4)
-                stats[f"significant_{key}"] = p_value < 0.05
-                if p_value < 0.05:
-                    significant_horizons.append(horizon)
+            t_stat, p_value = ttest_1samp(returns, 0)
+            stats[f"t_stat_{key}"] = round(float(t_stat), 3)
+            stats[f"p_value_{key}"] = round(float(p_value), 4)
+            stats[f"significant_{key}"] = p_value < 0.05
+            if p_value < 0.05:
+                significant_horizons.append(horizon)
 
     # Multiple testing correction summary
-    # With 5 horizons tested, a single p<0.05 hit has ~23% chance of being spurious.
-    # Require 2+ horizons significant at 0.05, OR 1 horizon significant at 0.01.
     stats["significant_horizons"] = significant_horizons
     stats["num_significant_horizons"] = len(significant_horizons)
 
@@ -256,7 +314,6 @@ def measure_event_impact(symbol, event_dates, benchmark="SPY", sector_etf=None,
             f"{len(significant_horizons)} horizons significant at p<0.05 — passes multi-horizon check."
         )
     elif len(significant_horizons) == 1:
-        # Check if the single significant horizon passes the stricter Bonferroni threshold
         h = significant_horizons[0]
         p = stats.get(f"p_value_abnormal_{h}", 1.0)
         if p < 0.01:
@@ -275,7 +332,95 @@ def measure_event_impact(symbol, event_dates, benchmark="SPY", sector_etf=None,
         stats["passes_multiple_testing"] = False
         stats["multiple_testing_note"] = "No horizons reached significance at p<0.05."
 
+    # Power analysis: given the observed effect and variance, how many samples do we need?
+    for horizon in ["1d", "3d", "5d", "10d", "20d"]:
+        key = f"abnormal_{horizon}"
+        avg_key = f"avg_{key}"
+        stdev_key = f"stdev_{key}"
+        if avg_key in stats and stdev_key in stats and stats[stdev_key] > 0:
+            recommended_n = compute_required_sample_size(
+                abs(stats[avg_key]), stats[stdev_key]
+            )
+            stats[f"recommended_n_{key}"] = recommended_n
+            stats[f"sample_sufficient_{key}"] = len(impacts) >= recommended_n
+
+    # Cross-event contamination check
+    if known_events:
+        contamination = check_event_contamination(
+            [{"symbol": i["symbol"], "date": i["event_date"]} for i in impacts],
+            known_events=known_events,
+        )
+        if contamination:
+            stats["contamination_warnings"] = contamination
+
     return stats
+
+
+def check_event_contamination(events, known_events=None, window_days=20):
+    """
+    Check for overlapping events that could contaminate measurement windows.
+
+    Args:
+        events: List of {"symbol": str, "date": str} dicts being measured
+        known_events: Additional known events to check against. If None, checks
+                     only within the events list itself.
+        window_days: Size of measurement window in calendar days
+
+    Returns:
+        List of warning dicts describing contaminated event pairs
+    """
+    all_events = list(events)
+    if known_events:
+        all_events.extend(known_events)
+
+    warnings = []
+    for i, ev in enumerate(events):
+        ev_date = datetime.strptime(ev["date"], "%Y-%m-%d")
+        for j, other in enumerate(all_events):
+            if ev["symbol"] != other["symbol"]:
+                continue
+            # Skip self-comparison (same index in the original events list)
+            if j < len(events) and j == i:
+                continue
+            other_date = datetime.strptime(other["date"], "%Y-%m-%d")
+            gap = abs((ev_date - other_date).days)
+            if 0 < gap <= window_days:
+                warnings.append({
+                    "event": ev,
+                    "conflicting_event": other,
+                    "gap_days": gap,
+                    "warning": (
+                        f"{ev['symbol']} has events on {ev['date']} and {other['date']} "
+                        f"({gap} days apart). Measurement windows overlap — "
+                        f"price impact may be contaminated."
+                    ),
+                })
+    return warnings
+
+
+def compute_required_sample_size(effect_size, stdev, alpha=0.05, power=0.8):
+    """
+    Compute required sample size for a one-sample t-test.
+
+    Given the observed effect size and standard deviation, how many samples
+    do we need to detect this effect with the specified power?
+
+    Args:
+        effect_size: Expected mean abnormal return (absolute value)
+        stdev: Standard deviation of abnormal returns
+        alpha: Significance level (default 0.05)
+        power: Desired statistical power (default 0.80)
+
+    Returns:
+        Required sample size (integer, minimum 3)
+    """
+    if effect_size <= 0 or stdev <= 0:
+        return 999  # Cannot compute — need positive values
+
+    z_alpha = norm.ppf(1 - alpha / 2)
+    z_beta = norm.ppf(power)
+    n = math.ceil(((z_alpha + z_beta) * stdev / effect_size) ** 2)
+    return max(3, n)
 
 
 def _stdev(values):
@@ -285,110 +430,3 @@ def _stdev(values):
     mean = sum(values) / len(values)
     variance = sum((x - mean) ** 2 for x in values) / (len(values) - 1)
     return variance ** 0.5
-
-
-def _t_test_p_value(t_stat, df):
-    """
-    Approximate two-tailed p-value for a t-statistic.
-    Uses the normal approximation for df >= 30, otherwise a rough
-    approximation via the regularized incomplete beta function.
-    """
-    import math
-    t = abs(t_stat)
-    if df >= 30:
-        # Normal approximation
-        p = 2 * (1 - _normal_cdf(t))
-    else:
-        # Approximation using the beta distribution relation:
-        # p = I(df/(df+t^2), df/2, 1/2)  where I is the regularized incomplete beta
-        x = df / (df + t * t)
-        p = _regularized_beta(x, df / 2.0, 0.5)
-    return min(p, 1.0)
-
-
-def _normal_cdf(x):
-    """Approximation of the standard normal CDF."""
-    import math
-    return 0.5 * (1 + math.erf(x / math.sqrt(2)))
-
-
-def _regularized_beta(x, a, b, n_terms=200):
-    """Regularized incomplete beta function via continued fraction (Lentz)."""
-    import math
-    if x <= 0:
-        return 0.0
-    if x >= 1:
-        return 1.0
-    ln_prefix = a * math.log(x) + b * math.log(1 - x) - math.log(a) - _log_beta(a, b)
-    prefix = math.exp(ln_prefix)
-    # Continued fraction
-    cf = 1.0
-    tiny = 1e-30
-    f = tiny
-    c = tiny
-    d = 0.0
-    for m in range(1, n_terms + 1):
-        # even step
-        if m == 1:
-            aa = 1.0
-        else:
-            k = m - 1
-            aa = (k * (b - k) * x) / ((a + 2*k - 1) * (a + 2*k))
-        d = 1.0 + aa * d
-        if abs(d) < tiny: d = tiny
-        c = 1.0 + aa / c
-        if abs(c) < tiny: c = tiny
-        d = 1.0 / d
-        f *= c * d
-        # odd step
-        aa = -((a + m - 1 + (m - 1)) * (a + b + m - 1 + (m - 1)) * x) / ((a + 2*(m-1) + 1) * (a + 2*(m-1) + 2))
-        # Simplified: use standard CF formula for beta
-    # Simpler: use scipy-style approximation
-    # Fall back to a cruder but reliable approximation
-    return _beta_cf(x, a, b)
-
-
-def _beta_cf(x, a, b):
-    """Beta continued fraction — Lentz's method."""
-    import math
-    ln_prefix = a * math.log(x) + b * math.log(1 - x) - _log_beta(a, b)
-    prefix = math.exp(ln_prefix)
-
-    tiny = 1e-30
-    f = 1.0
-    c = 1.0
-    d = 1.0 - (a + b) * x / (a + 1)
-    if abs(d) < tiny: d = tiny
-    d = 1.0 / d
-    f = d
-
-    for m in range(1, 201):
-        # d_{2m}
-        num = m * (b - m) * x / ((a + 2*m - 1) * (a + 2*m))
-        d = 1.0 + num * d
-        if abs(d) < tiny: d = tiny
-        c = 1.0 + num / c
-        if abs(c) < tiny: c = tiny
-        d = 1.0 / d
-        f *= c * d
-
-        # d_{2m+1}
-        num = -(a + m) * (a + b + m) * x / ((a + 2*m) * (a + 2*m + 1))
-        d = 1.0 + num * d
-        if abs(d) < tiny: d = tiny
-        c = 1.0 + num / c
-        if abs(c) < tiny: c = tiny
-        d = 1.0 / d
-        delta = c * d
-        f *= delta
-
-        if abs(delta - 1.0) < 1e-10:
-            break
-
-    return prefix * f / a
-
-
-def _log_beta(a, b):
-    """Log of the beta function."""
-    import math
-    return math.lgamma(a) + math.lgamma(b) - math.lgamma(a + b)

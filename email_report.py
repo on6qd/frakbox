@@ -152,7 +152,8 @@ def send_session_report(session_type, status, log_file, validation_warnings=""):
     # Read research_queue for priorities
     rq = {}
     try:
-        with open("research_queue.json") as f:
+        rq_path = os.path.join(os.path.dirname(__file__), "research_queue.json")
+        with open(rq_path) as f:
             rq = json.load(f)
     except Exception:
         pass
@@ -211,7 +212,8 @@ def send_session_report(session_type, status, log_file, validation_warnings=""):
     if next_priorities:
         html += "<h3>Next Session Priorities</h3><ol>"
         for p in next_priorities[:5]:
-            html += f"<li>{p}</li>"
+            task_text = p.get("task", p) if isinstance(p, dict) else p
+            html += f"<li>{task_text}</li>"
         html += "</ol>"
 
     # Log excerpt

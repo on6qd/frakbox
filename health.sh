@@ -1,7 +1,7 @@
 #!/bin/bash
 # Quick health check — run manually to see how the research loop is doing.
 
-cd /Users/bartdelepeleer/trading_bot2
+cd "$(dirname "$0")"
 
 echo "=== Research Bot Health ==="
 echo ""
@@ -86,9 +86,11 @@ fi
 # Launchd status
 echo ""
 echo "Scheduler:"
-if launchctl list | grep -q com.research.daily; then
-  echo "  com.research.daily: LOADED"
-else
-  echo "  com.research.daily: NOT LOADED"
-  echo "  Load with: launchctl load com.research.daily.plist"
-fi
+for PLIST_NAME in com.research.operations com.research.event_scan com.research.research; do
+  if launchctl list | grep -q "$PLIST_NAME"; then
+    echo "  $PLIST_NAME: LOADED"
+  else
+    echo "  $PLIST_NAME: NOT LOADED"
+    echo "    Load with: launchctl load ${PLIST_NAME}.plist"
+  fi
+done
