@@ -16,6 +16,9 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
+# Ensure Homebrew binaries are in PATH (needed for headless/launchd sessions)
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+
 # --- Prevent overlapping sessions (macOS-compatible, no flock) ---
 LOCKFILE="/tmp/research_bot.lock"
 if ! mkdir "$LOCKFILE" 2>/dev/null; then
@@ -32,7 +35,7 @@ if ! mkdir "$LOCKFILE" 2>/dev/null; then
     fi
   fi
 fi
-trap '"'"'rmdir "$LOCKFILE" 2>/dev/null'"'"' EXIT
+trap 'rmdir "$LOCKFILE" 2>/dev/null' EXIT
 
 # Load secrets from .env
 set -a
@@ -67,7 +70,7 @@ with open('$SESSION_STATE', 'w') as f:
     json.dump(d, f, indent=2)
 "
     # Send crash notification email
-    source venv/bin/activate
+    source venv/bin/activate 2>/dev/null || true
     python3 -c "
 from email_report import send_email
 try:
@@ -77,7 +80,7 @@ try:
     )
 except Exception as e:
     print(f'Could not send crash notification: {e}')
-" 2>/dev/null
+" 2>/dev/null || true
   fi
 fi
 
@@ -152,7 +155,7 @@ Start by reading these files — they ARE your memory:
 - knowledge_base.json (what you know: literature, validated effects, dead ends)
 - hypotheses.json (all hypotheses)
 - patterns.json (statistical patterns from experiments)
-- logs/research_notes.md (journal of all previous sessions)
+- logs/research_journal.jsonl (journal of all previous sessions)
 
 Check logs/session_state.json — if the previous session status is 'crashed', note what it was doing and recover.
 
@@ -180,7 +183,7 @@ THIS IS AN OPERATIONS SESSION. Focus on:
 7. Add newly discovered upcoming events to the watchlist.
 8. Set next_session_priorities for the evening research session — use set_next_session_priorities()
    with structured handoffs (what you attempted, what you found, what's blocked, what's next).
-9. Append to logs/research_notes.md.
+9. Append to logs/research_journal.jsonl (one JSON line: {"date": "...", "session_type": "operations", "investigated": "...", "findings": "...", "surprised_by": "...", "next_step": "..."}).
 
 Email report is sent automatically after the session — do NOT send it yourself.
 Do NOT do deep research or literature reviews — that's for the evening session."
@@ -193,7 +196,7 @@ Start by reading these files — they ARE your memory:
 - knowledge_base.json (what you know: literature, validated effects, dead ends)
 - hypotheses.json (all hypotheses)
 - patterns.json (statistical patterns from experiments)
-- logs/research_notes.md (journal of all previous sessions)
+- logs/research_journal.jsonl (journal of all previous sessions)
 
 Check logs/session_state.json — if the previous session status is 'crashed', note what it was doing and recover.
 
@@ -243,15 +246,25 @@ THIS IS A RESEARCH SESSION. Focus on:
 7. Check knowledge decay: run check_knowledge_decay() from self_review. Queue revalidation tasks for stale effects.
 8. Set priorities for the next (morning operations) session — use set_next_session_priorities()
    with structured handoffs (what you attempted, what you found, what's blocked, what's next).
-9. Append to logs/research_notes.md: what you researched, what you found, what's next.
+9. Append to logs/research_journal.jsonl (one JSON line: {"date": "...", "session_type": "research", "investigated": "...", "findings": "...", "surprised_by": "...", "next_step": "..."}).
 
 Email report is sent automatically after the session — do NOT send it yourself.
 Do NOT place trades or manage positions — that's for the morning session."
 fi
 
 # --- Run Claude with turn limit and timeout ---
-timeout "${TIMEOUT}m" claude --agent financial-researcher --max-turns "$MAX_TURNS" -p "$SESSION_PROMPT" 2>&1 | tee -a "$LOG_FILE"
-EXIT_CODE=$?
+# macOS doesn't have timeout; use gtimeout (from coreutils) or fall back to no timeout
+if command -v gtimeout &>/dev/null; then
+  TIMEOUT_CMD="gtimeout ${TIMEOUT}m"
+elif command -v timeout &>/dev/null; then
+  TIMEOUT_CMD="timeout ${TIMEOUT}m"
+else
+  TIMEOUT_CMD=""
+  echo "WARNING: No timeout command available — session will run without time limit" | tee -a "$LOG_FILE"
+fi
+
+$TIMEOUT_CMD claude --agent financial-researcher --max-turns "$MAX_TURNS" --permission-mode dontAsk --verbose --output-format stream-json -p "$SESSION_PROMPT" 2>>"$LOG_FILE" | tee -a "$LOG_FILE"
+EXIT_CODE=${PIPESTATUS[0]}
 
 if [ $EXIT_CODE -eq 124 ]; then
   SESSION_END_STATUS="timed_out"
@@ -270,13 +283,13 @@ if [ "$SESSION_TYPE" != "event_scan" ]; then
   fi
 fi
 
-# Check research_notes.md was appended (for research/operations sessions)
+# Check research_journal.jsonl was appended (for research/operations sessions)
 if [ "$SESSION_TYPE" != "event_scan" ]; then
-  if ! grep -q "$(date +%Y-%m-%d)" logs/research_notes.md 2>/dev/null; then
+  if ! grep -q "$(date +%Y-%m-%d)" logs/research_journal.jsonl 2>/dev/null; then
     if [ -n "$VALIDATION_WARNINGS" ]; then
       VALIDATION_WARNINGS="$VALIDATION_WARNINGS; "
     fi
-    VALIDATION_WARNINGS="${VALIDATION_WARNINGS}research_notes.md may not have been updated"
+    VALIDATION_WARNINGS="${VALIDATION_WARNINGS}research_journal.jsonl may not have been updated"
   fi
 fi
 
@@ -301,7 +314,7 @@ STATEEOF
 echo "=== Research cycle finished $(date) — status: $SESSION_END_STATUS, log size: $LOG_SIZE bytes ===" | tee -a "$LOG_FILE"
 
 # --- Structured session log (append to sessions.jsonl) ---
-source venv/bin/activate 2>/dev/null
+source venv/bin/activate 2>/dev/null || true
 python3 -c "
 import json
 entry = {

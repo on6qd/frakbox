@@ -73,14 +73,21 @@ print(f'  Dead ends: {len(kb.get(\"dead_ends\", []))}')
 
 echo ""
 
-# Research notes size
-if [ -f logs/research_notes.md ]; then
-  LINES=$(wc -l < logs/research_notes.md | tr -d ' ')
-  ENTRIES=$(grep -c '^---$' logs/research_notes.md)
-  echo "Research journal: $LINES lines, ~$ENTRIES entries"
-  if [ "$ENTRIES" -gt 30 ]; then
+# Research journal
+if [ -f logs/research_journal.jsonl ]; then
+  ENTRIES=$(wc -l < logs/research_journal.jsonl | tr -d ' ')
+  if [ "$ENTRIES" -gt 0 ]; then
+    FIRST_DATE=$(head -1 logs/research_journal.jsonl | python3 -c "import json,sys; print(json.loads(sys.stdin.read()).get('date','?'))" 2>/dev/null || echo "?")
+    LAST_DATE=$(tail -1 logs/research_journal.jsonl | python3 -c "import json,sys; print(json.loads(sys.stdin.read()).get('date','?'))" 2>/dev/null || echo "?")
+    echo "Research journal: $ENTRIES entries ($FIRST_DATE to $LAST_DATE)"
+  else
+    echo "Research journal: empty"
+  fi
+  if [ "$ENTRIES" -gt 100 ]; then
     echo "  WARNING: Consider running ./compact_notes.sh"
   fi
+else
+  echo "Research journal: not found"
 fi
 
 # Launchd status

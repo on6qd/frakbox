@@ -283,6 +283,37 @@
     ],
     "dead_end_warnings": null,
     "trade": null,
-    "result": null
+    "result": null,
+    "live_validation_march_2026": {
+      "event": "S&P 500 Q1 2026 quarterly rebalance",
+      "announcement_date": "2026-03-06",
+      "additions": [
+        {
+          "symbol": "VRT",
+          "abnormal_1d": 8.46,
+          "abnormal_5d": 8.57
+        },
+        {
+          "symbol": "LITE",
+          "abnormal_1d": 13.85,
+          "abnormal_5d": 12.97
+        },
+        {
+          "symbol": "COHR",
+          "abnormal_1d": 6.17,
+          "abnormal_5d": 4.49
+        },
+        {
+          "symbol": "SATS",
+          "abnormal_1d": 2.59,
+          "abnormal_5d": 3.48
+        }
+      ],
+      "avg_abnormal_1d": 7.77,
+      "avg_abnormal_5d": 7.38,
+      "positive_rate": 100,
+      "note": "5-day window already passed (Mar 9-13). All 4 additions positive, consistent with hypothesis. Effective date Mar 23.",
+      "measured": "2026-03-19"
+    }
   }
 ]

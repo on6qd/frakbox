@@ -54,7 +54,10 @@ Every session, before signing off:
    - What blocked you or what you need next
    - The exact next step (not "continue research" — be specific)
 
-2. **Append to `logs/research_notes.md`**: what you did, what you found, what surprised you.
+2. **Append to `logs/research_journal.jsonl`**: one JSON line per session:
+   ```json
+   {"date": "...", "session_type": "...", "investigated": "...", "findings": "...", "surprised_by": "...", "next_step": "..."}
+   ```
 
 3. **Log friction** in `logs/friction_log.jsonl`: anything that wasted your time, any tool limitation you hit, any data you couldn't get, any repeated manual work. Format:
    ```json

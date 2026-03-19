@@ -3,10 +3,9 @@
   "last_updated": "2026-03-15",
   "last_review_at_experiment": 0,
   "review_every_n_experiments": 10,
-  "last_weekly_diagnostic": null,
+  "last_weekly_diagnostic": "2026-03-19T21:08:30.828135",
   "bootstrap_review_threshold": 3,
   "bootstrap_review_completed": false,
-
   "defaults": {
     "min_sample_size": 12,
     "min_sample_size_exploratory": 5,
@@ -15,11 +14,16 @@
     "min_p_value": 0.05,
     "position_size_pct": 5,
     "position_size_uniform": true,
-    "measurement_horizons_days": [1, 3, 5, 10, 20],
+    "measurement_horizons_days": [
+      1,
+      3,
+      5,
+      10,
+      20
+    ],
     "max_concurrent_experiments": 5,
     "knowledge_revalidation_months": 12
   },
-
   "out_of_sample": {
     "note": "Historical instances MUST be split into discovery (70%) and validation (30%) sets using TEMPORAL splits. Older events = discovery, newer events = validation. This prevents look-ahead bias that random splits allow.",
     "split_type": "temporal",
@@ -27,9 +31,8 @@
     "validation_pct": 30,
     "min_validation_instances": 3,
     "enforcement": "hard",
-    "note2": "validate_out_of_sample() auto-splits by date if events have 'date' fields, or use discovery_cutoff_date for explicit control. Index-based splits are deprecated — use only as a last resort."
+    "note2": "validate_out_of_sample() auto-splits by date if events have 'date' fields, or use discovery_cutoff_date for explicit control. Index-based splits are deprecated \u2014 use only as a last resort."
   },
-
   "multiple_testing_correction": {
     "note": "With 14 categories x 5 horizons = 70 tests, p<0.05 yields ~3.5 false positives. Require significance at 2+ independent horizons OR use Bonferroni-adjusted threshold.",
     "method": "multi_horizon",
@@ -37,10 +40,14 @@
     "bonferroni_adjusted_p": 0.01,
     "note2": "If only 1 horizon is significant, use bonferroni_adjusted_p (0.01) instead of 0.05. If 2+ horizons significant at 0.05, no correction needed."
   },
-
   "event_timing": {
     "note": "Events happen at different times. An after-hours FDA decision moves the stock next morning, not same day. The reference price must account for this.",
-    "options": ["pre_market", "intraday", "after_hours", "unknown"],
+    "options": [
+      "pre_market",
+      "intraday",
+      "after_hours",
+      "unknown"
+    ],
     "default": "unknown",
     "reference_price_rules": {
       "pre_market": "Use previous day close as reference. Day-0 close captures the reaction.",
@@ -49,17 +56,25 @@
       "unknown": "Use previous day close as reference. Note timing uncertainty in hypothesis."
     }
   },
-
   "regime_conditioning": {
     "note": "Effects may be regime-dependent. Always check if the pattern holds across different market environments.",
     "regimes": {
-      "low_vol": {"vix_max": 20, "label": "calm"},
-      "mid_vol": {"vix_min": 20, "vix_max": 30, "label": "elevated"},
-      "high_vol": {"vix_min": 30, "label": "crisis"}
+      "low_vol": {
+        "vix_max": 20,
+        "label": "calm"
+      },
+      "mid_vol": {
+        "vix_min": 20,
+        "vix_max": 30,
+        "label": "elevated"
+      },
+      "high_vol": {
+        "vix_min": 30,
+        "label": "crisis"
+      }
     },
     "requirement": "If backtesting has N>=15, subset by regime and report whether effect is regime-dependent. If regime-dependent, note which regime the hypothesis applies to."
   },
-
   "promotion_criteria": {
     "note": "When does a live-tested pattern become a 'known effect'? These are the thresholds.",
     "min_live_tests": 3,
@@ -69,13 +84,17 @@
     "retirement_max_accuracy": 0.3,
     "note2": "After min_live_tests successful live experiments with accuracy >= min_live_accuracy and avg magnitude_ratio >= min_live_magnitude_ratio, promote to known_effects in knowledge_base.json. After retirement_min_tests with accuracy <= retirement_max_accuracy, retire and record as dead end."
   },
-
   "pre_registration": {
     "note": "Hypotheses are hashed at creation time. The hash covers: event_type, expected_symbol, expected_direction, expected_magnitude_pct, expected_timeframe_days. This prevents post-hoc adjustment of predictions.",
-    "fields_hashed": ["event_type", "expected_symbol", "expected_direction", "expected_magnitude_pct", "expected_timeframe_days"],
+    "fields_hashed": [
+      "event_type",
+      "expected_symbol",
+      "expected_direction",
+      "expected_magnitude_pct",
+      "expected_timeframe_days"
+    ],
     "enforcement": "Predictions are logged to results.jsonl at creation time, before any trade is placed."
   },
-
   "causal_mechanism_rubric": {
     "note": "A valid causal mechanism must satisfy at least 2 of these 3 criteria. 'Stocks go up because they always do' is not a mechanism.",
     "criteria": [
@@ -85,49 +104,79 @@
     ],
     "min_criteria_met": 2
   },
-
   "survivorship_bias_protocol": {
     "note": "When backtesting events where companies could have failed (FDA rejections, earnings disasters, bankruptcies), actively search for delisted/failed companies.",
     "requirement": "For event types involving potential company failure, include at least 2 delisted/bankrupt companies in the sample, OR explicitly document that no relevant delistings occurred and how you verified this.",
-    "high_risk_categories": ["fda_decision", "earnings_surprise", "dividend_changes", "regulatory_changes"]
+    "high_risk_categories": [
+      "fda_decision",
+      "earnings_surprise",
+      "dividend_changes",
+      "regulatory_changes"
+    ]
   },
-
   "data_quality": {
     "note": "measure_event_impact() can silently drop events with bad data. Track this.",
     "max_drop_rate_pct": 30,
     "requirement": "If more than 30% of attempted events fail to produce data, flag the backtest as unreliable and investigate data quality before forming hypotheses."
   },
-
   "web_search_protocol": {
     "note": "Web search is for finding EVENT DATES, not for determining what happened. News articles cherry-pick dramatic examples.",
-    "use_for": ["Finding dates when specific events occurred", "Identifying upcoming scheduled events", "Literature review of academic papers"],
-    "do_not_use_for": ["Determining price impact (use measure_event_impact instead)", "Judging pattern reliability from anecdotes"],
+    "use_for": [
+      "Finding dates when specific events occurred",
+      "Identifying upcoming scheduled events",
+      "Literature review of academic papers"
+    ],
+    "do_not_use_for": [
+      "Determining price impact (use measure_event_impact instead)",
+      "Judging pattern reliability from anecdotes"
+    ],
     "requirement": "After finding event dates via web search, ALWAYS verify the price impact with measure_event_impact(). Never form hypotheses based on news narratives alone."
   },
-
   "per_category": {},
-
   "confidence_rubric": {
     "note": "Confidence is computed from evidence, not assigned by feel. Score = sum of component scores, capped at 10.",
     "components": {
-      "sample_size": {"5-7": 1, "8-14": 2, "15+": 3},
-      "consistency": {"60-69%": 1, "70-79%": 2, "80%+": 3},
-      "effect_vs_noise": {"avg/stdev 0.3-0.5": 1, "avg/stdev 0.5-1.0": 2, "avg/stdev 1.0+": 3},
-      "literature_support": {"none": 0, "partial": 1, "strong": 2}
+      "sample_size": {
+        "5-7": 1,
+        "8-14": 2,
+        "15+": 3
+      },
+      "consistency": {
+        "60-69%": 1,
+        "70-79%": 2,
+        "80%+": 3
+      },
+      "effect_vs_noise": {
+        "avg/stdev 0.3-0.5": 1,
+        "avg/stdev 0.5-1.0": 2,
+        "avg/stdev 1.0+": 3
+      },
+      "literature_support": {
+        "none": 0,
+        "partial": 1,
+        "strong": 2
+      }
     },
     "max_score": 10,
     "note2": "A hypothesis with N=6, 65% consistency, avg/stdev=0.4, no literature = 1+1+1+0 = 3. This is low confidence and correctly so. Use literature_strength='partial' or 'strong' in compute_confidence_score() to award 1 or 2 points respectively."
   },
-
   "confidence_calibration": {
     "note": "Tracks whether confidence scores predict accuracy. Updated during self-reviews.",
     "buckets": {
-      "1-3": {"predictions": 0, "correct": 0},
-      "4-6": {"predictions": 0, "correct": 0},
-      "7-10": {"predictions": 0, "correct": 0}
+      "1-3": {
+        "predictions": 0,
+        "correct": 0
+      },
+      "4-6": {
+        "predictions": 0,
+        "correct": 0
+      },
+      "7-10": {
+        "predictions": 0,
+        "correct": 0
+      }
     }
   },
-
   "confounders_tracked": [
     "broad_market_direction",
     "vix_level",
@@ -137,33 +186,31 @@
     "event_timing",
     "market_regime"
   ],
-
   "category_status": {},
-
   "methodology_changelog": [
     {
       "version": 1,
       "date": "2026-03-15",
-      "changes": "Initial methodology. All defaults are starting assumptions — no data yet to calibrate against.",
+      "changes": "Initial methodology. All defaults are starting assumptions \u2014 no data yet to calibrate against.",
       "reason": "Project launch"
     },
     {
       "version": 2,
       "date": "2026-03-15",
       "changes": "Added: min_abnormal_return_pct (1.5%), min_p_value (0.05), confidence rubric (formula-based), survivorship/selection bias tracking, knowledge revalidation decay (12 months), magnitude-aware accuracy in self-review.",
-      "reason": "Methodology audit — statistical rigor and measurability gaps"
+      "reason": "Methodology audit \u2014 statistical rigor and measurability gaps"
     },
     {
       "version": 3,
       "date": "2026-03-15",
-      "changes": "Raised min_sample_size from 5 to 12 (added exploratory tier at 5). Added: out-of-sample split enforcement (70/30), multiple testing correction (require 2+ significant horizons or Bonferroni p<0.01), event timing protocol, regime conditioning, promotion/retirement criteria for live-tested patterns, pre-registration hashing, causal mechanism rubric (2 of 3 criteria), survivorship bias protocol (require delisted companies), data quality checks (max 30% drop rate), web search protocol (dates only — verify with backtest), uniform position sizing (removed P&L optimization loop).",
-      "reason": "Full methodology audit — addressing multiple testing, out-of-sample, event timing, regime conditioning, stopping criteria, pre-registration, and causal mechanism rigor"
+      "changes": "Raised min_sample_size from 5 to 12 (added exploratory tier at 5). Added: out-of-sample split enforcement (70/30), multiple testing correction (require 2+ significant horizons or Bonferroni p<0.01), event timing protocol, regime conditioning, promotion/retirement criteria for live-tested patterns, pre-registration hashing, causal mechanism rubric (2 of 3 criteria), survivorship bias protocol (require delisted companies), data quality checks (max 30% drop rate), web search protocol (dates only \u2014 verify with backtest), uniform position sizing (removed P&L optimization loop).",
+      "reason": "Full methodology audit \u2014 addressing multiple testing, out-of-sample, event timing, regime conditioning, stopping criteria, pre-registration, and causal mechanism rigor"
     },
     {
       "version": 4,
       "date": "2026-03-15",
-      "changes": "Multi-symbol backtest support (event_dates can now contain {symbol, date} dicts). Temporal out-of-sample splits (older=discovery, newer=validation — index splits deprecated). Replaced hand-rolled p-value with scipy.stats.ttest_1samp. Added power analysis (recommended_n fields in backtest output). Added cross-event contamination detection. Fixed sector-adjusted returns circular reference for large ETF constituents. Added task IDs and deduplication to research queue. Added idempotency keys to prevent duplicate hypotheses on crash+rerun. Added confounder enforcement and analysis in self-review. Added check_related_dead_ends() for negative result utilization. Added weekly research diagnostic. Structured session logs (sessions.jsonl). Raised turn limits from 50 to 80 for operations/research sessions. Split CLAUDE.md into operational reference + METHODOLOGY.md.",
-      "reason": "Infrastructure audit — 16 fixes for research loop reliability, statistical correctness, and cross-session coherence"
+      "changes": "Multi-symbol backtest support (event_dates can now contain {symbol, date} dicts). Temporal out-of-sample splits (older=discovery, newer=validation \u2014 index splits deprecated). Replaced hand-rolled p-value with scipy.stats.ttest_1samp. Added power analysis (recommended_n fields in backtest output). Added cross-event contamination detection. Fixed sector-adjusted returns circular reference for large ETF constituents. Added task IDs and deduplication to research queue. Added idempotency keys to prevent duplicate hypotheses on crash+rerun. Added confounder enforcement and analysis in self-review. Added check_related_dead_ends() for negative result utilization. Added weekly research diagnostic. Structured session logs (sessions.jsonl). Raised turn limits from 50 to 80 for operations/research sessions. Split CLAUDE.md into operational reference + METHODOLOGY.md.",
+      "reason": "Infrastructure audit \u2014 16 fixes for research loop reliability, statistical correctness, and cross-session coherence"
     }
   ]
 }

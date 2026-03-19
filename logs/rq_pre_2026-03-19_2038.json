@@ -28,11 +28,9 @@
       "category": "fda_decision",
       "question": "Backtest small biotech (market cap <$5B at time of announcement) PDUFA decisions 2018-2024: measure abnormal returns at 1d, 5d, 10d after CRL rejection vs approval. CRITICAL: include delisted companies (MUST search for failed biotech companies that received CRLs). Test: does CRL deficiency type (CMC vs clinical) predict magnitude of decline? Minimum 20 events per category (approval vs rejection). Potential hypothesis: SHORT small biotech after CRL, 10-day hold.",
       "priority": 1,
-      "status": "completed",
+      "status": "pending",
       "reasoning": "Literature confirms large, asymmetric, persistent effect for small biotech on CRL/rejection. Survivorship bias risk is high - must search for delisted companies explicitly. This could be a more reliable pattern than large-cap FDA decisions. Post-rejection drift makes this a potential trading signal.",
-      "added": "2026-03-19T19:18:13.752374",
-      "completed": "2026-03-19T21:08:22.606440",
-      "findings": "Partial: ran FDA CRL backtest (N=8 measured, 4 delisted due to survivorship bias). \nCRITICAL FINDING: CMC-only CRLs (AXSM, SRRK) show POSITIVE 1d returns. Clinical CRLs show high variance: OTLK -81%, APLT -77% vs ITRM +18%, NERV +1.2%.\nDead end recorded for GENERIC CRL short. Cannot form hypothesis due to: 33% data quality failure, stdev=41%, critical CMC vs clinical distinction.\nNEXT STEP: (1) Need alt data for SESN/ATNX/ICPT (SEC filings?). (2) Focus on clinical CRL + single-asset company sub-hypothesis. (3) Add data quality task for delisted biotech tickers."
+      "added": "2026-03-19T19:18:13.752374"
     },
     {
       "id": "seed-002",
@@ -50,42 +48,18 @@
       "category": "sp500_index_addition",
       "question": "Test S&P 500 DELETION effect (when stocks are REMOVED from the S&P 500): measure abnormal returns at 1d, 3d, 5d, 10d after deletion announcement. Hypothesis: stocks removed from S&P 500 show significant NEGATIVE abnormal returns. Literature says deletion effect historically was -12-16% (larger than addition effect). Check if deletion effect is also still present in 2020-2024. Note: many deletions are due to M&A (acquisition at premium) - filter these out.",
       "priority": 2,
-      "status": "completed",
+      "status": "pending",
       "reasoning": "Complement to the S&P 500 addition effect we documented. If deletion effect is real, could SHORT stocks after deletion announcement. Literature says deletion effect was historically larger than addition. Easy to test using same data sources.",
-      "added": "2026-03-19T19:18:13.752623",
-      "completed": "2026-03-19T20:58:56.150517",
-      "findings": "Deletion SHORT effect tested (N=21, 2021-2026). 3d avg=-1.99% (p=0.0078) but 1d avg=-0.44% (p=0.59). FAILS OUT-OF-SAMPLE: validation (N=13) 1d avg=+0.27% POSITIVE, 3d p=0.015 does not pass Bonferroni. DEAD END: severe selection bias, contrarian buyers offset index fund selling on D+1."
+      "added": "2026-03-19T19:18:13.752623"
     },
     {
       "id": "69fd246b",
       "category": "sp500_index_addition",
       "question": "Test S&P 500 addition POST-EFFECTIVE-DATE REVERSAL: after the effective date passes, do added stocks give back their gains? Measure abnormal returns starting from effective date (not announcement date) for horizons 1d, 5d, 10d, 20d post-effective. If stocks revert after effective date (index fund buying complete), this suggests the pre-effective run-up is entirely price pressure and not fundamental. Test on same 25 events from the addition backtest.",
       "priority": 2,
-      "status": "completed",
+      "status": "pending",
       "reasoning": "The classic S&P 500 inclusion literature disagrees on whether the addition effect is permanent or temporary. If temporary (price pressure), stocks should revert post-effective-date. If permanent (investor recognition), they should hold their gains. This will tell us how long to hold the position (sell before effective date vs hold longer).",
-      "added": "2026-03-19T19:18:13.752853",
-      "completed": "2026-03-19T20:58:56.149909",
-      "findings": "Post-effective-date reversal NOT present (N=24, 2020-2024). 1d avg=-0.61% (p=0.36), 5d avg=-0.41% (p=0.59), 20d avg=+1.16% (p=0.70). NONE significant. 0 horizons pass MT. Gains are PERMANENT (investor recognition), not temporary price pressure. The 5-day hold is optimal."
-    },
-    {
-      "id": "56d44482",
-      "category": "fda_decision",
-      "question": "Find alternative historical price data for delisted small biotech tickers that received CRLs.\nSpecifically: SESN (Sesen Bio - CRL Aug 13 2021, known ~-80% 1d), ATNX (Athenex - CRL Mar 1 2021, known -21% 1d),\nICPT (Intercept Pharma - CRL Jun 22 2023, unknown magnitude). \nTry: (1) SEC 8-K filings for exact stock price at close before/after announcement, (2) archive.org price data,\n(3) Alternative data APIs (Tiingo, Polygon). If data found, add to CRL backtest and check if clinical-only CRL short\nhypothesis becomes statistically significant. Also add 5+ more clinical CRL events from 2019-2024 to build N=15+.",
-      "priority": 2,
-      "status": "pending",
-      "reasoning": "FDA CRL backtest needs delisted company data. SESN/ATNX/ICPT are the highest-impact events and their absence understates the true effect. Critical for survivorship bias correction.",
-      "added": "2026-03-19T21:09:14.334450",
-      "depends_on": "9115c8a3"
-    },
-    {
-      "id": "992b463d",
-      "category": "fda_decision",
-      "question": "Refined FDA CRL sub-hypothesis: test specifically for 'single-asset small biotech with CLINICAL deficiency CRL.'\nCriteria: (1) Market cap <$500M at time of CRL, (2) Clinical/efficacy deficiency (not CMC-only), \n(3) Drug represented >50% of company pipeline.\nEvents to find: SESN-2021, ATNX-2021, NERV-2024, APLT-2024, OTLK-2023, ICPT-2023, plus 8-10 more from 2019-2024.\nFor each: classify as CMC vs clinical, check single-asset status. Backtest ONLY the clinical+single-asset subset.\nHYPOTHESIS TO TEST: SHORT single-asset small biotech on clinical CRL announcement, hold 10 days.\nLiterature predicts: -8-11% 3-day CAR for clinical CRL vs -3.4% for CMC CRL.",
-      "priority": 2,
-      "status": "pending",
-      "reasoning": "Generic CRL short is dead end, but refined clinical+single-asset CRL may still show consistent large negative returns. The 3 cases we measured (OTLK -81%, APLT -77%, VRCA -65%) all had clinical/severe CRL issues. Need N=15 to test.",
-      "added": "2026-03-19T21:09:14.335295",
-      "depends_on": "9115c8a3"
+      "added": "2026-03-19T19:18:13.752853"
     },
     {
       "id": "seed-003",
@@ -106,15 +80,6 @@
       "status": "pending",
       "reasoning": "Our mega-cap PEAD test showed NO drift (discovery: +1.05% 1d, negative drift after). Literature says PEAD is concentrated in small/mid-caps with fewer analysts. Testing mid-cap S&P 500 components addresses the academic prediction. This is a genuine test of whether information asymmetry drives PEAD.",
       "added": "2026-03-19T19:18:13.753087"
-    },
-    {
-      "id": "f15c05aa",
-      "category": "dividend_changes",
-      "question": "Explore dividend capture strategy: what is the abnormal return in the 3-5 days before an ex-dividend date\nfor high-yield dividend stocks? Does the price run up (dividend capture buying) and then fall (on ex-dividend date + 1)?\nTest S&P 500 stocks with dividend yield >3%. Find 15+ ex-dividend dates from 2021-2024. Key question: is there systematic \nabnormal return of >1.5% in the pre-ex-dividend period, separate from the mechanical dividend drop on ex-date?\nAlso: what is the post-ex-dividend drift for stocks that cut dividends (compare to increases)?",
-      "priority": 3,
-      "status": "pending",
-      "reasoning": "Dividend capture is well-documented in literature with clear causal mechanism (institutional window-dressing around dividend dates). Complementary to index addition work. No survivorship bias issues for dividend payers.",
-      "added": "2026-03-19T21:09:14.334968"
     }
   ],
   "event_watchlist": [
@@ -154,31 +119,31 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. MORNING: Note that March 2026 S&P 500 additions (VRT, LITE, COHR, SATS) announced Mar 6 - 5-day hold window ALREADY PASSED (Mar 9-13). Next trade opportunity: watch for next off-cycle addition announcement. Effective date March 23 - no trade needed.",
-      "set_by_session": "2026-03-19T21:09:14.335608"
+      "task": "1. FIRST: Check if there's a recent (March 2026) S&P 500 announcement we missed - use web search",
+      "set_by_session": "2026-03-19T19:18:13.753311"
     },
     {
-      "task": "2. RESEARCH: Test mid-cap PEAD (task 9845a59d) - S&P 500 components $5-30B market cap with >10% EPS beats. Need 20+ events. Use finviz/finvizFinance or yfinance for earnings dates.",
-      "set_by_session": "2026-03-19T21:09:14.335609"
+      "task": "2. Run FDA decision backtest for small biotech (task added: fda_decision category) - include delisted companies",
+      "set_by_session": "2026-03-19T19:18:13.753312"
     },
     {
-      "task": "3. RESEARCH: Begin dividend capture exploration (new task added). Start with high-yield S&P 500 stocks, find ex-dividend dates, measure pre-ex-dividend run-up.",
-      "set_by_session": "2026-03-19T21:09:14.335610"
+      "task": "3. Run S&P 500 DELETION effect backtest (additions complement)",
+      "set_by_session": "2026-03-19T19:18:13.753313"
     },
     {
-      "task": "4. RESEARCH: Find alternative data for SESN, ATNX, ICPT (delisted biotech tickers) - try Polygon.io, Tiingo API, or EDGAR 8-K price data.",
-      "set_by_session": "2026-03-19T21:09:14.335611"
+      "task": "4. Run post-effective-date reversal test for S&P 500 additions (do gains persist?)",
+      "set_by_session": "2026-03-19T19:18:13.753313"
     },
     {
-      "task": "5. RESEARCH: Consider whether to add index addition watchlist monitoring - look for Q2 2026 S&P 500 candidates (companies recently promoted to MidCap 400 or large enough for S&P 500).",
-      "set_by_session": "2026-03-19T21:09:14.335611"
+      "task": "5. Consider starting seed research on dividend capture strategy",
+      "set_by_session": "2026-03-19T19:18:13.753314"
     }
   ],
   "session_handoff": {
-    "attempted": "S&P 500 deletion effect backtest (N=21), post-effective-date reversal test (N=24), FDA small biotech CRL backtest (N=12, 4 delisted), March 2026 addition live validation, checked knowledge decay",
-    "accomplished": "DELETION: Dead end recorded - 1d effect flat/positive in validation (OOS fails). POST-EFFECTIVE REVERSAL: No reversal - gains are permanent (literature updated). MARCH 2026 LIVE VALIDATION: All 4 additions positive (VRT +8.46%, LITE +13.85%, COHR +6.17%, SATS +2.59%), avg +7.77% 1d - hypothesis 061ae3a8 confirmed. PDUFA CRL: Dead end for generic short. Key finding: CMC-only CRLs show positive 1d returns; clinical CRLs show large but variable crashes. Survivorship bias is severe (4/12 delisted). 2 new research tasks queued (FDA refined, dividend capture).",
-    "blocked_by": "FDA backtest blocked by delisted ticker data unavailability (SESN, ATNX, ICPT, CORV). YFinance cannot pull historical data for acquired/delisted tickers. March 2026 addition 5-day window has already passed - no trade needed now.",
-    "key_insight": "March 2026 S&P 500 additions (VRT +8.46%, LITE +13.85%, COHR +6.17%, SATS +2.59%) provide LIVE confirmation that hypothesis 061ae3a8 is working. ALL 4 additions positive on day 1. The addition effect is clearly alive. Main puzzle: Why does CMC-only FDA CRL cause POSITIVE stock reaction? Because market correctly identifies it as a temporary setback with high resubmission probability. Clinical CRL destroys the fundamental thesis. This distinction is now incorporated into FDA literature.",
-    "written_at": "2026-03-19T21:09:14.335612"
+    "attempted": "Ran pipeline calibration (seed-000), PEAD for mega-cap S&P 500 (seed-001), S&P 500 index addition effect (seed-002), FDA literature review (seed-003)",
+    "accomplished": "Pipeline calibrated successfully. PEAD dead end recorded for mega-cap. S&P 500 addition hypothesis created (ID: 061ae3a8, confidence 9/10, 25 events, 1d abnormal +4.09% discovery / +8.05% validation). FDA literature recorded. Q2 2026 rebalance added to watchlist (expected ~June 7, 2026).",
+    "blocked_by": "FDA backtest needs delisted biotech companies which require additional research. S&P 500 watchlist requires web monitoring (can't auto-check press releases without cron). Need to verify if any Q1 2026 S&P 500 addition was missed (March 2026 rebalance may have just occurred).",
+    "key_insight": "S&P 500 addition effect is clearly alive in 2020-2024 despite Greenwood & Sammon (2025) saying it disappeared. Most surprising finding: the validation set (2023-2024) shows STRONGER effect than discovery (2020-2022), suggesting the effect is not decaying. IMPORTANT CAVEAT: SMCI and PLTR were AI-thematic - we need to track whether the next few non-thematic additions also show the effect. One test trade ($5000 on next S&P 500 addition) would be valuable.",
+    "written_at": "2026-03-19T19:18:13.753315"
   }
 }

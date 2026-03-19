@@ -1,46 +1,34 @@
 #!/bin/bash
-# Compact research_notes.md when it gets too long.
-# Keeps the last 20 entries verbatim and summarizes older ones.
-# Run manually or add to a weekly cron.
-#
-# Strategy: entries are separated by "---". When there are >30 entries,
-# the oldest (all except last 20) get moved to research_notes_archive.md
-# and a one-line summary of each is left in place.
+# Compact research_journal.jsonl when it gets too long.
+# Keeps the last 50 entries and archives older ones.
+# No Claude invocation needed — just tail and move.
 
 cd "$(dirname "$0")"
 
-NOTES="logs/research_notes.md"
-ARCHIVE="logs/research_notes_archive.md"
+JOURNAL="logs/research_journal.jsonl"
+ARCHIVE="logs/research_journal_archive.jsonl"
+KEEP=50
+THRESHOLD=100
 
-if [ ! -f "$NOTES" ]; then
-  echo "No research notes to compact."
+if [ ! -f "$JOURNAL" ]; then
+  echo "No research journal to compact."
   exit 0
 fi
 
-# Count entries (separated by ---)
-ENTRY_COUNT=$(grep -c '^---$' "$NOTES")
+ENTRY_COUNT=$(wc -l < "$JOURNAL" | tr -d ' ')
 
-if [ "$ENTRY_COUNT" -le 30 ]; then
-  echo "Only $ENTRY_COUNT entries — no compaction needed (threshold: 30)."
+if [ "$ENTRY_COUNT" -le "$THRESHOLD" ]; then
+  echo "Only $ENTRY_COUNT entries — no compaction needed (threshold: $THRESHOLD)."
   exit 0
 fi
 
-echo "Found $ENTRY_COUNT entries. Compacting..."
+ARCHIVE_COUNT=$((ENTRY_COUNT - KEEP))
+echo "Found $ENTRY_COUNT entries. Archiving oldest $ARCHIVE_COUNT, keeping $KEEP."
 
-# Use Claude to summarize old entries and keep recent ones
-source .env
-source venv/bin/activate
+# Append older entries to archive
+head -n "$ARCHIVE_COUNT" "$JOURNAL" >> "$ARCHIVE"
 
-claude --max-turns 5 -p "Read logs/research_notes.md. It has $ENTRY_COUNT dated entries separated by '---'.
+# Keep only the recent entries
+tail -n "$KEEP" "$JOURNAL" > "${JOURNAL}.tmp" && mv "${JOURNAL}.tmp" "$JOURNAL"
 
-Your task:
-1. Identify the 20 most recent entries (by date).
-2. For every OLDER entry, write a one-line summary: '- YYYY-MM-DD: <what was researched and key finding>'
-3. Append the full text of older entries to logs/research_notes_archive.md (create if needed).
-4. Rewrite logs/research_notes.md with this structure:
-   - The header (# Research Notes + description)
-   - A section '## Archived sessions' with the one-line summaries
-   - '---'
-   - The 20 most recent entries, verbatim (do not modify them)
-
-Preserve all content — this is archival, not deletion."
+echo "Done. Archive now has $(wc -l < "$ARCHIVE" | tr -d ' ') entries. Journal has $(wc -l < "$JOURNAL" | tr -d ' ') entries."
