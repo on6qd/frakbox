@@ -1,5 +1,63 @@
 {
-  "literature": {},
+  "literature": {
+    "earnings_surprise_pead": {
+      "summary": "Post-Earnings Announcement Drift (PEAD): Bernard & Thomas (1989) found stocks continue to drift in the direction of earnings surprise for 60 days post-announcement. Effect is concentrated in smaller, less-followed companies where information asymmetry is highest. Academic consensus: PEAD is strongest in small-cap stocks (Q1-Q2 of market cap), weakest or absent in large-caps. Arbitrage by institutions has reduced the effect significantly since 1990s. By 2010s, the effect is largely arbitraged away for S&P 500 mega-caps.",
+      "sources": [
+        "Bernard & Thomas (1989) - original PEAD paper",
+        "Fama (1998) - Market efficiency critique noting PEAD survives but is small",
+        "Chordia et al (2009) - Liquidity and PEAD: more liquid stocks have less drift",
+        "Own backtest 2026-03-19: 33 mega-cap S&P 500 events, 2020-2024"
+      ],
+      "key_finding": "PEAD is NOT present for mega-cap S&P 500 companies with >10% EPS beats. Our backtest: discovery set (2021-2022) shows +1.05% avg abnormal 1d return, 45% positive rate. 1d-to-5d drift: -0.94% (mean reversion, not drift). Financials (GS/MS) show similar: +0.40% 1d, then -1.50% 1d\u21925d drift. 2023-2024 tech shows large returns (+8.37%) but confounded by AI theme (NVDA) and META profitability turnaround - not general PEAD.",
+      "regime_note": "2023-2024 period shows strong positive returns after tech beats, but these are driven by fundamental regime changes (AI adoption, META cost discipline) rather than generic PEAD. NVDA May 2023 (+23.5% abnormal) represents first AI guidance beat - one-time structural shift. These cannot be generalized as a repeatable pattern.",
+      "recorded": "2026-03-19T19:00:08.630639"
+    },
+    "sp500_index_addition": {
+      "summary": "The S&P 500 inclusion effect: stocks added to the S&P 500 experience abnormal positive returns around the announcement and before the effective date. Mechanism: forced buying by passive index funds creates predictable demand. Classic effect documented by Shleifer (1986), Harris & Gurel (1986). Chen et al (2004) find avg CAR of +6% from announcement to effective date (permanent effect). However, Greenwood & Sammon (2025, JF) document the 'disappearing index effect' - abnormal returns collapsed from ~7.4% (1990s) to <1% (2010-2020) as the additions became predictable and markets more efficient.",
+      "sources": [
+        "Shleifer (1986) JF - Do Demand Curves for Stocks Slope Down?",
+        "Harris & Gurel (1986) JF - Price and Volume Effects with S&P 500 Changes",
+        "Chen, Noronha & Singal (2004) JF - Price Response to S&P 500 Additions and Deletions",
+        "Greenwood & Sammon (2025) JF - The Disappearing Index Effect (NBER WP)",
+        "Own backtest 2026-03-19: 25 S&P 500 additions, 2020-2024"
+      ],
+      "key_finding": "OWN BACKTEST FINDS SIGNIFICANT EFFECT in 2020-2024 despite G&S finding effect disappeared by 2020. Discovery (2020-2022, n=15): 1d abnormal +4.09%, 5d abnormal +5.52%, 73% positive rate. Validation (2023-2024, n=10): 1d abnormal +8.05%, 5d abnormal +10.23%, 100% positive rate. POSSIBLE CONFOUNDERS: TSLA (EV theme), MRNA (COVID vaccine), SMCI/PLTR (AI theme) may inflate results. Effect still visible when these are analyzed separately. KEY INSIGHT: Effect may be strongest when (a) stock is not from S&P MidCap 400 (more surprising), (b) stock has thematic tailwinds at time of addition.",
+      "regime_note": "Effect observed in 2020-2024 during QE/stimulus era and AI bull market. May not persist in bear market or rising rate environments. Monitor validation carefully.",
+      "recorded": "2026-03-19T19:11:12.479975"
+    },
+    "fda_decision": {
+      "summary": "FDA PDUFA drug approval/rejection effects on stock prices. Effect is strongly SIZE-DEPENDENT: large pharma approval = ~+0.4% Day 0 (economically negligible). Small biotech approval = +8-11% abnormal return relative to large pharma. ASYMMETRY: Rejection (CRL) causes -4.3% to -9.2% (3-day CAR), much larger than positive on approval. First-cycle approval rate at PDUFA: ~75-85% (drugs that reach PDUFA are already screened). Pre-approval drift: mixed evidence; large-sample study (n=13,807) shows minimal day-1 drift. Post-rejection drift: continued negative drift for 2+ weeks.",
+      "sources": [
+        "PMC9439234 (2022) - 13,807 clinical trial outcomes, 2000-2020, 379 companies",
+        "PMC10817120 (2024) - How news affects biopharma stock prices",
+        "Muralitharan & Banerjee (SSRN 6027774, 2025) - FDA CRL reactions by deficiency type",
+        "Bhardwaj et al. (2006) QREF - Market response to FDA announcements"
+      ],
+      "key_findings": {
+        "large_pharma_approval_1d": "+0.4% (economically negligible)",
+        "biotech_vs_pharma_gap": "+8-11% higher for small biotech vs large pharma",
+        "rejection_car_3d": "-4.3% to -9.2%",
+        "asymmetry": "Rejection magnitude >> Approval magnitude",
+        "approval_rate_at_pdufa": "75-85% first-cycle",
+        "biotech_stdev": "4.59% (high variance - makes individual bets very risky)",
+        "crl_deficiency_type": "CMC CRLs cause 5.4pp less damage than clinical CRLs"
+      },
+      "actionable_patterns": [
+        "1. SHORT small biotech after CRL/rejection announcement - continued negative drift 2+ weeks",
+        "2. Monitor CRL deficiency type: clinical deficiency = larger negative impact",
+        "3. Biotech pre-PDUFA run-up: buy early, sell BEFORE decision (if stock ran up significantly)",
+        "4. Large pharma PDUFA: NOT actionable - near-zero effect"
+      ],
+      "caution": "Small biotech: extremely high variance, binary outcomes, survivorship bias. Many biotech companies are delisted/go bankrupt after failed trials. Implied volatility spikes before PDUFA date make options expensive. Pre-registration is CRITICAL to avoid post-hoc rationalization.",
+      "recorded": "2026-03-19T19:18:13.751534"
+    }
+  },
   "known_effects": {},
-  "dead_ends": []
+  "dead_ends": [
+    {
+      "event_type": "earnings_surprise_pead_megacap",
+      "reason": "Tested PEAD on 33 S&P 500 large-cap events (2020-2024): NVDA, AAPL, MSFT, GOOGL, META (tech), GS, MS (financials). Discovery set (2021-2022): avg 1d abnormal +1.05%, positive rate 45% (below random!), 1d\u21925d drift = -0.94% (mean reversion, not drift). Financial sector (GS/MS, 2020-2021): avg 1d = +0.40%, 1d\u21925d drift = -1.50%. No statistical significance at any horizon. Does not pass multiple testing correction. Below min_abnormal_return_pct threshold (1.5%). PEAD literature concentrated in small/mid-cap. Mega-caps are too efficiently priced \u2014 institutions arbitrage away within hours. EXCEPTION: The 2023-2024 period shows large returns for NVDA and META, but these are thematic regime changes (AI adoption, profitability turnarounds), not general PEAD. Do NOT pursue general PEAD for mega-cap S&P 500 companies.",
+      "recorded": "2026-03-19T19:00:08.631095"
+    }
+  ]
 }

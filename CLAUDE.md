@@ -27,7 +27,7 @@ Discover cause-and-effect relationships between real-world events and stock pric
 ### Logs
 | File | Purpose |
 |---|---|
-| `logs/research_notes.md` | Cumulative research journal (append-only) |
+| `logs/research_journal.jsonl` | Cumulative research journal (append-only, JSONL) |
 | `logs/sessions.jsonl` | Structured session log |
 | `logs/session_state.json` | Crash recovery state |
 | `logs/friction_log.jsonl` | What slows you down — drives process improvement |
@@ -91,6 +91,34 @@ self_review.needs_bootstrap_review(completed_count)
 self_review.run_bootstrap_review(completed_hypotheses)
 self_review.check_knowledge_decay()
 self_review.run_weekly_research_diagnostic()
+```
+
+## measure_event_impact() Return Structure
+
+```python
+result = market_data.measure_event_impact(...)
+# Aggregate stats (flat keys):
+result['avg_abnormal_1d']       # mean abnormal return at 1d
+result['median_abnormal_1d']
+result['positive_rate_abnormal_1d']  # % of events positive
+result['stdev_abnormal_1d']
+result['avg_raw_1d']            # raw (non-benchmark-adjusted) return
+# Horizons: 1d, 3d, 5d, 10d, 20d. Types: raw, abnormal, sector_adj
+
+result['passes_multiple_testing']  # True/False
+result['multiple_testing_note']    # explanation
+result['events_measured']
+result['events_attempted']
+result['data_quality_warning']     # None or warning string
+result['errors']                   # list of per-event errors
+
+# Per-event impacts (individual_impacts list):
+for ev in result['individual_impacts']:
+    ev['symbol']        # ticker
+    ev['event_date']    # date (NOT 'date' — use 'event_date')
+    ev['abnormal_1d']   # NOT 'abnormal_return_1d'
+    ev['raw_1d']
+    ev['bench_1d']      # benchmark return
 ```
 
 ## Alpaca Paper Trading
