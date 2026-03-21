@@ -87,6 +87,15 @@
       "added": "2026-03-21T11:56:17.469724"
     },
     {
+      "id": "51dbf89d",
+      "category": "insider_buying_cluster",
+      "question": "Create new hypothesis 'insider_cluster_3d_hold': 3+ insiders, buy at open day after filing, hold 3 trading days. Evidence: 3d avg +3.80% (2023-24 OOS), +3.89% (2022 OOS), +2.93% (2021 disc). This is a BETTER specification than the 1d hypothesis (4a981cc8) based on accumulated evidence. Pre-register before next trade. Use GO paper trade result to calibrate.",
+      "priority": 1,
+      "status": "pending",
+      "reasoning": "3d signal is more reliable and larger than 1d (p<0.0001 vs p=0.006, avg +3.5-4% vs +1-1.5%). New hypothesis would be better evidence-aligned. Confidence 7/10 expected.",
+      "added": "2026-03-21T12:03:12.762264"
+    },
+    {
       "id": "seed-002",
       "category": "index_rebalancing",
       "question": "When a stock is announced for S&P 500 addition, what is the abnormal return between announcement and effective date, and does it reverse after inclusion? How does this compare to Russell 2000 rebalancing?",

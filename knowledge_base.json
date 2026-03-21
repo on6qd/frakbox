@@ -70,15 +70,16 @@
       "recorded": "2026-03-19T21:08:22.605216"
     },
     "insider_buying_cluster": {
-      "summary": "Survivorship bias analysis of 2021 cluster events (n=60 sample): 40% failure rate from yfinance. Fate breakdown: acquisitions/mergers 43% (POLY/HP, SIX, SNPO, UNVR, OLO, SYNL, SWM/MATV, SRLP, NCBS), bankruptcies/distressed ~7% (BTTR, NMTR), SPACs/pre-IPO ~10% (NDAC, LEGO, RIVN), unknown ~40%. KEY FINDING: acquisitions dominate over bankruptcies by 6:1 ratio. Acquired stocks receive a 20-40% premium. Therefore, our backtest UNDERSTATES the true positive return by excluding acquisitions. This actually STRENGTHENS the hypothesis rather than creating upward bias from excluding failures. Survivorship bias direction: FAVORABLE (our measured 3d/5d +3-5% is a lower bound on true effect).",
-      "known_magnitude": "True effect likely larger than measured 3-5% due to excluded acquisitions",
-      "known_timeframe": "1-30 days for cluster signal; acquisitions typically announced 3-18 months later",
+      "summary": "THIRD OUT-OF-SAMPLE VALIDATION (2023-2024, n=120): 3+ insider cluster signal CONFIRMED in bull market regime. Results:\n1d: avg +1.21% (p=0.006), 60.8% positive\n3d: avg +3.80% (p<0.0001), 70.0% positive\n5d: avg +4.26% (p<0.0001), 66.7% positive\n20d: avg +3.34% (p=0.016), 59.5% positive\npasses_multiple_testing=True. Data failure rate: 20% (improved from 40% in 2021).\n\nCOMPLETE VALIDATION SUMMARY:\nDiscovery 2021 (n=50): 1d 72% positive, p=0.0012\nOOS 2022 bear market (n=66): 1d 80% positive, 5d avg +4.85%, p<0.0001\nOOS 2023-2024 bull market (n=120): 3d 70% positive, avg +3.80%, p<0.0001\nSignal is REGIME-ROBUST - works in both bull and bear markets.",
+      "known_magnitude": "3d: +3-4% avg abnormal, 5d: +4-5% avg abnormal. 1d: +1-3% avg (lower, more variable).",
+      "known_timeframe": "Signal peaks at 3-5 days. Persists to 20d but with lower significance.",
       "sources": [
-        "SEC EDGAR Form 4 data",
-        "Manual classification of 28 failed ticker fates"
+        "SEC EDGAR Form 4 quarterly bulk data (2021-2024)",
+        "Discovery n=50 (2021), OOS 2022 n=66, OOS 2023-2024 n=120",
+        "Kang, Kim & Wang (2018) academic foundation"
       ],
-      "gaps": "Unknown category (40% of failures) needs further investigation; some could be mergers, some delisted for other reasons",
-      "recorded": "2026-03-21T11:53:45.736045"
+      "gaps": "1d magnitude (1.21%) lower than expected 2.5% for hypothesis 4a981cc8. The 3d/5d hold may be more reliable than 1d. 2025 validation not yet run (Q4 2025 bulk data available).",
+      "recorded": "2026-03-21T12:02:23.946475"
     },
     "activist_investor_13d": {
       "summary": "Brav, Jiang, Partnoy & Thomas (2008) JF: activist hedge fund 13D filings show 7% abnormal return in [-20, +20] day window around filing. Effect is robust across 2001-2006 sample. Greenwood & Schor (2009): only activist campaigns targeting M&A show persistent long-term returns; operational activists show weaker long-run effects. Gantchev (2013): contested activist campaigns cost activists on average $10.71M \u2014 so activists only escalate when stakes are high, making escalation a signal. Key: MUST distinguish activist 13D (intent to influence) from passive 5%+ ownership (13G). Activist funds to track: Elliott, Carl Icahn, ValueAct, Third Point, Pershing Square, Starboard Value, Jana Partners, Trian Fund, Engine Capital, Sachem Head.",
