@@ -10,7 +10,7 @@ else
   echo "NOT RUNNING"
 fi
 
-# Latest log — extract text from stream-json
+# Latest log — extract activity from stream-json
 LATEST=$(ls -t logs/*.log 2>/dev/null | head -1)
 if [ -n "$LATEST" ]; then
   echo ""
@@ -18,21 +18,26 @@ if [ -n "$LATEST" ]; then
   echo ""
   echo "Recent activity:"
   python3 -c "
-import json, sys
+import json
 lines = open('$LATEST').readlines()
-for line in lines[-50:]:
+out = []
+for line in lines:
     try:
         d = json.loads(line)
         if d.get('type') == 'assistant':
             for c in d['message']['content']:
                 if c['type'] == 'text' and c['text'].strip():
-                    text = c['text'].strip()[:200]
-                    print(f'  {text}')
+                    out.append(c['text'].strip()[:200])
+                elif c['type'] == 'tool_use':
+                    out.append(f'[{c[\"name\"]}]')
         elif d.get('type') == 'result':
-            print(f'  --- Done: {d[\"num_turns\"]} turns, \${d[\"total_cost_usd\"]:.2f} ---')
+            out.append(f'--- Done: {d[\"num_turns\"]} turns, \${d[\"total_cost_usd\"]:.2f} ---')
     except:
-        pass
-" 2>/dev/null | tail -10
+        if line.startswith('==='):
+            out.append(line.strip())
+for line in out[-15:]:
+    print(f'  {line}')
+" 2>/dev/null
 fi
 
 # Research status

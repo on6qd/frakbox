@@ -9,5 +9,5 @@ fi
 
 [ -n "$PIDS" ] && kill $PIDS 2>/dev/null
 [ -n "$CLAUDE_PIDS" ] && kill $CLAUDE_PIDS 2>/dev/null
-rmdir /tmp/research_bot.lock 2>/dev/null
+rmdir "${TMPDIR:-/tmp}/research_bot_$(id -u).lock" 2>/dev/null
 echo "Stopped"

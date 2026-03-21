@@ -8,7 +8,7 @@ cd "$(dirname "$0")"
 
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
-LOCKFILE="/tmp/research_bot.lock"
+LOCKFILE="${TMPDIR:-/tmp}/research_bot_$(id -u).lock"
 INTERVAL=3600
 
 set -a; source .env; set +a
