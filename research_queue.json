@@ -287,9 +287,11 @@
       "category": "signal_discovery",
       "question": "Test earnings guidance cut (intra-quarter pre-announcement) as a SHORT signal. Companies that issue negative guidance pre-announcements before their official earnings. Does the stock continue to fall after the announcement? What is the persistence at 1d, 3d, 5d?",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Guidance cuts are information events with clear causal mechanism (management has visibility, revelation of bad news). Unlike analyst downgrades (secondary), this is primary corporate disclosure. Likely under-researched in our pipeline. Can use EDGAR 8-K Item 2.02 (Earnings Guidance) filings to find events.",
-      "added": "2026-03-21T22:06:13.578541"
+      "added": "2026-03-21T22:06:13.578541",
+      "completed": "2026-03-21T22:31:30.294213",
+      "findings": "Earnings guidance cut SHORT signal: DEAD END for general large-cap. N=9 events (AAPL/FDX/TGT/WMT/MU/SNAP/NKE/INTC 2018-2024). Blue chips BOUNCE after cuts (WMT +5.6%, TGT +2.5%), only pure growth/weaker (SNAP -11%) decline. avg_1d=-0.71% pos_rate=56% p=0.91. Not statistically or economically significant. Potential subhypothesis: SHORT growth-heavy (P/E >30) guidance cuts, but sample too small to test. DEAD END."
     },
     {
       "id": "seed-003",
@@ -426,41 +428,59 @@
   ],
   "next_session_priorities": [
     {
-      "task": "MONDAY March 23 AM: Confirm GO (1cb6140f) and WD (76678219) trades executed. Run: python trade_loop.py --dry-run to check. Both should flip from pending to active.",
-      "set_by_session": "2026-03-21T22:06:13.579957"
+      "task": {
+        "task": "MONDAY March 23 AM: Confirm GO (1cb6140f) and WD (76678219) trades executed at 9:30 AM. Run: python trade_loop.py --dry-run to verify. Both should show status=active after market open.",
+        "set_by_session": "2026-03-21T22:31:54.510947"
+      },
+      "set_by_session": "2026-03-21T22:31:54.511070"
     },
     {
-      "task": "THURSDAY March 26: Close GO trade with tools/close_go_trade.py",
-      "set_by_session": "2026-03-21T22:06:13.579959"
+      "task": {
+        "task": "THURSDAY March 26 close: Close GO position with tools/close_go_trade.py. First check price, then run the script.",
+        "set_by_session": "2026-03-21T22:31:54.510951"
+      },
+      "set_by_session": "2026-03-21T22:31:54.511072"
     },
     {
-      "task": "TUESDAY March 31: Close WD trade with tools/close_wd_trade.py",
-      "set_by_session": "2026-03-21T22:06:13.579960"
+      "task": {
+        "task": "TUESDAY March 31 close: Close WD position with tools/close_wd_trade.py. Note: WD is Financial Services - previous session found sector has no signal in 2023-24. Manage expectations for this trade.",
+        "set_by_session": "2026-03-21T22:31:54.510952"
+      },
+      "set_by_session": "2026-03-21T22:31:54.511073"
     },
     {
-      "task": "Run cluster_auto_scanner.py to check for new insider clusters (prioritize Energy/Industrials sectors)",
-      "set_by_session": "2026-03-21T22:06:13.579960"
+      "task": {
+        "task": "Run cluster_auto_scanner.py for new insider opportunities. Focus on Energy and Industrials sectors (best performance in sector analysis).",
+        "set_by_session": "2026-03-21T22:31:54.510953"
+      },
+      "set_by_session": "2026-03-21T22:31:54.511074"
     },
     {
-      "task": "Test earnings guidance cut SHORT signal (see new research task). Use EDGAR 8-K Item 2.02 filings.",
-      "set_by_session": "2026-03-21T22:06:13.579961"
+      "task": {
+        "task": "OPEN RESEARCH: Test small-cap first-ever buyback signal (task da0e1d25). This is the next untested hypothesis with theoretical backing from Vermaelen. Need EDGAR 8-K scanner to find first-ever buyback authorizations 2019-2024.",
+        "set_by_session": "2026-03-21T22:31:54.510953"
+      },
+      "set_by_session": "2026-03-21T22:31:54.511074"
     },
     {
-      "task": "S&P 500 Q2 2026: Monitor for May announcement of June 5 quarterly additions (next addition batch)",
-      "set_by_session": "2026-03-21T22:06:13.579962"
+      "task": {
+        "task": "STEER.MD STATUS: Volume/cost basis question (steer.md) is now ANSWERED: 4 different tests of related signals all dead ends for large-cap stocks. The disposition effect exists at individual level but is overwhelmed by institutional momentum. NOT worth more testing for large-caps. Could test retail-heavy small-caps but data quality challenges (yfinance delisted tickers) make it hard.",
+        "set_by_session": "2026-03-21T22:31:54.510954"
+      },
+      "set_by_session": "2026-03-21T22:31:54.511075"
     }
   ],
   "session_handoff": {
-    "notes": "Session March 21: Investigated steer.md direction (volume-disposition effect) and VWAP momentum signal.",
-    "findings": [
-      "Volume-disposition effect (steer.md): DEAD END. High-volume rises slightly underperform at 5d, low-volume slightly outperform, but FAILS multiple testing correction. Signal too weak to trade.",
-      "VWAP momentum breakout: DEAD END confirmed with 100-stock universe N=14,412. Previous session finding (+0.64-1.19%) was noise. Real signal: -0.08% at 1d (slight mean reversion), ~0% at 3-5d, +0.25-0.52% at 10d (too small to trade).",
-      "GO and WD triggers set to next_market_open \u2014 will execute Monday automatically. Verify after open.",
-      "Volume-disposition conceptual insight: true average investor cost basis requires tick data or intraday order flow, not available via yfinance. MVRV ratio concept from crypto is more applicable there."
-    ],
-    "blocked_by": "GO/WD trades not yet executed (market closed, Saturday)",
-    "next_step": "Monday: Verify GO/WD execution. Begin earnings guidance cut research using EDGAR 8-K Item 2.02 scanner.",
-    "written_at": "2026-03-21T22:06:13.579963"
+    "investigating": "Volume-profile cost basis signal (steer.md direction) and earnings guidance cut SHORT signal",
+    "state": "Both tested and confirmed dead ends. GO/WD insider cluster paper trades queued for Monday March 23 open with trigger=next_market_open.",
+    "intermediate_findings": {
+      "cost_basis_volume_profile": "Percent-in-profit (% of past-year volume below current price): N=18761 high-PIP events, avg_abnormal=+0.05%, pos_rate=50.3%, p=0.016 (positive not negative). DEAD END - same direction as VWAP tests. Disposition effect doesn't aggregate to market level for large-caps.",
+      "earnings_guidance_cut": "N=9 large-cap events. avg_1d=-0.71%, pos_rate=56%, p=0.91. Blue chips bounce (WMT +5.6%, TGT +2.5%). SNAP is outlier (-11%). Highly heterogeneous. DEAD END for general signal.",
+      "go_wd_trades": "Both set with trigger=next_market_open in hypotheses.json. Trade loop confirmed via dry-run. No new insider cluster signals from auto-scanner."
+    },
+    "blocked_by": "Nothing currently. Waiting for Monday market open for trade execution.",
+    "next_step": "Monday: verify GO/WD trade execution. Then: test small-cap first-ever buyback signal (task da0e1d25) - this is the most promising untested signal.",
+    "written_at": "2026-03-21T22:31:54.511076"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
