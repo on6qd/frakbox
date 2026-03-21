@@ -462,7 +462,7 @@
       "transmission_channel",
       "academic_reference"
     ],
-    "expected_symbol": "TBD",
+    "expected_symbol": "WD",
     "expected_direction": "long",
     "expected_magnitude_pct": 2.0,
     "expected_timeframe_days": 5,
@@ -1564,9 +1564,7 @@
     "passes_multiple_testing": true,
     "multiple_testing_warning": null,
     "confounder_warnings": null,
-    "symbol_warnings": [
-      "Symbol is TBD \u2014 must be resolved to a real ticker before activation."
-    ],
+    "symbol_warnings": [],
     "dead_end_warnings": null,
     "trade": null,
     "result": null

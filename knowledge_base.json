@@ -100,6 +100,19 @@
       ],
       "gaps": "N=3 events insufficient for statistical test (Wilcoxon p=N/A). Need 3+ more qualifying events. Key gap: most qualifying events are delisted (SESN, TCDA, YMAB etc) and data not available via Tiingo. Events from 2019-2020 era especially hard to verify.",
       "recorded": "2026-03-21T14:05:12.544838"
+    },
+    "fda_crl_clinical_short": {
+      "summary": "Clinical-primary FDA CRL events where single-asset small biotech crashes >55% show consistent post-gap SHORT continuation at 3d and 5d. N=4 events all show continuation. Effect: avg 3d abnormal -14.4%, 5d -18.8%. Entry: SHORT at crash-day open. Hold: 3-5 days.",
+      "known_magnitude": "avg 3d abnormal: -14.4% (range -13.5% to -23.3%). avg 5d: -18.8% (range -13.4% to -36.9%)",
+      "known_timeframe": "3-5 trading days from crash-day open",
+      "sources": [
+        "ARDX 2021-07-19: -15.3% 3d",
+        "APLT 2024-11-27: -23.3% 3d",
+        "OTLK 2023-08-29: -15.2% 3d",
+        "NERV 2024-02-27: -13.5% 3d"
+      ],
+      "gaps": "N=4 insufficient for formal hypothesis. Need N=6+ with OOS split. Delisted tickers (SESN, ATNX, CORV) would add data but not accessible via yfinance.",
+      "recorded": "2026-03-21T14:11:35.402735"
     }
   },
   "known_effects": {
@@ -237,6 +250,30 @@
         "If N reaches 6+ with all criteria, pre-register hypothesis"
       ],
       "last_updated": "2026-03-21T13:58:26.642906"
+    },
+    "fda_crl_clinical_short": {
+      "description": "N=4 clinical CRL events ALL show SHORT continuation from crash-day open. No reversals among events with: (1) >55% initial crash, (2) clinical/efficacy primary CRL, (3) single-drug pipeline, (4) not pre-anticipated. Threshold: >55% crash. Reversal pattern when crash <50% or 3rd+ CRL.",
+      "effect_sizes": {
+        "ardx": {
+          "3d": -15.3,
+          "5d": -28.9
+        },
+        "aplt": {
+          "3d": -23.3,
+          "5d": -36.9
+        },
+        "otlk": {
+          "3d": -15.2,
+          "5d": -19.8
+        },
+        "nerv": {
+          "3d": -13.5,
+          "5d": -13.4
+        }
+      },
+      "status": "promising_partial_n4",
+      "next_steps": "Find 2+ more events to reach N=6. Try BioPharmCatalyst archives, Polygon.io for delisted tickers.",
+      "last_updated": "2026-03-21T14:11:35.403408"
     }
   },
   "dead_ends": [

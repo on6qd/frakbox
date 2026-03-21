@@ -14,7 +14,7 @@
     {
       "id": "a37aba18",
       "category": "insider_buying_cluster",
-      "question": "URGENT: Paper trade execution. Activate hypothesis 4a981cc8 (GO - Grocery Outlet) on Monday March 23 at market open. GO cluster: 6 unique insiders including CEO bought $6.3M total between March 6-19 at avg $6.02/share. Current price ~$5.79 (4% below insider avg). Trade: LONG GO at Monday open, close Tuesday March 24 (1d hold). Position $5,000. Entry: activate_hypothesis('4a981cc8', entry_price=Monday_open, position_size=5000). Exit criteria: close position Tuesday at market close. HOW: Run python trader.py to check Alpaca, then research.activate_hypothesis(). Then place buy order.",
+      "question": "URGENT: Paper trade execution for TWO trades Monday March 23.\n\nTRADE 1 - GO (Grocery Outlet), hypothesis 1cb6140f (3d hold):\n  6 insiders incl CEO bought $6.3M at avg $6.02 (March 6-19). Current ~$5.79.\n  Entry: LONG GO at Monday open. Exit: Thursday March 26 close.\n  Run: python tools/activate_go_trade.py\n\nTRADE 2 - WD (Walker & Dunlop), hypothesis 76678219 (5d hold):\n  3 insiders filed March 20, last purchase March 18. Current ~$43.82.\n  Near 52W low ($42.12), down 51% from high. Mortgage Finance $1.49B.\n  Entry: LONG WD at Monday open. Exit: Tuesday March 30 close.\n  Run: python tools/activate_wd_trade.py\n\nBoth are $5,000 positions. Abort if either is down >10% from Friday close.",
       "priority": 0,
       "status": "pending",
       "reasoning": "GO cluster detected 2026-03-21, market closed (Saturday). Must enter Monday open to capture 1d signal window. 6 insiders including CEO = highest conviction cluster since backtest period.",
@@ -183,9 +183,11 @@
       "category": "insider_buying_cluster",
       "question": "Evaluate BLCO (Bausch + Lomb) cluster signal: 9 insiders including CEO bought between Feb 19 - March 6 at avg ~$17.70. Current price $15.72 (-11% from avg). This is 11+ days old for the 1d hypothesis but 5d/20d hold may still be valid. Check if 5d OOS evidence supports 16-21 day window after filing date. If so, could BLCO be a candidate for hypothesis 76678219 (5d hold)?",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "9 insiders + CEO is extremely high conviction. Stock has continued to decline since filing, which historically is when insider signals are most accurate (buying into weakness).",
-      "added": "2026-03-21T11:56:17.469246"
+      "added": "2026-03-21T11:56:17.469246",
+      "completed": "2026-03-21",
+      "findings_summary": "BLCO signal too old (last purchase March 6, 15+ days ago). Window has expired for 1d or 5d hold. WD (Walker & Dunlop) is a better secondary candidate: 3 insiders filed March 20 2026, last purchase March 18 (fresh signal), near 52W low, hypothesis 76678219 assigned."
     },
     {
       "id": "f524323b",
