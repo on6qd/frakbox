@@ -39,7 +39,7 @@ You are a researcher. Read CLAUDE.md, then read your state files:
 
 Then: source venv/bin/activate && python run.py --status
 
-Decide what's most valuable to work on right now. You might:
+Decide what is most valuable to work on right now. You might:
 - Follow up on priorities from the last session
 - Check news for events matching your watchlist
 - Research a new question from the queue
@@ -78,6 +78,6 @@ PROMPT
 echo "Research daemon started. Running every ${INTERVAL}s."
 while true; do
   run_session
-  echo "Next session at $(date -v+${INTERVAL}S +%H:%M 2>/dev/null || date -d "+${INTERVAL} seconds" +%H:%M 2>/dev/null || echo "~1h")"
+  echo "Next session in ~1h"
   sleep $INTERVAL
 done
