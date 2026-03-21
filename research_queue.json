@@ -340,9 +340,11 @@
       "category": "signal_discovery",
       "question": "Test CEO/CFO sudden departure SHORT signal. Focus on: (1) executives who leave with no explanation or vague explanation, (2) departures at mid-quarter (not end of quarter), (3) within 90 days of earnings. Causal mechanism: insider information, governance concerns.",
       "priority": 3,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Was mentioned as promising in session 3 but CEO turnaround was N too small. Flip side: sudden departures may be stronger signal. Need 8-K Item 5.02 filing scanner.",
-      "added": "2026-03-21T22:06:13.579419"
+      "added": "2026-03-21T22:06:13.579419",
+      "completed": "2026-03-21T23:40:28.931726",
+      "findings": "CEO performance failure departure SHORT signal FORMALIZED as hypothesis 5dbcfb37. N=12, avg_abnormal_1d=-3.25%, p=0.0034, bootstrap CI [-5.16, -1.52] excludes zero. Discovery (2019-22): MCD, UAA, DOCU, VFC \u2014 100% negative. Validation (2023-24): WBA, AAP, PARA, CVS, STLA, INTC, FIVE, BA \u2014 75% negative. New events beyond N=9: DOCU (Dan Springer, -4.20%), FIVE (Joel Anderson, -9.97%), BA (Dave Calhoun, -2.07%). Signal is 1d ONLY \u2014 3d p=0.077, not actionable. Entry at next-day market open. Exclusion list: PTON, VSCO, DIS/Iger, LYFT, SBUX all showed relief rallies \u2014 do NOT short. Expected_symbol=TBD until next qualifying event is identified. EDGAR scanner updated with N=12 confirmed events and relief-rally exclusion list."
     },
     {
       "id": "d288c2b8",
@@ -436,49 +438,55 @@
   ],
   "next_session_priorities": [
     {
-      "task": "MONDAY March 23 AM: Confirm GO (1cb6140f) and WD (76678219) trades executed at 9:30 AM. Run `python trade_loop.py --dry-run` first, then confirm active after open.",
-      "set_by_session": "2026-03-21T23:08:35.161568"
+      "task": "1. TRADES: Monday March 23 open - GO (1cb6140f) and WD (76678219) auto-execute via trigger=next_market_open. Run trade_loop.py --dry-run Monday AM to verify.",
+      "set_by_session": "2026-03-21T23:40:50.832237"
     },
     {
-      "task": "THURSDAY March 26 close: Close GO position with tools/close_go_trade.py",
-      "set_by_session": "2026-03-21T23:08:35.161572"
+      "task": "2. TRADE CLOSE: GO closes Thursday March 26 (3d deadline). Run close_go_trade.py or let trade_loop auto-close.",
+      "set_by_session": "2026-03-21T23:40:50.832242"
     },
     {
-      "task": "TUESDAY March 31 close: Close WD position with tools/close_wd_trade.py",
-      "set_by_session": "2026-03-21T23:08:35.161574"
+      "task": "3. TRADE CLOSE: WD closes ~Monday March 30 (5d deadline via calendar days). Run close_wd_trade.py or let trade_loop auto-close.",
+      "set_by_session": "2026-03-21T23:40:50.832243"
     },
     {
-      "task": "CEO PERFORMANCE FAILURE SHORT \u2014 CRITICAL NEXT STEP: Signal is N=9, p=0.0039, 0% positive rate at 1d. Need 3 more events to reach N=12 for formal hypothesis. Use tools/edgar_ceo_departure_scanner.py (just built). Strategy: run EDGAR scan for 2019-2022 Item 5.02 filings, filter by large-cap, check stock direction. Also manually check: FNF CEO Raymond James Flood departure (any date 2019-2021?), or search 'CEO fired performance large cap stock fell 2019 2020 2021 site:cnbc.com'. Already confirmed N=9 events in tools/edgar_ceo_departure_scanner.py CONFIRMED_PERFORMANCE_FAILURE_EVENTS list.",
-      "set_by_session": "2026-03-21T23:08:35.161574"
+      "task": "4. CEO DEPARTURE MONITORING: hypothesis 5dbcfb37 pending. Run edgar_ceo_departure_scanner.py --start 2025-01-01 --end 2026-03-21 --min-cap 2000 --check-direction to find recent qualifying events. Next candidate to watch: any large-cap forced CEO firing.",
+      "set_by_session": "2026-03-21T23:40:50.832244"
     },
     {
-      "task": "OPEN RESEARCH: Small-cap first-ever buyback signal (task da0e1d25) \u2014 build EDGAR 8-K scanner for first-ever buyback announcements. Look for 8-K text containing 'first' AND 'repurchase program' AND '$[amount]'.",
-      "set_by_session": "2026-03-21T23:08:35.161575"
+      "task": "5. FRESH INSIDER CLUSTERS: AMRZ (5x, B Holcim NA spinoff, trades Mar 9) and POOL (3x, .5B, trades Mar 13) both past 5d window. Check OpenInsider next week for new signals.",
+      "set_by_session": "2026-03-21T23:40:50.832245"
     },
     {
-      "task": "RUN cluster_auto_scanner.py for new insider opportunities. Focus on Energy and Industrials sectors.",
-      "set_by_session": "2026-03-21T23:08:35.161576"
+      "task": "6. SMALL-CAP BUYBACK SIGNAL (task da0e1d25): Build EDGAR 8-K scanner for first-ever repurchase authorization. Filter: market cap <B, repurchase >10% float, no prior buyback history.",
+      "set_by_session": "2026-03-21T23:40:50.832245"
     },
     {
-      "task": "S&P 500 June 5, 2026 rebalance announcement \u2014 monitor watchlist TBD/061ae3a8",
-      "set_by_session": "2026-03-21T23:08:35.161576"
+      "task": "7. S&P 500 Q2 2026 rebalance (~June 5): monitor for additions announcement. Hypothesis 061ae3a8 ready.",
+      "set_by_session": "2026-03-21T23:40:50.832246"
     }
   ],
   "session_handoff": {
     "session_date": "2026-03-21",
-    "steer_md_response": "Volume/cost basis question (March 2026 steer.md) ANSWERED: tested 4 variations \u2014 all dead ends. Large-cap disposition effect is overwhelmed by institutional momentum. NOT worth more testing.",
-    "ceo_departure_signal": {
-      "status": "STRONG EXPLORATORY \u2014 needs 3 more events for N=12",
-      "finding": "CEO performance failure departure SHORT (1d only): N=9, avg_1d=-3.27%, 0% positive rate, p=0.0039, CI excludes zero. Signal does NOT persist beyond 1d.",
-      "events": "9 confirmed events in tools/edgar_ceo_departure_scanner.py CONFIRMED_PERFORMANCE_FAILURE_EVENTS",
-      "dead_end": "CEO relief rally SHORT (10d) is dead end \u2014 N=12 expanded test shows no signal (p=0.57)",
-      "tool_built": "tools/edgar_ceo_departure_scanner.py \u2014 EDGAR Item 5.02 scanner (API tested and working)",
-      "how_to_find_3_more": "Run edgar_ceo_departure_scanner.py with start=2019-01-01 end=2022-12-31 --check-direction, OR manually search for large-cap CEO firings where stock fell in 2019-2022"
-    },
-    "fixes_made": [
-      "tools/largecap_filter.py: added ValueError guard against passing raw dollars instead of millions"
+    "steer_md_pickup": "Volume/cost-basis question from steer.md was answered in prior session (4 dead ends). No new steer.md directions taken.",
+    "completed_this_session": [
+      "Formalized CEO performance failure departure SHORT as hypothesis 5dbcfb37 (N=12, p=0.0034)",
+      "Added 3 new confirmed events: DOCU (2022-06-14), FIVE (2024-07-17), BA (2024-03-25)",
+      "Updated edgar_ceo_departure_scanner.py with N=12 and relief-rally exclusion list",
+      "Verified GO/WD triggers set for Monday open (trigger=next_market_open)",
+      "Identified AMRZ (Holcim NA) and POOL as new clusters - past trade window, note for next occurrence"
     ],
-    "written_at": "2026-03-21T23:08:35.161578"
+    "key_signal_status": {
+      "GO 1cb6140f": "trigger=next_market_open, executes Monday March 23, closes Thursday March 26",
+      "WD 76678219": "trigger=next_market_open, executes Monday March 23, closes ~Monday March 30",
+      "CEO departure 5dbcfb37": "pending, TBD symbol - need next qualifying event"
+    },
+    "watch_for": [
+      "Any large-cap (>B) CEO abruptly fired after sustained performance failure \u2014 SHORT at next open, 1d hold",
+      "AMRZ new insider cluster (next occurrence \u2014 company just went public as Holcim NA spinoff)"
+    ],
+    "specific_next_step": "Monday: verify GO and WD executed via trade_loop.py --dry-run. Then scan EDGAR for any CEO departure filings from past 7 days using edgar_ceo_departure_scanner.py --start 2026-03-14 --end 2026-03-21 --min-cap 2000 --check-direction",
+    "written_at": "2026-03-21T23:40:50.832247"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
