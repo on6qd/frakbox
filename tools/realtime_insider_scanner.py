@@ -29,6 +29,33 @@ USER_AGENT = os.environ.get("SEC_USER_AGENT", "Financial Research Bot contact@ex
 CACHE_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "realtime_cache")
 BASE_ARCHIVE = "https://www.sec.gov/Archives/edgar"
 
+# SEC EDGAR rate limit: ~10 requests/second is safe; we'll do 3/second with retry
+SEC_REQUEST_DELAY = 0.35   # seconds between requests
+SEC_MAX_RETRIES = 3
+SEC_RETRY_BACKOFF = 2.0    # exponential backoff multiplier
+
+
+def sec_get(url, timeout=15):
+    """GET request to SEC EDGAR with rate limiting and retry."""
+    headers = {"User-Agent": USER_AGENT}
+    delay = SEC_REQUEST_DELAY
+    for attempt in range(SEC_MAX_RETRIES):
+        try:
+            time.sleep(delay)
+            resp = requests.get(url, headers=headers, timeout=timeout)
+            return resp
+        except requests.exceptions.Timeout:
+            if attempt < SEC_MAX_RETRIES - 1:
+                delay *= SEC_RETRY_BACKOFF
+                continue
+            return None
+        except requests.exceptions.RequestException:
+            if attempt < SEC_MAX_RETRIES - 1:
+                delay *= SEC_RETRY_BACKOFF
+                continue
+            return None
+    return None
+
 
 def get_current_quarter():
     """Return (year, quarter) for today's date."""
@@ -54,9 +81,9 @@ def download_form_idx(year, quarter, cache=True):
     url = f"{BASE_ARCHIVE}/full-index/{year}/QTR{quarter}/form.idx"
     print(f"Downloading EDGAR form.idx {year}Q{quarter}...")
     headers = {"User-Agent": USER_AGENT}
-    resp = requests.get(url, headers=headers, timeout=120)
+    resp = requests.get(url, headers=headers, timeout=120)  # Large file — long timeout, no retry
 
-    if resp.status_code == 404:
+    if resp is None or resp.status_code == 404:
         print(f"  {year}Q{quarter} form.idx not found (404)")
         return []
 
@@ -89,22 +116,16 @@ def download_form_idx(year, quarter, cache=True):
     return entries
 
 
-def parse_form4_xml(cik, path, timeout=10):
+def parse_form4_xml(cik, path):
     """Fetch and parse a Form 4 XML filing.
 
     Returns dict with transaction info if it's an open market purchase by an officer/director,
     else returns None.
     """
-    headers = {"User-Agent": USER_AGENT}
-
     # Get filing index page
     idx_url = f"{BASE_ARCHIVE}/{path}"
-    try:
-        resp = requests.get(idx_url, headers=headers, timeout=timeout)
-    except requests.exceptions.Timeout:
-        return None
-
-    if resp.status_code != 200:
+    resp = sec_get(idx_url)
+    if resp is None or resp.status_code != 200:
         return None
 
     # Find XML file in index
@@ -121,12 +142,8 @@ def parse_form4_xml(cik, path, timeout=10):
         base_path = '/'.join(path.split('/')[:4])
         xml_url = f"{BASE_ARCHIVE}/{base_path}/{xml_href}"
 
-    try:
-        xml_resp = requests.get(xml_url, headers=headers, timeout=timeout)
-    except requests.exceptions.Timeout:
-        return None
-
-    if xml_resp.status_code != 200:
+    xml_resp = sec_get(xml_url)
+    if xml_resp is None or xml_resp.status_code != 200:
         return None
 
     xml = xml_resp.text
