@@ -26,89 +26,60 @@ def build_daily_report():
     active = get_active_hypotheses()
     pending = get_pending_hypotheses()
     completed = get_completed_hypotheses()
-    patterns = load_patterns()
     knowledge = load_knowledge()
 
-    recent_completed = sorted(completed, key=lambda h: h.get("result", {}).get("exit_time", ""), reverse=True)[:5]
+    known_count = len(knowledge.get("known_effects", {}))
+    dead_count = len(knowledge.get("dead_ends", []))
 
     html = f"""
-    <html><body style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;">
-    <h2>Daily Research Report — {datetime.now().strftime('%Y-%m-%d')}</h2>
+    <html><body style="font-family: -apple-system, Arial, sans-serif; max-width: 700px; margin: 0 auto; color: #333;">
+    <h2>Daily Research Report</h2>
+    <p style="color: #888;">{datetime.now().strftime('%A, %B %d %Y')}</p>
 
-    <h3>Account</h3>
-    <table style="border-collapse: collapse;">
-        <tr><td style="padding: 4px 12px;">Equity</td><td style="padding: 4px 12px;"><b>${summary['equity']:,.0f}</b></td></tr>
-        <tr><td style="padding: 4px 12px;">Cash</td><td style="padding: 4px 12px;">${summary['cash']:,.0f}</td></tr>
-        <tr><td style="padding: 4px 12px;">Positions</td><td style="padding: 4px 12px;">{len(summary['positions'])}</td></tr>
-    </table>
-
-    <h3>Research Progress</h3>
-    <table style="border-collapse: collapse;">
-        <tr><td style="padding: 4px 12px;">Total hypotheses</td><td style="padding: 4px 12px;">{research['total_hypotheses']}</td></tr>
-        <tr><td style="padding: 4px 12px;">Active experiments</td><td style="padding: 4px 12px;">{research['active']}</td></tr>
-        <tr><td style="padding: 4px 12px;">Completed</td><td style="padding: 4px 12px;">{research['completed']}</td></tr>
-        <tr><td style="padding: 4px 12px;">Direction accuracy</td><td style="padding: 4px 12px;"><b>{research['direction_accuracy']}</b></td></tr>
-        <tr><td style="padding: 4px 12px;">Patterns discovered</td><td style="padding: 4px 12px;">{research['patterns_discovered']}</td></tr>
-        <tr><td style="padding: 4px 12px;">Event types studied</td><td style="padding: 4px 12px;">{len(knowledge.get('literature', {}))}</td></tr>
-        <tr><td style="padding: 4px 12px;">Dead ends recorded</td><td style="padding: 4px 12px;">{len(knowledge.get('dead_ends', []))}</td></tr>
+    <table style="border-collapse: collapse; margin: 16px 0;">
+        <tr>
+            <td style="padding: 8px 20px; text-align: center;"><div style="font-size: 24px; font-weight: bold;">${summary['equity']:,.0f}</div><div style="color: #888; font-size: 12px;">Equity</div></td>
+            <td style="padding: 8px 20px; text-align: center;"><div style="font-size: 24px; font-weight: bold;">{known_count}</div><div style="color: #888; font-size: 12px;">Signals found</div></td>
+            <td style="padding: 8px 20px; text-align: center;"><div style="font-size: 24px; font-weight: bold;">{dead_count}</div><div style="color: #888; font-size: 12px;">Dead ends</div></td>
+            <td style="padding: 8px 20px; text-align: center;"><div style="font-size: 24px; font-weight: bold;">{research['total_hypotheses']}</div><div style="color: #888; font-size: 12px;">Hypotheses</div></td>
+        </tr>
     </table>
     """
 
-    # Reliable patterns
-    reliable = [p for p in patterns if p["total_tests"] >= 3]
-    reliable.sort(key=lambda p: p["reliability_score"], reverse=True)
-    if reliable:
-        html += "<h3>Validated Patterns</h3><table style='border-collapse: collapse; width: 100%;'>"
-        html += "<tr style='background: #f0f0f0;'><th style='padding: 6px; text-align: left;'>Event Type</th><th style='padding: 6px;'>Tests</th><th style='padding: 6px;'>Reliability</th><th style='padding: 6px;'>Avg Effect</th></tr>"
-        for p in reliable:
-            rel_pct = f"{p['reliability_score']*100:.0f}%"
-            html += f"<tr><td style='padding: 6px;'>{p['event_type']}</td><td style='padding: 6px; text-align: center;'>{p['total_tests']}</td><td style='padding: 6px; text-align: center;'>{rel_pct}</td><td style='padding: 6px; text-align: center;'>{p['avg_actual_magnitude']:+.1f}%</td></tr>"
-        html += "</table>"
+    # All hypotheses as stories
+    all_h = active + pending + completed
+    if all_h:
+        html += '<h3>Hypotheses</h3>'
+        for h in all_h:
+            html += build_hypothesis_story(h)
 
-    if research.get('by_event_type'):
-        html += "<h4>Accuracy by Event Type</h4><ul>"
-        for event_type, data in research['by_event_type'].items():
-            html += f"<li><b>{event_type}</b>: {data['accuracy']} (avg confidence: {data['avg_confidence']})</li>"
-        html += "</ul>"
+    # Validated signals & dead ends
+    html += build_findings_section(knowledge)
 
-    if active:
-        html += "<h3>Active Experiments</h3><table style='border-collapse: collapse; width: 100%;'>"
-        html += "<tr style='background: #f0f0f0;'><th style='padding: 6px; text-align: left;'>ID</th><th style='padding: 6px; text-align: left;'>Symbol</th><th style='padding: 6px; text-align: left;'>Direction</th><th style='padding: 6px; text-align: left;'>Event</th><th style='padding: 6px; text-align: left;'>P&L</th><th style='padding: 6px; text-align: left;'>Deadline</th></tr>"
-        positions = {p['symbol']: p for p in summary['positions']}
-        for h in active:
-            pos = positions.get(h['expected_symbol'], {})
-            pnl = f"{pos.get('unrealized_plpc', 0):+.1f}%" if pos else "n/a"
-            deadline = h.get('trade', {}).get('deadline', 'n/a')[:10]
-            html += f"<tr><td style='padding: 6px;'>{h['id']}</td><td style='padding: 6px;'>{h['expected_symbol']}</td><td style='padding: 6px;'>{h['expected_direction']}</td><td style='padding: 6px;'>{h['event_description'][:50]}</td><td style='padding: 6px;'>{pnl}</td><td style='padding: 6px;'>{deadline}</td></tr>"
-        html += "</table>"
+    # Research areas studied
+    html += build_literature_section(knowledge)
 
-    if recent_completed:
-        html += "<h3>Recent Results</h3><table style='border-collapse: collapse; width: 100%;'>"
-        html += "<tr style='background: #f0f0f0;'><th style='padding: 6px; text-align: left;'>Symbol</th><th style='padding: 6px; text-align: left;'>Event</th><th style='padding: 6px; text-align: left;'>Expected</th><th style='padding: 6px; text-align: left;'>Abnormal</th><th style='padding: 6px; text-align: left;'>Correct?</th></tr>"
-        for h in recent_completed:
-            r = h.get("result", {})
-            correct = "YES" if r.get("direction_correct") else "NO"
-            abnormal = r.get('abnormal_return_pct', r.get('raw_return_pct', 0))
-            html += f"<tr><td style='padding: 6px;'>{h['expected_symbol']}</td><td style='padding: 6px;'>{h['event_description'][:40]}</td><td style='padding: 6px;'>{h['expected_magnitude_pct']:+.1f}%</td><td style='padding: 6px;'>{abnormal:+.1f}%</td><td style='padding: 6px;'>{correct}</td></tr>"
-        html += "</table>"
+    # Watchlist
+    import json
+    import os
+    rq = {}
+    try:
+        rq_path = os.path.join(os.path.dirname(__file__), "research_queue.json")
+        with open(rq_path) as f:
+            rq = json.load(f)
+    except Exception:
+        pass
 
-    if pending:
-        html += f"<h3>Pending Hypotheses ({len(pending)})</h3><ul>"
-        for h in pending:
-            html += f"<li><b>{h['expected_symbol']}</b> ({h['expected_direction']}) — {h['event_description'][:60]} [confidence: {h['confidence']}/10]</li>"
-        html += "</ul>"
-
-    # Known effects summary
-    known = knowledge.get("known_effects", {})
-    if known:
-        html += "<h3>Known Effects (Validated)</h3><ul>"
-        for event_type, effect in known.items():
-            html += f"<li><b>{event_type}</b>: {effect.get('description', '')} — status: {effect.get('status', 'unknown')}</li>"
-        html += "</ul>"
+    watchlist = rq.get("event_watchlist", [])
+    if watchlist:
+        html += '<h3>Watching for</h3><ul>'
+        for w in watchlist:
+            html += f'<li><b>{w.get("event", "?")}</b> — expected {w.get("expected_date", "?")}</li>'
+        html += '</ul>'
 
     html += """
-    <hr style="margin-top: 30px;">
-    <p style="color: #888; font-size: 12px;">Automated research report — Stock Market Causal Research Project</p>
+    <hr style="margin-top: 20px;">
+    <p style="color: #aaa; font-size: 11px;">Stock Market Causal Research</p>
     </body></html>
     """
     return html
@@ -183,20 +154,249 @@ def parse_token_usage(log_file):
     return totals
 
 
-def send_session_report(session_type, status, log_file, validation_warnings=""):
-    """Send a post-session summary email. Called by daily_research.sh after every run."""
+def parse_session_narrative(log_file):
+    """Extract the researcher's own commentary from a stream-json log."""
+    import json
+
+    texts = []
+    try:
+        with open(log_file) as f:
+            for line in f:
+                line = line.strip()
+                if not line or not line.startswith("{"):
+                    continue
+                try:
+                    obj = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if obj.get("type") == "assistant":
+                    for c in obj.get("message", {}).get("content", []):
+                        if c.get("type") == "text":
+                            text = c["text"].strip()
+                            if text and len(text) > 40:
+                                texts.append(text)
+    except Exception:
+        pass
+    return texts
+
+
+def get_latest_journal_entry():
+    """Get the most recent research journal entry."""
     import json
     import os
 
-    # Parse token usage from log
-    token_usage = parse_token_usage(log_file) if log_file else {}
+    journal_path = os.path.join(os.path.dirname(__file__), "logs", "research_journal.jsonl")
+    last = None
+    try:
+        with open(journal_path) as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    last = json.loads(line)
+    except Exception:
+        pass
+    return last
 
-    # Load current state for the report
+
+def build_hypothesis_story(h):
+    """Tell the story of a hypothesis in plain language."""
+    import html as html_mod
+
+    direction = h.get("expected_direction", "?")
+    mag = h.get("expected_magnitude_pct", 0)
+    timeframe = h.get("expected_timeframe_days", "?")
+    symbol = h.get("expected_symbol", "TBD")
+    status = h.get("status", "?")
+    confidence = h.get("confidence", "?")
+    n = h.get("backtest_events", h.get("sample_size", "?"))
+
+    # Status styling
+    status_colors = {
+        "pending": "#1565c0", "active": "#e65100",
+        "completed": "#2e7d32", "retired": "#888",
+    }
+    color = status_colors.get(status, "#333")
+
+    # The idea (what and why)
+    desc = h.get("event_description", "")
+    mechanism = h.get("causal_mechanism", "")
+
+    # What the evidence showed
+    oos = h.get("out_of_sample_split", {})
+    oos_verdict = oos.get("verdict", "")
+
+    html = f"""
+    <div style="border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 16px; font-weight: bold;">{html_mod.escape(h.get('event_type', '').replace('_', ' ').title())}</span>
+            <span style="background: {color}; color: white; padding: 2px 10px; border-radius: 12px; font-size: 12px;">{status}</span>
+        </div>
+
+        <div style="margin-top: 10px;">
+            <b>The idea:</b> {html_mod.escape(desc[:200])}
+        </div>
+
+        <div style="margin-top: 8px;">
+            <b>Why it should work:</b> {html_mod.escape(mechanism[:200])}
+        </div>
+
+        <div style="margin-top: 8px;">
+            <b>Expected:</b> {direction.upper()} for <b>+{mag}%</b> over {timeframe} days
+            (confidence: {confidence}/10, tested on {n} historical events)
+        </div>
+    """
+
+    # Out-of-sample results
+    if oos and oos.get("discovery_avg_abnormal_1d") is not None:
+        disc_ret = oos.get("discovery_avg_abnormal_1d", 0)
+        disc_n = oos.get("discovery_n", "?")
+        disc_pos = oos.get("discovery_positive_rate_1d", 0)
+        val_ret = oos.get("validation_avg_abnormal_1d", 0)
+        val_n = oos.get("validation_n", "?")
+        val_pos = oos.get("validation_positive_rate_1d", 0)
+
+        verdict_color = "#2e7d32" if "PASS" in str(oos_verdict).upper() else "#c62828"
+        html += f"""
+        <div style="margin-top: 10px; background: #fafafa; padding: 10px; border-radius: 4px;">
+            <b>Test results:</b><br>
+            Discovery ({disc_n} events): <b>{disc_ret:+.1f}%</b> day-1 return, {disc_pos:.0%} positive<br>
+            Out-of-sample ({val_n} events): <b>{val_ret:+.1f}%</b> day-1 return, {val_pos:.0%} positive<br>
+            <span style="color: {verdict_color}; font-weight: bold;">{html_mod.escape(str(oos_verdict))}</span>
+        </div>
+        """
+
+    # Live validation
+    live = h.get("live_validation_march_2026")
+    if live and isinstance(live, dict):
+        additions = live.get("additions", [])
+        avg_1d = live.get("avg_abnormal_1d", 0)
+        html += '<div style="margin-top: 8px; background: #e8f5e9; padding: 10px; border-radius: 4px;">'
+        html += f'<b>Live validation ({live.get("announcement_date", "")}):</b> '
+        if additions:
+            parts = [f'{a["symbol"]} {a.get("abnormal_1d", 0):+.1f}%' for a in additions[:6]]
+            html += ", ".join(parts)
+        html += f'<br>Average: <b>{avg_1d:+.1f}%</b> day-1 abnormal return'
+        html += '</div>'
+
+    # Trade status
+    trade = h.get("trade")
+    result = h.get("result")
+    if trade and not result:
+        html += f"""
+        <div style="margin-top: 8px; background: #fff3e0; padding: 10px; border-radius: 4px;">
+            <b>Active trade:</b> {html_mod.escape(str(symbol))} @ ${trade.get('entry_price', '?')}
+            &middot; Size: ${trade.get('position_size_usd', '?'):,}
+            &middot; Deadline: {str(trade.get('deadline', '?'))[:10]}
+        </div>
+        """
+    elif result:
+        ret = result.get("abnormal_return_pct", result.get("raw_return_pct", 0))
+        correct = result.get("direction_correct", False)
+        emoji = "Correct" if correct else "Wrong"
+        ret_color = "#2e7d32" if ret > 0 else "#c62828"
+        html += f"""
+        <div style="margin-top: 8px; background: {'#e8f5e9' if correct else '#ffebee'}; padding: 10px; border-radius: 4px;">
+            <b>Result:</b> <span style="color: {ret_color};">{ret:+.1f}% abnormal return</span> — {emoji}
+        </div>
+        """
+
+    html += "</div>"
+    return html
+
+
+def build_findings_section(knowledge):
+    """Build a readable summary of all validated signals and dead ends."""
+    import html as html_mod
+
+    html = ""
+
+    # Validated signals
+    known = knowledge.get("known_effects", {})
+    if known:
+        html += '<h3 style="color: #2e7d32;">Validated Signals</h3>'
+        for name, effect in known.items():
+            title = name.replace("_", " ").title()
+            mag = effect.get("avg_magnitude_pct", "?")
+            timeframe = effect.get("timeframe_days", "?")
+            n = effect.get("sample_size", "?")
+            rate = effect.get("reliability", 0)
+            status = effect.get("status", "unknown")
+            desc = effect.get("description", "")
+
+            status_style = 'color: #2e7d32; font-weight: bold;' if status == 'strong' else ''
+
+            html += f"""
+            <div style="background: #f0f8f0; border-left: 4px solid #2e7d32; padding: 12px 16px; margin: 12px 0;">
+                <div style="font-size: 16px; font-weight: bold;">{html_mod.escape(title)}</div>
+                <div style="margin-top: 6px;">{html_mod.escape(desc)}</div>
+                <div style="margin-top: 8px; color: #555;">
+                    <b>+{mag}%</b> avg abnormal return over <b>{timeframe} days</b>
+                    &middot; {rate*100:.0f}% positive rate
+                    &middot; n={n}
+                    &middot; <span style="{status_style}">{status}</span>
+                </div>
+            """
+            if effect.get("magnitude_discovery") and effect.get("magnitude_oos"):
+                html += f"""
+                <div style="margin-top: 6px; font-size: 13px; color: #666;">
+                    Discovery: {html_mod.escape(str(effect['magnitude_discovery']))}
+                    <br>Out-of-sample: {html_mod.escape(str(effect['magnitude_oos']))}
+                </div>
+                """
+            if effect.get("regime_dependence"):
+                html += f'<div style="margin-top: 4px; font-size: 13px; color: #996600;">Regime note: {html_mod.escape(str(effect["regime_dependence"]))}</div>'
+            html += "</div>"
+
+    # Dead ends
+    dead = knowledge.get("dead_ends", [])
+    if dead:
+        html += f'<h3 style="color: #888;">Dead Ends ({len(dead)} ideas tested, didn\'t work)</h3><ul style="color: #666;">'
+        for d in dead:
+            name = d.get("event_type", "").replace("_", " ").title()
+            # Extract just the first sentence of the reason
+            reason = d.get("reason", "")
+            first_sentence = reason.split(".")[0] + "." if "." in reason else reason[:120]
+            html += f"<li><b>{html_mod.escape(name)}</b> — {html_mod.escape(first_sentence)}</li>"
+        html += "</ul>"
+
+    return html
+
+
+def build_literature_section(knowledge):
+    """Build a readable summary of what's been studied."""
+    import html as html_mod
+
+    lit = knowledge.get("literature", {})
+    if not lit:
+        return ""
+
+    html = '<h3>Research Areas</h3>'
+    for topic, data in lit.items():
+        title = topic.replace("_", " ").title()
+        key = data.get("key_finding", data.get("summary", ""))[:200]
+        html += f'<div style="margin: 8px 0;"><b>{html_mod.escape(title)}</b> — {html_mod.escape(key)}</div>'
+
+    return html
+
+
+def send_session_report(session_type, status, log_file, validation_warnings=""):
+    """Send a post-session summary email. Called by run.sh after every session."""
+    import json
+    import os
+    import html as html_mod
+
+    # Parse token usage and narrative from log
+    token_usage = parse_token_usage(log_file) if log_file else {}
+    narrative = parse_session_narrative(log_file) if log_file else []
+
+    # Get the latest journal entry (what the researcher wrote about this session)
+    journal = get_latest_journal_entry() or {}
+
+    # Load current state
     research = get_research_summary()
     knowledge = load_knowledge()
-    patterns = load_patterns()
 
-    # Read research_queue for priorities
+    # Read research_queue for priorities and handoff
     rq = {}
     try:
         rq_path = os.path.join(os.path.dirname(__file__), "research_queue.json")
@@ -205,87 +405,122 @@ def send_session_report(session_type, status, log_file, validation_warnings=""):
     except Exception:
         pass
 
-    queue_pending = len([t for t in rq.get("queue", []) if t.get("status") == "pending"])
-    queue_completed = len([t for t in rq.get("queue", []) if t.get("status") == "completed"])
-    watchlist_count = len(rq.get("event_watchlist", []))
+    handoff = rq.get("session_handoff", {})
     next_priorities = rq.get("next_session_priorities", [])
-
-    # Read last N lines of the log for a session excerpt
-    log_tail = ""
-    try:
-        with open(log_file) as f:
-            lines = f.readlines()
-        # Get last 40 lines, skip very long ones
-        tail_lines = [l[:200] for l in lines[-40:]]
-        log_tail = "".join(tail_lines)
-    except Exception:
-        log_tail = "(could not read log)"
+    queue_pending = len([t for t in rq.get("queue", []) if t.get("status") == "pending"])
+    watchlist_count = len(rq.get("event_watchlist", []))
 
     status_color = {"completed": "#2e7d32", "timed_out": "#e65100", "crashed": "#c62828"}.get(status, "#333")
-    status_emoji = {"completed": "OK", "timed_out": "TIMEOUT", "crashed": "CRASHED"}.get(status, status.upper())
+    status_label = {"completed": "Completed", "timed_out": "Timed Out", "crashed": "Crashed"}.get(status, status.upper())
 
-    subject = f"[{status_emoji}] {session_type} session — {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+    subject = f"Research session — {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+    if status != "completed":
+        subject = f"[{status_label.upper()}] {subject}"
 
+    # --- Build the email ---
     html = f"""
-    <html><body style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;">
-    <h2 style="color: {status_color};">{session_type.replace('_', ' ').title()} Session — {status_emoji}</h2>
-    <p>{datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
-
-    <h3>Session</h3>
-    <table style="border-collapse: collapse;">
-        <tr><td style="padding: 4px 12px;">Type</td><td style="padding: 4px 12px;"><b>{session_type}</b></td></tr>
-        <tr><td style="padding: 4px 12px;">Status</td><td style="padding: 4px 12px; color: {status_color};"><b>{status}</b></td></tr>
-        <tr><td style="padding: 4px 12px;">Log</td><td style="padding: 4px 12px;">{os.path.basename(log_file)}</td></tr>
-    </table>
+    <html><body style="font-family: -apple-system, Arial, sans-serif; max-width: 700px; margin: 0 auto; color: #333;">
+    <h2>Research Session Report</h2>
+    <p style="color: #888;">{datetime.now().strftime('%A, %B %d %Y at %H:%M')} &middot; <span style="color: {status_color};">{status_label}</span></p>
     """
 
     if validation_warnings:
-        html += f'<p style="color: #e65100;"><b>Warnings:</b> {validation_warnings}</p>'
+        html += f'<p style="color: #e65100; background: #fff3e0; padding: 8px 12px; border-radius: 4px;"><b>Warning:</b> {html_mod.escape(validation_warnings)}</p>'
 
+    # --- What was investigated (from journal) ---
+    if journal.get("investigated"):
+        html += f"""
+        <h3>What was investigated</h3>
+        <p>{html_mod.escape(journal['investigated'])}</p>
+        """
+
+    # --- Key findings (from journal) ---
+    if journal.get("findings"):
+        html += '<h3>Findings</h3>'
+        # Split findings into paragraphs for readability
+        findings = journal["findings"]
+        for paragraph in findings.split("\n\n"):
+            paragraph = paragraph.strip()
+            if not paragraph:
+                continue
+            # Bold text before first colon on lines that look like labels
+            html += f'<p style="margin: 8px 0;">{html_mod.escape(paragraph)}</p>'
+
+    # --- Surprises (from journal) ---
+    if journal.get("surprised_by"):
+        html += f"""
+        <h3>Surprises</h3>
+        <div style="background: #fff8e1; border-left: 4px solid #ffa000; padding: 12px 16px; margin: 12px 0;">
+            {html_mod.escape(journal['surprised_by'])}
+        </div>
+        """
+
+    # --- Researcher's commentary (from log, most insightful excerpts) ---
+    if narrative:
+        # Pick the longest/most substantive messages (likely the analysis summaries)
+        best = sorted(narrative, key=len, reverse=True)[:3]
+        html += '<h3>Researcher notes</h3>'
+        for note in best:
+            # Trim to ~500 chars for readability
+            trimmed = note[:500] + ("..." if len(note) > 500 else "")
+            html += f'<div style="background: #f5f5f5; padding: 10px 14px; margin: 8px 0; border-radius: 4px; font-size: 14px;">{html_mod.escape(trimmed)}</div>'
+
+    # --- Hypotheses (the full story) ---
+    all_hypotheses = get_active_hypotheses() + get_pending_hypotheses() + get_completed_hypotheses()
+    if all_hypotheses:
+        html += '<h3>Hypotheses</h3>'
+        for h in all_hypotheses:
+            html += build_hypothesis_story(h)
+
+    # --- Validated signals & dead ends ---
+    html += build_findings_section(knowledge)
+
+    # --- What's next ---
+    if handoff.get("next_step") or next_priorities:
+        html += '<h3>Next up</h3>'
+        if handoff.get("next_step"):
+            html += f'<p>{html_mod.escape(handoff["next_step"])}</p>'
+        if next_priorities:
+            html += "<ol>"
+            for p in next_priorities[:5]:
+                task_text = p.get("task", p) if isinstance(p, dict) else p
+                html += f"<li>{html_mod.escape(str(task_text))}</li>"
+            html += "</ol>"
+
+    if handoff.get("blockers"):
+        html += f'<p style="color: #c62828;">Blocked: {html_mod.escape(handoff["blockers"])}</p>'
+
+    # --- Scoreboard (compact) ---
+    known_count = len(knowledge.get("known_effects", {}))
+    dead_count = len(knowledge.get("dead_ends", []))
     html += f"""
-    <h3>Research Progress</h3>
+    <h3>Scoreboard</h3>
     <table style="border-collapse: collapse;">
-        <tr><td style="padding: 4px 12px;">Hypotheses</td><td style="padding: 4px 12px;">{research['total_hypotheses']} total, {research['active']} active, {research['completed']} completed</td></tr>
-        <tr><td style="padding: 4px 12px;">Direction accuracy</td><td style="padding: 4px 12px;"><b>{research['direction_accuracy']}</b></td></tr>
-        <tr><td style="padding: 4px 12px;">Patterns</td><td style="padding: 4px 12px;">{research['patterns_discovered']}</td></tr>
-        <tr><td style="padding: 4px 12px;">Literature entries</td><td style="padding: 4px 12px;">{len(knowledge.get('literature', {}))}</td></tr>
-        <tr><td style="padding: 4px 12px;">Known effects</td><td style="padding: 4px 12px;">{len(knowledge.get('known_effects', {}))}</td></tr>
-        <tr><td style="padding: 4px 12px;">Dead ends</td><td style="padding: 4px 12px;">{len(knowledge.get('dead_ends', []))}</td></tr>
-        <tr><td style="padding: 4px 12px;">Research queue</td><td style="padding: 4px 12px;">{queue_pending} pending, {queue_completed} completed</td></tr>
-        <tr><td style="padding: 4px 12px;">Event watchlist</td><td style="padding: 4px 12px;">{watchlist_count} events</td></tr>
+        <tr><td style="padding: 4px 12px;">Validated signals</td><td style="padding: 4px 12px;"><b>{known_count}</b></td></tr>
+        <tr><td style="padding: 4px 12px;">Dead ends</td><td style="padding: 4px 12px;">{dead_count}</td></tr>
+        <tr><td style="padding: 4px 12px;">Hypotheses</td><td style="padding: 4px 12px;">{research['total_hypotheses']} ({research['active']} active)</td></tr>
+        <tr><td style="padding: 4px 12px;">Queue</td><td style="padding: 4px 12px;">{queue_pending} pending</td></tr>
+        <tr><td style="padding: 4px 12px;">Watchlist</td><td style="padding: 4px 12px;">{watchlist_count} events</td></tr>
     </table>
     """
 
+    # --- Token usage (compact) ---
     if token_usage and token_usage.get("total_tokens", 0) > 0:
         def fmt_k(n):
             return f"{n/1000:,.1f}k" if n >= 1000 else str(n)
         html += f"""
-    <h3>Token Usage</h3>
-    <table style="border-collapse: collapse;">
-        <tr><td style="padding: 4px 12px;">Input</td><td style="padding: 4px 12px;">{fmt_k(token_usage['input_tokens'])}</td></tr>
-        <tr><td style="padding: 4px 12px;">Output</td><td style="padding: 4px 12px;">{fmt_k(token_usage['output_tokens'])}</td></tr>
-        <tr><td style="padding: 4px 12px;">Cache read</td><td style="padding: 4px 12px;">{fmt_k(token_usage['cache_read_tokens'])}</td></tr>
-        <tr><td style="padding: 4px 12px;">Cache creation</td><td style="padding: 4px 12px;">{fmt_k(token_usage['cache_creation_tokens'])}</td></tr>
-        <tr><td style="padding: 4px 12px;"><b>Total</b></td><td style="padding: 4px 12px;"><b>{fmt_k(token_usage['total_tokens'])}</b></td></tr>
-        <tr><td style="padding: 4px 12px;">API calls</td><td style="padding: 4px 12px;">{token_usage['api_calls']}</td></tr>
-    </table>
+    <p style="color: #888; font-size: 12px; margin-top: 16px;">
+        Tokens: {fmt_k(token_usage['total_tokens'])} total
+        ({fmt_k(token_usage['input_tokens'])} in,
+        {fmt_k(token_usage['output_tokens'])} out,
+        {fmt_k(token_usage['cache_read_tokens'])} cached)
+        &middot; {token_usage['api_calls']} API calls
+    </p>
     """
 
-    if next_priorities:
-        html += "<h3>Next Session Priorities</h3><ol>"
-        for p in next_priorities[:5]:
-            task_text = p.get("task", p) if isinstance(p, dict) else p
-            html += f"<li>{task_text}</li>"
-        html += "</ol>"
-
-    # Log excerpt
-    import html as html_mod
-    html += f"""
-    <h3>Session Log (tail)</h3>
-    <pre style="background: #f5f5f5; padding: 12px; font-size: 11px; overflow-x: auto; max-height: 400px; white-space: pre-wrap;">{html_mod.escape(log_tail)}</pre>
-
-    <hr style="margin-top: 30px;">
-    <p style="color: #888; font-size: 12px;">Automated session report — Stock Market Causal Research Project</p>
+    html += """
+    <hr style="margin-top: 20px;">
+    <p style="color: #aaa; font-size: 11px;">Stock Market Causal Research</p>
     </body></html>
     """
 

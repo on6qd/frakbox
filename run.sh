@@ -52,7 +52,9 @@ run_session() {
   prompt=$(cat <<'PROMPT'
 Your agent constitution (.claude/agents/financial-researcher.md) is loaded automatically — it defines your scientific standards and operational rules.
 
-Read CLAUDE.md, then read your state files:
+Read steer.md first — it contains directions from the human researcher. If there are active directions, prioritize them over your own queue. Note which ones you picked up.
+
+Then read CLAUDE.md and your state files:
 - research_queue.json (priorities and handoff from last session)
 - knowledge_base.json (what you know)
 - hypotheses.json (all hypotheses)
