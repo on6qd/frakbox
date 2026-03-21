@@ -64,12 +64,12 @@ PROMPT
 
   $TIMEOUT_CMD claude \
     --agent financial-researcher \
-    --permission-mode dontAsk \
+    --dangerously-skip-permissions \
     --verbose \
     --output-format stream-json \
-    -p "$prompt" 2>>"$logfile" | tee -a "$logfile" || true
+    -p "$prompt" < /dev/null >>"$logfile" 2>&1 || true
 
-  echo "=== Session finished $(date) ===" | tee -a "$logfile"
+  echo "=== Session finished $(date) ===" >> "$logfile"
 
   # Send email report
   python3 email_report.py --session research completed "$logfile" "" 2>>"$logfile" || true
