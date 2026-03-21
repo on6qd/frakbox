@@ -47,6 +47,8 @@ def main():
                         help='Simulate without placing actual order')
     parser.add_argument('--entry-price', type=float, default=None,
                         help='Entry price (for return calculation)')
+    parser.add_argument('--yes', action='store_true',
+                        help='Skip confirmation prompt (for automated/non-interactive execution)')
     args = parser.parse_args()
 
     print("=" * 60)
@@ -86,6 +88,9 @@ def main():
         print(f"Current GO price: ${current:.2f}")
     except Exception as e:
         print(f"Warning: could not fetch live price: {e}")
+        if args.yes:
+            print("ERROR: Cannot auto-fetch price, and --yes flag set. Aborting.")
+            return 1
         current_input = input("Enter current GO price: ")
         current = float(current_input)
 
@@ -101,7 +106,11 @@ def main():
         print("[DRY RUN] Would close position and complete hypothesis")
         return 0
 
-    confirm = input("Close position and complete hypothesis? (yes/no): ").strip().lower()
+    if args.yes:
+        print("Auto-confirming close (--yes flag set).")
+        confirm = 'yes'
+    else:
+        confirm = input("Close position and complete hypothesis? (yes/no): ").strip().lower()
     if confirm != 'yes':
         print("Aborted.")
         return 0

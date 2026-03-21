@@ -63,6 +63,8 @@ def main():
                         help='Simulate without placing actual order')
     parser.add_argument('--price', type=float, default=None,
                         help='Override entry price (default: fetch live)')
+    parser.add_argument('--yes', action='store_true',
+                        help='Skip confirmation prompt (for automated/non-interactive execution)')
     args = parser.parse_args()
 
     print("=" * 60)
@@ -108,7 +110,11 @@ def main():
         return 0
 
     # Confirm
-    confirm = input("Place trade? (yes/no): ").strip().lower()
+    if args.yes:
+        print("Auto-confirming (--yes flag set).")
+        confirm = 'yes'
+    else:
+        confirm = input("Place trade? (yes/no): ").strip().lower()
     if confirm != 'yes':
         print("Aborted.")
         return 0

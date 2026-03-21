@@ -63,6 +63,8 @@ def main():
                         help='Simulate without placing actual order')
     parser.add_argument('--entry-price', type=float, default=None,
                         help='Entry price (for return calculation, overrides stored value)')
+    parser.add_argument('--yes', action='store_true',
+                        help='Skip confirmation prompt (for automated/non-interactive execution)')
     args = parser.parse_args()
 
     print("=" * 60)
@@ -111,6 +113,9 @@ def main():
             current = float(hist['Close'].iloc[-1])
             print(f"Current WD price (yfinance): ${current:.2f}")
         except Exception as e2:
+            if args.yes:
+                print("ERROR: Cannot auto-fetch WD price, and --yes flag set. Aborting.")
+                return 1
             current_input = input(f"Enter current WD price: ")
             current = float(current_input)
 
@@ -131,7 +136,11 @@ def main():
         print(f"[DRY RUN] Outcome would be: {outcome}")
         return 0
 
-    confirm = input("Close position and complete hypothesis? (yes/no): ").strip().lower()
+    if args.yes:
+        print("Auto-confirming close (--yes flag set).")
+        confirm = 'yes'
+    else:
+        confirm = input("Close position and complete hypothesis? (yes/no): ").strip().lower()
     if confirm != 'yes':
         print("Aborted.")
         return 0
