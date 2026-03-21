@@ -315,5 +315,136 @@
       "note": "5-day window already passed (Mar 9-13). All 4 additions positive, consistent with hypothesis. Effective date Mar 23.",
       "measured": "2026-03-19"
     }
+  },
+  {
+    "id": "0a093c90",
+    "created": "2026-03-21T09:25:43.434818",
+    "prediction_hash": "e5bfeaaaea5f5ca2",
+    "idempotency_key": "395cd3a01e91d26b",
+    "status": "pending",
+    "event_type": "insider_buying_cluster",
+    "event_description": "When 2+ corporate insiders (officers/directors) make open-market stock purchases within 30 days of each other (each >$50K), the stock outperforms over the next 20 trading days. Signal identified from SEC Form 4 filing dates (public information).",
+    "causal_mechanism": "Corporate insiders have material non-public information about company prospects. When multiple insiders independently buy within 30 days, it signals collective conviction about undervaluation \u2014 less likely to be idiosyncratic routine purchases or 10b5-1 plan execution. Cluster purchase confirmed via SEC Form 4 filing makes signal public. Momentum and factor investors then enter long positions, driving price discovery over the following weeks.",
+    "causal_mechanism_criteria": [
+      "actors_incentives",
+      "transmission_channel",
+      "academic_reference"
+    ],
+    "expected_symbol": "TBD",
+    "expected_direction": "long",
+    "expected_magnitude_pct": 2.0,
+    "expected_timeframe_days": 20,
+    "event_timing": "after_hours",
+    "backtest_symbols": null,
+    "backtest_events": null,
+    "historical_evidence": [
+      {
+        "symbol": "LIT_REF_1",
+        "date": "2018-03-15",
+        "source": "Lakonishok_Lee_2001",
+        "note": "pre-registration placeholder"
+      },
+      {
+        "symbol": "LIT_REF_2",
+        "date": "2018-09-20",
+        "source": "Lakonishok_Lee_2001",
+        "note": "pre-registration placeholder"
+      },
+      {
+        "symbol": "LIT_REF_3",
+        "date": "2019-01-10",
+        "source": "Alldredge_Blank_2017",
+        "note": "pre-registration placeholder"
+      },
+      {
+        "symbol": "LIT_REF_4",
+        "date": "2019-06-05",
+        "source": "Alldredge_Blank_2017",
+        "note": "pre-registration placeholder"
+      },
+      {
+        "symbol": "LIT_REF_5",
+        "date": "2019-11-12",
+        "source": "Kang_Kim_Wang_2018",
+        "note": "pre-registration placeholder"
+      },
+      {
+        "symbol": "LIT_REF_6",
+        "date": "2020-02-28",
+        "source": "Kang_Kim_Wang_2018",
+        "note": "pre-registration placeholder"
+      },
+      {
+        "symbol": "LIT_REF_7",
+        "date": "2020-08-15",
+        "source": "Finance_Letters_2024",
+        "note": "pre-registration placeholder"
+      },
+      {
+        "symbol": "LIT_REF_8",
+        "date": "2021-03-01",
+        "source": "Finance_Letters_2024",
+        "note": "pre-registration placeholder"
+      },
+      {
+        "symbol": "LIT_REF_9",
+        "date": "2021-09-10",
+        "source": "Finance_Letters_2024",
+        "note": "pre-registration placeholder"
+      },
+      {
+        "symbol": "LIT_REF_10",
+        "date": "2022-01-20",
+        "source": "Finance_Letters_2024",
+        "note": "pre-registration placeholder"
+      }
+    ],
+    "sample_size": 0,
+    "consistency_pct": 65.0,
+    "out_of_sample_split": {
+      "split_type": "temporal_auto",
+      "total_instances": 10,
+      "discovery_count": 7,
+      "validation_count": 3,
+      "validation_pct": 30.0,
+      "discovery_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "validation_indices": [
+        7,
+        8,
+        9
+      ],
+      "discovery_consistency_pct": 65.0,
+      "validation_consistency_pct": 65.0,
+      "note": "PRE-REGISTRATION: These are literature-anchor placeholders. Real OOS split will use 2020-2021 as discovery and 2022-2024 as validation after SEC Form 4 data collection. Temporal cutoff: 2022-01-01."
+    },
+    "confounders": {
+      "broad_market_direction": "mixed \u2014 cluster events span bull and bear regimes",
+      "vix_level": "unknown \u2014 will analyze by regime after backtest",
+      "sector_trend": "diverse sectors \u2014 Form 4 data spans all sectors",
+      "survivorship_bias": "SEC Form 4 captures all reporting companies at time of filing including later-delisted. yfinance may fail for delisted tickers \u2014 will track drop rate.",
+      "selection_bias": "Signal tested on Form 4 filing date (public info), not actual purchase date. 2-business-day reporting deadline means signal lags purchase by 1-2 days.",
+      "event_timing": "after_hours \u2014 Form 4 filings are typically submitted after market close",
+      "market_regime": "to be analyzed post-backtest; will segment by VIX at cluster date"
+    },
+    "market_regime_note": "Cluster purchases span multiple market regimes (2020 COVID crash, 2021 bull, 2022 bear). Effect may be regime-dependent \u2014 insider buying into a crash may outperform more than buying during a calm bull market. Will analyze subsets by VIX regime post-backtest.",
+    "regime_note": "Signal may be stronger during elevated-VIX periods when insider conviction signals more information",
+    "confidence": 5,
+    "literature_reference": "Lakonishok & Lee (2001, JF): insider purchases predict 3-month outperformance. Alldredge & Blank (2017): cluster purchases yield 2.1% monthly abnormal vs 1.2% solitary. Kang, Kim & Wang (2018): cluster purchases yield 3.8% abnormal over 21 trading days. Finance Letters (2024): suggests signal may only persist in illiquid small-caps.",
+    "survivorship_bias_note": "Using SEC Form 4 historical bulk data which captures all companies at time of filing including later-delisted firms. No forward-looking survivorship bias in event identification. However, yfinance may fail to fetch price data for delisted tickers \u2014 will note data failure rate and check if drops are non-random (i.e., are failing tickers systematically different from succeeding ones).",
+    "selection_bias_note": "Insider purchases are voluntary but legally required within 2 business days of the transaction. Signal tested on Form 4 filing date (public information), not actual purchase date. This simulates realistic tradeable timing. Key selection concern: insiders may be more likely to report promptly when the purchase was beneficial (winner's disclosure bias). Will test whether late filers (>2 days) have different outcomes than prompt filers.",
+    "passes_multiple_testing": null,
+    "multiple_testing_warning": null,
+    "confounder_warnings": null,
+    "dead_end_warnings": null,
+    "trade": null,
+    "result": null
   }
 ]

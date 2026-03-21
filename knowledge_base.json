@@ -70,17 +70,18 @@
       "recorded": "2026-03-19T21:08:22.605216"
     },
     "insider_buying_cluster": {
-      "summary": "Strong academic support for insider buying as a return predictor. Lakonishok & Lee (2001) JF: insider purchases predict 3-month forward returns, effect stronger for small/mid caps. Seyhun (1986): insiders earn abnormal returns of 3-5% over 12 months after open-market purchases. Jeng, Metrick & Zeckhauser (2003): insider purchases earn 50 bps/month abnormal return. 'Cluster' insider buying (multiple insiders buying within 30 days) is significantly stronger signal than single-insider purchases. Key distinction: open-market purchases vs option exercises \u2014 only open-market purchases are informative. Data source: SEC Form 4 filings (EDGAR), free public access. Best filters: (1) officer/director purchases only, (2) open-market transactions only, (3) 2+ insiders buying within 30 days = 'cluster', (4) transaction size >$50K per insider to filter noise.",
-      "key_papers": [
-        "Lakonishok & Lee (2001) - JF - Insider trading and future returns",
-        "Seyhun (1986) - JF - Insiders profits, costs of trading, and market efficiency",
-        "Jeng, Metrick & Zeckhauser (2003) - REStat - Estimating the returns to insider trading",
-        "Rozeff & Zaman (1998) - JAE - Overreaction and insider trading"
+      "summary": "Insider buying cluster signal (2+ insiders each buying >$50K within 30 days) shows positive abnormal returns at 3d and 5d horizons in two independent samples from 2020-2021 SEC Form 4 data. Both samples significant at p<0.05 for 3d and 5d. Effect size: avg 3-5% abnormal over 3-5 days. 20d signal is weak/absent (no significance, negative median). Key caveat: 37-42% data drop rate from delisted tickers introduces survivorship bias.",
+      "known_magnitude": "2-4% abnormal at 3-5 days (median 1.3-1.7%); mean inflated by outliers",
+      "known_timeframe": "3-5 trading days (not 20 days as initially hypothesized)",
+      "sources": [
+        "Lakonishok & Lee (2001, JF): insider purchases predict 3-month outperformance",
+        "Alldredge & Blank (2017): cluster purchases yield 2.1% monthly abnormal vs 1.2% solitary",
+        "Kang, Kim & Wang (2018): cluster purchases yield 3.8% abnormal over 21 trading days",
+        "Finance Letters (2024): signal may persist mainly in illiquid small-caps",
+        "Own backtest (2026-03-21): two independent 200-event samples from 2020-2021 SEC Form 4, 3d p=0.0044 and p=0.0048 in both samples; 5d p=0.037 and p=0.018"
       ],
-      "mechanism": "Insiders have private information about business prospects. Legal trading windows (open-window periods) constrain when they can trade, so purchases during these windows signal genuine conviction. Multiple insiders buying together amplifies the signal \u2014 each insider independently decided the stock is undervalued. Transmission: initial Form 4 disclosure on EDGAR within 2 days of transaction \u2192 institutional investors and algorithms detect cluster \u2192 front-running causes price pressure.",
-      "typical_effect_size": "+3-5% abnormal return over 3 months from cluster insider buying. Effect strongest for small-to-mid cap stocks with lower institutional coverage.",
-      "caveats": "Survivorship bias: only surviving companies have Form 4 data. Selection bias: dramatic cluster buys get press coverage. Insiders can be wrong (they often buy near fundamentally bad periods when stock is cheap). Legal constraint means actual purchase date may lag conviction formation by weeks. Academic literature is mostly from 1980s-2000s; HFT and algorithmic filing detection may have compressed the edge.",
-      "recorded": "2026-03-19T21:29:30.799260"
+      "gaps": "1. Survivorship bias: ~40% of events are delisted tickers with no yfinance data. Need a data source with historical prices for delisted tickers. 2. Optimal signal horizon appears to be 3-5 days, not 20 days as pre-registered. 3. Finance Letters (2024) suggests signal may only work in illiquid stocks \u2014 need to test large-cap (>$1B market cap) subset separately. 4. The high right-skew (mean >> median) suggests a few big wins drive the avg \u2014 need to test whether this is sustainable or lucky.",
+      "recorded": "2026-03-21T09:34:56.565225"
     },
     "activist_investor_13d": {
       "summary": "Brav, Jiang, Partnoy & Thomas (2008) JF: activist hedge fund 13D filings show 7% abnormal return in [-20, +20] day window around filing. Effect is robust across 2001-2006 sample. Greenwood & Schor (2009): only activist campaigns targeting M&A show persistent long-term returns; operational activists show weaker long-run effects. Gantchev (2013): contested activist campaigns cost activists on average $10.71M \u2014 so activists only escalate when stakes are high, making escalation a signal. Key: MUST distinguish activist 13D (intent to influence) from passive 5%+ ownership (13G). Activist funds to track: Elliott, Carl Icahn, ValueAct, Third Point, Pershing Square, Starboard Value, Jana Partners, Trian Fund, Engine Capital, Sachem Head.",
