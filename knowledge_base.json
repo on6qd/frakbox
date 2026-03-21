@@ -173,22 +173,58 @@
     },
     "fda_crl_clinical_post_crash_drift": {
       "description": "SHORT from open after clinical-primary CRL announcement: small biotech with clinical efficacy deficiency shows continued negative drift over 3-5 days after initial gap-down",
-      "only_when": "Initial gap-down is >60% (extreme surprise). Smaller crashes (<50%) show recovery.",
+      "only_when": "Initial gap-down is >60% (extreme surprise). CRL must be clinical/efficacy-primary (NOT safety-primary). First or second CRL for the drug (NOT 3rd+ = pre-anticipated). Company is single-drug or heavily dependent on this asset.",
       "evidence_strong_cases": {
-        "ARDX_2021-07-19": "3d=-15.3%, 5d=-28.9% (74% initial gap)",
-        "APLT_2024-11-27": "3d=-23.3%, 5d=-42.1% (77% initial gap)",
-        "OTLK_2023-08-29": "3d=-19.4%, 5d=-19.8% (80% initial gap)"
+        "ARDX_2021-07-20": "Gap=-73.6%, Day1=-73.9%, 1d=-4.2%, 3d=-16.4%, 5d=-19.9%. CRL: magnitude of effect 'small and unclear clinical significance'",
+        "APLT_2024-11-29": "Gap=-74.6%, Day1=-76.3%, 1d=-13.8%, 3d=-32.0%, 5d=-36.9%. CRL: deficiencies in clinical study results for govorestat (galactosemia)",
+        "OTLK_2023-08-30": "Gap=-80.2%, Day1=-80.9%, 1d=-15.2%, 3d=-14.5%, 5d=-19.3%. CRL: lack of substantial evidence of effectiveness"
       },
-      "evidence_recovery_cases": {
-        "BHVN_2024-11-04": "3d=+2.1% (40% initial gap - recovered)",
-        "ALDX_2026-03-16": "3d=+64.8% (73% gap but stock recovered sharply)"
+      "evidence_reversal_cases": {
+        "REPL_2025-07-22": "Day1=-77.2%, but 1d=+18.9%, 3d=+12.3%, 5d=+33.7% - REVERSAL. CRL: IGNYTE trial heterogeneity concern. Company had other pipeline assets (not single-drug). Pre-crash stock was UP +29.7% in prior 30 days.",
+        "ALDX_2026-03-17": "Day1=-70.7%, but 1d=+14.5% - REVERSAL. 3rd CRL for same drug = pre-anticipated (-22.8% in 30 days before crash).",
+        "CORV_2019-12-24": "Day1 small (crash was Dec 10 at AdComm vote). CRL was safety-primary not efficacy. Forward: 1d=+10%, 3d=+17.5%"
       },
-      "n_total": 5,
-      "n_strong_clinical": 3,
-      "verdict": "PROMISING but N=3 insufficient for hypothesis. Need 3+ more cases with >60% gap to test.",
-      "causal_mechanism": "Post-gap continuation: (1) institutional selling continues for days as risk managers exit, (2) retail investors slow to respond, (3) options market gamma selling drives continued pressure",
-      "source": "FDA CRL API: https://api.fda.gov/transparency/crl.json (419 CRLs, 124 unapproved, 25 with clinical language)",
-      "last_updated": "2026-03-21T13:27:00.250562"
+      "evidence_safety_primary": {
+        "AKBA_2022-03-30": "Gap=-4.3% (intraday, not overnight gap), Day1=-66.0%, 1d=-13.4%, 3d=-20.5%, 5d=-31.2%. BUT CRL was safety-primary (MACE concerns, liver injury) not efficacy. Efficacy was actually MET. Ambiguous."
+      },
+      "n_confirmed_continuation": 3,
+      "n_confirmed_reversal": 3,
+      "reversal_flags": [
+        "3rd+ CRL for same drug (stock pre-declined)",
+        "Safety-primary CRL (efficacy met, safety failed)",
+        "Company has diversified pipeline beyond the CRL drug",
+        "Stock already declined >20% in 30 days before crash",
+        "AdComm had already voted against"
+      ],
+      "continuation_criteria": [
+        "Initial gap-down >60%",
+        "Clinical-efficacy primary deficiency (not safety)",
+        "First or second CRL for this drug",
+        "Single-drug or heavily concentrated company",
+        "Stock stable or rising 30 days before crash (surprise element)"
+      ],
+      "avg_continuation_3d": -17.3,
+      "avg_continuation_5d": -25.4,
+      "new_cases_checked_2026_03_21": [
+        "IRON (Disc Medicine): only -22% - below threshold",
+        "BHVN (Biohaven): only -40% - below threshold",
+        "SYDNEXIS: private company",
+        "LIB Therapeutics: private company",
+        "RGNX: only -20% - below threshold",
+        "REPL (Replimune): -77% but REVERSAL (diversified pipeline, stock was rising before)",
+        "ALDX (Aldeyra): -70% but REVERSAL (3rd CRL, pre-anticipated)",
+        "AKBA (Akebia): -66% but SAFETY-primary CRL",
+        "ABEO (Abeona): -54% but CMC-only CRL"
+      ],
+      "verdict": "PENDING - N=3 confirmed continuation (need 3+ more matching all criteria before pre-registering). The reversal pattern is now understood: avoid when stock is pre-anticipated OR safety-primary OR company has other assets.",
+      "next_steps": [
+        "Look for 2019-2021 clinical CRL crashes in delisted tickers via Tiingo",
+        "Check Sesen Bio (SESN) Aug 2021 CRL - mixed clinical/CMC",
+        "Search for additional 2020-2022 single-drug clinical-efficacy CRL cases",
+        "Consider whether AKBA safety-primary case should be in separate category",
+        "If N reaches 6+ with all criteria, pre-register hypothesis"
+      ],
+      "last_updated": "2026-03-21T13:58:26.642906"
     }
   },
   "dead_ends": [
