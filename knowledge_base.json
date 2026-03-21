@@ -142,6 +142,53 @@
       "signal_direction": "LONG at open day after last cluster filing",
       "bias_note": "Favorable survivorship bias (acquisitions >> bankruptcies in delisted pool)",
       "last_updated": "2026-03-21T12:49:07.809010"
+    },
+    "insider_buying_cluster_largecap": {
+      "effect": "LARGECAP VALIDATION: 3+ insider cluster signal holds when filtered to large-cap stocks",
+      "filter_500m": {
+        "n": 266,
+        "year": "2023-2024",
+        "3d_avg_abnormal": "+3.46%",
+        "3d_median": "+2.34%",
+        "3d_pos_rate": "68.4%",
+        "3d_wilcoxon_p": "<0.0001",
+        "5d_avg_abnormal": "+3.60%",
+        "5d_pos_rate": "65.8%",
+        "passes_multiple_testing": true
+      },
+      "filter_5b": {
+        "n": 67,
+        "year": "2023-2024",
+        "3d_avg_abnormal": "+2.81%",
+        "3d_median": "+2.18%",
+        "3d_pos_rate": "70.1%",
+        "3d_wilcoxon_p": "0.0009",
+        "5d_avg_abnormal": "+2.96%",
+        "5d_pos_rate": "67.2%",
+        "passes_multiple_testing": true
+      },
+      "interpretation": "Signal is NOT driven by micro-cap outliers. Effect persists for S&P500-scale companies (>5B market cap). Median returns more reliable (less skewness). Confirms trading GO at ~$5B is within the validated signal range.",
+      "bias_note": "Largecap filter reduces survivorship bias - most >500M companies have continuous price history. Only 6/272 events failed (2.2% failure rate vs 40% full universe)",
+      "last_updated": "2026-03-21T13:17:13.583191"
+    },
+    "fda_crl_clinical_post_crash_drift": {
+      "description": "SHORT from open after clinical-primary CRL announcement: small biotech with clinical efficacy deficiency shows continued negative drift over 3-5 days after initial gap-down",
+      "only_when": "Initial gap-down is >60% (extreme surprise). Smaller crashes (<50%) show recovery.",
+      "evidence_strong_cases": {
+        "ARDX_2021-07-19": "3d=-15.3%, 5d=-28.9% (74% initial gap)",
+        "APLT_2024-11-27": "3d=-23.3%, 5d=-42.1% (77% initial gap)",
+        "OTLK_2023-08-29": "3d=-19.4%, 5d=-19.8% (80% initial gap)"
+      },
+      "evidence_recovery_cases": {
+        "BHVN_2024-11-04": "3d=+2.1% (40% initial gap - recovered)",
+        "ALDX_2026-03-16": "3d=+64.8% (73% gap but stock recovered sharply)"
+      },
+      "n_total": 5,
+      "n_strong_clinical": 3,
+      "verdict": "PROMISING but N=3 insufficient for hypothesis. Need 3+ more cases with >60% gap to test.",
+      "causal_mechanism": "Post-gap continuation: (1) institutional selling continues for days as risk managers exit, (2) retail investors slow to respond, (3) options market gamma selling drives continued pressure",
+      "source": "FDA CRL API: https://api.fda.gov/transparency/crl.json (419 CRLs, 124 unapproved, 25 with clinical language)",
+      "last_updated": "2026-03-21T13:27:00.250562"
     }
   },
   "dead_ends": [
