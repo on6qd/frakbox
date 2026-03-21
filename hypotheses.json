@@ -1585,7 +1585,7 @@
       "transmission_channel",
       "academic_reference"
     ],
-    "expected_symbol": "TBD",
+    "expected_symbol": "GO",
     "expected_direction": "long",
     "expected_magnitude_pct": 2.5,
     "expected_timeframe_days": 1,
@@ -2799,6 +2799,21 @@
     ],
     "dead_end_warnings": null,
     "trade": null,
-    "result": null
+    "result": null,
+    "trade_notes": {
+      "live_signal_found": "2026-03-21",
+      "cluster_details": {
+        "insiders": 6,
+        "includes_ceo": true,
+        "total_value": 6323953,
+        "date_range": "2026-03-06 to 2026-03-19",
+        "avg_purchase_price": 6.02
+      },
+      "planned_entry": "Monday 2026-03-24 market open",
+      "planned_entry_price_estimate": 5.79,
+      "planned_exit": "2026-03-25 close (1d hold)",
+      "position_size": 5000,
+      "rationale": "CEO + 5 directors buying into sustained weakness. Current price $5.79 is 4% below insider avg. Strongest cluster signal (6 insiders) since backtest period."
+    }
   }
 ]

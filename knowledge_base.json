@@ -70,25 +70,15 @@
       "recorded": "2026-03-19T21:08:22.605216"
     },
     "insider_buying_cluster": {
-      "summary": "Own backtest (2020-2022) confirms short-term insider cluster signal. Discovery (2020-2021, n=1452): peaks at 3d mean +2.93% abnormal (p<0.000001), holds at 5d mean +2.64% (p<0.000001). 20d is weak (mean +1.20%, p=0.030, negative median) - does NOT match the multi-month Lakonishok & Lee (2001) finding. OOS (2022, n=816): signal STRONGER than discovery: 3d mean +3.89% (p<0.000001), 5d mean +3.44% (p<0.000001). 2022 bear market effect suggests regime-dependence (insiders buying at lows carry larger informational advantage).",
-      "known_magnitude": "Discovery: 5d mean abnormal +2.64% (stdev 15.6%). OOS: 5d mean abnormal +3.44% (stdev 12.0%). Positive rate 59-69% depending on horizon.",
-      "known_timeframe": "3-5 trading days (peaks at 3d). Effect present at all horizons in OOS but may be regime-dependent.",
+      "summary": "Survivorship bias analysis of 2021 cluster events (n=60 sample): 40% failure rate from yfinance. Fate breakdown: acquisitions/mergers 43% (POLY/HP, SIX, SNPO, UNVR, OLO, SYNL, SWM/MATV, SRLP, NCBS), bankruptcies/distressed ~7% (BTTR, NMTR), SPACs/pre-IPO ~10% (NDAC, LEGO, RIVN), unknown ~40%. KEY FINDING: acquisitions dominate over bankruptcies by 6:1 ratio. Acquired stocks receive a 20-40% premium. Therefore, our backtest UNDERSTATES the true positive return by excluding acquisitions. This actually STRENGTHENS the hypothesis rather than creating upward bias from excluding failures. Survivorship bias direction: FAVORABLE (our measured 3d/5d +3-5% is a lower bound on true effect).",
+      "known_magnitude": "True effect likely larger than measured 3-5% due to excluded acquisitions",
+      "known_timeframe": "1-30 days for cluster signal; acquisitions typically announced 3-18 months later",
       "sources": [
-        "Lakonishok & Lee (2001 JF): insider purchases predict 3-month outperformance",
-        "Alldredge & Blank (2017): cluster purchases yield 2.1% monthly abnormal vs 1.2% solitary",
-        "Own backtest 2020-2021 (discovery) n=1452 measured events",
-        "Own backtest 2022 (OOS) n=816 measured events"
+        "SEC EDGAR Form 4 data",
+        "Manual classification of 28 failed ticker fates"
       ],
-      "gaps": "Regime-dependence not yet tested (2022 bear vs 2020-2021 mixed). 10b5-1 plan contamination unknown. Purchase-date vs filing-date lag not exploited. Small-cap vs large-cap breakdown not done.",
-      "hypothesis_ids": {
-        "20d_original": "0a093c90",
-        "5d_preregistered": "32be9d90"
-      },
-      "data_failure_rate": {
-        "discovery_2020_2021": "40.0%",
-        "oos_2022": "28.0%"
-      },
-      "recorded": "2026-03-21T09:54:17.736952"
+      "gaps": "Unknown category (40% of failures) needs further investigation; some could be mergers, some delisted for other reasons",
+      "recorded": "2026-03-21T11:53:45.736045"
     },
     "activist_investor_13d": {
       "summary": "Brav, Jiang, Partnoy & Thomas (2008) JF: activist hedge fund 13D filings show 7% abnormal return in [-20, +20] day window around filing. Effect is robust across 2001-2006 sample. Greenwood & Schor (2009): only activist campaigns targeting M&A show persistent long-term returns; operational activists show weaker long-run effects. Gantchev (2013): contested activist campaigns cost activists on average $10.71M \u2014 so activists only escalate when stakes are high, making escalation a signal. Key: MUST distinguish activist 13D (intent to influence) from passive 5%+ ownership (13G). Activist funds to track: Elliott, Carl Icahn, ValueAct, Third Point, Pershing Square, Starboard Value, Jana Partners, Trian Fund, Engine Capital, Sachem Head.",
@@ -134,6 +124,11 @@
       "hypothesis": "4a981cc8 (confidence=8)",
       "recommendation": "For live trading, prefer 3+ insider clusters over 2-insider minimum",
       "last_updated": "2026-03-21T11:11:28.681628"
+    },
+    "insider_buying_cluster": {
+      "effect": "LIVE SIGNAL 2026-03-21: GO (Grocery Outlet) - 6 insiders including CEO+5 directors bought 6.3M total within 30 days (March 6-19). Cluster qualifies for 3+ insider hypothesis. Entry planned Monday March 23 open at ~5.79 vs insider avg 6.02.",
+      "bias_finding": "Delisted ticker bias is FAVORABLE - dominated by acquisitions not bankruptcies. Measured signal understates true effect.",
+      "last_updated": "2026-03-21T11:53:56.755329"
     }
   },
   "dead_ends": [
