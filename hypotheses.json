@@ -1567,7 +1567,10 @@
     "symbol_warnings": [],
     "dead_end_warnings": null,
     "trade": null,
-    "result": null
+    "result": null,
+    "trigger": "next_market_open",
+    "trigger_position_size": 5000,
+    "trigger_stop_loss_pct": 10
   },
   {
     "id": "4a981cc8",
@@ -3165,7 +3168,10 @@
       "entry_plan": "Monday March 23 open - 3 trading days after CEO+5 dir filing",
       "rationale": "6 insiders including CEO. 3d hold aligns better with this hypothesis than 4a981cc8.",
       "note": "If 4a981cc8 (1d hold) is activated first, use 1cb6140f for BLCO (9 insiders) next"
-    }
+    },
+    "trigger": "next_market_open",
+    "trigger_position_size": 5000,
+    "trigger_stop_loss_pct": 10
   },
   {
     "id": "5f805860",

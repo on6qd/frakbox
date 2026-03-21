@@ -104,9 +104,11 @@
       "category": "signal_discovery",
       "question": "Do large share buyback announcements (>5% market cap, or first-ever program) generate positive abnormal returns in the 3-5d window? Academic literature suggests +2-4%. Event source: 8-K Item 8.01. Advantage: announced any time, not just at earnings.",
       "priority": 1,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Buyback signal has strong literature support, clear event timing (8-K or press release), and clean causal mechanism (reduced float + management signal of undervaluation). Need to find events via EDGAR Item 8.01 with share repurchase filter for >5% market cap magnitude.",
-      "added": "2026-03-21T19:09:02.391627"
+      "added": "2026-03-21T19:09:02.391627",
+      "completed": "2026-03-21T19:30:24.153603",
+      "findings": "SIGNAL WEAKENED BY LITERATURE. Key findings: (1) Academic consensus: long-horizon abnormal returns on buyback announcements dropped to near-zero post-2007 as markets became efficient to this signal. (2) Short-term (3d) CAR is still ~1.4-1.6% per European studies, but US large-caps show diminishing effect. (3) First-ever buyback announcements are NOT reliably positive -- Salesforce first-ever B buyback (Aug 2022) caused a 10% DROP because investors read it as management signaling low-growth outlook. (4) Large routine buybacks (Apple B, MSFT B, etc.) have muted 1d stock reactions because they are expected and priced in. (5) The sub-signal with most promise: small/mid-cap companies announcing buyback for first time AND buying back >10% of float. Academic paper (Vermaelen) documents 16% long-horizon excess returns for large tender-offer buybacks, but tender offers are rare and well-known. (6) DECISION: Do not backtest this as-is. The causal mechanism (undervaluation signaling) is well-documented but efficiency has eroded the edge. NEXT STEP: If pursuing, narrow to (a) first-ever programs at companies with <B market cap, (b) buying back >10% of shares outstanding, (c) announced with earnings miss (contradicts growth pessimism narrative). This sub-hypothesis has not been tested and may have edge."
     },
     {
       "id": "seed-002",
@@ -241,6 +243,15 @@
       "added": "2026-03-21T19:09:02.392290"
     },
     {
+      "id": "da0e1d25",
+      "category": "capital_allocation",
+      "question": "Refined buyback sub-hypothesis: small-cap (<$2B mcap) first-ever buyback programs buying back >10% of float. Do these generate significant short-term abnormal returns? Build EDGAR 8-K scanner to find these events 2019-2024, then backtest.",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "General large buyback signal is dead (market efficient post-2007). But extreme-size first-ever buybacks at small-caps may still signal undervaluation meaningfully. Requires EDGAR 8-K item 8.01 parsing to find events. Academic paper by Vermaelen shows 16% long-horizon excess returns for large tender offers but this has not been tested for small-cap open-market repurchases.",
+      "added": "2026-03-21T19:30:39.570109"
+    },
+    {
       "id": "seed-003",
       "category": "fda_decision",
       "question": "For Phase 3 FDA approvals/rejections of novel drugs (not generics, not supplements), what is the typical abnormal return at 1d and 5d horizons? Does the effect differ between first-time submissions and resubmissions after a Complete Response Letter?",
@@ -348,45 +359,30 @@
   ],
   "next_session_priorities": [
     {
-      "task": {
-        "task": "IMMEDIATE (Monday March 23, 9:30 AM ET): Run python tools/activate_go_trade.py --yes AND python tools/activate_wd_trade.py --yes. Abort if either stock is down >10% from Friday close. GO expected at ~$5.79, WD expected at ~$43.82.",
-        "set_by_session": "2026-03-21T18:24:00"
-      },
-      "set_by_session": "2026-03-21T19:09:11.989051"
+      "task": "MONDAY MARCH 23 9:30 AM ET: trade_loop.py will fire triggers automatically. Verify by checking dry-run output. Both GO (1cb6140f) and WD (76678219) have trigger=next_market_open set. DO NOT run activate scripts manually -- trade_loop.py handles it.",
+      "set_by_session": "2026-03-21T19:30:55.788259"
     },
     {
-      "task": {
-        "task": "THURSDAY March 26 close: Run python tools/close_go_trade.py --yes to close GO position (3d hold expires). Hypothesis 1cb6140f.",
-        "set_by_session": "2026-03-21T18:24:00"
-      },
-      "set_by_session": "2026-03-21T19:09:11.989053"
+      "task": "THURSDAY March 26 close: Run python tools/close_go_trade.py --yes to close GO position (3d hold expires). Hypothesis 1cb6140f.",
+      "set_by_session": "2026-03-21T19:30:55.788264"
     },
     {
-      "task": {
-        "task": "TUESDAY March 30 close: Run python tools/close_wd_trade.py --yes to close WD position (5d hold expires). Hypothesis 76678219.",
-        "set_by_session": "2026-03-21T18:24:00"
-      },
-      "set_by_session": "2026-03-21T19:09:11.989054"
+      "task": "TUESDAY March 30 close: Run python tools/close_wd_trade.py --yes to close WD position (5d hold expires). Hypothesis 76678219.",
+      "set_by_session": "2026-03-21T19:30:55.788265"
     },
     {
-      "task": {
-        "task": "SESSION START ROUTINE: Run python tools/edgar_clinical_failure_scanner.py --days 7 to check for new qualifying events for d302c84b (clinical efficacy failure short). Run BEFORE anything else.",
-        "set_by_session": "2026-03-21T19:09:11.988932"
-      },
-      "set_by_session": "2026-03-21T19:09:11.989055"
+      "task": "SESSION START ROUTINE: Run python tools/edgar_clinical_failure_scanner.py --days 7. This week found 7 candidates: ALDX, RYTM, GOSS, TBPH, ATRA, OTLK, and unidentified Humacyte. Each needs: (1) single-pipeline check, (2) >55% crash verification, (3) no pre-anticipation check, (4) >/bin/zsh.50/share post-crash. GOSS is a repeat from prior analysis.",
+      "set_by_session": "2026-03-21T19:30:55.788266"
     },
     {
-      "task": {
-        "task": "RESEARCH: Build large buyback announcement scanner. Use EDGAR 8-K Item 8.01 search for share repurchase announcements. Filter for (1) first-ever or exceptionally large program, (2) >B market cap, (3) program size >5% of market cap. Run backtest on 2020-2024 events.",
-        "set_by_session": "2026-03-21T19:09:11.988938"
-      },
-      "set_by_session": "2026-03-21T19:09:11.989055"
+      "task": "RESEARCH: Refined buyback sub-hypothesis (task da0e1d25). Build EDGAR 8-K Item 8.01 scanner to find first-ever small-cap buyback programs >10% of float, 2019-2024. Then backtest.",
+      "set_by_session": "2026-03-21T19:30:55.788266"
     }
   ],
   "session_handoff": {
-    "notes": "Session 8 (March 21 afternoon): (1) Clinical failure scanner: checked ATRA, OTLK, TBPH, RYTM. No new qualifying events - OTLK price below $0.50 minimum, TBPH market cap >$500M, RYTM market cap $5.9B, ATRA had NO crash event. (2) S&P 500 March 2026 live validation: LITE/COHR/SATS/VRT all positive at 1d (avg +5.20%, 100% positive rate), confirms H-061ae3a8. (3) Earnings restatement signal DEAD END: 8-K filing date != announcement date for most events. Avg 1d abnormal -0.30%, passes_multiple_testing=False. SYM -36% crash genuine but showed reversal at 3d. Recorded in knowledge_base. (4) CEO unexpected departure signal: academic literature shows heterogeneous result (firing outperformer=negative, firing underperformer=positive). Not pursuing. (5) Credit rating upgrades: academic literature MIXED, pre-announcement effect captures most of the move. Not pursuing. (6) Added to research queue: large buyback announcements (medium priority) and fallen angel credit downgrades (low priority). (7) GO and WD paper trades still pending for Monday March 23 open.",
-    "set_by_session": "2026-03-21T19:09:11.988939",
-    "written_at": "2026-03-21T19:09:11.989056"
+    "notes": "Session 9 (March 21): Set trade_loop triggers on GO (1cb6140f) and WD (76678219) for Monday March 23 open. Both verified via dry-run (ready=False, fires at market open). EDGAR scanner found 7 clinical failure candidates this week -- need manual screening. Large buyback signal researched and recorded as dead end -- general signal eroded post-2007; narrow sub-hypothesis (small-cap, >10% float, first-ever) added to queue as da0e1d25.",
+    "set_by_session": "2026-03-21T19:30:00.000000",
+    "written_at": "2026-03-21T19:30:55.788268"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

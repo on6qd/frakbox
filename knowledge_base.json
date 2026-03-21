@@ -547,6 +547,11 @@
       "event_type": "earnings_restatement",
       "reason": "Large-cap 8-K Item 4.02 filings show avg 1d abnormal return of -0.30% (heterogeneous, 67% positive rate). Three fundamental problems: (1) 8-K filing date is NOT the announcement date for most events - market often learns via earnings calls, press releases, or trading halts before the 8-K is filed; (2) Direction is ambiguous - some restatements are upward revisions (RGEN, LZ, TRU all went UP); (3) 2021 SPAC warrant restatements contaminate the dataset. PRCH showed -16% on actual-announcement-day but this is exceptional. N=12 large-cap events, passes_multiple_testing=False. Signal is not reliable enough to trade.",
       "recorded": "2026-03-21T19:06:31.744515"
+    },
+    {
+      "event_type": "large_buyback_announcement",
+      "reason": "Large buyback announcements (>5% market cap) as a signal have been eroded by market efficiency post-2007. Academic literature (multiple studies 2020-2024) confirms long-horizon abnormal returns are near zero for US large/mid-caps. Short-term 3d CAR is ~1.4-1.6% but barely clears transaction costs and is not confirmed for US market 2020-2024. Counter-evidence: Salesforce first-ever B buyback (Aug 2022) caused -10% reaction because investors read it as low-growth signal. The general signal is dead. A narrower sub-hypothesis may have merit: first-ever programs at small-caps (<B mcap) buying back >10% of float. Not yet tested.",
+      "recorded": "2026-03-21T19:30:31.801882"
     }
   ]
 }
