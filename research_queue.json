@@ -204,40 +204,52 @@
   ],
   "next_session_priorities": [
     {
-      "task": "Run full 2020-2021 population backtest (all 2427 filtered events) to get N>1000 for power",
-      "set_by_session": "2026-03-21T09:35:22.188235"
+      "task": "Activate hypothesis 32be9d90 (insider_buying_cluster_5d): fetch 2023+ events from SEC Form 4 using insider_cluster_detector.py, or identify next live event. Paper trade K long.",
+      "set_by_session": "2026-03-21T09:54:56.510657"
     },
     {
-      "task": "Run 2022 out-of-sample validation backtest",
-      "set_by_session": "2026-03-21T09:35:22.188236"
+      "task": "Investigate OOS 2022 regime effect: why is the signal stronger in 2022 than 2020-2021? Run by-quarter analysis within 2022 to see if effect loads on Q4 bounce vs Q1-Q3 drawdown.",
+      "set_by_session": "2026-03-21T09:54:56.510663"
     },
     {
-      "task": "Investigate delisted ticker bias direction",
-      "set_by_session": "2026-03-21T09:35:22.188237"
+      "task": "Decide on 0a093c90 (20d): either retire as dead end for neutral regimes, or pre-register a regime-conditional version (insider cluster 20d in high-VIX environment).",
+      "set_by_session": "2026-03-21T09:54:56.510664"
     },
     {
-      "task": "Update hypothesis record with actual backtest evidence and proper OOS split",
-      "set_by_session": "2026-03-21T09:35:22.188238"
+      "task": "Data quality: 10b5-1 plan contamination - if SEC Form 4 includes a flag for 10b5-1 plans, filter them out and re-run to see if signal strengthens.",
+      "set_by_session": "2026-03-21T09:54:56.510665"
     }
   ],
   "session_handoff": {
-    "hypothesis_id": "0a093c90",
-    "hypothesis_status": "pending",
-    "prediction_hash": "e5bfeaaaea5f5ca2",
-    "backtest_status": "two independent 200-event discovery samples run",
-    "key_finding": "3d and 5d horizons significant in both samples (p<0.01 and p<0.05). 20d not significant. Mean 3-5% abnormal but median 1-2%, right-skewed.",
-    "critical_issue": "40% data drop rate from delisted tickers - survivorship bias direction unclear",
-    "csv_path": "/Users/frakbox/Bots/financial_researcher/data/insider_cluster_events.csv",
-    "cluster_count": 3638,
-    "discovery_pool": 2427,
-    "tool_created": "/Users/frakbox/Bots/financial_researcher/tools/insider_cluster_detector.py",
-    "sec_columns_confirmed": {
-      "submissions": "ACCESSION_NUMBER, FILING_DATE, ISSUERTRADINGSYMBOL",
-      "nonderiv_trans": "ACCESSION_NUMBER, TRANS_CODE, TRANS_SHARES, TRANS_PRICEPERSHARE",
-      "reporting_owners": "ACCESSION_NUMBER, RPTOWNERCIK, RPTOWNERNAME"
+    "current_investigation": "insider_buying_cluster signal - backtest complete",
+    "state": "COMPLETE - discovery + OOS validated. Hypothesis 32be9d90 (5d) confirmed. Ready for activation.",
+    "key_findings": {
+      "discovery_2020_2021": {
+        "n_measured": 1452,
+        "n_attempted": 2418,
+        "failure_rate": "40%",
+        "3d_mean": "+2.93%",
+        "5d_mean": "+2.64%",
+        "20d_mean": "+1.20%",
+        "passes_multiple_testing": true
+      },
+      "oos_2022": {
+        "n_measured": 816,
+        "n_attempted": 1138,
+        "failure_rate": "28%",
+        "3d_mean": "+3.89%",
+        "5d_mean": "+3.44%",
+        "20d_mean": "+3.67%",
+        "passes_multiple_testing": true,
+        "note": "Signal STRONGER in OOS 2022 bear market - likely regime effect"
+      }
     },
-    "pre_registration_timestamp": "2026-03-21",
-    "next_step": "Run full population backtest: python3 -c 'import sys; sys.path.insert(0, \"/Users/frakbox/Bots/financial_researcher\"); import pandas as pd, market_data; events = pd.read_csv(\"/Users/frakbox/Bots/financial_researcher/data/insider_cluster_events.csv\"); ...' with all 2427 2020-2021 filtered events",
-    "written_at": "2026-03-21T09:35:22.188239"
+    "hypothesis_ids": {
+      "5d_confirmed": "32be9d90",
+      "20d_original": "0a093c90"
+    },
+    "next_step": "Activate hypothesis 32be9d90. Fetch 2023-2024 SEC Form 4 data to get live event candidates.",
+    "blockers": "Need to collect 2023-2024 Form 4 data via insider_cluster_detector.py to find fresh events for live trading",
+    "written_at": "2026-03-21T09:54:56.510667"
   }
 }

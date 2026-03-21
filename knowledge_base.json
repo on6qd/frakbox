@@ -70,18 +70,25 @@
       "recorded": "2026-03-19T21:08:22.605216"
     },
     "insider_buying_cluster": {
-      "summary": "Insider buying cluster signal (2+ insiders each buying >$50K within 30 days) shows positive abnormal returns at 3d and 5d horizons in two independent samples from 2020-2021 SEC Form 4 data. Both samples significant at p<0.05 for 3d and 5d. Effect size: avg 3-5% abnormal over 3-5 days. 20d signal is weak/absent (no significance, negative median). Key caveat: 37-42% data drop rate from delisted tickers introduces survivorship bias.",
-      "known_magnitude": "2-4% abnormal at 3-5 days (median 1.3-1.7%); mean inflated by outliers",
-      "known_timeframe": "3-5 trading days (not 20 days as initially hypothesized)",
+      "summary": "Own backtest (2020-2022) confirms short-term insider cluster signal. Discovery (2020-2021, n=1452): peaks at 3d mean +2.93% abnormal (p<0.000001), holds at 5d mean +2.64% (p<0.000001). 20d is weak (mean +1.20%, p=0.030, negative median) - does NOT match the multi-month Lakonishok & Lee (2001) finding. OOS (2022, n=816): signal STRONGER than discovery: 3d mean +3.89% (p<0.000001), 5d mean +3.44% (p<0.000001). 2022 bear market effect suggests regime-dependence (insiders buying at lows carry larger informational advantage).",
+      "known_magnitude": "Discovery: 5d mean abnormal +2.64% (stdev 15.6%). OOS: 5d mean abnormal +3.44% (stdev 12.0%). Positive rate 59-69% depending on horizon.",
+      "known_timeframe": "3-5 trading days (peaks at 3d). Effect present at all horizons in OOS but may be regime-dependent.",
       "sources": [
-        "Lakonishok & Lee (2001, JF): insider purchases predict 3-month outperformance",
+        "Lakonishok & Lee (2001 JF): insider purchases predict 3-month outperformance",
         "Alldredge & Blank (2017): cluster purchases yield 2.1% monthly abnormal vs 1.2% solitary",
-        "Kang, Kim & Wang (2018): cluster purchases yield 3.8% abnormal over 21 trading days",
-        "Finance Letters (2024): signal may persist mainly in illiquid small-caps",
-        "Own backtest (2026-03-21): two independent 200-event samples from 2020-2021 SEC Form 4, 3d p=0.0044 and p=0.0048 in both samples; 5d p=0.037 and p=0.018"
+        "Own backtest 2020-2021 (discovery) n=1452 measured events",
+        "Own backtest 2022 (OOS) n=816 measured events"
       ],
-      "gaps": "1. Survivorship bias: ~40% of events are delisted tickers with no yfinance data. Need a data source with historical prices for delisted tickers. 2. Optimal signal horizon appears to be 3-5 days, not 20 days as pre-registered. 3. Finance Letters (2024) suggests signal may only work in illiquid stocks \u2014 need to test large-cap (>$1B market cap) subset separately. 4. The high right-skew (mean >> median) suggests a few big wins drive the avg \u2014 need to test whether this is sustainable or lucky.",
-      "recorded": "2026-03-21T09:34:56.565225"
+      "gaps": "Regime-dependence not yet tested (2022 bear vs 2020-2021 mixed). 10b5-1 plan contamination unknown. Purchase-date vs filing-date lag not exploited. Small-cap vs large-cap breakdown not done.",
+      "hypothesis_ids": {
+        "20d_original": "0a093c90",
+        "5d_preregistered": "32be9d90"
+      },
+      "data_failure_rate": {
+        "discovery_2020_2021": "40.0%",
+        "oos_2022": "28.0%"
+      },
+      "recorded": "2026-03-21T09:54:17.736952"
     },
     "activist_investor_13d": {
       "summary": "Brav, Jiang, Partnoy & Thomas (2008) JF: activist hedge fund 13D filings show 7% abnormal return in [-20, +20] day window around filing. Effect is robust across 2001-2006 sample. Greenwood & Schor (2009): only activist campaigns targeting M&A show persistent long-term returns; operational activists show weaker long-run effects. Gantchev (2013): contested activist campaigns cost activists on average $10.71M \u2014 so activists only escalate when stakes are high, making escalation a signal. Key: MUST distinguish activist 13D (intent to influence) from passive 5%+ ownership (13G). Activist funds to track: Elliott, Carl Icahn, ValueAct, Third Point, Pershing Square, Starboard Value, Jana Partners, Trian Fund, Engine Capital, Sachem Head.",

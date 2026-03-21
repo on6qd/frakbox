@@ -435,7 +435,7 @@
       "market_regime": "to be analyzed post-backtest; will segment by VIX at cluster date"
     },
     "market_regime_note": "Cluster purchases span multiple market regimes (2020 COVID crash, 2021 bull, 2022 bear). Effect may be regime-dependent \u2014 insider buying into a crash may outperform more than buying during a calm bull market. Will analyze subsets by VIX regime post-backtest.",
-    "regime_note": "Signal may be stronger during elevated-VIX periods when insider conviction signals more information",
+    "regime_note": "BACKTEST FINDING: 20d signal is weak in discovery (2020-2021): mean +1.20%, p=0.030, NEGATIVE median. However, 20d is significant in OOS 2022 (bear market year): mean +3.67%, p<0.000001. This suggests the 20d effect is REGIME-DEPENDENT: strong during bear markets when insider buying is most contrarian, near-zero in bull markets. The pre-registered 5d hypothesis (32be9d90) captures the more reliable cross-regime signal. Decision: this 20d hypothesis is CONDITIONALLY a dead end for neutral regimes, but may be worth pursuing as a regime-conditional strategy.",
     "confidence": 5,
     "literature_reference": "Lakonishok & Lee (2001, JF): insider purchases predict 3-month outperformance. Alldredge & Blank (2017): cluster purchases yield 2.1% monthly abnormal vs 1.2% solitary. Kang, Kim & Wang (2018): cluster purchases yield 3.8% abnormal over 21 trading days. Finance Letters (2024): suggests signal may only persist in illiquid small-caps.",
     "survivorship_bias_note": "Using SEC Form 4 historical bulk data which captures all companies at time of filing including later-delisted firms. No forward-looking survivorship bias in event identification. However, yfinance may fail to fetch price data for delisted tickers \u2014 will note data failure rate and check if drops are non-random (i.e., are failing tickers systematically different from succeeding ones).",
@@ -445,6 +445,7 @@
     "confounder_warnings": null,
     "dead_end_warnings": null,
     "trade": null,
-    "result": null
+    "result": null,
+    "notes_added": "Full backtest complete. Discovery (2020-2021, n=1452): 20d mean +1.20%, p=0.030, median -0.13%. OOS (2022 bear, n=816): 20d mean +3.67%, p<0.000001, median +1.84%. Divergence between discovery and OOS at 20d likely reflects bear-market regime effect. See hypothesis 32be9d90 for the more robust 5d signal."
   }
 ]
