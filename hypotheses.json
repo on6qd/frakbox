@@ -3493,7 +3493,7 @@
         10
       ],
       "discovery_consistency_pct": 100.0,
-      "validation_consistency_pct": 80.0,
+      "validation_consistency_pct": 100.0,
       "split_type": "temporal",
       "discovery_period": "2019-2022",
       "validation_period": "2023-2026",
@@ -3527,6 +3527,13 @@
       "Related dead end: clinical_trial_failure_undifferentiated \u2014 Phase 2/3 trial failures are too heterogeneous without filtering: 67% continuation, 33% reversal. Does not pass multiple testing (pos_rate=33%, avg_3d=-11.78%). Need discriminating factor: company cash runway, pipeline depth, drug credibility. Continuation cases: company wound down, drug clearly worthless. Reversal cases: company has other programs, cash to retry, partner support."
     ],
     "trade": null,
-    "result": null
+    "result": null,
+    "notes": [
+      {
+        "date": "2026-03-21",
+        "type": "correction",
+        "text": "Corrected validation_consistency_pct from 80% to 100%. Original 80% was based on stale GOSS measurement (+1.55%) which was due to wrong date. Corrected date (Feb 23, 2026) shows GOSS -37.21% continuation. All 5/5 validation events now confirm continuation pattern."
+      }
+    ]
   }
 ]

@@ -256,13 +256,33 @@
       "findings": "Dead end. Pre-ex-dividend run-up for high-yield stocks (VZ/MO/T/PM/KMI): avg 3d abnormal +0.60% (discovery) vs +0.21% (validation). Below 1.5% threshold. No multiple testing pass. Effect is ~0.4% average - too small to trade."
     },
     {
+      "id": "d288c2b8",
+      "category": "sec_wells_notice",
+      "question": "Wells Notice sub-hypothesis: Are financial fraud Wells Notices different from procedural ones? If yes, test 10+ fraud-specific Wells Notices (like BEN -13%, NRDS -7%) vs procedural (NDAQ +1.5%, XYL -2.5%). Need manual classification or a legal database. Likely requires Bloomberg Law or SEC enforcement actions database. LOW PRIORITY: would need external data source.",
+      "priority": 4,
+      "status": "pending",
+      "reasoning": "Wells Notice full sample failed multiple testing but directional pattern exists at 1d (68% negative). Fraud vs procedural is the key discriminator. Cannot test without case classification.",
+      "added": "2026-03-21T18:38:45.275104"
+    },
+    {
+      "id": "26108727",
+      "category": "activist_investor_13d",
+      "question": "Activist 13D first-news-date signal: Test activist campaigns using the FIRST NEWS COVERAGE DATE (not SEC filing date). The 10-day filing window means prices move on news leaks, not official filings. Would need Bloomberg News/Refinitiv to get publication dates. Brav et al (2008) found +7% for 2001-2006 using filing dates - this has decayed. But the causal mechanism is still valid. Test if usable via press release scraping (company press releases when activist publicly announces position). MEDIUM PRIORITY.",
+      "priority": 4,
+      "status": "pending",
+      "reasoning": "Activist 13D filing date signal fully decayed in 2020-2024 (avg +0.26% 1d, N=24 Starboard events). However academic support for the phenomenon is strong. Signal may be accessible via press release date rather than SEC filing date.",
+      "added": "2026-03-21T18:38:45.275867"
+    },
+    {
       "id": "3e7d2571",
       "category": "event_monitoring",
       "question": "Build EDGAR monitoring tool: daily scan of biotech 8-K filings for primary endpoint failure language. Use EDGAR EFTS full-text search API. Should flag: company name, ticker, date, keywords found. Run this at start of each session to catch qualifying events for d302c84b.",
       "priority": 7,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "The current approach of manually searching for qualifying events is slow and reactive. An automated EDGAR scanner would catch qualifying events within hours of the 8-K filing, enabling same-day trade setup.",
-      "added": "2026-03-21T18:04:39.810408"
+      "added": "2026-03-21T18:04:39.810408",
+      "completed": "2026-03-21T18:38:32.311158",
+      "findings": "COMPLETED: tools/edgar_clinical_failure_scanner.py was already built in Session 6. The tool scans EDGAR EFTS full-text search for 8-K filings with clinical failure language in last N days. Validated this session - run at start of each session to check for qualifying d302c84b events. Added to session startup routine."
     }
   ],
   "event_watchlist": [
@@ -310,52 +330,34 @@
   ],
   "next_session_priorities": [
     {
-      "task": {
-        "task": "IMMEDIATE (Monday March 23, 9:30 AM ET): Run python tools/activate_go_trade.py --yes AND python tools/activate_wd_trade.py --yes. Abort if either stock down >10% from Friday close.",
-        "set_by_session": "2026-03-21T17:00:00"
-      },
-      "set_by_session": "2026-03-21T18:07:25.828250"
+      "task": "IMMEDIATE (Monday March 23, 9:30 AM ET): Run python tools/activate_go_trade.py --yes AND python tools/activate_wd_trade.py --yes. Abort if either stock is down >10% from Friday close. GO expected at ~$5.79, WD expected at ~$43.82.",
+      "set_by_session": "2026-03-21T18:24:00"
     },
     {
-      "task": {
-        "task": "THURSDAY March 26 close: Run python tools/close_go_trade.py --yes to close GO position (3d hold expires).",
-        "set_by_session": "2026-03-21T17:00:00"
-      },
-      "set_by_session": "2026-03-21T18:07:25.828255"
+      "task": "THURSDAY March 26 close: Run python tools/close_go_trade.py --yes to close GO position (3d hold expires). Hypothesis 1cb6140f.",
+      "set_by_session": "2026-03-21T18:24:00"
     },
     {
-      "task": {
-        "task": "TUESDAY March 30 close: Run python tools/close_wd_trade.py --yes to close WD position (5d hold expires).",
-        "set_by_session": "2026-03-21T17:00:00"
-      },
-      "set_by_session": "2026-03-21T18:07:25.828256"
+      "task": "TUESDAY March 30 close: Run python tools/close_wd_trade.py --yes to close WD position (5d hold expires). Hypothesis 76678219.",
+      "set_by_session": "2026-03-21T18:24:00"
     },
     {
-      "task": {
-        "task": "SESSION START ROUTINE: Run python tools/edgar_clinical_failure_scanner.py --days 7 to check for new qualifying events for d302c84b (clinical efficacy failure short). If any ticker shows crash >55% in last 7 days: (1) check market cap <500M, (2) check single-pipeline, (3) check not pre-anticipated, (4) check post-crash price >0.50/share, (5) check no stated path forward. If qualifies, activate hypothesis d302c84b immediately.",
-        "set_by_session": "2026-03-21T17:00:00"
-      },
-      "set_by_session": "2026-03-21T18:07:25.828257"
+      "task": "SESSION START ROUTINE: Run python tools/edgar_clinical_failure_scanner.py --days 7 to check for new qualifying events for d302c84b (clinical efficacy failure short). Qualifying criteria: (1) market cap <500M, (2) crash >55%, (3) not pre-anticipated, (4) post-crash price >$0.50/share, (5) no stated path forward. If qualifies, check available hypothesis slots and activate immediately.",
+      "set_by_session": "2026-03-21T18:24:00"
     },
     {
-      "task": {
-        "task": "RESEARCH: Explore S&P 500 index DELETION signal (hypothesis 061ae3a8 is pending). When a stock is removed from S&P 500 (deletion announcement), there is a forced selling effect from index funds. Research whether deletion shows stronger signal than addition. Check: (1) recent S&P 500 deletions 2022-2025, (2) measure 1d/3d/5d abnormal returns post-announcement, (3) compare to the addition signal already researched.",
-        "set_by_session": "2026-03-21T17:00:00"
-      },
-      "set_by_session": "2026-03-21T18:07:25.828257"
+      "task": "RESEARCH: Check for S&P 500 addition announcements (off-cycle or Q2 2026 quarterly). Monitor press.spglobal.com for any new announcements. Hypothesis 061ae3a8 is pending with TBD symbol. Next quarterly rebalance announcement: expected June 7, 2026 after hours.",
+      "set_by_session": "2026-03-21T18:24:00"
     },
     {
-      "task": {
-        "task": "RESEARCH: Explore new signal category - SEC enforcement actions (Wells notices, SEC investigations announced via 8-K). When a company announces SEC investigation or receives Wells notice, does the stock continue to fall? Research: search EDGAR for 8-K filings with Item 8.01 mentioning SEC investigation or Wells notice (2020-2024), check market cap filter, measure abnormal returns.",
-        "set_by_session": "2026-03-21T17:00:00"
-      },
-      "set_by_session": "2026-03-21T18:07:25.828258"
+      "task": "RESEARCH: Explore new signal categories not yet tested: (1) Earnings restatement announcements - strong negative signal, (2) Dividend initiation effect - company pays first-ever dividend showing cash confidence, (3) Credit rating upgrade from junk to investment grade (fallen angel reversal). All have strong academic support and clear causal mechanisms.",
+      "set_by_session": "2026-03-21T18:24:00"
     }
   ],
   "session_handoff": {
-    "notes": "Session 6 (March 21): (1) Discovered GOSS reversal in d302c84b backtest was due to near-miss p=0.032 (not definitive failure) and company planned FDA meeting. True corrected avg_3d=-20.24% (not -27.45%). 10/11 continuation (90.9%). (2) Added new qualifying criteria: post-crash price >0.50/share, NO stated path forward. (3) CEO/CFO departure and reverse split: both dead ends at 3-5d horizon. (4) Built tools/edgar_clinical_failure_scanner.py to scan EDGAR daily for qualifying events. (5) No new qualifying events found for d302c84b. (6) Monday trades ready: GO (1cb6140f, 3d hold, close Thu Mar 26) + WD (76678219, 5d hold, close Tue Mar 30). Both scripts verified via --dry-run.",
-    "set_by_session": "2026-03-21T17:00:00",
-    "written_at": "2026-03-21T18:07:25.828259"
+    "notes": "Session 7 (March 21): (1) Fixed verify_data_integrity() bug - next_session_priorities had nested dict structure causing TypeError. Fixed in research.py line 1001. (2) Ran clinical failure scanner - no new qualifying events for d302c84b. (3) Explored Wells Notice signal: 22 events, 1d=-1.95% (p=0.0196, single horizon), DEAD END - heterogeneous event type, fails multiple testing. (4) Explored Activist 13D filing date signal: N=24 Starboard events, 1d=+0.26%, DEAD END - signal fully decayed from 2001-2006 era because market discovers position during accumulation before 13D filing date. (5) Fixed d302c84b validation_consistency_pct: was 80% (stale from wrong GOSS date), corrected to 100% (all 11 events now show continuation). (6) GO and WD paper trades still pending for Monday March 23 open. Both scripts verified working.",
+    "set_by_session": "2026-03-21T18:24:00",
+    "written_at": "2026-03-21T18:39:10.043596"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

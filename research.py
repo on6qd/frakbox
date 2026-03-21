@@ -998,7 +998,15 @@ def verify_data_integrity():
 
         # Check next_session_priorities for hypothesis ID references
         for p in rq.get("next_session_priorities", []):
-            task = p.get("task", "") if isinstance(p, dict) else str(p)
+            if isinstance(p, dict):
+                task_raw = p.get("task", "")
+                # task may be nested (a dict with 'task' key) or a plain string
+                if isinstance(task_raw, dict):
+                    task = task_raw.get("task", "") or str(task_raw)
+                else:
+                    task = str(task_raw)
+            else:
+                task = str(p)
             refs = re.findall(r'\b([0-9a-f]{8})\b', task)
             for ref in refs:
                 if ref not in hyp_ids and ref not in {t.get("id") for t in rq.get("queue", [])}:

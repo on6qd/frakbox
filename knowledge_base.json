@@ -83,11 +83,16 @@
       "recorded": "2026-03-21T12:49:43.996962"
     },
     "activist_investor_13d": {
-      "summary": "Brav, Jiang, Partnoy & Thomas (2008) JF: activist hedge fund 13D filings show 7% abnormal return in [-20, +20] day window around filing. Effect is robust across 2001-2006 sample. Greenwood & Schor (2009): only activist campaigns targeting M&A show persistent long-term returns; operational activists show weaker long-run effects. Gantchev (2013): contested activist campaigns cost activists on average $10.71M \u2014 so activists only escalate when stakes are high, making escalation a signal. Key: MUST distinguish activist 13D (intent to influence) from passive 5%+ ownership (13G). Activist funds to track: Elliott, Carl Icahn, ValueAct, Third Point, Pershing Square, Starboard Value, Jana Partners, Trian Fund, Engine Capital, Sachem Head.",
-      "typical_effect_size": "+7% abnormal return in 40-day window around 13D filing announcement",
-      "mechanism": "Activists acquire 5%+ position secretly (pre-13D filing), then file 13D triggering mandatory disclosure within 10 days. Market reprices target based on: (1) acquisition premium potential, (2) operational improvement expectations, (3) share buyback/dividend increase potential. Front-running by institutions and algorithms on 13D filing date compresses edge.",
-      "caveats": "Pre-announcement accumulation period is unobservable. Many 13D campaigns fail \u2014 activists don't always win. Effect may already be priced in by 13D date. Need to distinguish purpose (activist vs passive) which is disclosed in 13D but requires reading the filing.",
-      "recorded": "2026-03-19T21:29:30.799536"
+      "summary": "Activist investor 13D filing date (public SC 13D filing) as signal: Tested Starboard Value 13D initial filings N=24 (2020-2024). 1d avg=+0.26%, 3d avg=+0.30%, 5d avg=-0.17%. Positive rate 45.8%. Does NOT pass multiple testing. Signal has fully decayed from Brav et al (2008) +7% finding. Reason: 10-day filing window means markets discover position during accumulation (news leaks), so the 13D filing date is NOT the information event.",
+      "known_magnitude": "Near zero in 2020-2024 (1d=+0.26%, p=N/A). Literature found +7% for 2001-2006.",
+      "known_timeframe": "N/A - no signal at 1d-20d horizons for 13D filing date",
+      "sources": [
+        "Brav, Jiang, Partnoy & Thomas (2008) JF: +7% abnormal in [-20,+20] window around 13D filing",
+        "Greenwood & Schor (2009): only M&A-targeting activists show persistent long-run gains",
+        "Own backtest 2026-03-21: Starboard Value N=24 initial 13D filings 2020-2024"
+      ],
+      "gaps": "Signal may recover if using actual first-news-coverage date instead of SEC filing date. Requires Bloomberg/Refinitiv news database to access. The causal mechanism remains valid - activists do create value - but we cannot access the true announcement date without premium news data.",
+      "recorded": "2026-03-21T18:38:18.995369"
     },
     "fda_crl_clinical_post_crash": {
       "summary": "Academic research (Investor underreaction to FDA CRL news): Long-term market reactions to FDA Phase III clinical trial announcements (ScienceDirect 2025) found evidence of investor underreaction - prices continue to drift in the same direction after initial crash. Larger reactions for small companies. CMC deficiencies associated with ~5pp less negative abnormal return than clinical deficiencies (ResearchGate academic paper on CRL deficiency types). This supports the post-gap continuation drift hypothesis.",
@@ -150,6 +155,17 @@
       ],
       "gaps": "Need more events to test >$500M cap boundary (ARDX was larger), need to test in high-VIX regimes",
       "recorded": "2026-03-21T15:58:21.438379"
+    },
+    "sec_wells_notice": {
+      "summary": "SEC Wells Notice disclosure effect (when companies announce receipt of Wells Notice via 8-K). Tested 22 events 2020-2024. 1d avg=-1.95% (p=0.0196), 3d avg=-2.05% (p=0.1934). Only 1d passes p<0.05 but fails Bonferroni requirement. 1d positive rate: 31.8% (directional but weak). SNR=0.55. High variance (stdev 3.62% at 1d). Not actionable.",
+      "known_magnitude": "1d avg=-1.95% (p=0.0196, single horizon only)",
+      "known_timeframe": "1 day - signal dissipates by 3d",
+      "sources": [
+        "Own backtest 2026-03-21: 22 Wells Notice 8-K events 2020-2024",
+        "EDGAR full-text search: SC 13D with Wells Notice language"
+      ],
+      "gaps": "Heterogeneous event type - procedural Wells notices (NDAQ, XYL, HAYW) show near-zero reaction. Would need news database to classify fraud vs procedural Wells notices.",
+      "recorded": "2026-03-21T18:38:18.994493"
     }
   },
   "known_effects": {
@@ -501,6 +517,16 @@
       "event_type": "reverse_stock_split_announcement",
       "reason": "Attempted to backtest reverse split announcement signal. N=3 (CLOV, NKLA, MVIS) shows avg_abnormal_1d=+3.2% (POSITIVE, unexpected), avg_abnormal_3d=-1.57%, positive_rate_3d=33%. Signal does not exist in 3-5 day post-announcement window. Main problems: (1) Most qualifying NASDAQ-compliance reverse splits involve micro-cap companies (<M market cap) with poor liquidity and high borrow costs. (2) Post-2023 NASDAQ rules require only 2 business days notice so announcement and effective date are simultaneous. (3) Signal is 12-month drift per academic literature (Desai & Jain 1997), not 3-5 day. (4) The 1d reaction is slightly positive (artificial demand from share consolidation). Not tradeable at 3-5 day horizon.",
       "recorded": "2026-03-21T18:01:33.135319"
+    },
+    {
+      "event_type": "sec_wells_notice",
+      "reason": "Wells Notice disclosures (SEC 8-K): Tested 22 events (2020-2024). 1d avg=-1.95% (p=0.0196), 3d avg=-2.05% (p=0.1934). Only 1 horizon passes at p<0.05 - fails Bonferroni requirement (need p<0.01). 1d positive rate 31.8% (68.2% negative) shows directional tendency but SNR=0.55 is too low. High variance: stdev 3.62% at 1d. COIN May 2023 is outlier (+18% 3d) due to crypto industry dynamics. Large-cap sub-sample (N=16, ex-COIN): 1d p=0.04, 3d p=0.09 - still fails multiple testing. Core issue: Wells Notices are heterogeneous (fraud vs procedural) and the procedural ones (NDAQ, XYL, HAYW) show near-zero reaction. Would need N=50+ to sub-classify reliably. NOT WORTH PURSUING without access to legal case classification.",
+      "recorded": "2026-03-21T18:29:42.245298"
+    },
+    {
+      "event_type": "activist_investor_13d_filing",
+      "reason": "Activist investor SC 13D filing date as signal: Tested Starboard Value initial 13D filings (N=24, 2020-2024). 1d avg=+0.26%, 3d avg=+0.30%, 5d avg=-0.17%. Positive rate 45.8% (below 50%). Does not pass multiple testing. MECHANISM FAILURE: SC 13D filings have a 10-day filing window after crossing 5% threshold. News of activist accumulation typically leaks before the official filing date, so the filing date is NOT the information event. The market reprices on news discovery (often during accumulation) rather than at filing. Brav et al (2008) found +7% for 2001-2006 data - this effect has DECAYED completely in 2020-2024. Could potentially recover signal using news discovery dates (first media coverage) rather than filing dates, but would require Bloomberg/Refinitiv news database. Causal mechanism still valid but signal access requires news data we do not have.",
+      "recorded": "2026-03-21T18:33:07.456524"
     }
   ]
 }
