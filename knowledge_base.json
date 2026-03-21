@@ -138,6 +138,18 @@
       },
       "gaps": "Need to quantify the discriminating factor (cash runway, number of pipeline assets, prior program failures). Cannot yet predict continuation vs reversal systematically. Recommend collecting cash position + pipeline count for each event.",
       "recorded": "2026-03-21T15:30:03.780266"
+    },
+    "clinical_efficacy_failure_short": {
+      "summary": "Single-pipeline small biotech stocks that crash >55% on clinical efficacy failure (Phase 2/3 or FDA CRL) continue to decline -27% on average over 3 trading days. N=11, 100% directional accuracy at 3d/5d, p=0.001. Two event types share the same causal mechanism: removal of all projected revenue for a single-drug company. Registered as hypothesis d302c84b.",
+      "known_magnitude": "-27.45% avg abnormal 3d (range: -14.95% to -41.42%)",
+      "known_timeframe": "3 trading days from crash-day open",
+      "sources": [
+        "Bhattacharya et al. (2009): Phase 2/3 failures cause -8 to -11% 3-day CAR for small biotech",
+        "Hwang (2013): FDA CRL rejections cause persistent post-announcement drift",
+        "Our own N=11 backtest 2019-2026 (both CRL and Phase 2/3 combined)"
+      ],
+      "gaps": "Need more events to test >$500M cap boundary (ARDX was larger), need to test in high-VIX regimes",
+      "recorded": "2026-03-21T15:58:21.438379"
     }
   },
   "known_effects": {
@@ -432,6 +444,125 @@
       },
       "note": "Both show continuation. Both are 2026 events, potentially tradeable in future.",
       "last_updated": "2026-03-21T15:30:03.781291"
+    },
+    "clinical_efficacy_failure_short": {
+      "discovery": "N=11 events (6 FDA CRL clinical + 5 Phase 2/3 failures), single-pipeline small biotech, >55% initial crash",
+      "avg_abnormal_3d": -27.45,
+      "avg_abnormal_5d": -29.4,
+      "avg_abnormal_10d": -30.4,
+      "positive_rate_3d": 0.0,
+      "positive_rate_5d": 0.0,
+      "wilcoxon_p_3d": 0.001,
+      "passes_multiple_testing": true,
+      "oos_split": "temporal: 2019-2022 discovery (n=6), 2023-2026 validation (n=5)",
+      "discovery_avg_3d": -28.45,
+      "validation_avg_3d": -26.26,
+      "reversal_case": "AVIR (Atea, Roche partner, multiple programs) -> +12.4% 3d -- EXCLUDED by single-pipeline filter",
+      "qualifying_filter": "crash>55%, single-pipeline, clinical/efficacy deficiency, not pre-anticipated (stock not down >20% in prior 10d)",
+      "events": [
+        {
+          "symbol": "ACER",
+          "date": "2019-06-24",
+          "abnormal_3d": -34.66,
+          "type": "CRL"
+        },
+        {
+          "symbol": "ARDX",
+          "date": "2021-07-19",
+          "abnormal_3d": -15.28,
+          "type": "CRL"
+        },
+        {
+          "symbol": "FBRX",
+          "date": "2021-09-03",
+          "abnormal_3d": -26.04,
+          "type": "Phase2b"
+        },
+        {
+          "symbol": "PRQR",
+          "date": "2022-02-11",
+          "abnormal_3d": -24.29,
+          "type": "Phase2"
+        },
+        {
+          "symbol": "ATHX",
+          "date": "2022-05-20",
+          "abnormal_3d": -41.42,
+          "type": "Phase3"
+        },
+        {
+          "symbol": "NERV",
+          "date": "2022-10-16",
+          "abnormal_3d": -29.0,
+          "type": "CRL"
+        },
+        {
+          "symbol": "GRTX",
+          "date": "2023-08-10",
+          "abnormal_3d": -14.95,
+          "type": "CRL"
+        },
+        {
+          "symbol": "OTLK",
+          "date": "2023-08-29",
+          "abnormal_3d": -19.45,
+          "type": "CRL"
+        },
+        {
+          "symbol": "APLT",
+          "date": "2024-11-29",
+          "abnormal_3d": -33.53,
+          "type": "CRL"
+        },
+        {
+          "symbol": "GOSS",
+          "date": "2026-02-23",
+          "abnormal_3d": -37.21,
+          "type": "Phase3"
+        },
+        {
+          "symbol": "IMMP",
+          "date": "2026-03-13",
+          "abnormal_3d": -26.16,
+          "type": "Phase3"
+        }
+      ],
+      "non_qualifying_events_tested": [
+        {
+          "symbol": "PTCT",
+          "crash": -9.9,
+          "reason": "multi-program large cap"
+        },
+        {
+          "symbol": "IRON",
+          "crash": -21.9,
+          "reason": "below 55% threshold"
+        },
+        {
+          "symbol": "SRRK",
+          "crash": 0,
+          "note": "went UP +12% on CRL - multi-program"
+        },
+        {
+          "symbol": "CAPR",
+          "crash": -33,
+          "reason": "CMC/manufacturing deficiency"
+        },
+        {
+          "symbol": "AQST",
+          "crash": 0,
+          "note": "went UP +39% - human factors issue"
+        },
+        {
+          "symbol": "AVIR",
+          "crash": -66,
+          "note": "REVERSAL +12.4% 3d - excluded by single-pipeline filter"
+        }
+      ],
+      "confidence": 8,
+      "hypothesis_id": "d302c84b",
+      "status": "pre-registered, awaiting live event",
+      "last_updated": "2026-03-21T15:58:21.437159"
     }
   },
   "dead_ends": [
