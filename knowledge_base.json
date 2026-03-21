@@ -553,6 +553,26 @@
       "event_type": "large_buyback_announcement",
       "reason": "Large buyback announcements (>5% market cap) as a signal have been eroded by market efficiency post-2007. Academic literature (multiple studies 2020-2024) confirms long-horizon abnormal returns are near zero for US large/mid-caps. Short-term 3d CAR is ~1.4-1.6% but barely clears transaction costs and is not confirmed for US market 2020-2024. Counter-evidence: Salesforce first-ever B buyback (Aug 2022) caused -10% reaction because investors read it as low-growth signal. The general signal is dead. A narrower sub-hypothesis may have merit: first-ever programs at small-caps (<B mcap) buying back >10% of float. Not yet tested.",
       "recorded": "2026-03-21T19:30:31.801882"
+    },
+    {
+      "event_type": "fallen_angel_credit_downgrade",
+      "reason": "IG-to-junk credit downgrades tested as short signal (3-5d hold). DEAD END for 3 reasons: (1) Insufficient clean events: most fallen angel events cluster in 2020 COVID crisis making it impossible to isolate the downgrade effect from market-wide selloff. Only 4-5 clean non-crisis events identifiable in 2018-2024 (KHC 2019, GE 2021, DISH 2019, VFC 2023). Insufficient for OOS split (need min 6). (2) Pre-anticipation: fallen angel downgrades are typically preceded by months of credit watch periods. Stock market prices in the downgrade well before the announcement. GE Oct 2018 downgrade day saw +7% stock return (relief rally, not crash). VFC Nov 2023 downgrade day coincided with earnings beat, up +10%. (3) Wrong mechanism for equity alpha: credit downgrades affect bond prices directly. The equity effect requires forced selling by IG-only bond funds (which does not affect stock price directly) and higher cost of capital repricing (too slow for 3-5d hold). Literature: Kliger & Sarig (2000) found credit rating changes affect bond markets more than equity markets. Equity abnormal returns on rating change day are near zero.",
+      "recorded": "2026-03-21T19:56:50.043988"
+    },
+    {
+      "event_type": "profit_warning_preannouncement",
+      "reason": "Companies issuing intra-quarter profit warnings / negative guidance revisions via 8-K Item 7.01. Tested 6 events 2019-2022 (SNAP, AMD, AAPL, FDX, TGT, WMT). Results: 1d avg abnormal=-0.86%, 3d avg=-7.84% (driven by SNAP outlier), p=0.311-0.629. FAILS multiple testing. Heterogeneous outcomes: SNAP shows -41.2% 3d continuation (extreme -43% initial crash), but AAPL, TGT, FDX show near-zero or POSITIVE 3d abnormal. Core problem: mega-cap profit warnings attract fast-reacting institutional buyers (buy-the-dip); only micro/small-cap warnings with >30% initial crash might show continuation. But those events are hard to find systematically via EDGAR. Decision: dead end for systematic trading. The d302c84b hypothesis already captures the best version of this pattern (biotech-specific, very large crashes).",
+      "recorded": "2026-03-21T19:57:50.904780"
+    },
+    {
+      "event_type": "dividend_cut_suspension",
+      "reason": "Dividend cuts/suspensions at historically reliable dividend payers tested as short signal. Tested 8 non-COVID events 2018-2024 (GE, INTC, WBA, VFC, KHC, PCG, CTL, MPW). Results: 1d avg abnormal=-1.09% (p=0.55), 3d avg=-7.92% (p=0.147). Fails multiple testing. High variance: MPW +8.4% (investors interpreted cut as positive for balance sheet), VFC +6.5% 3d (recovery), KHC 3d movement driven by concurrent $15B goodwill writedown not dividend. PCG driven by bankruptcy context, not dividend. Core issue: dividend cuts are almost always concurrent with other negative news (earnings misses, restructuring) making it impossible to isolate dividend effect. Also many are pre-anticipated (stock already in decline). Income-focused REIT/utility stocks (MPW) have different investor base that views dividend cut as discipline signal. NOT actionable as standalone signal.",
+      "recorded": "2026-03-21T19:59:56.953665"
+    },
+    {
+      "event_type": "ipo_lockup_expiry",
+      "reason": "IPO lock-up expiry (typically 180 days post-IPO) tested as short signal. Tested 12 events 2020-2022. Results: 1d avg=+0.12% (flat), 3d avg=+1.66% (positive). Fails multiple testing. 50% positive rate = random. Key issues: (1) Effect has been pre-arbitraged - sophisticated traders SHORT before expiry, creating price pressure weeks before the event date, then BUY on the expiry date itself. This means the expiry DATE shows mean reversion (positive), not continuation (negative). (2) Heterogeneous outcomes: RIVN -5.7%, BRZE -4.6% vs DOCS +3.7%, MNDY +7.2%, COIN +1.9%. (3) Exact lock-up date uncertain - varies by share class, can be extended. Academic literature (Field & Hanka 2001): -2% at expiry in 1990s has likely decayed. NOT actionable.",
+      "recorded": "2026-03-21T20:00:43.102056"
     }
   ]
 }

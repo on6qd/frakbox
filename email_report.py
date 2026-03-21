@@ -326,36 +326,83 @@ def build_findings_section(knowledge):
     if known:
         html += '<h3 style="color: #2e7d32;">Validated Signals</h3>'
         for name, effect in known.items():
-            title = name.replace("_", " ").title()
-            mag = effect.get("avg_magnitude_pct", "?")
-            timeframe = effect.get("timeframe_days", "?")
-            n = effect.get("sample_size", "?")
-            rate = effect.get("reliability", 0)
-            status = effect.get("status", "unknown")
-            desc = _to_str(effect.get("description", ""))
+            # Skip deprecated entries
+            if "DEPRECATED" in name.upper() or effect.get("note", "").startswith("DEPRECATED"):
+                continue
 
-            status_style = 'color: #2e7d32; font-weight: bold;' if status == 'strong' else ''
+            title = name.replace("_", " ").title()
+            status = _to_str(effect.get("status", effect.get("verdict", "")))
+
+            # Build description from whatever fields exist
+            desc = _to_str(effect.get("description", effect.get("effect", "")))
+            if not desc:
+                # Fallback: use first string value that looks like a description
+                for v in effect.values():
+                    if isinstance(v, str) and len(v) > 30:
+                        desc = v
+                        break
+
+            # Pick border color based on status
+            if any(s in status.lower() for s in ["strong", "confirmed", "pass"]):
+                border_color = "#2e7d32"
+                bg_color = "#f0f8f0"
+            elif any(s in status.lower() for s in ["pending", "partial", "promising"]):
+                border_color = "#f9a825"
+                bg_color = "#fffde7"
+            else:
+                border_color = "#1565c0"
+                bg_color = "#e3f2fd"
 
             html += f"""
-            <div style="background: #f0f8f0; border-left: 4px solid #2e7d32; padding: 12px 16px; margin: 12px 0;">
+            <div style="background: {bg_color}; border-left: 4px solid {border_color}; padding: 12px 16px; margin: 12px 0;">
                 <div style="font-size: 16px; font-weight: bold;">{html_mod.escape(title)}</div>
-                <div style="margin-top: 6px;">{html_mod.escape(desc)}</div>
-                <div style="margin-top: 8px; color: #555;">
-                    <b>+{mag}%</b> avg abnormal return over <b>{timeframe} days</b>
-                    &middot; {rate*100:.0f}% positive rate
-                    &middot; n={n}
-                    &middot; <span style="{status_style}">{status}</span>
-                </div>
+                <div style="margin-top: 6px;">{html_mod.escape(desc[:300])}</div>
             """
+
+            # Show stats line if structured fields exist
+            stats_parts = []
+            mag = effect.get("avg_magnitude_pct") or effect.get("avg_abnormal_3d") or effect.get("avg_1d_abnormal")
+            if mag is not None:
+                stats_parts.append(f"<b>{mag:+.1f}%</b> avg abnormal" if isinstance(mag, (int, float)) else f"<b>{mag}</b>")
+            timeframe = effect.get("timeframe_days")
+            if timeframe:
+                stats_parts.append(f"over <b>{timeframe}d</b>")
+            n = effect.get("sample_size") or effect.get("n_events")
+            if n:
+                stats_parts.append(f"n={n}")
+            rate = effect.get("reliability") or effect.get("positive_rate") or effect.get("positive_rate_1d")
+            if rate is not None:
+                pct = rate * 100 if isinstance(rate, float) and rate <= 1 else rate
+                stats_parts.append(f"{pct:.0f}% positive")
+            if status:
+                stats_parts.append(status)
+
+            if stats_parts:
+                html += f'<div style="margin-top: 8px; color: #555;">{" &middot; ".join(stats_parts)}</div>'
+
+            # Discovery / OOS details
             if effect.get("magnitude_discovery") and effect.get("magnitude_oos"):
                 html += f"""
                 <div style="margin-top: 6px; font-size: 13px; color: #666;">
-                    Discovery: {html_mod.escape(str(effect['magnitude_discovery']))}
-                    <br>Out-of-sample: {html_mod.escape(str(effect['magnitude_oos']))}
+                    Discovery: {html_mod.escape(_to_str(effect['magnitude_discovery']))}
+                    <br>Out-of-sample: {html_mod.escape(_to_str(effect['magnitude_oos']))}
                 </div>
                 """
+            elif effect.get("discovery_2021") or effect.get("oos_2022"):
+                parts = []
+                if effect.get("discovery_2021"):
+                    parts.append(f"Discovery: {html_mod.escape(_to_str(effect['discovery_2021']))}")
+                if effect.get("oos_2022"):
+                    parts.append(f"OOS 2022: {html_mod.escape(_to_str(effect['oos_2022']))}")
+                if effect.get("oos_2023_2024"):
+                    parts.append(f"OOS 2023-24: {html_mod.escape(_to_str(effect['oos_2023_2024']))}")
+                html += f'<div style="margin-top: 6px; font-size: 13px; color: #666;">{"<br>".join(parts)}</div>'
+
             if effect.get("regime_dependence"):
-                html += f'<div style="margin-top: 4px; font-size: 13px; color: #996600;">Regime note: {html_mod.escape(str(effect["regime_dependence"]))}</div>'
+                html += f'<div style="margin-top: 4px; font-size: 13px; color: #996600;">Regime: {html_mod.escape(_to_str(effect["regime_dependence"]))}</div>'
+            if effect.get("blocking_issue"):
+                html += f'<div style="margin-top: 4px; font-size: 13px; color: #c62828;">Blocking: {html_mod.escape(_to_str(effect["blocking_issue"]))}</div>'
+
             html += "</div>"
 
     # Dead ends
