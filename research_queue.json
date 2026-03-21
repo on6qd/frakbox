@@ -276,45 +276,31 @@
   ],
   "next_session_priorities": [
     {
-      "task": "IMMEDIATE (Monday March 23): Activate GO trade. Run: python tools/activate_go_trade.py (markets open 9:30 AM ET). Use hypothesis 1cb6140f (3d hold, NOT 4a981cc8 the 1d hold). Abort if GO down >10% from $5.79.",
-      "set_by_session": "2026-03-21T13:30:00.000000"
+      "task": "PRIORITY 1: FDA CRL SHORT SIGNAL - Need 3+ more clinical-primary CRL continuation cases to reach N=6 for hypothesis pre-registration. Current: N=3 (ARDX, APLT, OTLK). See research_queue for specific task.",
+      "set_by_session": "2026-03-21T14:05:37.546408"
     },
     {
-      "task": "THURSDAY March 26: Close GO trade at market close. Run: python tools/close_go_trade.py. Complete hypothesis 1cb6140f with actual return.",
-      "set_by_session": "2026-03-21T13:30:00.000000"
+      "task": "PRIORITY 2: GO Insider Trade - Execute Monday March 23 open. See task a37aba18 in research_queue.",
+      "set_by_session": "2026-03-21T14:05:37.546414"
     },
     {
-      "task": "LARGECAP BACKTEST DONE (this session). >500M filter: 3d +3.46%, 68% pos (n=266). >5B filter: 3d +2.81%, 70% pos (n=67). Signal confirmed for S&P500-scale stocks. Results saved to data/largecap_filtered_2324.csv and data/sp500like_filtered_2324.csv.",
-      "set_by_session": "2026-03-21T13:30:00.000000"
-    },
-    {
-      "task": "FDA CRL clinical post-crash drift: need N=8+ events with >60% initial gap-down to test SHORT hypothesis. Currently n=3 (ARDX, APLT, OTLK). Find 5+ more: use FDA CRL API (api.fda.gov/transparency/crl.json, 25 clinical-efficacy CRLs identified). Next events to check: Disc Medicine IRON (Feb 13 2026 CRL), SYDNEXIS (Oct 22 2025), LIB Therapeutics (Dec 12 2025). Also: check SESN-Aug13-2021 via SEC 8-K for price range. Strategy: SHORT at open the day after CRL, hold 3-5 days.",
-      "set_by_session": "2026-03-21T13:30:00.000000"
-    },
-    {
-      "task": "BLCO secondary candidate: 9 insiders including CEO bought Feb 19-Mar 6 at avg $17.70. Current ~$15.72. If GO trade succeeds, consider BLCO for hypothesis 76678219 (2+ insiders, 5d hold). Signal is 18+ days old at this point, weakening.",
-      "set_by_session": "2026-03-21T13:30:00.000000"
+      "task": "PRIORITY 3: Insider cluster 3d hold signal - hypothesis 4a981cc8 needs activation.",
+      "set_by_session": "2026-03-21T14:05:37.546415"
     }
   ],
   "session_handoff": {
-    "current_investigation": "GO paper trade ready (Monday), FDA CRL clinical post-crash drift signal in progress",
-    "state": "GO: hypothesis 1cb6140f (3d hold) pre-registered. Script ready at tools/activate_go_trade.py. Largecap backtest completed this session (data/largecap_filtered_2324.csv, data/sp500like_filtered_2324.csv). FDA CRL clinical pattern: N=3 strong cases (ARDX -15.3% 3d, APLT -23.3% 3d, OTLK -19.4% 3d) after >60% initial gap. Need N=5+ more to form hypothesis.",
-    "what_was_completed_this_session": [
-      "Largecap-filtered 2023-24 insider cluster backtest: >500M (n=266, 3d +3.46%, 68% pos), >5B (n=67, 3d +2.81%, 70% pos). Signal confirmed at large-cap scale. Saves to data/largecap_filtered_2324.csv.",
-      "Discovered FDA CRL public API (api.fda.gov/transparency/crl.json): 419 total, 124 unapproved, 25 with clinical language. This is a systematic source for future FDA research.",
-      "Corrected CRL dates for APLT (Nov 27 2024), ARDX (Jul 19 2021), OTLK (Aug 29 2023) - previous session had wrong dates.",
-      "Identified FDA clinical CRL post-crash continuation pattern: 3 of 6 events with >60% gap-down show 15-40% continued decline over 3-5 days from open. BHVN and ALDX (smaller/recovered) are outliers.",
-      "Completed tasks 56d44482 and 992b463d with partial findings. New task added for FDA CRL continuation study.",
-      "Verified Tiingo API cannot retrieve SESN/ATNX historical prices (metadata present, no price data on free tier)."
+    "current_investigation": "FDA CRL clinical-primary crash + continuation drift hypothesis",
+    "state": "N=3 confirmed continuation cases. Formal backtest shows avg 3d abnormal=-19.35%, 5d=-30.27%. Multiple testing PASSES. p-value N/A (need more events). Key challenge: finding qualifying events where stock data is available.",
+    "key_findings": [
+      "CONFIRMED CONTINUATION (all qualify): ARDX (2021-07-20, -74%, 3d=-15.3%), APLT (2024-11-29, -76%, 3d=-23.3%), OTLK (2023-08-30, -81%, 3d=-14.5%)",
+      "CONFIRMED REVERSALS (fail hypothesis): REPL (2025-07-22, -77%, but 3d=+12.3% - company had other pipeline assets), ALDX (2026-03-17, -71%, but 1d=+14.5% - 3rd CRL, pre-anticipated)",
+      "BOUNDARY CASE: NERV (2024-02-27, -58.8% - just below 60% threshold, CRL was clinical-primary, mild continuation 3d=-6%)",
+      "BOUNDARY CASE: AKBA (2022-03-30, -66%, 3d=-20.5% but CRL was safety-primary not efficacy, and crash was intraday not overnight gap)",
+      "FDA CRL database: 419 total CRLs, scanned all for 2019-2026 clinical-primary unapproved ones",
+      "Reversal flags identified: (a) 3rd+ CRL = pre-anticipated = reversal, (b) safety-primary CRL, (c) company has diversified pipeline, (d) stock already declined >20% in 30 days before crash"
     ],
-    "open_scientific_questions": [
-      "FDA CRL clinical short: is the continued post-gap decline consistent at N=8+? Currently n=3 with strong signal. Need 5 more events.",
-      "GO trade: will execute Monday March 23. 6 insiders incl CEO, $6.3M total, avg $6.02.",
-      "BLCO: 9 insiders including CEO, 18+ days old. Still potentially relevant for 5d hold.",
-      "S&P 500 addition watchlist: Next rebalance ~June 2026."
-    ],
-    "fda_crl_key_finding": "SHORT from open after >60% clinical CRL gap: ARDX 3d=-15%, APLT 3d=-23%, OTLK 3d=-19%. Smaller crashes (BHVN -40%) recover. N=3 insufficient, need N=8+.",
-    "largecap_backtest_key_finding": "3+ insider cluster signal holds at >5B market cap (n=67 2023-24): 3d avg=+2.81%, median=+2.18%, 70.1% pos, p=0.0009. Confirms signal is not driven by small-cap/delisted noise.",
-    "written_at": "2026-03-21T13:30:00.000000"
+    "what_blocked": "Most qualifying events (SESN, TCDA, YMAB, ORPH) are delisted and data not available via Tiingo or yfinance. 2019-2020 era very hard to verify.",
+    "next_specific_step": "Search for additional 2022-2024 clinical-primary CRL events using BioPharmCatalyst calendar or similar FDA PDUFA tracker. Try to get SESN Aug 2021 data via direct SEC EDGAR stock price sources or Polygon.io API. If data gap persists, consider lowering threshold to >55% crash (would add NERV as candidate). Alternatively: write a tool to scrape SEC 8-K filings for CRL announcements and cross-reference with yfinance crash events.",
+    "written_at": "2026-03-21T14:05:37.546417"
   }
 }

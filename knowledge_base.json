@@ -88,6 +88,18 @@
       "mechanism": "Activists acquire 5%+ position secretly (pre-13D filing), then file 13D triggering mandatory disclosure within 10 days. Market reprices target based on: (1) acquisition premium potential, (2) operational improvement expectations, (3) share buyback/dividend increase potential. Front-running by institutions and algorithms on 13D filing date compresses edge.",
       "caveats": "Pre-announcement accumulation period is unobservable. Many 13D campaigns fail \u2014 activists don't always win. Effect may already be priced in by 13D date. Need to distinguish purpose (activist vs passive) which is disclosed in 13D but requires reading the filing.",
       "recorded": "2026-03-19T21:29:30.799536"
+    },
+    "fda_crl_clinical_post_crash": {
+      "summary": "Academic research (Investor underreaction to FDA CRL news): Long-term market reactions to FDA Phase III clinical trial announcements (ScienceDirect 2025) found evidence of investor underreaction - prices continue to drift in the same direction after initial crash. Larger reactions for small companies. CMC deficiencies associated with ~5pp less negative abnormal return than clinical deficiencies (ResearchGate academic paper on CRL deficiency types). This supports the post-gap continuation drift hypothesis.",
+      "known_magnitude": "3-event sample: avg 3d abnormal = -19.35%, avg 5d abnormal = -30.27% (vs benchmark/sector). All 3 events showed continuation (0% positive rate at 3d).",
+      "known_timeframe": "Continuation signal peaks at 3-5 days. Entry: short from crash-day open. Exit: 3-5 days later.",
+      "sources": [
+        "https://www.sciencedirect.com/science/article/abs/pii/S1544612325013947 - Long-term market reactions to FDA Phase III clinical trial announcements",
+        "https://www.researchgate.net/publication/399488839_Stock_Market_Reactions_to_FDA_Complete_Response_Letters_Evidence_from_Deficiency_Types_Firm_Characteristics_and_Tail_Risk",
+        "FDA CRL database: https://api.fda.gov/transparency/crl.json (419 total CRLs)"
+      ],
+      "gaps": "N=3 events insufficient for statistical test (Wilcoxon p=N/A). Need 3+ more qualifying events. Key gap: most qualifying events are delisted (SESN, TCDA, YMAB etc) and data not available via Tiingo. Events from 2019-2020 era especially hard to verify.",
+      "recorded": "2026-03-21T14:05:12.544838"
     }
   },
   "known_effects": {
