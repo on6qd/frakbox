@@ -152,6 +152,7 @@ result['events_measured']
 result['data_quality_warning']       # None or warning string
 result['regime_filter']              # None or "calm"/"elevated"/"crisis"
 result['regime_filtered_count']      # events excluded by regime filter
+result['bootstrap_ci_abnormal_1d']    # {"point_estimate", "ci_lower", "ci_upper", "ci_excludes_zero"}
 result['entry_price_mode']           # "close" or "open"
 result['avg_estimated_cost_pct']     # avg round-trip cost (when estimate_costs=True)
 # Horizons: 1d, 3d, 5d, 10d, 20d. Types: raw, abnormal, sector_adj

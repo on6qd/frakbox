@@ -474,7 +474,8 @@
         "7. NEW: Company has NO stated path forward for the failed drug (exclude near-miss p-values or subgroup-analysis FDA meeting plans)",
         "8. NEW: Primary endpoint must be clearly failed (p>0.05, not p=0.03 vs 0.025 threshold)"
       ],
-      "last_updated": "2026-03-21T18:02:49.096679"
+      "last_updated": "2026-03-21T19:35:56.635321",
+      "march_14_21_edgar_scan": "EDGAR scan March 14-21 2026: 7 8-K filers reviewed. NONE qualify for d302c84b. ALDX (Aldeyra): -70.7% crash but DISQUALIFIED - pre-anticipation -24.7% in prior 10 days AND repeat event (3rd CRL for same reproxalap NDA). TBPH (Theravance): -26% on Phase 3 CYPRESS MSA miss - below 55% threshold, DISQUALIFIED. RYTM (Rhythm): -6% on EMANATE miss - multi-product company, got FDA approval same week, DISQUALIFIED. ATRA (Atara): No new crash in scan period - Jan 2026 CRL follow-up meeting, not a new event. HUMA (Humacyte): Positive news week (Saudi Arabia deal, capital raise), no clinical failure. GOSS and IMMP: Already captured in d302c84b backtest."
     },
     "sp500_index_addition": {
       "validation": "March 2026 quarterly rebalance (announced March 6, effective March 23)",

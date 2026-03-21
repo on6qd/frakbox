@@ -552,6 +552,14 @@ def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_
                 except ValueError:
                     pass  # Wilcoxon can fail with identical values
 
+    # Bootstrap confidence intervals for abnormal returns
+    for horizon in ["1d", "3d", "5d", "10d", "20d"]:
+        key = f"abnormal_{horizon}"
+        returns = [i[key] for i in impacts if key in i]
+        if len(returns) >= 3:
+            ci = bootstrap_ci(returns, n_bootstrap=10000, ci=95)
+            stats[f"bootstrap_ci_{key}"] = ci
+
     # Multiple testing correction summary
     stats["significant_horizons"] = significant_horizons
     stats["num_significant_horizons"] = len(significant_horizons)
@@ -704,6 +712,66 @@ def apply_cross_category_fdr(category_p_values, alpha=0.05):
         }
 
     return results
+
+
+def bootstrap_ci(returns, n_bootstrap=10000, ci=95, statistic="mean"):
+    """
+    Compute bootstrap confidence interval for the mean (or median) of returns.
+
+    Resamples with replacement to estimate the sampling distribution of the
+    mean, then reports the percentile-based confidence interval.
+
+    Args:
+        returns: List of observed returns
+        n_bootstrap: Number of bootstrap samples (default 10,000)
+        ci: Confidence level as integer (default 95 = 95% CI)
+        statistic: "mean" or "median"
+
+    Returns:
+        dict with 'point_estimate', 'ci_lower', 'ci_upper', 'ci_level',
+        'ci_excludes_zero' (True if the CI does not contain zero),
+        'n_bootstrap'
+    """
+    import numpy as np
+
+    arr = np.array(returns, dtype=float)
+    n = len(arr)
+    if n < 3:
+        est = float(np.mean(arr)) if statistic == "mean" else float(np.median(arr))
+        return {
+            "point_estimate": round(est, 4),
+            "ci_lower": None,
+            "ci_upper": None,
+            "ci_level": ci,
+            "ci_excludes_zero": None,
+            "n_bootstrap": 0,
+            "note": "Too few observations for bootstrap (need >= 3)",
+        }
+
+    # Generate all bootstrap samples at once
+    rng = np.random.default_rng()
+    indices = rng.integers(0, n, size=(n_bootstrap, n))
+    samples = arr[indices]
+
+    if statistic == "mean":
+        boot_stats = samples.mean(axis=1)
+        point_est = float(np.mean(arr))
+    else:
+        boot_stats = np.median(samples, axis=1)
+        point_est = float(np.median(arr))
+
+    alpha = (100 - ci) / 2
+    lower = float(np.percentile(boot_stats, alpha))
+    upper = float(np.percentile(boot_stats, 100 - alpha))
+
+    return {
+        "point_estimate": round(point_est, 4),
+        "ci_lower": round(lower, 4),
+        "ci_upper": round(upper, 4),
+        "ci_level": ci,
+        "ci_excludes_zero": (lower > 0) or (upper < 0),
+        "n_bootstrap": n_bootstrap,
+    }
 
 
 def _stdev(values):

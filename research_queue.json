@@ -359,30 +359,41 @@
   ],
   "next_session_priorities": [
     {
-      "task": "MONDAY MARCH 23 9:30 AM ET: trade_loop.py will fire triggers automatically. Verify by checking dry-run output. Both GO (1cb6140f) and WD (76678219) have trigger=next_market_open set. DO NOT run activate scripts manually -- trade_loop.py handles it.",
-      "set_by_session": "2026-03-21T19:30:55.788259"
+      "task": "MONDAY MARCH 23 9:30 AM ET: trade_loop.py fires GO (1cb6140f) and WD (76678219) triggers automatically. Check by 9:45 ET that both trades appear in Alpaca. DO NOT run activate scripts manually.",
+      "set_by_session": "2026-03-21T19:36:24.929784"
     },
     {
-      "task": "THURSDAY March 26 close: Run python tools/close_go_trade.py --yes to close GO position (3d hold expires). Hypothesis 1cb6140f.",
-      "set_by_session": "2026-03-21T19:30:55.788264"
+      "task": "THURSDAY March 26 close: Run python tools/close_go_trade.py --yes to close GO position (3d hold). Hypothesis 1cb6140f.",
+      "set_by_session": "2026-03-21T19:36:24.929789"
     },
     {
-      "task": "TUESDAY March 30 close: Run python tools/close_wd_trade.py --yes to close WD position (5d hold expires). Hypothesis 76678219.",
-      "set_by_session": "2026-03-21T19:30:55.788265"
+      "task": "TUESDAY March 30 close: Run python tools/close_wd_trade.py --yes to close WD position (5d hold). Hypothesis 76678219.",
+      "set_by_session": "2026-03-21T19:36:24.929790"
     },
     {
-      "task": "SESSION START ROUTINE: Run python tools/edgar_clinical_failure_scanner.py --days 7. This week found 7 candidates: ALDX, RYTM, GOSS, TBPH, ATRA, OTLK, and unidentified Humacyte. Each needs: (1) single-pipeline check, (2) >55% crash verification, (3) no pre-anticipation check, (4) >/bin/zsh.50/share post-crash. GOSS is a repeat from prior analysis.",
-      "set_by_session": "2026-03-21T19:30:55.788266"
+      "task": "SESSION START: Run python tools/edgar_clinical_failure_scanner.py --days 7 to scan for new clinical failures. March 14-21 scan was clean (7 candidates, none qualified).",
+      "set_by_session": "2026-03-21T19:36:24.929791"
     },
     {
-      "task": "RESEARCH: Refined buyback sub-hypothesis (task da0e1d25). Build EDGAR 8-K Item 8.01 scanner to find first-ever small-cap buyback programs >10% of float, 2019-2024. Then backtest.",
-      "set_by_session": "2026-03-21T19:30:55.788266"
+      "task": "RESEARCH: Fallen angel credit downgrades (IG to junk, forced institutional selling). High priority, task 835449be.",
+      "set_by_session": "2026-03-21T19:36:24.929791"
+    },
+    {
+      "task": "RESEARCH: Refined buyback sub-hypothesis - build EDGAR 8-K Item 8.01 scanner for first-ever small-cap buyback programs >10% of float.",
+      "set_by_session": "2026-03-21T19:36:24.929792"
     }
   ],
   "session_handoff": {
-    "notes": "Session 9 (March 21): Set trade_loop triggers on GO (1cb6140f) and WD (76678219) for Monday March 23 open. Both verified via dry-run (ready=False, fires at market open). EDGAR scanner found 7 clinical failure candidates this week -- need manual screening. Large buyback signal researched and recorded as dead end -- general signal eroded post-2007; narrow sub-hypothesis (small-cap, >10% float, first-ever) added to queue as da0e1d25.",
-    "set_by_session": "2026-03-21T19:30:00.000000",
-    "written_at": "2026-03-21T19:30:55.788268"
+    "active_trades": {
+      "GO_1cb6140f": "trigger=next_market_open set, fires Monday March 23 9:30 ET, 3d hold, close Thursday March 26",
+      "WD_76678219": "trigger=next_market_open set, fires Monday March 23 9:30 ET, 5d hold, close Tuesday March 30"
+    },
+    "trade_loop_status": "trade_loop.py handles execution automatically. Check logs if trades do not appear in Alpaca by 9:45 ET Monday.",
+    "clinical_failure_scan_march_14_21": "CLEAN SCAN - 7 candidates, NONE qualified for d302c84b. ALDX disqualified: 3rd CRL same drug + pre-anticipation -24.7%. TBPH disqualified: only -26% crash (need >55%). RYTM disqualified: mixed results, multi-product, only -6% reaction. ATRA: no new crash event this week. HUMA: positive news week.",
+    "buyback_research": "DEAD END recorded earlier session. Small-cap tender offer sub-hypothesis added to queue.",
+    "next_research": "fallen_angel_credit_downgrades - investment grade bonds losing IG status creates forced institutional selling pressure. High signal potential.",
+    "duplicate_hypothesis": "hypothesis 4a981cc8 (GO, no trigger) is a duplicate of 1cb6140f (GO, has trigger). Consider retiring 4a981cc8 once 1cb6140f trade executes.",
+    "written_at": "2026-03-21T19:36:24.929793"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
