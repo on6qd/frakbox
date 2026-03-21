@@ -79,15 +79,64 @@ self_review.compute_confidence_score(sample_size, consistency_pct, avg_return, s
 # literature_strength: "none"|"partial"|"strong" — only used when has_literature=True
 ```
 
-## create_hypothesis() Validation Rules
+## create_hypothesis() Full Signature
 
-These are enforced in code and will raise `ValueError` if violated:
+```python
+research.create_hypothesis(
+    event_type="insider_buying_cluster",       # string key for knowledge base
+    event_description="...",                   # human-readable description
+    causal_mechanism="...",                    # full causal chain explanation
+    causal_mechanism_criteria={               # must satisfy 2 of 3
+        "actors_and_incentives": "...",
+        "transmission_channel": "...",
+        "academic_reference": "..."
+    },
+    expected_symbol="AAPL",                   # ticker or "TBD"
+    expected_direction="long",                 # "long" or "short"
+    expected_magnitude_pct=5.0,               # abnormal return (>= 1.5%)
+    expected_timeframe_days=5,                # hold period in trading days
+    historical_evidence={                      # must contain real measured data
+        "avg_abnormal_return": -23.88,
+        "sample_size": 6,
+        "consistency_pct": 100.0,
+        "time_period": "2019-2024",
+        "stdev": 8.74,
+        "passes_multiple_testing": True,
+        "p_value": 0.001
+    },
+    sample_size=6,                            # number of historical events
+    consistency_pct=100.0,                    # % of events in predicted direction
+    confounders={                             # all keys from methodology.json required
+        "market_regime": "...",
+        "sector_trend": "...",
+        "concurrent_news": "..."
+    },
+    market_regime_note="...",                 # e.g. "tested across calm/elevated VIX"
+    confidence=8,                             # integer from compute_confidence_score()
+    out_of_sample_split={                     # temporal split required
+        "discovery_period": "2019-2022",
+        "validation_period": "2023-2024",
+        "validation_indices": [3, 4, 5],      # 0-indexed, min 3 required
+        "validation_consistency_pct": 100.0
+    },
+    survivorship_bias_note="...",
+    selection_bias_note="...",
+    literature_reference=None,                # optional
+    event_timing="after_hours",              # optional: "after_hours"/"pre_market"/"unknown"
+    passes_multiple_testing=True,            # optional, from backtest result
+    backtest_symbols=["AAPL", "MSFT"],       # optional list
+    backtest_events=[{"symbol": "AAPL", "date": "2024-01-15"}]  # optional list
+)
+```
+
+**Validation Rules** (enforced in code, raises `ValueError` if violated):
 - `expected_magnitude_pct` must be >= `min_abnormal_return_pct` (1.5%)
 - Expected return after transaction costs must exceed 1.0% (use `estimate_transaction_cost()` for event-specific costs, default 0.1%)
 - All confounders from `methodology.json` must be provided (use "unknown" if no data)
 - Historical evidence cannot be all placeholders — need real measured data
 - Causal mechanism must satisfy 2 of 3 criteria
 - `expected_symbol` can be "TBD" but must be resolved before `activate_hypothesis()`
+- `out_of_sample_split.validation_indices` must have >= 3 entries
 
 ## measure_event_impact() Return Structure
 
@@ -109,6 +158,34 @@ result['avg_estimated_cost_pct']     # avg round-trip cost (when estimate_costs=
 # Per-event: result['individual_impacts'][i]['abnormal_1d'], ['event_date'], ['symbol']
 # Per-event: ['entry_price_type'] ("close"/"open"), ['avg_daily_volume'], ['volume_ratio']
 # Per-event: ['estimated_cost'] (when estimate_costs=True)
+```
+
+## Custom Tools (tools/)
+
+| Tool | Purpose |
+|---|---|
+| `insider_cluster_detector.py` | Find SEC Form 4 clusters from bulk quarterly data |
+| `realtime_insider_scanner.py` | Scan recent Form 4 filings via EDGAR daily index |
+| `openinsider_scraper.py` | Scrape OpenInsider cluster screener for fresh signals |
+| `largecap_filter.py` | Filter event lists to >500M or >5B market cap (prevents yfinance delistment failures) |
+| `verify_event_date.py` | Find actual crash date within ±5 days of expected date (prevents wrong-date backtests) |
+| `activate_go_trade.py` | Activate GO insider cluster paper trade |
+| `activate_wd_trade.py` | Activate WD insider cluster paper trade |
+| `close_go_trade.py` | Close GO paper trade and complete hypothesis |
+| `close_wd_trade.py` | Close WD paper trade and complete hypothesis |
+
+**Standard backtest workflow:**
+```python
+# 1. Verify dates BEFORE backtesting (prevents the #1 source of errors)
+from tools.verify_event_date import verify_event_date
+result = verify_event_date("AAPL", "2024-01-15", crash_threshold=-0.30, window_days=5)
+
+# 2. Filter large-caps to avoid yfinance delistment failures
+from tools.largecap_filter import filter_to_largecap
+events = filter_to_largecap(events, min_market_cap=500_000_000)
+
+# 3. Always use entry_price="open" for after-hours events
+result = market_data.measure_event_impact(event_dates=[...], entry_price="open")
 ```
 
 ## Data Sources
