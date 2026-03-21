@@ -68,6 +68,26 @@
       "reason_not_hypothesis": "Cannot form hypothesis due to: (1) data quality >30% failure from delistings, (2) extreme variance (stdev 41%), (3) critical CMC vs clinical distinction unresolved in sample, (4) need single-asset company filter to reduce variance. Need alternative price data for delisted tickers.",
       "next_steps": "Find historical price data for SESN, ATNX, ICPT via SEC Edgar or alternative sources. Classify ALL events by CMC vs clinical deficiency type. Filter for single-asset companies. Need N=15+ clinical CRL events to overcome variance.",
       "recorded": "2026-03-19T21:08:22.605216"
+    },
+    "insider_buying_cluster": {
+      "summary": "Strong academic support for insider buying as a return predictor. Lakonishok & Lee (2001) JF: insider purchases predict 3-month forward returns, effect stronger for small/mid caps. Seyhun (1986): insiders earn abnormal returns of 3-5% over 12 months after open-market purchases. Jeng, Metrick & Zeckhauser (2003): insider purchases earn 50 bps/month abnormal return. 'Cluster' insider buying (multiple insiders buying within 30 days) is significantly stronger signal than single-insider purchases. Key distinction: open-market purchases vs option exercises \u2014 only open-market purchases are informative. Data source: SEC Form 4 filings (EDGAR), free public access. Best filters: (1) officer/director purchases only, (2) open-market transactions only, (3) 2+ insiders buying within 30 days = 'cluster', (4) transaction size >$50K per insider to filter noise.",
+      "key_papers": [
+        "Lakonishok & Lee (2001) - JF - Insider trading and future returns",
+        "Seyhun (1986) - JF - Insiders profits, costs of trading, and market efficiency",
+        "Jeng, Metrick & Zeckhauser (2003) - REStat - Estimating the returns to insider trading",
+        "Rozeff & Zaman (1998) - JAE - Overreaction and insider trading"
+      ],
+      "mechanism": "Insiders have private information about business prospects. Legal trading windows (open-window periods) constrain when they can trade, so purchases during these windows signal genuine conviction. Multiple insiders buying together amplifies the signal \u2014 each insider independently decided the stock is undervalued. Transmission: initial Form 4 disclosure on EDGAR within 2 days of transaction \u2192 institutional investors and algorithms detect cluster \u2192 front-running causes price pressure.",
+      "typical_effect_size": "+3-5% abnormal return over 3 months from cluster insider buying. Effect strongest for small-to-mid cap stocks with lower institutional coverage.",
+      "caveats": "Survivorship bias: only surviving companies have Form 4 data. Selection bias: dramatic cluster buys get press coverage. Insiders can be wrong (they often buy near fundamentally bad periods when stock is cheap). Legal constraint means actual purchase date may lag conviction formation by weeks. Academic literature is mostly from 1980s-2000s; HFT and algorithmic filing detection may have compressed the edge.",
+      "recorded": "2026-03-19T21:29:30.799260"
+    },
+    "activist_investor_13d": {
+      "summary": "Brav, Jiang, Partnoy & Thomas (2008) JF: activist hedge fund 13D filings show 7% abnormal return in [-20, +20] day window around filing. Effect is robust across 2001-2006 sample. Greenwood & Schor (2009): only activist campaigns targeting M&A show persistent long-term returns; operational activists show weaker long-run effects. Gantchev (2013): contested activist campaigns cost activists on average $10.71M \u2014 so activists only escalate when stakes are high, making escalation a signal. Key: MUST distinguish activist 13D (intent to influence) from passive 5%+ ownership (13G). Activist funds to track: Elliott, Carl Icahn, ValueAct, Third Point, Pershing Square, Starboard Value, Jana Partners, Trian Fund, Engine Capital, Sachem Head.",
+      "typical_effect_size": "+7% abnormal return in 40-day window around 13D filing announcement",
+      "mechanism": "Activists acquire 5%+ position secretly (pre-13D filing), then file 13D triggering mandatory disclosure within 10 days. Market reprices target based on: (1) acquisition premium potential, (2) operational improvement expectations, (3) share buyback/dividend increase potential. Front-running by institutions and algorithms on 13D filing date compresses edge.",
+      "caveats": "Pre-announcement accumulation period is unobservable. Many 13D campaigns fail \u2014 activists don't always win. Effect may already be priced in by 13D date. Need to distinguish purpose (activist vs passive) which is disclosed in 13D but requires reading the filing.",
+      "recorded": "2026-03-19T21:29:30.799536"
     }
   },
   "known_effects": {},
@@ -86,6 +106,16 @@
       "event_type": "fda_crl_generic_short",
       "reason": "Tested generic 'SHORT small biotech after any CRL' hypothesis. N=8 measured (4 delisted = survivorship bias).\nResults: 1d avg=-25.24% (median=-2.84%), 5d avg=-28.51%, positive_rate_1d=50%. Does NOT pass multiple testing (no horizons significant at p<0.05, though p=0.12 at 1d with N=8). \nCRITICAL ISSUES: (1) CMC-only CRLs show POSITIVE 1d returns (AXSM +4.8%, SRRK +4.1%) - wrongly shorting these would lose money. (2) Clinical CRLs have EXTREME variance - OTLK -81% but ITRM +18%, NERV +1.2%. (3) 33% data failure from delistings = survivorship bias. \nDO NOT pursue generic CRL short. The effect is real but too heterogeneous. Need CONDITIONAL sub-hypothesis: (single-asset company) + (clinical deficiency CRL) + (pre-announcement run-up, suggesting market expected approval). That specific sub-case might be consistently very negative, but requires 15+ events with that profile.",
       "recorded": "2026-03-19T21:08:22.605654"
+    },
+    {
+      "event_type": "earnings_surprise_pead_midcap",
+      "reason": "Mid-cap PEAD ($5-30B market cap, >10% EPS beats) does not exist. N=19 events across WING/TREX/IBP/OLLI/FIVE: 1d avg=+0.01%, 20d avg=+1.27%, all p-values 0.67-0.99, 50% positive rate at 20d = essentially random. Per-symbol: IBP +11.99% vs OLLI -12.94% \u2014 no consistent direction. Confirms academic finding that PEAD is primarily a microcap phenomenon. Mean reversion and noise dominate at mid-cap due to better analyst coverage and institutional ownership.",
+      "recorded": "2026-03-19T21:29:30.798254"
+    },
+    {
+      "event_type": "dividend_capture_preex_runup",
+      "reason": "Pre-ex-dividend run-up for high-yield S&P 500 stocks (VZ/MO/T/PM/KMI, 2021-2024) does NOT produce a tradeable signal. Tested 3 windows: 5-day (3d p=0.122), 20-day (20d p=0.158), 4-day pre-ex (3d p=0.223). None pass multiple testing. OOS validation: discovery 0.60% vs validation 0.21% \u2014 shrinking effect. Per-symbol inconsistency: VZ +1.29%, T +0.88% vs MO -0.19%, KMI -0.22% (3d abnormal). Effect is real academically (Hartzmark & Solomon 2013: +41 bps/month) but ~0.4% average is below our 1.5% minimum threshold and transaction costs would eliminate it. Not actionable.",
+      "recorded": "2026-03-19T21:29:30.798967"
     }
   ]
 }

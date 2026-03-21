@@ -103,18 +103,22 @@
       "category": "earnings_surprise_pead",
       "question": "Test PEAD for smaller S&P 500 components (market cap $5B-$30B) with >10% EPS beats. Classic PEAD literature finds the effect concentrated in smaller, less-covered stocks. Find 20+ S&P 500 mid-cap earnings beats from 2020-2024, measure abnormal returns at 1d, 5d, 10d, 20d. Distinct from mega-cap test (which showed no PEAD). Check analyst coverage as moderator: fewer analysts = stronger drift?",
       "priority": 3,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Our mega-cap PEAD test showed NO drift (discovery: +1.05% 1d, negative drift after). Literature says PEAD is concentrated in small/mid-caps with fewer analysts. Testing mid-cap S&P 500 components addresses the academic prediction. This is a genuine test of whether information asymmetry drives PEAD.",
-      "added": "2026-03-19T19:18:13.753087"
+      "added": "2026-03-19T19:18:13.753087",
+      "completed": "2026-03-20T19:53:27.000887",
+      "findings": "Dead end. N=19 mid-cap events (WING/TREX/IBP/OLLI/FIVE): 1d avg=+0.01%, 20d avg=+1.27%, all p-values 0.67-0.99, 50% positive rate at 20d = random. Confirms PEAD is primarily a microcap phenomenon. Not actionable."
     },
     {
       "id": "f15c05aa",
       "category": "dividend_changes",
       "question": "Explore dividend capture strategy: what is the abnormal return in the 3-5 days before an ex-dividend date\nfor high-yield dividend stocks? Does the price run up (dividend capture buying) and then fall (on ex-dividend date + 1)?\nTest S&P 500 stocks with dividend yield >3%. Find 15+ ex-dividend dates from 2021-2024. Key question: is there systematic \nabnormal return of >1.5% in the pre-ex-dividend period, separate from the mechanical dividend drop on ex-date?\nAlso: what is the post-ex-dividend drift for stocks that cut dividends (compare to increases)?",
       "priority": 3,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Dividend capture is well-documented in literature with clear causal mechanism (institutional window-dressing around dividend dates). Complementary to index addition work. No survivorship bias issues for dividend payers.",
-      "added": "2026-03-19T21:09:14.334968"
+      "added": "2026-03-19T21:09:14.334968",
+      "completed": "2026-03-20T19:53:27.001456",
+      "findings": "Dead end. Pre-ex-dividend run-up for high-yield stocks (VZ/MO/T/PM/KMI): avg 3d abnormal +0.60% (discovery) vs +0.21% (validation). Below 1.5% threshold. No multiple testing pass. Effect is ~0.4% average - too small to trade."
     }
   ],
   "event_watchlist": [
