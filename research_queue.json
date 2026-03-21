@@ -120,6 +120,15 @@
       "added": "2026-03-21T20:10:22.936285"
     },
     {
+      "id": "2abb07d3",
+      "category": "sp500_index_addition",
+      "question": "MONITOR: S&P 500 Q2 2026 rebalance announcement expected June 5, 2026 (first Friday of June). Action: (1) On or before June 5, run tools/sp500_change_scanner.py --check-now to detect announcement. (2) For each confirmed addition, buy $5,000 LONG at Monday June 8 open. (3) Hold 5 trading days, exit June 15. Evidence: March 2026 additions showed avg 1d=+5.20%, 3d=+7.66%, 100% positive rate (VRT+4.2%, LITE+10.0%, COHR+5.9%, SATS+0.7%).",
+      "priority": 1,
+      "status": "pending",
+      "reasoning": "We missed the March 2026 rebalance because it wasn't in our watchlist (only June was). The signal validated again: 100% positive rate at 3d, avg +7.66%. June 2026 is next opportunity. We have $100K cash and max 5 active experiments - plenty of room for this trade.",
+      "added": "2026-03-21T20:45:49.626841"
+    },
+    {
       "id": "seed-002",
       "category": "index_rebalancing",
       "question": "When a stock is announced for S&P 500 addition, what is the abnormal return between announcement and effective date, and does it reverse after inclusion? How does this compare to Russell 2000 rebalancing?",
@@ -267,9 +276,11 @@
       "category": "signal_discovery",
       "question": "Explore reverse merger / blank check SPAC completion announcements: when a SPAC announces merger target (De-SPAC), measure abnormal returns at 1d, 3d, 5d. The initial announcement causes large positive move for target. Key question: does the SPAC acquiring company (SPAC itself) show positive or negative drift after announcement? Academic finding: SPAC acquirers underperform by 15-30% in first year post-merger, but ANNOUNCEMENT day effect may be different.",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "SPAC market produced many events 2020-2022. The mechanism is clear: initial enthusiasm followed by dilution reality. Short the SPAC acquirer 1-5 days after announcement? Or look at the target company optionality.",
-      "added": "2026-03-21T20:10:22.935754"
+      "added": "2026-03-21T20:10:22.935754",
+      "completed": "2026-03-21T20:45:49.626192",
+      "findings": "DEAD END. SPAC De-SPAC announcement day effect: 5 events measured, 1d pos_rate=40%, avg=-0.38% (p=0.92). Direction heterogeneous. Problems: (1) Leak contamination - CCIV pre-ran +400% before official announcement; (2) Regime-specific to 2020-2021 SPAC bubble (post-Q1 2021 market normalized to $10); (3) 3 of 8 events delisted/unmeasurable. Dead end recorded in knowledge base."
     },
     {
       "id": "seed-003",
@@ -379,36 +390,46 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. VERIFY GO/WD TRADES EXECUTED: Check trade_loop.py executed both trades at Monday open. View Alpaca paper account positions. If not executed, debug trade_loop.py.",
-      "set_by_session": "2026-03-21T20:10:36.379270"
+      "task": "1. VERIFY GO/WD TRADES: Monday March 23 open, trade_loop.py fires both. Check Alpaca account positions and confirm execution. If not executed, debug trade_loop.py.",
+      "set_by_session": "2026-03-21T20:46:08.523352"
     },
     {
-      "task": "2. CLOSE GO TRADE: Thursday March 26 close, run python tools/close_go_trade.py. MUST be done within session.",
-      "set_by_session": "2026-03-21T20:10:36.379275"
+      "task": "2. CLOSE GO TRADE: Thursday March 26, run python tools/close_go_trade.py. Note: GO is Financial Services sector - new sector analysis suggests this sector has weaker signal. Watch closely.",
+      "set_by_session": "2026-03-21T20:46:08.523357"
     },
     {
-      "task": "3. CHECK CLUSTER SCANNER LOG: Review /logs/cluster_scanner.log for any new qualifying clusters detected Mon/Tue/Wed. Set triggers immediately if fresh clusters found.",
-      "set_by_session": "2026-03-21T20:10:36.379276"
+      "task": "3. CHECK CLUSTER SCANNER: Run tools/cluster_auto_scanner.py or check logs/cluster_scanner.log for any new qualifying clusters filed Mon/Tue/Wed. Prioritize Energy/Industrials sectors over Financial/Healthcare.",
+      "set_by_session": "2026-03-21T20:46:08.523358"
     },
     {
-      "task": "4. CHECK EDGAR CLINICAL FAILURE SCANNER: Run edgar_clinical_failure_scanner.py --days 7 for new d302c84b candidates.",
-      "set_by_session": "2026-03-21T20:10:36.379277"
+      "task": "4. CLINICAL FAILURE SCANNER: Run edgar_clinical_failure_scanner.py --days 7 for new d302c84b candidates. If IMMP or GOSS has further continuation, document it.",
+      "set_by_session": "2026-03-21T20:46:08.523359"
     },
     {
-      "task": "5. CLOSE WD TRADE: Tuesday March 31 close, run python tools/close_wd_trade.py.",
-      "set_by_session": "2026-03-21T20:10:36.379278"
+      "task": "5. CLOSE WD TRADE: Tuesday March 31, run python tools/close_wd_trade.py. WD is Financial Services - sector analysis shows this has weaker signal. This is important post-trade learning.",
+      "set_by_session": "2026-03-21T20:46:08.523360"
     },
     {
-      "task": "6. POST-TRADE ANALYSIS: After both trades close, compute actual vs expected returns. Was the 3d/5d signal validated? Update hypothesis confidence if significant deviation.",
-      "set_by_session": "2026-03-21T20:10:36.379279"
+      "task": "6. SECTOR FILTER RESEARCH: Test whether excluding Financial Services clusters from 1cb6140f/0a093c90 hypotheses would have improved historical performance. Run a backtest on non-financial-services 2023-24 events.",
+      "set_by_session": "2026-03-21T20:46:08.523360"
+    },
+    {
+      "task": "7. S&P 500 JUNE PREP: Begin monitoring for May 2026 off-cycle additions. The June 5, 2026 quarterly announcement is the primary target. Task 2abb07d3 in queue.",
+      "set_by_session": "2026-03-21T20:46:08.523361"
     }
   ],
   "session_handoff": {
-    "what_investigated": "Signal discovery: fallen angel downgrades (dead end), profit warnings (dead end), secondary equity offerings (dead end), IPO lock-up expiry (dead end). CEO/CFO sub-filter for insider clusters (marginal, not worth pursuing). Built cluster_auto_scanner.py to catch missed opportunities.",
-    "key_finding": "We have been missing fresh insider cluster opportunities (POOL $3.6M, AMRZ $4.6M) because the scanner only runs when Claude sessions are active. Built and scheduled tools/cluster_auto_scanner.py to run daily at 9:15 PM ET via launchd.",
-    "blocked_by": "No new qualifying events for d302c84b. S&P 500 next addition unknown date.",
-    "next_step": "Monday: Verify GO+WD trades executed. Thursday: Close GO. Tuesday March 31: Close WD. Check cluster_scanner.log for fresh opportunities daily.",
-    "written_at": "2026-03-21T20:10:36.379280"
+    "current_state": "Session 11 complete. 3 dead ends recorded (SPAC, stock splits, CEO turnaround). Sector analysis completed for insider clusters. March 2026 S&P 500 additions validated hypothesis 061ae3a8 (missed trade). sp500_change_scanner.py built.",
+    "active_positions": "None yet - GO and WD pending Monday March 23 open",
+    "critical_dates": {
+      "2026-03-23": "GO and WD trades fire at 9:30 AM ET",
+      "2026-03-26": "Close GO (3d hold from March 23)",
+      "2026-03-31": "Close WD (5d hold from March 23)",
+      "2026-06-05": "S&P 500 Q2 2026 rebalance announcement"
+    },
+    "sector_finding": "Insider clusters strongest in Consumer Cyclical (90% pos, 9.88% 3d), Industrials (71% pos, 4.47% 3d), Energy (62.5% pos, 3.11% 3d). Financial Services shows NO signal (-0.26% 3d, 55.9% pos). WD is Financial Services - our pending trade.",
+    "next_new_research": "Priority: sector filter refinement for insider cluster signal. Alternative: first-ever buyback in small-caps (da0e1d25), Wells Notice fraud sub-filter (d288c2b8)",
+    "written_at": "2026-03-21T20:46:08.523362"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

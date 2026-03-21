@@ -487,19 +487,42 @@
       "march_14_21_edgar_scan": "EDGAR scan March 14-21 2026: 7 8-K filers reviewed. NONE qualify for d302c84b. ALDX (Aldeyra): -70.7% crash but DISQUALIFIED - pre-anticipation -24.7% in prior 10 days AND repeat event (3rd CRL for same reproxalap NDA). TBPH (Theravance): -26% on Phase 3 CYPRESS MSA miss - below 55% threshold, DISQUALIFIED. RYTM (Rhythm): -6% on EMANATE miss - multi-product company, got FDA approval same week, DISQUALIFIED. ATRA (Atara): No new crash in scan period - Jan 2026 CRL follow-up meeting, not a new event. HUMA (Humacyte): Positive news week (Saudi Arabia deal, capital raise), no clinical failure. GOSS and IMMP: Already captured in d302c84b backtest."
     },
     "sp500_index_addition": {
-      "validation": "March 2026 quarterly rebalance (announced March 6, effective March 23)",
-      "symbols": [
-        "LITE",
-        "COHR",
-        "SATS",
-        "VRT"
+      "finding": "March 2026 Q1 rebalance live validation (4 new events post-hypothesis creation)",
+      "date": "2026-03-07 announcement, 2026-03-23 effective",
+      "additions": [
+        {
+          "symbol": "VRT",
+          "1d_abnormal": 4.2,
+          "3d_abnormal": 6.1,
+          "5d_abnormal": 4.4
+        },
+        {
+          "symbol": "LITE",
+          "1d_abnormal": 10.0,
+          "3d_abnormal": 15.7,
+          "5d_abnormal": 9.2
+        },
+        {
+          "symbol": "COHR",
+          "1d_abnormal": 5.9,
+          "3d_abnormal": 5.8,
+          "5d_abnormal": 4.2
+        },
+        {
+          "symbol": "SATS",
+          "1d_abnormal": 0.7,
+          "3d_abnormal": 3.1,
+          "5d_abnormal": 1.6
+        }
       ],
-      "avg_abnormal_1d": 5.2,
-      "avg_abnormal_3d": 7.66,
-      "avg_abnormal_5d": 4.87,
-      "positive_rate_1d": 1.0,
-      "notes": "All 4 additions positive at 1d and 3d. LITE strongest at +9.97% 1d. Consistent with prior live validation data (avg +7.77% 1d from session 7 measurement). Signal remains strong.",
-      "last_updated": "2026-03-21T19:06:31.745424"
+      "avg_1d_abnormal": 5.2,
+      "avg_3d_abnormal": 7.66,
+      "positive_rate_1d": 100.0,
+      "positive_rate_3d": 100.0,
+      "note": "We missed this trade (watchlist only had June 2026). Added to backtest evidence. Confirms signal strength in Q1 2026 market (AI infrastructure theme: VRT/COHR/LITE all AI-adjacent).",
+      "missed_opportunity_pct": 5.2,
+      "next_opportunity": "June 2026 Q2 rebalance announcement, expected ~June 5-7, 2026",
+      "last_updated": "2026-03-21T20:43:15.229218"
     }
   },
   "dead_ends": [
@@ -587,6 +610,11 @@
       "event_type": "spac_demerger_announcement",
       "reason": "SPAC merger announcement day effect (De-SPAC announcement): tested 5 events 2020-2021. 1d avg abnormal=-0.38% (p=0.92), 1d positive rate=40%. Direction entirely heterogeneous: IPOB +12.4%, CCIV -8.0% (buy-rumor-sell-news, leaked weeks before), DCRB -6.7%, PSTH -2.0%, GGPI +2.3%. Fails multiple testing. Key problems: (1) LEAK contamination - many SPAC targets were widely rumored before official announcement (CCIV pre-ran +400% before Feb 22 announcement). (2) REGIME contamination - Q4 2020/Q1 2021 SPAC bubble: mean SPAC price day after announcement was $15.77 (from $10 base), but by Q2 2021 fell back to ~$10 with no consistent jumps (Kiesel 2023, European Financial Management). (3) Survivorship/delistment: 3 of 8 events (VTIQ, SHLL, AJAX) unmeasurable due to delisting. (4) No sub-filter improves signal: long SPAC (momentum) or short SPAC (dilution realization) both fail. Academic finding: SPACs that closed in Q4 2020/Q1 2021 had mean price of $9.01 by Dec 2021 (-43% from announcement high). The announcement DAY return is not a tradeable signal - neither direction is consistent.",
       "recorded": "2026-03-21T20:30:19.334312"
+    },
+    {
+      "event_type": "stock_split_announcement",
+      "reason": "Stock split announcement effect: tested 11 events 2020-2024. 1d avg=-0.84%, pos_rate=36.4% (NEGATIVE). 3d avg=+2.06%, pos_rate=54.5%, p=0.27. Fails multiple testing. Main issues: (1) Almost all large-cap split announcements are confounded with quarterly earnings - the earnings surprise effect dominates any split signal (NVDA 2024 +11.6% 3d was earnings-driven, DECK -7.9% 1d was earnings miss). (2) The few standalone splits (PANW, TSCO) showed -2.4% and -0.4% at 1d. (3) Even TSLA Aug 2020 (+4.4% 1d) may have been momentum-driven rather than split-driven. (4) Literature finding of +2.5% abnormal return for split announcements likely applies to non-confounded mid-cap events; for large-caps with simultaneous earnings, earnings dominate. Alternative path: test mid-cap standalone stock splits (split announcement NOT on earnings day, market cap $500M-$5B). These would be harder to find but less confounded.",
+      "recorded": "2026-03-21T20:39:59.380036"
     }
   ]
 }
