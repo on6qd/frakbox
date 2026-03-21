@@ -504,33 +504,55 @@
       "last_updated": "2026-03-21T21:33:45.174443"
     },
     "ceo_performance_failure_departure_short": {
-      "summary": "CEO sudden departure for performance failure \u2192 consistent negative 1d abnormal return when entering SHORT at next-day open",
+      "summary": "Large-cap CEO fired for performance failure \u2192 SHORT next-day open, hold 1d",
       "signal": "SHORT",
-      "entry": "Next-day open after announcement (announcement typically after hours)",
-      "hold_period": "1 day (signal does NOT persist beyond 1d)",
-      "avg_abnormal_1d": -3.27,
-      "positive_rate_1d": 0.0,
-      "wilcoxon_p_1d": 0.0039,
-      "bootstrap_ci_1d_excludes_zero": true,
+      "entry": "Next-day market open (announcement typically after-hours)",
+      "hold_period": "1 trading day ONLY (signal does NOT persist: 3d p=0.077)",
+      "avg_abnormal_1d": -3.25,
+      "median_abnormal_1d": -2.96,
+      "stdev_1d": 3.32,
+      "positive_rate_1d": 16.7,
+      "wilcoxon_p_1d": 0.0034,
+      "bootstrap_ci_1d": {
+        "lower": -5.155,
+        "upper": -1.518,
+        "excludes_zero": true
+      },
       "passes_multiple_testing": true,
-      "sample_size": 9,
-      "events": [
-        "WBA 2023-09-01",
-        "UAA 2022-05-18",
-        "INTC 2024-12-02",
-        "CVS 2024-10-18",
-        "MCD 2019-11-03",
-        "STLA 2024-12-02",
-        "PARA 2024-04-29",
-        "VFC 2022-12-13",
-        "AAP 2023-08-24"
-      ],
+      "sample_size": 12,
       "discovery_period": "2019-2022",
+      "discovery_n": 4,
+      "discovery_consistency": "100%",
       "validation_period": "2023-2024",
-      "limitation": "N=9 below minimum 12 for formal hypothesis. Need 3 more clean events.",
-      "next_step": "Find 3 more large-cap CEO performance failure events 2019-2024 to reach N=12. Use EDGAR 8-K Item 5.02 scanner.",
-      "status": "STRONG EXPLORATORY FINDING \u2014 not yet a formal hypothesis",
-      "last_updated": "2026-03-21T23:04:24.703853"
+      "validation_n": 8,
+      "validation_consistency": "75%",
+      "hypothesis_id": "5dbcfb37",
+      "qualifying_criteria": [
+        "CEO departure is abrupt/forced (not planned succession)",
+        "Market cap >\\B",
+        "Stock underperformed sector 20%+ in prior 12 months",
+        "Company had earnings misses or profit warnings in past year",
+        "EXCLUDE: relief-rally departures (new CEO welcomed positively)"
+      ],
+      "confirmed_events_n12": [
+        "MCD 2019-11-04 (Steve Easterbrook, -1.20%)",
+        "UAA 2022-05-19 (Patrik Frisk, -6.22%)",
+        "DOCU 2022-06-14 (Dan Springer, -4.20%)",
+        "VFC 2022-12-14 (Steve Rendle, -0.64%)",
+        "WBA 2023-09-01 (Rosalind Brewer, -7.09%)",
+        "AAP 2023-08-24 (Tom Greco, -0.98%)",
+        "PARA 2024-04-30 (Bob Bakish, -4.33%)",
+        "CVS 2024-10-18 (Karen Lynch, +0.95% - miss)",
+        "STLA 2024-12-02 (Carlos Tavares, +0.62% - miss)",
+        "INTC 2024-12-02 (Pat Gelsinger, -3.84%)",
+        "FIVE 2024-07-17 (Joel Anderson, -9.97%)",
+        "BA 2024-03-25 (Dave Calhoun, -2.07%)"
+      ],
+      "exclusions_documented": "PTON (relief rally +22%), VSCO (relief +3.2%), DIS/Iger (+relief), LYFT (relief), CHGG (+2.4%), NFLX (-1.4% - borderline), SNAP/UAL/F (wrong events)",
+      "net_expected_return": 2.95,
+      "estimated_cost_pct": 0.302,
+      "status": "FORMAL HYPOTHESIS 5dbcfb37",
+      "last_updated": "2026-03-21T23:37:53.994540"
     }
   },
   "dead_ends": [

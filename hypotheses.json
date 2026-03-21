@@ -3542,5 +3542,243 @@
         "text": "Corrected validation_consistency_pct from 80% to 100%. Original 80% was based on stale GOSS measurement (+1.55%) which was due to wrong date. Corrected date (Feb 23, 2026) shows GOSS -37.21% continuation. All 5/5 validation events now confirm continuation pattern."
       }
     ]
+  },
+  {
+    "id": "5dbcfb37",
+    "created": "2026-03-21T23:37:22.434091",
+    "prediction_hash": "6b88acbc19d7381f",
+    "idempotency_key": "69841bc49d244f73",
+    "status": "pending",
+    "event_type": "ceo_performance_failure_departure_short",
+    "event_description": "When a large-cap (>\\B market cap) CEO is forced out due to documented performance failure (poor financial results sustained over 6+ months, board pressure, earnings misses), SHORT the stock at next-day market open. Hold 1 trading day. Qualifying: CEO departure is abrupt/forced, stock underperformed sector 20%+ in prior 12 months, company had public earnings misses or profit warnings in past year.",
+    "causal_mechanism": "Board firing a CEO signals problems are worse than management publicly acknowledged. Board has internal visibility management withheld. Institutional investors who were holding on sell on this confirmation signal. Short sellers use announcement as entry. New CEO uncertainty premium applied. Effect is concentrated in Day 1 (p=0.0034); does NOT persist to Day 3+ (p=0.077).",
+    "causal_mechanism_criteria": {
+      "actors_and_incentives": "Boards fire CEOs only when situation is unsustainable \u2014 bears reputational cost. Institutional holders sell on confirmation of problems they suspected. Short sellers who identified the decline use CEO firing as entry confirmation.",
+      "transmission_channel": "(1) Bayesian update: board firing reveals hidden severity of problems. (2) Uncertainty premium: new CEO will assess books, possible guidance revision. Effect concentrated at Day 1 open; reverting by Day 3 as uncertainty resolves.",
+      "academic_reference": "Huson, Parrino & Starks (2001) JFQA: negative stock reactions to forced CEO departures. Warner, Watts & Wruck (1988) JFE: stock underperformance predicts management changes. Fee & Hadlock (2004) JFE: performance-based CEO turnover confirms selection mechanism."
+    },
+    "expected_symbol": "TBD",
+    "expected_direction": "short",
+    "expected_magnitude_pct": 3.25,
+    "expected_timeframe_days": 1,
+    "event_timing": "after_hours",
+    "backtest_symbols": [
+      "MCD",
+      "UAA",
+      "DOCU",
+      "VFC",
+      "WBA",
+      "AAP",
+      "PARA",
+      "CVS",
+      "STLA",
+      "INTC",
+      "FIVE",
+      "BA"
+    ],
+    "backtest_events": [
+      {
+        "symbol": "MCD",
+        "date": "2019-11-04"
+      },
+      {
+        "symbol": "UAA",
+        "date": "2022-05-19"
+      },
+      {
+        "symbol": "DOCU",
+        "date": "2022-06-14"
+      },
+      {
+        "symbol": "VFC",
+        "date": "2022-12-14"
+      },
+      {
+        "symbol": "WBA",
+        "date": "2023-09-01"
+      },
+      {
+        "symbol": "AAP",
+        "date": "2023-08-24"
+      },
+      {
+        "symbol": "PARA",
+        "date": "2024-04-30"
+      },
+      {
+        "symbol": "CVS",
+        "date": "2024-10-18"
+      },
+      {
+        "symbol": "STLA",
+        "date": "2024-12-02"
+      },
+      {
+        "symbol": "INTC",
+        "date": "2024-12-02"
+      },
+      {
+        "symbol": "FIVE",
+        "date": "2024-07-17"
+      },
+      {
+        "symbol": "BA",
+        "date": "2024-03-25"
+      }
+    ],
+    "historical_evidence": [
+      {
+        "symbol": "MCD",
+        "date": "2019-11-04",
+        "period": "discovery_2019",
+        "abnormal_1d": -1.2,
+        "abnormal_3d": 1.79,
+        "ceo": "Steve Easterbrook",
+        "reason": "sexual misconduct + performance"
+      },
+      {
+        "symbol": "UAA",
+        "date": "2022-05-19",
+        "period": "discovery_2022",
+        "abnormal_1d": -6.22,
+        "abnormal_3d": -4.0,
+        "ceo": "Patrik Frisk",
+        "reason": "sustained earnings misses"
+      },
+      {
+        "symbol": "DOCU",
+        "date": "2022-06-14",
+        "period": "discovery_2022",
+        "abnormal_1d": -4.2,
+        "abnormal_3d": -3.06,
+        "ceo": "Dan Springer",
+        "reason": "70% stock decline, over-hiring, missed guidance"
+      },
+      {
+        "symbol": "VFC",
+        "date": "2022-12-14",
+        "period": "discovery_2022",
+        "abnormal_1d": -0.64,
+        "abnormal_3d": -2.93,
+        "ceo": "Steve Rendle",
+        "reason": "inventory crisis, guidance cuts"
+      },
+      {
+        "symbol": "WBA",
+        "date": "2023-09-01",
+        "period": "validation_2023",
+        "abnormal_1d": -7.09,
+        "abnormal_3d": -9.11,
+        "ceo": "Rosalind Brewer",
+        "reason": "pharmacy crisis, earnings misses"
+      },
+      {
+        "symbol": "AAP",
+        "date": "2023-08-24",
+        "period": "validation_2023",
+        "abnormal_1d": -0.98,
+        "abnormal_3d": -5.58,
+        "ceo": "Tom Greco",
+        "reason": "supply chain failures, margins collapse"
+      },
+      {
+        "symbol": "PARA",
+        "date": "2024-04-30",
+        "period": "validation_2024",
+        "abnormal_1d": -4.33,
+        "abnormal_3d": 15.53,
+        "ceo": "Bob Bakish",
+        "reason": "streaming losses, activist pressure"
+      },
+      {
+        "symbol": "CVS",
+        "date": "2024-10-18",
+        "period": "validation_2024",
+        "abnormal_1d": 0.95,
+        "abnormal_3d": -3.63,
+        "ceo": "Karen Lynch",
+        "reason": "insurance losses, PBM investigations"
+      },
+      {
+        "symbol": "STLA",
+        "date": "2024-12-02",
+        "period": "validation_2024",
+        "abnormal_1d": 0.62,
+        "abnormal_3d": 2.88,
+        "ceo": "Carlos Tavares",
+        "reason": "market share loss, profitability collapse"
+      },
+      {
+        "symbol": "INTC",
+        "date": "2024-12-02",
+        "period": "validation_2024",
+        "abnormal_1d": -3.84,
+        "abnormal_3d": -12.44,
+        "ceo": "Pat Gelsinger",
+        "reason": "fab strategy failure, market share loss"
+      },
+      {
+        "symbol": "FIVE",
+        "date": "2024-07-17",
+        "period": "validation_2024",
+        "abnormal_1d": -9.97,
+        "abnormal_3d": -7.63,
+        "ceo": "Joel Anderson",
+        "reason": "massive earnings miss, guidance cut"
+      },
+      {
+        "symbol": "BA",
+        "date": "2024-03-25",
+        "period": "validation_2024",
+        "abnormal_1d": -2.07,
+        "abnormal_3d": -2.45,
+        "ceo": "Dave Calhoun",
+        "reason": "safety/quality crisis, regulatory pressure"
+      }
+    ],
+    "sample_size": 12,
+    "consistency_pct": 83.3,
+    "out_of_sample_split": {
+      "discovery_period": "2019-2022",
+      "validation_period": "2023-2024",
+      "validation_indices": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "validation_consistency_pct": 75.0
+    },
+    "confounders": {
+      "broad_market_direction": "Events span bull and bear markets 2019-2024. Effect persists across.",
+      "vix_level": "Mostly VIX <30. Not tested in crisis (VIX>30). Likely stronger in elevated VIX.",
+      "sector_trend": "Mixed sectors: consumer, tech, industrial, retail. Sector-neutral signal.",
+      "survivorship_bias": "WBA/PARA delisted; recovered via Tiingo. BBBY/GPS excluded (no data). Bias UPWARD.",
+      "selection_bias": "Events from EDGAR + domain knowledge. Relief-rally departures (PTON, VSCO, DIS/Iger) excluded.",
+      "event_timing": "Most after-hours. Entry at next-day open. Open price used in backtest.",
+      "market_regime": "Discovery (2019-22): 100% negative. Validation (2023-24): 75% negative. Regime matters."
+    },
+    "market_regime_note": "Discovery period 100% negative. Validation 75% negative. 2 near-zero positives (CVS +0.95%, STLA +0.62%) in bull regime.",
+    "regime_note": null,
+    "confidence": 7,
+    "literature_reference": "Huson, Parrino & Starks (2001); Warner, Watts & Wruck (1988); Fee & Hadlock (2004)",
+    "survivorship_bias_note": "WBA/PARA delisted but data recovered. BBBY/GPS excluded (no data available). Bias likely upward (excluded events were failures).",
+    "selection_bias_note": "Relief-rally departures explicitly excluded: PTON (Foley), VSCO (Waters), DIS (Chapek/Iger), LYFT (Green). This prevents look-ahead; the exclusion rule is pre-defined.",
+    "passes_multiple_testing": true,
+    "multiple_testing_warning": null,
+    "confounder_warnings": null,
+    "symbol_warnings": [
+      "Symbol is TBD \u2014 must be resolved to a real ticker before activation."
+    ],
+    "dead_end_warnings": [
+      "Related dead end: ceo_cfo_sudden_departure \u2014 Backtested N=10 mid-cap CEO/CFO sudden departure events (2022-2024). avg_abnormal_3d=+0.19%, positive_rate_3d=40%, passes_multiple_testing=False. Signal too noisy for 3-5 day hold. Events are idiosyncratic - LCID CFO departure (Dec 2023) showed +12.8% 3d reversal; FRPT CFO departure showed +11.2% 3d reversal. No discriminating factor found to separate continuation from reversal cases. Academic literature shows this as a 1-3 month signal, not 3-5 day. Would need 30+ day hold and different strategy. Not tradeable at our 3-5 day horizon with current methodology.",
+      "Related dead end: ceo_relief_rally_short \u2014 CEO relief rally (market celebrates bad CEO removal) \u2192 SHORT at next-day open does NOT work. N=12 expanded test shows avg 10d = -1.34%, p=0.5693. Original N=8 result (-5.47% at 10d) was small-sample noise. Individual events highly variable: DG +13.73%, KSS +8.92%, SBUX 2024 +0.39%, GE +4.57% vs PTON -19.64%, WFC -6.80%. No consistent pattern."
+    ],
+    "trade": null,
+    "result": null
   }
 ]

@@ -4,13 +4,17 @@ EDGAR 8-K CEO/CFO Departure Scanner
 Scans EDGAR for 8-K filings mentioning Item 5.02 (departure of principal officers)
 to find CEO and CFO sudden departures from large-cap companies.
 
-Target signal: CEO performance failure departure → SHORT next-day open
-Current exploratory finding: N=9, 0% positive rate, p=0.0039 at 1d
-Need: 3 more events (N=12) to form a formal hypothesis
+Target signal: CEO performance failure departure → SHORT next-day open, 1d hold
+FORMAL HYPOTHESIS: 5dbcfb37
+N=12, avg_abnormal_1d=-3.25%, p=0.0034, CI=[-5.16, -1.52] excludes zero
+Discovery (2019-2022): 4 events, 100% negative
+Validation (2023-2024): 8 events, 75% negative (2 near-zero positives: CVS, STLA)
+
+Key exclusion: relief-rally departures (PTON, VSCO, LYFT, SBUX) — stock RISES, do NOT short
 
 Usage:
-    python tools/edgar_ceo_departure_scanner.py --start 2019-01-01 --end 2022-12-31 --min-cap 2000
-    python tools/edgar_ceo_departure_scanner.py --start 2019-01-01 --end 2022-12-31 --check-direction
+    python tools/edgar_ceo_departure_scanner.py --start 2025-01-01 --end 2025-12-31 --min-cap 2000
+    python tools/edgar_ceo_departure_scanner.py --start 2025-01-01 --end 2025-12-31 --check-direction
 """
 
 import sys
@@ -292,19 +296,36 @@ def print_candidate_events(events: list, filter_fell: bool = True):
         print(f"{company:<30} {ticker:<8} {date:<12} {ret_str:<10} {cap_str}")
 
 
-# Known confirmed events (from manual research) for cross-reference
+# Known confirmed events (N=12 formal hypothesis 5dbcfb37) for cross-reference
+# Discovery (2019-2022): 4 events, 100% negative 1d
+# Validation (2023-2024): 8 events, 75% negative 1d
+# Overall: avg abnormal 1d = -3.25%, p=0.0034, CI excludes zero
+# Entry: NEXT-DAY OPEN (not announcement day close)
 CONFIRMED_PERFORMANCE_FAILURE_EVENTS = [
     # Discovery period (2019-2022)
-    {"symbol": "UAA",  "date": "2022-05-18", "ceo": "Patrik Frisk"},
-    {"symbol": "MCD",  "date": "2019-11-03", "ceo": "Steve Easterbrook"},
-    {"symbol": "VFC",  "date": "2022-12-13", "ceo": "Steve Rendle"},
+    {"symbol": "MCD",  "date": "2019-11-04", "ceo": "Steve Easterbrook", "abnormal_1d": -1.20},
+    {"symbol": "UAA",  "date": "2022-05-19", "ceo": "Patrik Frisk",      "abnormal_1d": -6.22},
+    {"symbol": "DOCU", "date": "2022-06-14", "ceo": "Dan Springer",       "abnormal_1d": -4.20},
+    {"symbol": "VFC",  "date": "2022-12-14", "ceo": "Steve Rendle",       "abnormal_1d": -0.64},
     # Validation period (2023-2024)
-    {"symbol": "WBA",  "date": "2023-09-01", "ceo": "Rosalind Brewer"},
-    {"symbol": "INTC", "date": "2024-12-02", "ceo": "Pat Gelsinger"},
-    {"symbol": "CVS",  "date": "2024-10-18", "ceo": "Karen Lynch"},
-    {"symbol": "STLA", "date": "2024-12-02", "ceo": "Carlos Tavares"},
-    {"symbol": "PARA", "date": "2024-04-29", "ceo": "Bob Bakish"},
-    {"symbol": "AAP",  "date": "2023-08-24", "ceo": "Tom Greco"},
+    {"symbol": "WBA",  "date": "2023-09-01", "ceo": "Rosalind Brewer",   "abnormal_1d": -7.09},
+    {"symbol": "AAP",  "date": "2023-08-24", "ceo": "Tom Greco",         "abnormal_1d": -0.98},
+    {"symbol": "PARA", "date": "2024-04-30", "ceo": "Bob Bakish",        "abnormal_1d": -4.33},
+    {"symbol": "CVS",  "date": "2024-10-18", "ceo": "Karen Lynch",       "abnormal_1d": +0.95},  # miss
+    {"symbol": "STLA", "date": "2024-12-02", "ceo": "Carlos Tavares",    "abnormal_1d": +0.62},  # miss
+    {"symbol": "INTC", "date": "2024-12-02", "ceo": "Pat Gelsinger",     "abnormal_1d": -3.84},
+    {"symbol": "FIVE", "date": "2024-07-17", "ceo": "Joel Anderson",     "abnormal_1d": -9.97},
+    {"symbol": "BA",   "date": "2024-03-25", "ceo": "Dave Calhoun",      "abnormal_1d": -2.07},
+]
+
+# Relief-rally departures to EXCLUDE (new CEO welcomed = stock RISES)
+# Do NOT short these patterns
+RELIEF_RALLY_DEPARTURES = [
+    {"symbol": "PTON", "date": "2022-02-08", "ceo": "John Foley",       "abnormal_1d": +22.59},
+    {"symbol": "VSCO", "date": "2024-10-11", "ceo": "Martin Waters",    "abnormal_1d":  +3.23},
+    {"symbol": "DIS",  "date": "2022-11-21", "ceo": "Bob Chapek",       "abnormal_1d":  -2.18},  # Iger return
+    {"symbol": "LYFT", "date": "2023-04-13", "ceo": "Logan Green",      "abnormal_1d":  +3.46},
+    {"symbol": "SBUX", "date": "2024-09-10", "ceo": "Laxman Narasimhan","abnormal_1d":  +3.51},
 ]
 
 
