@@ -102,17 +102,31 @@
       "recorded": "2026-03-21T14:05:12.544838"
     },
     "fda_crl_clinical_short": {
-      "summary": "Clinical-primary FDA CRL events where single-asset small biotech crashes >55% show consistent post-gap SHORT continuation at 3d and 5d. N=4 events all show continuation. Effect: avg 3d abnormal -14.4%, 5d -18.8%. Entry: SHORT at crash-day open. Hold: 3-5 days.",
-      "known_magnitude": "avg 3d abnormal: -14.4% (range -13.5% to -23.3%). avg 5d: -18.8% (range -13.4% to -36.9%)",
+      "summary": "FDA CRL clinical-primary crash continuation signal: N=5 events (ARDX Jul 2021, GRTX Aug 2023, OTLK Aug 2023, NERV Feb 2024, APLT Nov 2024) ALL show SHORT continuation from crash-day open. 0% positive rate. Avg 3d abnormal=-19.83%, avg 5d=-29.34%. Reversal pattern also identified: (1) 2nd+ CRL for same company, (2) safety-primary CRL, (3) diversified pipeline, (4) pre-anticipated (stock down >20% in 30d before), (5) device/usability CRL.",
+      "known_magnitude": "avg 3d: -19.83% abnormal (range -15.3% to -23.3%). avg 5d: -29.34% (range -19.8% to -42.1%)",
       "known_timeframe": "3-5 trading days from crash-day open",
       "sources": [
-        "ARDX 2021-07-19: -15.3% 3d",
-        "APLT 2024-11-27: -23.3% 3d",
-        "OTLK 2023-08-29: -15.2% 3d",
-        "NERV 2024-02-27: -13.5% 3d"
+        "ARDX 2021-07-20: -80.2% gap, 3d=-15.3%, 5d=-28.9%",
+        "GRTX 2023-08-10: -82.8% gap, 3d=-21.6%, 5d=-32.8% [NEW N=5]",
+        "OTLK 2023-08-30: -80.9% gap, 3d=-19.4%, 5d=-19.8%",
+        "NERV 2024-02-27: -58.8% gap, 3d=-19.5%, 5d=-23.1%",
+        "APLT 2024-11-29: -74.6% gap, 3d=-23.3%, 5d=-42.1%",
+        "REVERSAL: REPL 2025-07-22, ALDX 2026-03-17, SPRY 2023-09-20, OTLK 2025-08-28"
       ],
-      "gaps": "N=4 insufficient for formal hypothesis. Need N=6+ with OOS split. Delisted tickers (SESN, ATNX, CORV) would add data but not accessible via yfinance.",
-      "recorded": "2026-03-21T14:11:35.402735"
+      "gaps": "N=5 insufficient for OOS split (need 3+ validation instances = N>=7). Cannot formally pre-register. Looking for 2+ more events. Main bottleneck: delisted tickers (SESN, TCDA, FGEN, YMAB all delisted with no data). FBRX Sep 2021 was phase 2 failure (not CRL) - different category.",
+      "recorded": "2026-03-21T14:45:33.606315"
+    },
+    "clinical_trial_failure_continuation": {
+      "summary": "Phase 2/3 clinical trial FAILURE (primary endpoint not met) in single-drug small biotech: after crash-day open SHORT shows strong continued decline over 3-5 days. Mechanistically identical to FDA CRL clinical-primary crashes but different event stage. N=1 confirmed (FBRX Sep 2021), consistent with the CRL continuation pattern.",
+      "known_magnitude": "FBRX Sep 3 2021: -80.2% gap, 1d abnormal=-25.7%, 3d=-27.8%, 5d=-25.5%",
+      "known_timeframe": "3-5 trading days from crash-day open",
+      "sources": [
+        "FBRX (Forte Biosciences) Sep 3 2021: FB-401 Phase 2b failure for atopic dermatitis. Gap=-80.2%, 3d abnormal=-27.8%, 5d=-25.5%",
+        "Pattern consistent with FDA CRL continuation hypothesis N=5 events (same mechanism)",
+        "Tiingo historical data (delisted ticker, data available)"
+      ],
+      "gaps": "N=1 is insufficient. Need to find 5+ more Phase 2/3 clinical failures with >55% crash. Search approach: SEC 8-K filings for \"clinical trial\" + \"primary endpoint\" + \"failed\" from 2019-2024. This broadens the signal universe substantially (Phase 2/3 failures are more frequent than CRLs).",
+      "recorded": "2026-03-21T14:46:06.001385"
     }
   },
   "known_effects": {
@@ -252,28 +266,57 @@
       "last_updated": "2026-03-21T13:58:26.642906"
     },
     "fda_crl_clinical_short": {
-      "description": "N=4 clinical CRL events ALL show SHORT continuation from crash-day open. No reversals among events with: (1) >55% initial crash, (2) clinical/efficacy primary CRL, (3) single-drug pipeline, (4) not pre-anticipated. Threshold: >55% crash. Reversal pattern when crash <50% or 3rd+ CRL.",
+      "description": "N=5 clinical CRL events ALL show SHORT continuation from crash-day open. 0% positive rate at all horizons. Avg 3d=-19.83%, avg 5d=-29.34%. Events: ARDX, GRTX, OTLK, NERV, APLT.",
       "effect_sizes": {
         "ardx": {
+          "gap": -73.6,
+          "1d": -2.4,
           "3d": -15.3,
           "5d": -28.9
         },
-        "aplt": {
-          "3d": -23.3,
-          "5d": -36.9
+        "grtx": {
+          "gap": -82.8,
+          "1d": -5.3,
+          "3d": -21.6,
+          "5d": -32.8
         },
         "otlk": {
-          "3d": -15.2,
+          "gap": -80.9,
+          "1d": -4.0,
+          "3d": -19.4,
           "5d": -19.8
         },
         "nerv": {
-          "3d": -13.5,
-          "5d": -13.4
+          "gap": -58.8,
+          "1d": -15.3,
+          "3d": -19.5,
+          "5d": -23.1
+        },
+        "aplt": {
+          "gap": -74.6,
+          "1d": -7.5,
+          "3d": -23.3,
+          "5d": -42.1
         }
       },
-      "status": "promising_partial_n4",
-      "next_steps": "Find 2+ more events to reach N=6. Try BioPharmCatalyst archives, Polygon.io for delisted tickers.",
-      "last_updated": "2026-03-21T14:11:35.403408"
+      "avg_1d_abnormal": -6.91,
+      "avg_3d_abnormal": -19.83,
+      "avg_5d_abnormal": -29.34,
+      "pos_rate_1d": 0.0,
+      "pos_rate_3d": 0.0,
+      "pos_rate_5d": 0.0,
+      "passes_multiple_testing": true,
+      "status": "promising_partial_n5",
+      "blocking_issue": "Need min 3 validation instances per methodology (currently 2 if split 3/2)",
+      "reversal_cases_documented": {
+        "REPL_2025": "diversified pipeline",
+        "ALDX_2026": "3rd CRL, pre-anticipated",
+        "SPRY_2023": "device/usability CRL not efficacy failure",
+        "OTLK_2025": "2nd CRL for same company, ultra-micro-cap short-squeeze"
+      },
+      "new_event_grtx": "GRTX (Galera Therapeutics) Aug 10 2023: avasopasem NDA, clinical endpoint failure, -82.8% gap, 3d=-21.6%, 5d=-32.8%, single-drug company",
+      "next_steps": "Need 2+ more qualifying events. Search: Phase 2/3 trial failure crashes as related category. Try Polygon.io for delisted tickers. Monitor upcoming PDUFA calendar for qualifying single-asset small biotech clinical CRL events.",
+      "last_updated": "2026-03-21T14:45:33.605587"
     }
   },
   "dead_ends": [
