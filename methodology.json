@@ -1,9 +1,9 @@
 {
-  "version": 4,
-  "last_updated": "2026-03-15",
+  "version": 5,
+  "last_updated": "2026-03-21",
   "last_review_at_experiment": 0,
   "review_every_n_experiments": 10,
-  "last_weekly_diagnostic": "2026-03-19T21:08:30.828135",
+  "last_weekly_diagnostic": "2026-03-21T10:46:00.361519",
   "bootstrap_review_threshold": 3,
   "bootstrap_review_completed": false,
   "defaults": {
@@ -22,7 +22,10 @@
       20
     ],
     "max_concurrent_experiments": 5,
-    "knowledge_revalidation_months": 12
+    "knowledge_revalidation_months": 12,
+    "min_direction_threshold_pct": 0.5,
+    "estimated_round_trip_cost_pct": 0.1,
+    "min_net_return_after_costs_pct": 1.0
   },
   "out_of_sample": {
     "note": "Historical instances MUST be split into discovery (70%) and validation (30%) sets using TEMPORAL splits. Older events = discovery, newer events = validation. This prevents look-ahead bias that random splits allow.",
@@ -38,7 +41,9 @@
     "method": "multi_horizon",
     "min_significant_horizons": 2,
     "bonferroni_adjusted_p": 0.01,
-    "note2": "If only 1 horizon is significant, use bonferroni_adjusted_p (0.01) instead of 0.05. If 2+ horizons significant at 0.05, no correction needed."
+    "note2": "If only 1 horizon is significant, use bonferroni_adjusted_p (0.01) instead of 0.05. If 2+ horizons significant at 0.05, no correction needed.",
+    "cross_category_fdr_method": "benjamini_hochberg",
+    "cross_category_fdr_note": "Within-backtest correction handles horizons. Across categories (N=14+), apply Benjamini-Hochberg FDR using market_data.apply_cross_category_fdr() when reviewing aggregate results."
   },
   "event_timing": {
     "note": "Events happen at different times. An after-hours FDA decision moves the stock next morning, not same day. The reference price must account for this.",
@@ -147,9 +152,8 @@
         "80%+": 3
       },
       "effect_vs_noise": {
-        "avg/stdev 0.3-0.5": 1,
-        "avg/stdev 0.5-1.0": 2,
-        "avg/stdev 1.0+": 3
+        "avg/stdev 0.3-0.7": 1,
+        "avg/stdev 0.7+": 2
       },
       "literature_support": {
         "none": 0,
@@ -158,7 +162,7 @@
       }
     },
     "max_score": 10,
-    "note2": "A hypothesis with N=6, 65% consistency, avg/stdev=0.4, no literature = 1+1+1+0 = 3. This is low confidence and correctly so. Use literature_strength='partial' or 'strong' in compute_confidence_score() to award 1 or 2 points respectively."
+    "note2": "Components now sum to exactly 10 (3+3+2+2). A hypothesis with N=6, 65% consistency, avg/stdev=0.4, no literature = 1+1+1+0 = 3. Use literature_strength='partial' or 'strong' in compute_confidence_score() to award 1 or 2 points respectively."
   },
   "confidence_calibration": {
     "note": "Tracks whether confidence scores predict accuracy. Updated during self-reviews.",
@@ -211,6 +215,12 @@
       "date": "2026-03-15",
       "changes": "Multi-symbol backtest support (event_dates can now contain {symbol, date} dicts). Temporal out-of-sample splits (older=discovery, newer=validation \u2014 index splits deprecated). Replaced hand-rolled p-value with scipy.stats.ttest_1samp. Added power analysis (recommended_n fields in backtest output). Added cross-event contamination detection. Fixed sector-adjusted returns circular reference for large ETF constituents. Added task IDs and deduplication to research queue. Added idempotency keys to prevent duplicate hypotheses on crash+rerun. Added confounder enforcement and analysis in self-review. Added check_related_dead_ends() for negative result utilization. Added weekly research diagnostic. Structured session logs (sessions.jsonl). Raised turn limits from 50 to 80 for operations/research sessions. Split CLAUDE.md into operational reference + METHODOLOGY.md.",
       "reason": "Infrastructure audit \u2014 16 fixes for research loop reliability, statistical correctness, and cross-session coherence"
+    },
+    {
+      "version": 5,
+      "date": "2026-03-21",
+      "changes": "Methodology audit \u2014 13 fixes: (1) cross-category BH FDR utility, (2) Wilcoxon signed-rank robustness check + skewness warnings, (3) confidence rubric SNR component reduced to max 2 (components sum to 10), (4) placeholder evidence detection blocks fake OOS validation, (5) min_abnormal_return_pct enforced in create_hypothesis, (6) direction correctness requires min 0.5% threshold, (7) confounder validation now blocking, (8) backtest_events type documented, (9) stale hypothesis detection in weekly diagnostic, (10) magnitude ratio direction-aware for shorts, (11) transaction cost model (0.1% round-trip, 1.0% min net), (12) regime_filter param for VIX-conditional backtesting, (13) prediction hash tamper check at completion.",
+      "reason": "Methodology audit \u2014 statistical robustness, validation integrity, and missing enforcement"
     }
   ]
 }

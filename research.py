@@ -12,6 +12,7 @@ A hypothesis requires:
 import hashlib
 import json
 import os
+import re
 import tempfile
 import uuid
 from datetime import datetime, timedelta
@@ -287,7 +288,28 @@ def create_hypothesis(
         backtest_symbols: List of symbols used in multi-symbol backtest
             (e.g., ["AAPL", "MSFT", "NVDA"]). Shows pattern is general, not stock-specific.
         backtest_events: List of {"symbol", "date"} dicts from the multi-symbol backtest.
+            Legacy: may be an int (count) in older hypotheses. New hypotheses should use list format.
     """
+    # Idempotency check FIRST: return existing hypothesis before running any validation.
+    # This prevents validation errors when re-running after a crash+restart.
+    idempotency_key = _compute_idempotency_key(event_type, expected_symbol, event_description)
+    hypotheses = load_hypotheses()
+    for existing in hypotheses:
+        if existing.get("idempotency_key") == idempotency_key:
+            return existing  # Already created — return existing
+
+    # Validate symbol format (TBD is allowed for event-driven hypotheses)
+    symbol_warnings = []
+    if expected_symbol == "TBD":
+        symbol_warnings.append(
+            "Symbol is TBD — must be resolved to a real ticker before activation."
+        )
+    elif not expected_symbol or len(expected_symbol) > 5:
+        raise ValueError(
+            f"expected_symbol '{expected_symbol}' is invalid. "
+            f"Use a 1-5 character ticker, or 'TBD' for event-driven hypotheses."
+        )
+
     # Validate causal mechanism
     valid, msg = validate_causal_mechanism(causal_mechanism, causal_mechanism_criteria)
     if not valid:
@@ -306,17 +328,54 @@ def create_hypothesis(
             "Split historical evidence 70/30 and verify pattern holds in both sets."
         )
 
-    # Validate confounders contain all tracked fields
+    # Load methodology for validation checks
     from self_review import load_methodology
     m = load_methodology()
+
+    # Validate expected magnitude exceeds noise floor
+    min_magnitude = m.get("defaults", {}).get("min_abnormal_return_pct", 1.5)
+    if expected_magnitude_pct < min_magnitude:
+        raise ValueError(
+            f"expected_magnitude_pct ({expected_magnitude_pct}%) is below "
+            f"min_abnormal_return_pct ({min_magnitude}%). Effect too small to be actionable."
+        )
+
+    # Validate expected return covers transaction costs
+    round_trip_cost = m.get("defaults", {}).get("estimated_round_trip_cost_pct", 0.1)
+    min_net = m.get("defaults", {}).get("min_net_return_after_costs_pct", 1.0)
+    net_return = expected_magnitude_pct - round_trip_cost
+    if net_return < min_net:
+        raise ValueError(
+            f"Expected net return after costs ({net_return:.2f}%) is below "
+            f"minimum ({min_net}%). Not economically viable."
+        )
+
+    # Validate historical evidence contains real price data (not placeholders)
+    placeholder_count = 0
+    measured_count = 0
+    for ev in historical_evidence:
+        if ev.get("note") and "placeholder" in ev["note"].lower():
+            placeholder_count += 1
+        elif str(ev.get("symbol", "")).startswith("LIT_REF"):
+            placeholder_count += 1
+        elif ev.get("abnormal_1d") is not None or ev.get("abnormal_5d") is not None:
+            measured_count += 1
+    min_measured = m.get("defaults", {}).get("min_sample_size_exploratory", 5)
+    if placeholder_count > 0 and measured_count < min_measured:
+        raise ValueError(
+            f"historical_evidence has {placeholder_count} placeholder entries and only "
+            f"{measured_count} measured entries (need >= {min_measured}). "
+            f"Run measure_event_impact() to collect real price data before creating a hypothesis."
+        )
+
+    # Validate confounders contain all tracked fields (blocking)
     tracked = m.get("confounders_tracked", [])
     missing_confounders = [c for c in tracked if c not in confounders]
-    confounder_warnings = []
     if missing_confounders:
-        confounder_warnings.append(
+        raise ValueError(
             f"Missing confounders: {missing_confounders}. "
-            f"All confounders from methodology.json should be recorded, "
-            f"even if the value is 'unknown' or 'not applicable'."
+            f"All confounders from methodology.json must be recorded. "
+            f"Use 'unknown' or 'not applicable' if you don't have data."
         )
 
     # Check for related dead ends
@@ -341,13 +400,6 @@ def create_hypothesis(
         event_type, expected_symbol, expected_direction,
         expected_magnitude_pct, expected_timeframe_days
     )
-
-    # Idempotency check: don't create duplicate hypotheses on crash+rerun
-    idempotency_key = _compute_idempotency_key(event_type, expected_symbol, event_description)
-    hypotheses = load_hypotheses()
-    for existing in hypotheses:
-        if existing.get("idempotency_key") == idempotency_key:
-            return existing  # Already created — return existing
 
     hypothesis = {
         "id": uuid.uuid4().hex[:8],
@@ -387,7 +439,8 @@ def create_hypothesis(
         "multiple_testing_warning": multiple_testing_warning,
 
         # Warnings from validation checks
-        "confounder_warnings": confounder_warnings if confounder_warnings else None,
+        "confounder_warnings": None,  # Now blocking — missing confounders raise ValueError
+        "symbol_warnings": symbol_warnings if symbol_warnings else None,
         "dead_end_warnings": dead_end_warnings if dead_end_warnings else None,
 
         # Filled when trade is placed
@@ -448,8 +501,20 @@ def activate_hypothesis(hypothesis_id, entry_price, position_size, order_id=None
             f"Cannot activate: {active_count} active experiments already "
             f"(max {max_concurrent}). Close or invalidate existing experiments first."
         )
+    found = False
     for h in hypotheses:
         if h["id"] == hypothesis_id:
+            found = True
+            if h["status"] != "pending":
+                raise ValueError(
+                    f"Cannot activate hypothesis {hypothesis_id}: status is '{h['status']}', "
+                    f"expected 'pending'."
+                )
+            if h["expected_symbol"] == "TBD":
+                raise ValueError(
+                    f"Cannot activate hypothesis {hypothesis_id}: symbol is still 'TBD'. "
+                    f"Update expected_symbol to a real ticker first."
+                )
             h["status"] = "active"
             h["trade"] = {
                 "entry_price": entry_price,
@@ -463,6 +528,8 @@ def activate_hypothesis(hypothesis_id, entry_price, position_size, order_id=None
                 "sector_etf_at_entry": sector_etf_price,
             }
             break
+    if not found:
+        raise ValueError(f"Hypothesis {hypothesis_id} not found.")
     save_hypotheses(hypotheses)
 
 
@@ -501,9 +568,34 @@ def complete_hypothesis(hypothesis_id, exit_price, actual_return_pct, post_morte
         - What did we learn?
         - Should we update the pattern or discard it?
     """
+    from self_review import load_methodology
+    m = load_methodology()
+    min_direction_threshold = m.get("defaults", {}).get("min_direction_threshold_pct", 0.5)
+
     hypotheses = load_hypotheses()
+    found = False
     for h in hypotheses:
         if h["id"] == hypothesis_id:
+            found = True
+            # Status check: only active hypotheses can be completed
+            if h["status"] != "active":
+                raise ValueError(
+                    f"Cannot complete hypothesis {hypothesis_id}: status is '{h['status']}', "
+                    f"expected 'active'. Activate the hypothesis first via activate_hypothesis()."
+                )
+
+            # Pre-registration tamper check: verify prediction hash
+            expected_hash = _compute_prediction_hash(
+                h["event_type"], h["expected_symbol"], h["expected_direction"],
+                h["expected_magnitude_pct"], h["expected_timeframe_days"]
+            )
+            if h.get("prediction_hash") and expected_hash != h["prediction_hash"]:
+                raise ValueError(
+                    f"TAMPER DETECTED: Prediction hash mismatch for hypothesis {hypothesis_id}. "
+                    f"Stored: {h['prediction_hash']}, Computed: {expected_hash}. "
+                    f"Prediction fields may have been modified after pre-registration."
+                )
+
             h["status"] = "completed"
             expected_return = h["expected_magnitude_pct"] if h["expected_direction"] == "long" else -h["expected_magnitude_pct"]
 
@@ -511,8 +603,16 @@ def complete_hypothesis(hypothesis_id, exit_price, actual_return_pct, post_morte
             abnormal_return = actual_return_pct - (spy_return_pct or 0)
             sector_adj_return = actual_return_pct - (sector_etf_return_pct or 0) if sector_etf_return_pct is not None else None
 
-            # Judge correctness on abnormal return, not raw
-            direction_correct = (abnormal_return > 0) == (h["expected_direction"] == "long")
+            # Judge correctness on abnormal return with minimum threshold
+            # A +0.01% move on a +5% prediction is noise, not a correct call
+            direction_matches = (abnormal_return > 0) == (h["expected_direction"] == "long")
+            direction_correct = direction_matches and abs(abnormal_return) >= min_direction_threshold
+
+            # Magnitude ratio: direction-aware (0 if wrong direction)
+            if direction_correct and expected_return != 0:
+                magnitude_ratio = abs(abnormal_return) / abs(expected_return)
+            else:
+                magnitude_ratio = 0.0
 
             h["result"] = {
                 "exit_price": exit_price,
@@ -523,7 +623,8 @@ def complete_hypothesis(hypothesis_id, exit_price, actual_return_pct, post_morte
                 "sector_adj_return_pct": round(sector_adj_return, 2) if sector_adj_return is not None else None,
                 "expected_return_pct": expected_return,
                 "direction_correct": direction_correct,
-                "magnitude_ratio": abs(abnormal_return / expected_return) if expected_return != 0 else None,
+                "direction_matches_but_below_threshold": direction_matches and not direction_correct,
+                "magnitude_ratio": round(magnitude_ratio, 3) if magnitude_ratio is not None else None,
                 "post_mortem": post_mortem,
                 "confounders_at_exit": confounders_at_exit,
                 # Structured post-mortem fields (all required for quality post-mortems)
@@ -535,17 +636,23 @@ def complete_hypothesis(hypothesis_id, exit_price, actual_return_pct, post_morte
             log_result(h)
             _update_pattern(h)
             break
+    if not found:
+        raise ValueError(f"Hypothesis {hypothesis_id} not found.")
     save_hypotheses(hypotheses)
 
 
 def invalidate_hypothesis(hypothesis_id, reason):
     """Mark a hypothesis as invalidated (conditions changed before testing)."""
     hypotheses = load_hypotheses()
+    found = False
     for h in hypotheses:
         if h["id"] == hypothesis_id:
+            found = True
             h["status"] = "invalidated"
             h["result"] = {"reason": reason, "time": datetime.now().isoformat()}
             break
+    if not found:
+        raise ValueError(f"Hypothesis {hypothesis_id} not found.")
     save_hypotheses(hypotheses)
 
 
@@ -817,9 +924,13 @@ def check_promotion_or_retirement(event_type):
     total = pattern["total_tests"]
     accuracy = pattern["reliability_score"] or 0
     experiments = pattern.get("experiments", [])
-    mag_ratios = [e.get("actual_pct", 0) / e.get("expected_pct", 1)
-                  for e in experiments if e.get("expected_pct", 0) != 0]
-    avg_mag_ratio = sum(abs(r) for r in mag_ratios) / len(mag_ratios) if mag_ratios else 0
+    # Only count magnitude ratio for direction-correct experiments
+    # For shorts, actual_pct is negative when correct — use abs() for both
+    mag_ratios = []
+    for e in experiments:
+        if e.get("expected_pct", 0) != 0 and e.get("direction_correct", False):
+            mag_ratios.append(abs(e.get("actual_pct", 0)) / abs(e["expected_pct"]))
+    avg_mag_ratio = sum(mag_ratios) / len(mag_ratios) if mag_ratios else 0
 
     stats = {
         "total_tests": total,
@@ -855,3 +966,78 @@ def check_promotion_or_retirement(event_type):
         "reason": f"Pattern has {total} tests, {accuracy:.0%} accuracy — needs more data.",
         "stats": stats,
     }
+
+
+def verify_data_integrity():
+    """
+    Verify referential integrity across all data files.
+    Run at session start to catch data loss (e.g., hypothesis created but not persisted).
+
+    Returns:
+        {"ok": bool, "issues": list of strings}
+    """
+    issues = []
+    hypotheses = load_hypotheses()
+    hyp_ids = {h["id"] for h in hypotheses}
+
+    # Check research_queue.json references
+    rq_path = os.path.join(os.path.dirname(__file__), "research_queue.json")
+    if os.path.exists(rq_path):
+        with open(rq_path) as f:
+            rq = json.load(f)
+
+        # Check session_handoff hypothesis_ids
+        handoff = rq.get("session_handoff", {})
+        for key, hid in handoff.get("hypothesis_ids", {}).items():
+            if hid not in hyp_ids:
+                issues.append(
+                    f"MISSING HYPOTHESIS: research_queue.json session_handoff references "
+                    f"'{hid}' ({key}) but it does not exist in hypotheses.json. "
+                    f"The hypothesis was likely lost due to a session timeout. Re-create it."
+                )
+
+        # Check next_session_priorities for hypothesis ID references
+        for p in rq.get("next_session_priorities", []):
+            task = p.get("task", "") if isinstance(p, dict) else str(p)
+            refs = re.findall(r'\b([0-9a-f]{8})\b', task)
+            for ref in refs:
+                if ref not in hyp_ids and ref not in {t.get("id") for t in rq.get("queue", [])}:
+                    issues.append(
+                        f"DANGLING REFERENCE: next_session_priorities mentions '{ref}' "
+                        f"which is not a known hypothesis or task ID."
+                    )
+
+    # Check results.jsonl for orphaned pre-registrations
+    if os.path.exists(RESULTS_FILE):
+        with open(RESULTS_FILE) as f:
+            for line_num, line in enumerate(f, 1):
+                try:
+                    entry = json.loads(line.strip())
+                    rid = entry.get("id")
+                    if rid and entry.get("type") == "pre_registration" and rid not in hyp_ids:
+                        issues.append(
+                            f"ORPHANED PRE-REGISTRATION: results.jsonl line {line_num} "
+                            f"has pre-registration for '{rid}' but hypothesis is missing."
+                        )
+                except json.JSONDecodeError:
+                    issues.append(f"CORRUPT DATA: results.jsonl line {line_num} is not valid JSON")
+
+    # Check active hypotheses have real symbols
+    for h in hypotheses:
+        if h["status"] == "active" and h["expected_symbol"] == "TBD":
+            issues.append(
+                f"INVALID STATE: Hypothesis {h['id']} is ACTIVE but symbol is 'TBD'. "
+                f"Cannot have an active trade on an unresolved symbol."
+            )
+
+    # Check for stale active hypotheses past deadline
+    for h in hypotheses:
+        if h["status"] == "active":
+            deadline = h.get("trade", {}).get("deadline")
+            if deadline and deadline < datetime.now().isoformat():
+                issues.append(
+                    f"OVERDUE: Hypothesis {h['id']} ({h['event_type']}) is past deadline "
+                    f"{deadline[:10]}. Complete or invalidate it."
+                )
+
+    return {"ok": len(issues) == 0, "issues": issues}

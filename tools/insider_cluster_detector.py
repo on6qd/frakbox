@@ -16,7 +16,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 from collections import defaultdict
 
-USER_AGENT = "Financial Research Bot research@example.com"
+USER_AGENT = os.environ.get("SEC_USER_AGENT", "Financial Research Bot contact@example.com")
 BASE_URL = "https://www.sec.gov/files/structureddata/data/insider-transactions-data-sets"
 CACHE_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "sec_form4_cache")
 

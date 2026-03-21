@@ -4,3 +4,6 @@ __pycache__/
 *.pyc
 logs/
 .claude/settings.local.json
+data/sec_form4_cache/*.pkl
+data/sec_form4_cache/*.zip
+*.tmp

@@ -407,9 +407,12 @@ def _analyze_categories(hypotheses):
         result = h.get("result", {})
         if result.get("direction_correct"):
             categories[cat]["correct"] += 1
-        mag_ratio = result.get("magnitude_ratio")
-        if mag_ratio is not None:
-            categories[cat]["magnitude_ratios"].append(mag_ratio)
+            # Only include magnitude ratios from direction-correct experiments
+            # (wrong-direction experiments now have magnitude_ratio=0.0, which
+            # would artificially dilute the average)
+            mag_ratio = result.get("magnitude_ratio")
+            if mag_ratio is not None and mag_ratio > 0:
+                categories[cat]["magnitude_ratios"].append(mag_ratio)
 
     result = {}
     for cat, data in categories.items():
@@ -566,12 +569,11 @@ def compute_confidence_score(sample_size, consistency_pct, avg_return, stdev_ret
     elif consistency_pct >= 60:
         score += 1
 
-    # Effect vs noise — signal-to-noise ratio (max 3)
+    # Effect vs noise — signal-to-noise ratio (max 2)
+    # Reduced from max 3 so components sum to exactly 10 (3+3+2+2)
     if stdev_return > 0:
         snr = abs(avg_return) / stdev_return
-        if snr >= 1.0:
-            score += 3
-        elif snr >= 0.5:
+        if snr >= 0.7:
             score += 2
         elif snr >= 0.3:
             score += 1
@@ -671,7 +673,8 @@ def run_weekly_research_diagnostic():
                 f"Research queue has {pending} pending tasks. Consider prioritizing or dropping low-value ones."
             )
 
-    # Hypothesis rigor trend
+    # Hypothesis rigor trend + staleness check (single load)
+    hyps = []
     if os.path.exists(HYPOTHESES_FILE):
         with open(HYPOTHESES_FILE) as f:
             hyps = json.load(f)
@@ -719,6 +722,26 @@ def run_weekly_research_diagnostic():
                     f"{timed_out}/{len(recent_sessions)} sessions timed out. "
                     f"Consider increasing turn limits or splitting work into smaller tasks."
                 )
+
+    # Staleness check: active hypotheses past their deadline (reuses hyps from above)
+    if hyps:
+        now = datetime.now()
+        for h in hyps:
+            if h["status"] == "active":
+                deadline = h.get("trade", {}).get("deadline")
+                if deadline and datetime.fromisoformat(deadline) < now:
+                    report["recommendations"].append(
+                        f"STALE: Hypothesis {h['id']} ({h['event_type']}) is past its deadline "
+                        f"({deadline[:10]}). Complete or invalidate it."
+                    )
+            elif h["status"] == "pending":
+                created = h.get("created", "")
+                if created and (now - datetime.fromisoformat(created)).days > 14:
+                    report["recommendations"].append(
+                        f"STALE: Hypothesis {h['id']} ({h['event_type']}) has been pending "
+                        f"for {(now - datetime.fromisoformat(created)).days} days. "
+                        f"Activate or invalidate it."
+                    )
 
     # Update methodology with last diagnostic date
     m = load_methodology()

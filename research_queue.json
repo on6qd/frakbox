@@ -39,9 +39,11 @@
       "category": "insider_cluster_buying",
       "question": "Backtest the insider buying cluster hypothesis: when 2+ corporate insiders (officers/directors) make open-market stock purchases within 30 days of each other (each >$50K), does the stock outperform over the next 1 month and 3 months? Use SEC EDGAR quarterly bulk data (free, no API key). Cover 2018-2024. Filter for market cap >$500M to ensure tradeable. Academic benchmark: Kang, Kim & Wang (2018) found 3.8% abnormal returns over 21 days for cluster purchases vs 2.0% for non-cluster. Key risk: signal may have decayed in liquid stocks post-2018.",
       "priority": 1,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Feasibility confirmed: SEC provides free quarterly bulk ZIPs. Data contains NONDERIV_TRANS.tsv (transaction code P = open market purchase, shares, price), SUBMISSION.tsv (ticker), REPORTINGOWNER.tsv (director/officer flag). End-to-end test on Q4 2024 found 1,330 qualified purchases and 487 cluster events in one quarter alone. Literature supports the signal (2001-2018 data). The 2020-2024 signal strength is the open empirical question. Build tools/insider_cluster_detector.py first, then pre-register hypothesis before measuring returns.",
       "added": "2026-03-21T08:17:00.000000",
+      "completed": "2026-03-21T09:30:00.000000",
+      "findings": "Tool built at tools/insider_cluster_detector.py. Discovery backtest (2020-2021) and OOS (2022) both validated. See knowledge_base.json insider_buying_cluster entry.",
       "implementation_notes": "1. Download ZIPs: https://www.sec.gov/files/structureddata/data/insider-transactions-data-sets/{YEAR}q{Q}_form345.zip for 2018Q1 through 2024Q4. 2. Parse NONDERIV_TRANS (TRANS_CODE=P, TRANS_SHARES*TRANS_PRICEPERSHARE>50000). 3. Join with SUBMISSION (ticker) and REPORTINGOWNER (Director or Officer roles). 4. Group by ticker+30-day window, find 2+ different insiders. 5. Filter for market cap >$500M at event date (use yfinance). 6. Output: list of cluster event dates + tickers. 7. Run measure_event_impact() on events. 8. Split discovery (2018-2021) vs validation (2022-2024). Min 3 validation instances required."
     },
     {
@@ -204,36 +206,48 @@
   ],
   "next_session_priorities": [
     {
-      "task": "Activate hypothesis 32be9d90 (insider_buying_cluster_5d): fetch 2023+ events from SEC Form 4 using insider_cluster_detector.py, or identify next live event. Paper trade K long.",
-      "set_by_session": "2026-03-21T09:54:56.510657"
+      "task": "Download 2026Q1 Form 4 data and find March 2026 insider cluster events. Resolve expected_symbol for hypothesis 76678219 (insider_buying_cluster_5d) and activate it with a live paper trade. Filter for 3+ insider clusters in names >$500M market cap.",
+      "set_by_session": "2026-03-21T11:00:00.000000"
     },
     {
-      "task": "Investigate OOS 2022 regime effect: why is the signal stronger in 2022 than 2020-2021? Run by-quarter analysis within 2022 to see if effect loads on Q4 bounce vs Q1-Q3 drawdown.",
-      "set_by_session": "2026-03-21T09:54:56.510663"
+      "task": "Run full-population 2020-2021 discovery backtest (all ~2474 events) to get proper n=1452 statistics. The current hypothesis 76678219 is based on small-sample replication (n=61+56). A full-population run would upgrade confidence to 8+ (sample_size >= 200, positive_rate_1d=68% in OOS). Use insider_cluster_detector.py on cached data.",
+      "set_by_session": "2026-03-21T11:00:00.000000"
     },
     {
-      "task": "Decide on 0a093c90 (20d): either retire as dead end for neutral regimes, or pre-register a regime-conditional version (insider cluster 20d in high-VIX environment).",
-      "set_by_session": "2026-03-21T09:54:56.510664"
+      "task": "Investigate regime-conditional 20d signal (hypothesis 0a093c90): test whether VIX>25 regime shows stronger 20d insider cluster signal. Run measure_event_impact with regime_filter='elevated' on 2020-2022 events. If elevated-VIX-only shows p<0.01 at 20d, register as regime-conditional hypothesis.",
+      "set_by_session": "2026-03-21T11:00:00.000000"
     },
     {
-      "task": "Data quality: 10b5-1 plan contamination - if SEC Form 4 includes a flag for 10b5-1 plans, filter them out and re-run to see if signal strengthens.",
-      "set_by_session": "2026-03-21T09:54:56.510665"
+      "task": "10b5-1 plan filtering: search for whether SEC Form 4 NONDERIV_TRANS includes any 10b5-1 plan flag. Check column names in the TSV files. If so, add filter to insider_cluster_detector.py and re-run to see if signal strengthens without pre-planned transactions.",
+      "set_by_session": "2026-03-21T11:00:00.000000"
+    },
+    {
+      "task": "S&P 500 watchlist: check for Q2 2026 rebalance announcement (expected ~June 6, 2026). Also check for any off-cycle S&P 500 addition announcements in March-April 2026. When announced, immediately buy at open (hypothesis 061ae3a8).",
+      "set_by_session": "2026-03-21T11:00:00.000000"
     }
   ],
   "session_handoff": {
-    "current_investigation": "insider_buying_cluster signal - backtest complete",
-    "state": "COMPLETE - discovery + OOS validated. Hypothesis 32be9d90 (5d) confirmed. Ready for activation.",
+    "current_investigation": "insider_buying_cluster signal - hypothesis recreated, looking for live events",
+    "state": "Hypothesis 76678219 (insider_buying_cluster_5d) created with small-sample replication evidence. Need to find live event and activate.",
     "key_findings": {
-      "discovery_2020_2021": {
+      "hypothesis_76678219_created": {
+        "id": "76678219",
+        "status": "pending",
+        "confidence": 5,
+        "sample_size": 117,
+        "note": "Small-sample replicate (n=61 disc 2021, n=56 OOS 2022). Discovery 5d positive rate: 56%, OOS 1d significant (p=0.028, Wilcoxon p=0.007, 68% positive rate). Full population backtest (documented 2026-03-21 prior session): disc n=1452 5d p<0.000001, OOS n=816 5d p<0.000001."
+      },
+      "discovery_2020_2021_full_pop": {
         "n_measured": 1452,
         "n_attempted": 2418,
         "failure_rate": "40%",
         "3d_mean": "+2.93%",
         "5d_mean": "+2.64%",
         "20d_mean": "+1.20%",
-        "passes_multiple_testing": true
+        "passes_multiple_testing": true,
+        "note": "From 2026-03-21 prior session research journal - not re-run in this session"
       },
-      "oos_2022": {
+      "oos_2022_full_pop": {
         "n_measured": 816,
         "n_attempted": 1138,
         "failure_rate": "28%",
@@ -241,15 +255,16 @@
         "5d_mean": "+3.44%",
         "20d_mean": "+3.67%",
         "passes_multiple_testing": true,
-        "note": "Signal STRONGER in OOS 2022 bear market - likely regime effect"
-      }
+        "note": "From 2026-03-21 prior session research journal - not re-run in this session"
+      },
+      "data_coverage": "insider_cluster_events.csv covers 2020-2025 (6376 events). 2026Q1 Form 4 data NOT yet downloaded."
     },
     "hypothesis_ids": {
-      "5d_confirmed": "32be9d90",
+      "5d_replicated": "76678219",
       "20d_original": "0a093c90"
     },
-    "next_step": "Activate hypothesis 32be9d90. Fetch 2023-2024 SEC Form 4 data to get live event candidates.",
-    "blockers": "Need to collect 2023-2024 Form 4 data via insider_cluster_detector.py to find fresh events for live trading",
-    "written_at": "2026-03-21T09:54:56.510667"
+    "next_step": "Download 2026Q1 Form 4 data using tools/insider_cluster_detector.py to get Jan-Mar 2026 cluster events. Filter for high-conviction (3+ insiders) in tradeable names (>$500M market cap). Resolve expected_symbol for 76678219 and activate it.",
+    "blockers": "No 2026Q1 Form 4 data yet. The SEC typically releases quarterly data with a 1-2 month lag, so Jan-Mar 2026 data may not be available until May 2026. Alternative: use Dec 2025 events that are still within 5-day window... but those are already stale (90+ days).",
+    "written_at": "2026-03-21T11:00:00.000000"
   }
 }

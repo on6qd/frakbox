@@ -84,11 +84,12 @@ def build_daily_report():
 
     if recent_completed:
         html += "<h3>Recent Results</h3><table style='border-collapse: collapse; width: 100%;'>"
-        html += "<tr style='background: #f0f0f0;'><th style='padding: 6px; text-align: left;'>Symbol</th><th style='padding: 6px; text-align: left;'>Event</th><th style='padding: 6px; text-align: left;'>Expected</th><th style='padding: 6px; text-align: left;'>Actual</th><th style='padding: 6px; text-align: left;'>Correct?</th></tr>"
+        html += "<tr style='background: #f0f0f0;'><th style='padding: 6px; text-align: left;'>Symbol</th><th style='padding: 6px; text-align: left;'>Event</th><th style='padding: 6px; text-align: left;'>Expected</th><th style='padding: 6px; text-align: left;'>Abnormal</th><th style='padding: 6px; text-align: left;'>Correct?</th></tr>"
         for h in recent_completed:
             r = h.get("result", {})
             correct = "YES" if r.get("direction_correct") else "NO"
-            html += f"<tr><td style='padding: 6px;'>{h['expected_symbol']}</td><td style='padding: 6px;'>{h['event_description'][:40]}</td><td style='padding: 6px;'>{h['expected_magnitude_pct']:+.1f}%</td><td style='padding: 6px;'>{r.get('actual_return_pct', 0):+.1f}%</td><td style='padding: 6px;'>{correct}</td></tr>"
+            abnormal = r.get('abnormal_return_pct', r.get('raw_return_pct', 0))
+            html += f"<tr><td style='padding: 6px;'>{h['expected_symbol']}</td><td style='padding: 6px;'>{h['event_description'][:40]}</td><td style='padding: 6px;'>{h['expected_magnitude_pct']:+.1f}%</td><td style='padding: 6px;'>{abnormal:+.1f}%</td><td style='padding: 6px;'>{correct}</td></tr>"
         html += "</table>"
 
     if pending:
@@ -115,6 +116,8 @@ def build_daily_report():
 
 def send_email(subject, body):
     """Send a simple HTML email. Used by shell scripts and internal notifications."""
+    from config import require_gmail
+    require_gmail()
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = GMAIL_ADDRESS

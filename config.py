@@ -3,21 +3,37 @@ from pathlib import Path
 
 # Load .env if vars aren't already set
 _env_file = Path(__file__).parent / ".env"
-if _env_file.exists() and "ALPACA_API_KEY" not in os.environ:
+if _env_file.exists():
     for line in _env_file.read_text().splitlines():
         line = line.strip()
         if line and not line.startswith("#") and "=" in line:
             k, v = line.split("=", 1)
             os.environ.setdefault(k.strip(), v.strip().strip("'\""))
 
-ALPACA_API_KEY = os.environ["ALPACA_API_KEY"]
-ALPACA_SECRET_KEY = os.environ["ALPACA_SECRET_KEY"]
+ALPACA_API_KEY = os.environ.get("ALPACA_API_KEY", "")
+ALPACA_SECRET_KEY = os.environ.get("ALPACA_SECRET_KEY", "")
 ALPACA_BASE_URL = os.environ.get("ALPACA_BASE_URL", "https://paper-api.alpaca.markets")
 
 # Max percentage of portfolio per experiment
 MAX_POSITION_PCT = 0.05  # 5% per hypothesis test
 
 # Email reporting
-GMAIL_ADDRESS = os.environ["GMAIL_ADDRESS"]
-GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
+GMAIL_ADDRESS = os.environ.get("GMAIL_ADDRESS", "")
+GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
 REPORT_RECIPIENT = os.environ.get("REPORT_RECIPIENT", GMAIL_ADDRESS)
+
+
+def require_alpaca():
+    """Raise if Alpaca credentials are missing. Call at point-of-use, not import time."""
+    if not ALPACA_API_KEY or not ALPACA_SECRET_KEY:
+        raise RuntimeError(
+            "ALPACA_API_KEY and ALPACA_SECRET_KEY must be set in .env or environment."
+        )
+
+
+def require_gmail():
+    """Raise if Gmail credentials are missing. Call at point-of-use, not import time."""
+    if not GMAIL_ADDRESS or not GMAIL_APP_PASSWORD:
+        raise RuntimeError(
+            "GMAIL_ADDRESS and GMAIL_APP_PASSWORD must be set in .env or environment."
+        )

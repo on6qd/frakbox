@@ -98,7 +98,34 @@
       "recorded": "2026-03-19T21:29:30.799536"
     }
   },
-  "known_effects": {},
+  "known_effects": {
+    "insider_buying_cluster_5d": {
+      "description": "2+ corporate insiders making open-market purchases >$50K within 30 days produces significant 3-5 day abnormal returns. Tested on 2020-2022 SEC Form 4 data.",
+      "direction": "positive",
+      "avg_magnitude_pct": 3.44,
+      "timeframe_days": 5,
+      "peak_horizon": "3d",
+      "sample_size": 816,
+      "reliability": 0.667,
+      "our_tests": 0,
+      "status": "strong",
+      "hypothesis_id": "930a181e",
+      "magnitude_discovery": "+2.64% avg abnormal at 5d (n=1452, 2020-2021)",
+      "magnitude_oos": "+3.44% avg abnormal at 5d (n=816, 2022 bear market)",
+      "magnitude_3d_oos": "+3.89% avg abnormal at 3d (OOS peak)",
+      "positive_rate_oos": "66.7% at 5d",
+      "statistical_significance": "p<0.000001 in both discovery and OOS",
+      "oos_verdict": "PASS \u2014 OOS stronger than discovery (bear market regime)",
+      "oos_period": "2022 (S&P -19% full year)",
+      "regime_dependence": "Possible: 2022 bear market OOS shows stronger signal than 2020-2021 bull/mixed discovery. Hypothesis: insider conviction buying during broad declines carries more information. Need 2023-2024 bull market data to confirm regime dependence.",
+      "survivorship_bias": "35% average data failure rate (delisted tickers). M&A targets (positive) and bankruptcies (negative) both missing. Net direction unknown.",
+      "confidence_score": 6,
+      "tradeable": true,
+      "filter_criteria": "2+ insiders, >$50K each, within 30-day window, Form 4 filing date",
+      "data_source": "SEC Form 4 bulk data (edgar.sec.gov structured data sets)",
+      "last_updated": "2026-03-21T09:59:49.357636"
+    }
+  },
   "dead_ends": [
     {
       "event_type": "earnings_surprise_pead_megacap",

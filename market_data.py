@@ -11,7 +11,7 @@ effect from broad market moves.
 import math
 import yfinance as yf
 from datetime import datetime, timedelta
-from scipy.stats import ttest_1samp, norm
+from scipy.stats import ttest_1samp, wilcoxon, norm, skew as scipy_skew
 
 
 # Approximate weights of large constituents in sector ETFs.
@@ -147,7 +147,7 @@ def get_price_around_date(symbol, event_date, days_before=5, days_after=20,
 
 
 def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_etf=None,
-                         event_timing="unknown", known_events=None):
+                         event_timing="unknown", known_events=None, regime_filter=None):
     """
     Measure abnormal price impact across multiple instances of the same event type.
 
@@ -173,6 +173,9 @@ def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_
         known_events: Optional list of {"symbol", "date"} dicts for contamination checking.
                       If provided, flags events where another known event falls within
                       the measurement window.
+        regime_filter: Optional VIX regime filter — "calm" (VIX<20), "elevated" (20-30),
+                      or "crisis" (VIX>30). Only events matching the specified regime are
+                      included in the analysis. Uses ^VIX close on event date.
     """
     if event_dates is None:
         return {"error": "event_dates is required"}
@@ -180,6 +183,27 @@ def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_
     impacts = []
     errors = []
     symbols_seen = set()
+    regime_filtered_count = 0
+
+    # Pre-fetch VIX data if regime filtering is requested
+    vix_by_date = {}
+    if regime_filter:
+        regime_thresholds = {"calm": (0, 20), "elevated": (20, 30), "crisis": (30, 999)}
+        if regime_filter not in regime_thresholds:
+            return {"error": f"Invalid regime_filter '{regime_filter}'. Use 'calm', 'elevated', or 'crisis'."}
+        # Determine date range for VIX fetch
+        all_dates = []
+        for de in event_dates:
+            d = de["date"] if isinstance(de, dict) else de
+            all_dates.append(d)
+        if all_dates:
+            min_date = min(all_dates)
+            max_date = max(all_dates)
+            vix_start = (datetime.strptime(min_date, "%Y-%m-%d") - timedelta(days=10)).strftime("%Y-%m-%d")
+            vix_end = (datetime.strptime(max_date, "%Y-%m-%d") + timedelta(days=5)).strftime("%Y-%m-%d")
+            vix_df = yf.Ticker("^VIX").history(start=vix_start, end=vix_end, interval="1d")
+            if not vix_df.empty:
+                vix_by_date = {d.strftime("%Y-%m-%d"): round(row["Close"], 2) for d, row in vix_df.iterrows()}
 
     for date_entry in event_dates:
         # Resolve symbol and date from the entry
@@ -198,6 +222,20 @@ def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_
         if event_symbol is None:
             errors.append({"date": date, "error": "No symbol specified"})
             continue
+
+        # Regime filter: skip events outside the specified VIX regime
+        if regime_filter and vix_by_date:
+            vix_val = vix_by_date.get(date)
+            # If exact date not found, try nearest prior date
+            if vix_val is None:
+                prior_dates = [d for d in sorted(vix_by_date.keys()) if d <= date]
+                if prior_dates:
+                    vix_val = vix_by_date[prior_dates[-1]]
+            if vix_val is not None:
+                lo, hi = regime_thresholds[regime_filter]
+                if not (lo <= vix_val < hi):
+                    regime_filtered_count += 1
+                    continue
 
         symbols_seen.add(event_symbol)
 
@@ -246,13 +284,15 @@ def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_
         return {"error": "Could not measure any events", "attempted": len(event_dates),
                 "errors": errors}
 
-    # Data quality check
-    drop_rate = (len(event_dates) - len(impacts)) / len(event_dates) * 100
+    # Data quality check (exclude intentionally regime-filtered events from drop rate)
+    eligible_events = len(event_dates) - regime_filtered_count
+    drop_rate = (eligible_events - len(impacts)) / eligible_events * 100 if eligible_events > 0 else 0
     data_quality_warning = None
     if drop_rate > 30:
         data_quality_warning = (
-            f"WARNING: {drop_rate:.0f}% of events failed to produce data "
-            f"({len(impacts)}/{len(event_dates)} succeeded). "
+            f"WARNING: {drop_rate:.0f}% of eligible events failed to produce data "
+            f"({len(impacts)}/{eligible_events} succeeded"
+            f"{f', {regime_filtered_count} excluded by regime filter' if regime_filtered_count else ''}). "
             f"Results may be unreliable — investigate data quality before forming hypotheses."
         )
 
@@ -263,6 +303,8 @@ def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_
         "benchmark": benchmark,
         "sector_etf": sector_etf,
         "event_timing": event_timing,
+        "regime_filter": regime_filter,
+        "regime_filtered_count": regime_filtered_count if regime_filter else None,
         "events_measured": len(impacts),
         "events_attempted": len(event_dates),
         "events_failed": len(errors),
@@ -303,6 +345,32 @@ def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_
             stats[f"significant_{key}"] = p_value < 0.05
             if p_value < 0.05:
                 significant_horizons.append(horizon)
+
+            # Skewness warning — t-test unreliable on highly skewed small samples
+            skewness = float(scipy_skew(returns))
+            stats[f"skewness_{key}"] = round(skewness, 2)
+            if abs(skewness) > 1.0:
+                stats[f"skewness_warning_{key}"] = (
+                    f"High skewness ({skewness:.2f}) — t-test may be unreliable. "
+                    f"Check Wilcoxon p-value for robustness."
+                )
+
+            # Wilcoxon signed-rank test (non-parametric robustness check)
+            nonzero_returns = [r for r in returns if r != 0]
+            if len(nonzero_returns) >= 6:
+                try:
+                    _, wilcoxon_p = wilcoxon(nonzero_returns)
+                    stats[f"wilcoxon_p_{key}"] = round(float(wilcoxon_p), 4)
+                    # Flag divergence between t-test and Wilcoxon
+                    t_sig = p_value < 0.05
+                    w_sig = wilcoxon_p < 0.05
+                    if t_sig and not w_sig:
+                        stats[f"robustness_warning_{key}"] = (
+                            f"t-test significant (p={p_value:.4f}) but Wilcoxon not "
+                            f"(p={wilcoxon_p:.4f}). Significance may be driven by outliers."
+                        )
+                except ValueError:
+                    pass  # Wilcoxon can fail with identical values
 
     # Multiple testing correction summary
     stats["significant_horizons"] = significant_horizons
@@ -421,6 +489,41 @@ def compute_required_sample_size(effect_size, stdev, alpha=0.05, power=0.8):
     z_beta = norm.ppf(power)
     n = math.ceil(((z_alpha + z_beta) * stdev / effect_size) ** 2)
     return max(3, n)
+
+
+def apply_cross_category_fdr(category_p_values, alpha=0.05):
+    """
+    Apply Benjamini-Hochberg FDR correction across multiple event categories.
+
+    When testing N categories, some will be significant by chance. This adjusts
+    p-values to control the false discovery rate.
+
+    Args:
+        category_p_values: Dict of {category_name: min_p_value_across_horizons}
+        alpha: Desired FDR level (default 0.05)
+
+    Returns:
+        Dict of {category_name: {"raw_p": float, "adjusted_p": float, "significant": bool}}
+    """
+    if not category_p_values:
+        return {}
+
+    # Sort by p-value
+    sorted_cats = sorted(category_p_values.items(), key=lambda x: x[1])
+    m = len(sorted_cats)
+    results = {}
+
+    for rank, (cat, raw_p) in enumerate(sorted_cats, 1):
+        # BH adjusted p-value: p * m / rank
+        adjusted_p = min(1.0, raw_p * m / rank)
+        results[cat] = {
+            "raw_p": round(raw_p, 4),
+            "adjusted_p": round(adjusted_p, 4),
+            "bh_rank": rank,
+            "significant": adjusted_p < alpha,
+        }
+
+    return results
 
 
 def _stdev(values):

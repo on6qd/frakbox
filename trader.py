@@ -4,10 +4,11 @@ Places and closes paper trades to test hypotheses.
 """
 
 import alpaca_trade_api as tradeapi
-from config import ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_BASE_URL
+from config import ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_BASE_URL, MAX_POSITION_PCT, require_alpaca
 
 
 def get_api():
+    require_alpaca()
     return tradeapi.REST(ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_BASE_URL, api_version="v2")
 
 
@@ -51,8 +52,25 @@ def place_experiment(symbol, direction, notional_amount):
     Returns:
         dict with order details
     """
+    if not symbol or symbol == "TBD":
+        return {"success": False, "error": f"Cannot trade symbol '{symbol}' — resolve to a real ticker first"}
+
     api = get_api()
     side = "buy" if direction == "long" else "sell"
+
+    # Validate position size against portfolio limits
+    try:
+        account = api.get_account()
+        portfolio_value = float(account.portfolio_value)
+        max_notional = portfolio_value * MAX_POSITION_PCT
+        if notional_amount > max_notional:
+            return {
+                "success": False,
+                "error": f"Notional ${notional_amount:,.0f} exceeds {MAX_POSITION_PCT*100:.0f}% "
+                         f"of portfolio (max ${max_notional:,.0f})"
+            }
+    except Exception as e:
+        return {"success": False, "error": f"Could not validate position size: {e}"}
 
     try:
         quote = api.get_latest_trade(symbol)
