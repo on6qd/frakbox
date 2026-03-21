@@ -259,12 +259,15 @@
       "last_updated": "2026-03-21T13:17:13.583191"
     },
     "fda_crl_clinical_post_crash_drift": {
-      "example": "ALDX March 17 2026",
-      "event": "FDA CRL for reproxalap (dry eye disease)",
+      "example": "ALDX March 17 2026 (SECOND CRL \u2014 reproxalap for dry eye disease)",
+      "event": "FDA CRL mid-label-negotiation \u2014 FDA issued label drafts Dec 2025 AND Mar 2026, then issued CRL same month. Company stated \"label negotiations were not completed\" \u2014 genuinely unexpected.",
       "crash": "-70.7% on announcement day",
-      "pre_anticipation": "stock already down ~25% in prior 10 trading days",
-      "note": "Pre-anticipated CRLs may be harder to trade short \u2014 market partially priced in. Watch for unexpected CRLs as better opportunities.",
-      "last_updated": "2026-03-21T21:33:45.175165"
+      "pre_drift": "Stock down ~25% in prior 10 days, but this may NOT be CRL anticipation \u2014 likely cash runway concerns (prior CRL noted cash into \"late 2025\") and sector weakness rather than CRL-specific knowledge",
+      "first_crl": "Nov 27 2023 \u2014 required additional trial. Company ran additional trial, resubmitted NDA.",
+      "second_crl": "Mar 17 2026 \u2014 FDA rejected again: \"lack of substantial evidence\", \"inconsistency of study results\", \"totality of evidence does not support effectiveness\". No safety/manufacturing issues. FDA did NOT recommend additional trials \u2014 effectively a final rejection.",
+      "key_signal_for_scanner": "Active label draft negotiations (FDA providing label drafts) followed by CRL = unexpected event. Pre-crash drift alone is NOT sufficient to disqualify as pre-anticipated \u2014 need to check whether company was in active dialogue with FDA.",
+      "tradeable": "Would have been difficult given pre-drift, but the -70.7% on a $109M market cap stock on a day with active label negotiations makes this a strong example of the fda_clinical_rejection_short signal",
+      "last_updated": "2026-03-21T21:39:26.008578"
     },
     "fda_crl_clinical_short": {
       "description": "N=5 clinical CRL events ALL show SHORT continuation from crash-day open. 0% positive rate at all horizons. Avg 3d=-19.83%, avg 5d=-29.34%. Events: ARDX, GRTX, OTLK, NERV, APLT.",
