@@ -316,6 +316,15 @@
       "findings": "Dead end. Pre-ex-dividend run-up for high-yield stocks (VZ/MO/T/PM/KMI): avg 3d abnormal +0.60% (discovery) vs +0.21% (validation). Below 1.5% threshold. No multiple testing pass. Effect is ~0.4% average - too small to trade."
     },
     {
+      "id": "afac732e",
+      "category": "new_signal",
+      "question": "VWAP breakout momentum: does expanding to 100+ stock universe and filtering for calm VIX regime validate a hypothesis-quality signal? Test thresholds 20% and 25% above VWAP. Net return after costs needs to clear 1% minimum.",
+      "priority": 3,
+      "status": "pending",
+      "reasoning": "Discovered as opposite of tested disposition effect. 489 events over 20 stocks shows +0.64-1.19% abnormal returns, all horizons, OOS confirmed. High-volume variant is strongest. But economic edge after costs is thin (~0.42-0.82% net). Need larger universe, tighter threshold, and regime filter before a hypothesis can be formed. Tools exist: tools/vwap_deviation_signal.py",
+      "added": "2026-03-21T21:33:45.176032"
+    },
+    {
       "id": "d288c2b8",
       "category": "sec_wells_notice",
       "question": "Wells Notice sub-hypothesis: Are financial fraud Wells Notices different from procedural ones? If yes, test 10+ fraud-specific Wells Notices (like BEN -13%, NRDS -7%) vs procedural (NDAQ +1.5%, XYL -2.5%). Need manual classification or a legal database. Likely requires Bloomberg Law or SEC enforcement actions database. LOW PRIORITY: would need external data source.",
@@ -343,6 +352,15 @@
       "added": "2026-03-21T18:04:39.810408",
       "completed": "2026-03-21T18:38:32.311158",
       "findings": "COMPLETED: tools/edgar_clinical_failure_scanner.py was already built in Session 6. The tool scans EDGAR EFTS full-text search for 8-K filings with clinical failure language in last N days. Validated this session - run at start of each session to check for qualifying d302c84b events. Added to session startup routine."
+    },
+    {
+      "id": "6730a683",
+      "category": "momentum",
+      "question": "Is VWAP_252 breakout (Close/VWAP >= 1.15) a viable LONG momentum signal? Can it be traded profitably?",
+      "priority": 7,
+      "status": "pending",
+      "reasoning": "VWAP deviation backtest revealed the OPPOSITE of the disposition effect: stocks extended above VWAP continue upward. Signal has n=489, passes_multiple_testing=True, +0.64% abnormal at 1d, all bootstrap CIs exclude zero, OOS 2024 confirms (+0.82% 1d). Need regime analysis, higher-threshold test, and transaction cost viability check before forming hypothesis.",
+      "added": "2026-03-21T21:14:05.919073"
     }
   ],
   "event_watchlist": [
@@ -390,46 +408,37 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. VERIFY GO/WD TRADES: Monday March 23 open, trade_loop.py fires both. Check Alpaca account positions and confirm execution. If not executed, debug trade_loop.py.",
-      "set_by_session": "2026-03-21T20:46:08.523352"
+      "task": "URGENT Monday March 23: Verify GO (1cb6140f) and WD (76678219) trades executed at market open via `python trade_loop.py --dry-run` before market opens, then check positions after open",
+      "set_by_session": "2026-03-21T21:34:49.434028"
     },
     {
-      "task": "2. CLOSE GO TRADE: Thursday March 26, run python tools/close_go_trade.py. Note: GO is Financial Services sector - new sector analysis suggests this sector has weaker signal. Watch closely.",
-      "set_by_session": "2026-03-21T20:46:08.523357"
+      "task": "Thursday March 26: Close GO trade using tools/close_go_trade.py",
+      "set_by_session": "2026-03-21T21:34:49.434033"
     },
     {
-      "task": "3. CHECK CLUSTER SCANNER: Run tools/cluster_auto_scanner.py or check logs/cluster_scanner.log for any new qualifying clusters filed Mon/Tue/Wed. Prioritize Energy/Industrials sectors over Financial/Healthcare.",
-      "set_by_session": "2026-03-21T20:46:08.523358"
+      "task": "Run cluster_auto_scanner.py to check for new insider clusters (prioritize Energy/Industrials)",
+      "set_by_session": "2026-03-21T21:34:49.434034"
     },
     {
-      "task": "4. CLINICAL FAILURE SCANNER: Run edgar_clinical_failure_scanner.py --days 7 for new d302c84b candidates. If IMMP or GOSS has further continuation, document it.",
-      "set_by_session": "2026-03-21T20:46:08.523359"
+      "task": "Tuesday March 31: Close WD trade using tools/close_wd_trade.py",
+      "set_by_session": "2026-03-21T21:34:49.434035"
     },
     {
-      "task": "5. CLOSE WD TRADE: Tuesday March 31, run python tools/close_wd_trade.py. WD is Financial Services - sector analysis shows this has weaker signal. This is important post-trade learning.",
-      "set_by_session": "2026-03-21T20:46:08.523360"
+      "task": "VWAP momentum deeper investigation: expand to 100+ stock universe, test 20%/25% VWAP thresholds, calm VIX regime filter \u2014 see research queue task added this session",
+      "set_by_session": "2026-03-21T21:34:49.434036"
     },
     {
-      "task": "6. SECTOR FILTER RESEARCH: Test whether excluding Financial Services clusters from 1cb6140f/0a093c90 hypotheses would have improved historical performance. Run a backtest on non-financial-services 2023-24 events.",
-      "set_by_session": "2026-03-21T20:46:08.523360"
-    },
-    {
-      "task": "7. S&P 500 JUNE PREP: Begin monitoring for May 2026 off-cycle additions. The June 5, 2026 quarterly announcement is the primary target. Task 2abb07d3 in queue.",
-      "set_by_session": "2026-03-21T20:46:08.523361"
+      "task": "S&P 500 June 2026 prep: monitor for May announcement of June 5 quarterly additions",
+      "set_by_session": "2026-03-21T21:34:49.434037"
     }
   ],
   "session_handoff": {
-    "current_state": "Session 11 complete. 3 dead ends recorded (SPAC, stock splits, CEO turnaround). Sector analysis completed for insider clusters. March 2026 S&P 500 additions validated hypothesis 061ae3a8 (missed trade). sp500_change_scanner.py built.",
-    "active_positions": "None yet - GO and WD pending Monday March 23 open",
-    "critical_dates": {
-      "2026-03-23": "GO and WD trades fire at 9:30 AM ET",
-      "2026-03-26": "Close GO (3d hold from March 23)",
-      "2026-03-31": "Close WD (5d hold from March 23)",
-      "2026-06-05": "S&P 500 Q2 2026 rebalance announcement"
-    },
-    "sector_finding": "Insider clusters strongest in Consumer Cyclical (90% pos, 9.88% 3d), Industrials (71% pos, 4.47% 3d), Energy (62.5% pos, 3.11% 3d). Financial Services shows NO signal (-0.26% 3d, 55.9% pos). WD is Financial Services - our pending trade.",
-    "next_new_research": "Priority: sector filter refinement for insider cluster signal. Alternative: first-ever buyback in small-caps (da0e1d25), Wells Notice fraud sub-filter (d288c2b8)",
-    "written_at": "2026-03-21T20:46:08.523362"
+    "investigating": "VWAP breakout momentum signal (disposition effect inverse) \u2014 preliminary finding, not yet hypothesis quality",
+    "intermediate_findings": "VWAP momentum: 20 large-cap stocks 2018-2023 (n=489): +0.64% to +1.19% abnormal returns LONG after VWAP 15% breakout, all horizons, OOS 2024 confirms. High-volume variant strongest (+0.87% 1d, +1.19% 20d). Net after ~0.40% costs is 0.42-0.82% \u2014 below 1% minimum threshold at most horizons. NEEDS: larger universe, 20-25% threshold, calm VIX filter.",
+    "blocked_by": "Methodology requires >1% net return and >1.5% expected magnitude. Current signal is 0.64-1.19% abnormal which barely qualifies at 20d but not at shorter horizons. Need tighter entry threshold.",
+    "next_step": "Run tools/vwap_deviation_signal.py with threshold=1.20 and threshold=1.25 on expanded 100-stock S&P 500 universe. Use calm VIX regime filter. Check if high-volume variant at 20d threshold clears both the 1.5% magnitude and 1% net return bars.",
+    "active_trades_pending": "GO (1cb6140f, 3-day hold) and WD (76678219) both trigger=next_market_open for Monday March 23 open. Close dates: GO by March 26, WD by March 31.",
+    "written_at": "2026-03-21T21:34:49.434038"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

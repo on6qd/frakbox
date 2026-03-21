@@ -259,59 +259,12 @@
       "last_updated": "2026-03-21T13:17:13.583191"
     },
     "fda_crl_clinical_post_crash_drift": {
-      "description": "SHORT from open after clinical-primary CRL announcement: small biotech with clinical efficacy deficiency shows continued negative drift over 3-5 days after initial gap-down",
-      "only_when": "Initial gap-down is >60% (extreme surprise). CRL must be clinical/efficacy-primary (NOT safety-primary). First or second CRL for the drug (NOT 3rd+ = pre-anticipated). Company is single-drug or heavily dependent on this asset.",
-      "evidence_strong_cases": {
-        "ARDX_2021-07-20": "Gap=-73.6%, Day1=-73.9%, 1d=-4.2%, 3d=-16.4%, 5d=-19.9%. CRL: magnitude of effect 'small and unclear clinical significance'",
-        "APLT_2024-11-29": "Gap=-74.6%, Day1=-76.3%, 1d=-13.8%, 3d=-32.0%, 5d=-36.9%. CRL: deficiencies in clinical study results for govorestat (galactosemia)",
-        "OTLK_2023-08-30": "Gap=-80.2%, Day1=-80.9%, 1d=-15.2%, 3d=-14.5%, 5d=-19.3%. CRL: lack of substantial evidence of effectiveness"
-      },
-      "evidence_reversal_cases": {
-        "REPL_2025-07-22": "Day1=-77.2%, but 1d=+18.9%, 3d=+12.3%, 5d=+33.7% - REVERSAL. CRL: IGNYTE trial heterogeneity concern. Company had other pipeline assets (not single-drug). Pre-crash stock was UP +29.7% in prior 30 days.",
-        "ALDX_2026-03-17": "Day1=-70.7%, but 1d=+14.5% - REVERSAL. 3rd CRL for same drug = pre-anticipated (-22.8% in 30 days before crash).",
-        "CORV_2019-12-24": "Day1 small (crash was Dec 10 at AdComm vote). CRL was safety-primary not efficacy. Forward: 1d=+10%, 3d=+17.5%"
-      },
-      "evidence_safety_primary": {
-        "AKBA_2022-03-30": "Gap=-4.3% (intraday, not overnight gap), Day1=-66.0%, 1d=-13.4%, 3d=-20.5%, 5d=-31.2%. BUT CRL was safety-primary (MACE concerns, liver injury) not efficacy. Efficacy was actually MET. Ambiguous."
-      },
-      "n_confirmed_continuation": 3,
-      "n_confirmed_reversal": 3,
-      "reversal_flags": [
-        "3rd+ CRL for same drug (stock pre-declined)",
-        "Safety-primary CRL (efficacy met, safety failed)",
-        "Company has diversified pipeline beyond the CRL drug",
-        "Stock already declined >20% in 30 days before crash",
-        "AdComm had already voted against"
-      ],
-      "continuation_criteria": [
-        "Initial gap-down >60%",
-        "Clinical-efficacy primary deficiency (not safety)",
-        "First or second CRL for this drug",
-        "Single-drug or heavily concentrated company",
-        "Stock stable or rising 30 days before crash (surprise element)"
-      ],
-      "avg_continuation_3d": -17.3,
-      "avg_continuation_5d": -25.4,
-      "new_cases_checked_2026_03_21": [
-        "IRON (Disc Medicine): only -22% - below threshold",
-        "BHVN (Biohaven): only -40% - below threshold",
-        "SYDNEXIS: private company",
-        "LIB Therapeutics: private company",
-        "RGNX: only -20% - below threshold",
-        "REPL (Replimune): -77% but REVERSAL (diversified pipeline, stock was rising before)",
-        "ALDX (Aldeyra): -70% but REVERSAL (3rd CRL, pre-anticipated)",
-        "AKBA (Akebia): -66% but SAFETY-primary CRL",
-        "ABEO (Abeona): -54% but CMC-only CRL"
-      ],
-      "verdict": "PENDING - N=3 confirmed continuation (need 3+ more matching all criteria before pre-registering). The reversal pattern is now understood: avoid when stock is pre-anticipated OR safety-primary OR company has other assets.",
-      "next_steps": [
-        "Look for 2019-2021 clinical CRL crashes in delisted tickers via Tiingo",
-        "Check Sesen Bio (SESN) Aug 2021 CRL - mixed clinical/CMC",
-        "Search for additional 2020-2022 single-drug clinical-efficacy CRL cases",
-        "Consider whether AKBA safety-primary case should be in separate category",
-        "If N reaches 6+ with all criteria, pre-register hypothesis"
-      ],
-      "last_updated": "2026-03-21T13:58:26.642906"
+      "example": "ALDX March 17 2026",
+      "event": "FDA CRL for reproxalap (dry eye disease)",
+      "crash": "-70.7% on announcement day",
+      "pre_anticipation": "stock already down ~25% in prior 10 trading days",
+      "note": "Pre-anticipated CRLs may be harder to trade short \u2014 market partially priced in. Watch for unexpected CRLs as better opportunities.",
+      "last_updated": "2026-03-21T21:33:45.175165"
     },
     "fda_crl_clinical_short": {
       "description": "N=5 clinical CRL events ALL show SHORT continuation from crash-day open. 0% positive rate at all horizons. Avg 3d=-19.83%, avg 5d=-29.34%. Events: ARDX, GRTX, OTLK, NERV, APLT.",
@@ -523,6 +476,17 @@
       "missed_opportunity_pct": 5.2,
       "next_opportunity": "June 2026 Q2 rebalance announcement, expected ~June 5-7, 2026",
       "last_updated": "2026-03-21T20:43:15.229218"
+    },
+    "vwap_breakout_momentum": {
+      "direction": "long",
+      "magnitude": "+0.64% to +1.19% abnormal return",
+      "horizons": "1d through 20d",
+      "sample": "20 large-cap stocks, 489 events 2018-2023, confirmed OOS 2024",
+      "volume_filter": "high-volume variant (+0.87% 1d) stronger than base",
+      "status": "preliminary - needs larger universe and regime filtering before hypothesis",
+      "constraint": "net returns after ~0.40% round-trip costs may be below 1% minimum threshold at shorter horizons",
+      "tool": "tools/vwap_deviation_signal.py",
+      "last_updated": "2026-03-21T21:33:45.174443"
     }
   },
   "dead_ends": [
@@ -615,6 +579,11 @@
       "event_type": "stock_split_announcement",
       "reason": "Stock split announcement effect: tested 11 events 2020-2024. 1d avg=-0.84%, pos_rate=36.4% (NEGATIVE). 3d avg=+2.06%, pos_rate=54.5%, p=0.27. Fails multiple testing. Main issues: (1) Almost all large-cap split announcements are confounded with quarterly earnings - the earnings surprise effect dominates any split signal (NVDA 2024 +11.6% 3d was earnings-driven, DECK -7.9% 1d was earnings miss). (2) The few standalone splits (PANW, TSCO) showed -2.4% and -0.4% at 1d. (3) Even TSLA Aug 2020 (+4.4% 1d) may have been momentum-driven rather than split-driven. (4) Literature finding of +2.5% abnormal return for split announcements likely applies to non-confounded mid-cap events; for large-caps with simultaneous earnings, earnings dominate. Alternative path: test mid-cap standalone stock splits (split announcement NOT on earnings day, market cap $500M-$5B). These would be harder to find but less confounded.",
       "recorded": "2026-03-21T20:39:59.380036"
+    },
+    {
+      "event_type": "vwap_overextension_disposition_effect_short",
+      "reason": "Tested 20 large-cap stocks 2018-2023 (n=489 events). Hypothesis: stocks trading >15% above 1-year rolling VWAP face selling pressure from investors with unrealized gains (disposition effect). REJECTED: Stocks above VWAP 15% consistently OUTPERFORM over all horizons 1-20 days (abnormal +0.64% to +0.86%, all p<0.01). Low-volume filter (n=363) also shows positive returns, contradicting the specific mechanism. High-volume breakouts show strongest momentum (+0.87% to +1.19%). Signal is the opposite direction \u2014 momentum, not mean reversion. OOS 2024 (n=120) confirms. See tools/vwap_deviation_signal.py.",
+      "recorded": "2026-03-21T21:33:45.173372"
     }
   ]
 }
