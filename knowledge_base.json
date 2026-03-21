@@ -206,9 +206,18 @@
       "last_updated": "2026-03-21T11:11:28.681628"
     },
     "insider_buying_cluster": {
-      "effect": "LIVE SIGNAL 2026-03-21: GO (Grocery Outlet) - 6 insiders including CEO+5 directors bought 6.3M total within 30 days (March 6-19). Cluster qualifies for 3+ insider hypothesis. Entry planned Monday March 23 open at ~5.79 vs insider avg 6.02.",
-      "bias_finding": "Delisted ticker bias is FAVORABLE - dominated by acquisitions not bankruptcies. Measured signal understates true effect.",
-      "last_updated": "2026-03-21T11:53:56.755329"
+      "finding": "Sector heterogeneity in 2023-24 largecap clusters",
+      "source": "Sector analysis of 233 largecap 2023-24 cluster events (session 11)",
+      "consumer_cyclical": "3d avg=+9.88%, pos_rate=90%, p=0.007 (N=10, strong but small N)",
+      "industrials": "3d avg=+4.47%, pos_rate=71%, p=0.014 (N=31)",
+      "energy": "3d avg=+3.11%, pos_rate=62.5%, p=0.009 (N=24)",
+      "technology": "3d avg=+3.41%, NOT significant p=0.20 (N=21)",
+      "financial_services": "3d avg=-0.26%, NOT significant p=0.76 (N=34) - WEAKEST",
+      "communication_services": "3d avg=-0.13%, NOT significant p=0.95 (N=8) - AVOID",
+      "healthcare": "MEAN skewed by outliers (DRUG +1369%), MEDIAN=0.24% - low predictability",
+      "caution": "2020-2022 validation of sector effect was inconclusive due to data quality; 2023-24 finding only",
+      "implication": "Prefer Energy/Industrials clusters; de-prioritize Financial Services and Healthcare clusters",
+      "last_updated": "2026-03-21T20:38:25.034986"
     },
     "insider_buying_cluster_3plus": {
       "effect": "3+ insider cluster buys within 30 days: abnormal returns at 3d and 5d consistently positive",
@@ -573,6 +582,11 @@
       "event_type": "ipo_lockup_expiry",
       "reason": "IPO lock-up expiry (typically 180 days post-IPO) tested as short signal. Tested 12 events 2020-2022. Results: 1d avg=+0.12% (flat), 3d avg=+1.66% (positive). Fails multiple testing. 50% positive rate = random. Key issues: (1) Effect has been pre-arbitraged - sophisticated traders SHORT before expiry, creating price pressure weeks before the event date, then BUY on the expiry date itself. This means the expiry DATE shows mean reversion (positive), not continuation (negative). (2) Heterogeneous outcomes: RIVN -5.7%, BRZE -4.6% vs DOCS +3.7%, MNDY +7.2%, COIN +1.9%. (3) Exact lock-up date uncertain - varies by share class, can be extended. Academic literature (Field & Hanka 2001): -2% at expiry in 1990s has likely decayed. NOT actionable.",
       "recorded": "2026-03-21T20:00:43.102056"
+    },
+    {
+      "event_type": "spac_demerger_announcement",
+      "reason": "SPAC merger announcement day effect (De-SPAC announcement): tested 5 events 2020-2021. 1d avg abnormal=-0.38% (p=0.92), 1d positive rate=40%. Direction entirely heterogeneous: IPOB +12.4%, CCIV -8.0% (buy-rumor-sell-news, leaked weeks before), DCRB -6.7%, PSTH -2.0%, GGPI +2.3%. Fails multiple testing. Key problems: (1) LEAK contamination - many SPAC targets were widely rumored before official announcement (CCIV pre-ran +400% before Feb 22 announcement). (2) REGIME contamination - Q4 2020/Q1 2021 SPAC bubble: mean SPAC price day after announcement was $15.77 (from $10 base), but by Q2 2021 fell back to ~$10 with no consistent jumps (Kiesel 2023, European Financial Management). (3) Survivorship/delistment: 3 of 8 events (VTIQ, SHLL, AJAX) unmeasurable due to delisting. (4) No sub-filter improves signal: long SPAC (momentum) or short SPAC (dilution realization) both fail. Academic finding: SPACs that closed in Q4 2020/Q1 2021 had mean price of $9.01 by Dec 2021 (-43% from announcement high). The announcement DAY return is not a tradeable signal - neither direction is consistent.",
+      "recorded": "2026-03-21T20:30:19.334312"
     }
   ]
 }
