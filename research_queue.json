@@ -289,40 +289,41 @@
   ],
   "next_session_priorities": [
     {
-      "task": "IMMEDIATE (Monday March 23 9:30 AM ET): Run python tools/activate_go_trade.py AND python tools/activate_wd_trade.py. K each. Abort if either is down >10% from Friday close.",
-      "set_by_session": "2026-03-21T14:46:31.928965"
+      "task": "IMMEDIATE (Monday March 23, 9:30 AM ET): Run python tools/activate_go_trade.py AND python tools/activate_wd_trade.py. Abort if either is down >10% from Friday close.",
+      "set_by_session": "2026-03-21T15:30:38.266235"
     },
     {
-      "task": "THURSDAY March 26: Close GO: python tools/close_go_trade.py --entry-price XXXX",
-      "set_by_session": "2026-03-21T14:46:31.928968"
+      "task": "THURSDAY March 26: Close GO: python tools/close_go_trade.py",
+      "set_by_session": "2026-03-21T15:30:38.266241"
     },
     {
-      "task": "TUESDAY March 30: Close WD: python tools/close_wd_trade.py --entry-price XXXX",
-      "set_by_session": "2026-03-21T14:46:31.928969"
+      "task": "TUESDAY March 30: Close WD: python tools/close_wd_trade.py",
+      "set_by_session": "2026-03-21T15:30:38.266243"
     },
     {
-      "task": "FDA CRL: N=5 confirmed continuation events (0% positive rate, avg 3d=-19.83%). Need 2 more for hypothesis. Priority: search Phase 2/3 clinical trial failures as RELATED but BROADER category (FBRX Sep 2021 fits pattern). Use SEC EDGAR 8-K search for \"primary endpoint\" + \"failed\" to find clinical trial failure crashes.",
-      "set_by_session": "2026-03-21T14:46:31.928970"
+      "task": "FDA CLINICAL REJECTION SHORT (H-5f805860): Search for live qualifying event. Criteria: small biotech, FDA CRL/RTF/AdComm negative vote, >55% single-day crash, NOT pre-anticipated (stock not down >20% in prior 10 days). Check: upcoming FDA PDUFA dates for small single-pipeline biotechs. Start with FDA calendar search.",
+      "set_by_session": "2026-03-21T15:30:38.266244"
     },
     {
-      "task": "New research queue: Clinical Trial Failure continuation - search SEC 8-Ks 2019-2023 for Phase 2/3 failures with >55% crash + single-drug small biotech. Run batch crash detection. If N>=7, pre-register SHORT hypothesis.",
-      "set_by_session": "2026-03-21T14:46:31.928971"
+      "task": "PHASE 2/3 FAILURE HYPOTHESIS: Research discriminating factor for continuation vs reversal. Need to collect: (1) cash runway at time of failure, (2) number of other pipeline programs, (3) big pharma partnership presence. If these features cleanly separate 6 continuation + 3 reversal, can build a refined Phase 2/3 failure continuation hypothesis.",
+      "set_by_session": "2026-03-21T15:30:38.266244"
+    },
+    {
+      "task": "DATA QUALITY: Previous session had WRONG event dates for N=5 CRL dataset. Going forward: always verify event dates by checking price data (find the actual >55% crash day) rather than trusting knowledge base entries from prior sessions.",
+      "set_by_session": "2026-03-21T15:30:38.266245"
     }
   ],
   "session_handoff": {
-    "current_investigation": "FDA CRL clinical-primary crash continuation signal + related clinical trial failure signal",
-    "state": "N=5 confirmed FDA CRL continuation events (avg 3d=-19.83%, 0% pos rate). Cannot form hypothesis (need N=7+ for 3 validation instances). New category identified: Phase 2/3 trial failure (FBRX Sep 2021) shows identical pattern.",
-    "key_findings": [
-      "N=5 FDA CRL events: ARDX (2021), GRTX (2023), OTLK (2023), NERV (2024), APLT (2024) - ALL continuation",
-      "GRTX Aug 10 2023 (Galera avasopasem) added as 5th event: -82.8% gap, 3d=-21.6%, 5d=-32.8%",
-      "Reversal cases documented: REPL, ALDX, SPRY, OTLK 2025 - all have clear predictable flags",
-      "FBRX Sep 3 2021: Phase 2b failure (not CRL) shows same -80.2% crash + 3d=-27.8% continuation",
-      "GO trade + WD trade: scripts ready, execute Monday March 23 at 9:30 AM ET",
-      "Primary bottleneck: delisted tickers (SESN, FGEN, SGEN, RETA) block N expansion for CRL category"
-    ],
-    "what_blocked": "Most qualifying historical events (SESN, TCDA, FGEN, RETA, YMAB) are delisted. Tiingo has partial data (YMAB, RETA, TSVT) but no qualifying crashes found there. Phase 2 failures (FBRX) are not CRL events - different category requiring its own hypothesis.",
-    "next_specific_step": "Use SEC EDGAR full-text search for 8-K filings with \"clinical trial\" + \"failed\" + \"primary endpoint\" keywords to find Phase 2/3 clinical failure events. Cross-check tickers for >55% crash. FBRX Sep 2021 is confirmed. Need 5+ more for that hypothesis. Alternatively, monitor PDUFA calendar for upcoming single-asset clinical CRL events that would naturally expand the N.",
-    "written_at": "2026-03-21T14:46:31.928973"
+    "current_investigation": "FDA clinical rejection short hypothesis (H-5f805860) pre-registered. Needs live event to activate.",
+    "intermediate_findings": {
+      "fda_crl_signal": "CORRECT dataset is N=6 (ACER 2019, ARDX 2021, NERV 2022, GRTX 2023, OTLK 2023, APLT 2024). 0% positive rate at ALL horizons. Avg 3d abnormal = -23.88%. OOS split 3+3 = 100% directional accuracy in both periods. Confidence 7.",
+      "wrong_dates_found": "Previous session had WRONG dates: ARDX (2022-07-12\u21922021-07-19), OTLK (2023-10-12\u21922023-08-29), NERV (2022-09-27\u21922022-10-16), APLT (2024-02-14 was CMC positive reaction\u2192correct date 2024-11-27). New event added: ACER 2019-06-24.",
+      "phase23_failure": "N=9 backtested (FBRX, AVIR, PRQR, ATHX, ANTX, NMRA, RZLT, GOSS, IMMP). 6 continuation (67%), 3 reversal (33%). Does NOT pass multiple testing as a group. Reversal cases: AVIR (Roche partner/other assets), NMRA (M cash/3 planned trials), RZLT (cash runway). Continuation = company wound down/no viable path.",
+      "recent_events": "IMMP (March 13 2026, -82.6% crash): 3d continuation -26.2%. GOSS (Feb 23 2026, -80.1% crash): 3d continuation -37.2%. Both could not be traded (too late). Both validate the hypothesis."
+    },
+    "what_blocked": "SESN and ORPH Tiingo returned empty data (ADR or too old). VBLT and GLYC also failed. Need Polygon.io for full coverage. Phase 2/3 failures not homogeneous enough without discriminating features.",
+    "next_step": "Search FDA PDUFA calendar for upcoming decisions on single-pipeline small biotechs. URL: https://www.fda.gov/patients/drug-development-process/step-4-fda-drug-review. Also check BioPharma Catalyst PDUFA dates.",
+    "written_at": "2026-03-21T15:30:38.266247"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

@@ -117,16 +117,27 @@
       "recorded": "2026-03-21T14:45:33.606315"
     },
     "clinical_trial_failure_continuation": {
-      "summary": "Phase 2/3 clinical trial FAILURE (primary endpoint not met) in single-drug small biotech: after crash-day open SHORT shows strong continued decline over 3-5 days. Mechanistically identical to FDA CRL clinical-primary crashes but different event stage. N=1 confirmed (FBRX Sep 2021), consistent with the CRL continuation pattern.",
-      "known_magnitude": "FBRX Sep 3 2021: -80.2% gap, 1d abnormal=-25.7%, 3d=-27.8%, 5d=-25.5%",
-      "known_timeframe": "3-5 trading days from crash-day open",
+      "summary": "Phase 2/3 trial failures cause 55%+ crashes. Continuation signal exists but is HETEROGENEOUS (67% continuation, 33% reversal). Key discriminator appears to be whether the company has a viable path forward.",
+      "known_magnitude": "-20 to -46% abnormal 3d for continuation events; +12 to +34% for reversal events",
+      "known_timeframe": "3-5 days post-crash",
       "sources": [
-        "FBRX (Forte Biosciences) Sep 3 2021: FB-401 Phase 2b failure for atopic dermatitis. Gap=-80.2%, 3d abnormal=-27.8%, 5d=-25.5%",
-        "Pattern consistent with FDA CRL continuation hypothesis N=5 events (same mechanism)",
-        "Tiingo historical data (delisted ticker, data available)"
+        "Backtested 9 events: FBRX, AVIR, PRQR, ATHX, ANTX, NMRA, RZLT, GOSS, IMMP (2021-2026)"
       ],
-      "gaps": "N=1 is insufficient. Need to find 5+ more Phase 2/3 clinical failures with >55% crash. Search approach: SEC 8-K filings for \"clinical trial\" + \"primary endpoint\" + \"failed\" from 2019-2024. This broadens the signal universe substantially (Phase 2/3 failures are more frequent than CRLs).",
-      "recorded": "2026-03-21T14:46:06.001385"
+      "continuation_events": {
+        "FBRX (2021-09-02)": "abn_3d=-26.0%, drug worse than placebo, no path, filed bankrupcty",
+        "PRQR (2022-02-10)": "abn_3d=-24.3%, all trial arms equal, halted program",
+        "ATHX (2022-05-19)": "abn_3d=-41.4%, filed Chapter 11, company wound down",
+        "ANTX (2024-02-11)": "abn_3d=-27.2%, Phase 3 halted, company went private",
+        "GOSS (2026-02-22)": "abn_3d=-37.2%, missed p-value threshold by hair (0.032 vs 0.025)",
+        "IMMP (2026-03-12)": "abn_3d=-26.2%, lead program discontinued, TACTI-003 remains"
+      },
+      "reversal_events": {
+        "AVIR (2021-10-18)": "abn_3d=+12.4%, Roche partnership, other COVID assets, viable path",
+        "NMRA (2025-01-01)": "abn_3d=+30.3%, first of 3 planned Phase 3s, M+ cash, rational bet on remaining trials",
+        "RZLT (2025-12-10)": "abn_3d=+33.5%, ersodetug - company had cash runway + alternative indications possible"
+      },
+      "gaps": "Need to quantify the discriminating factor (cash runway, number of pipeline assets, prior program failures). Cannot yet predict continuation vs reversal systematically. Recommend collecting cash position + pipeline count for each event.",
+      "recorded": "2026-03-21T15:30:03.780266"
     }
   },
   "known_effects": {
@@ -403,6 +414,24 @@
         "APLT": "2024-02-14 (wrong - was CMC CRL resubmission positive) \u2192 correct: 2024-11-27"
       },
       "last_updated": "2026-03-21T15:22:50.113740"
+    },
+    "clinical_trial_failure_recent_2026": {
+      "GOSS": {
+        "date": "2026-02-23",
+        "abn_3d": -37.2,
+        "abn_5d": -27.8,
+        "continuation": true,
+        "crash_pct": -80.1
+      },
+      "IMMP": {
+        "date": "2026-03-13",
+        "abn_3d": -26.2,
+        "abn_5d": -24.5,
+        "continuation": true,
+        "crash_pct": -82.6
+      },
+      "note": "Both show continuation. Both are 2026 events, potentially tradeable in future.",
+      "last_updated": "2026-03-21T15:30:03.781291"
     }
   },
   "dead_ends": [
@@ -430,6 +459,11 @@
       "event_type": "dividend_capture_preex_runup",
       "reason": "Pre-ex-dividend run-up for high-yield S&P 500 stocks (VZ/MO/T/PM/KMI, 2021-2024) does NOT produce a tradeable signal. Tested 3 windows: 5-day (3d p=0.122), 20-day (20d p=0.158), 4-day pre-ex (3d p=0.223). None pass multiple testing. OOS validation: discovery 0.60% vs validation 0.21% \u2014 shrinking effect. Per-symbol inconsistency: VZ +1.29%, T +0.88% vs MO -0.19%, KMI -0.22% (3d abnormal). Effect is real academically (Hartzmark & Solomon 2013: +41 bps/month) but ~0.4% average is below our 1.5% minimum threshold and transaction costs would eliminate it. Not actionable.",
       "recorded": "2026-03-19T21:29:30.798967"
+    },
+    {
+      "event_type": "clinical_trial_failure_undifferentiated",
+      "reason": "Phase 2/3 trial failures are too heterogeneous without filtering: 67% continuation, 33% reversal. Does not pass multiple testing (pos_rate=33%, avg_3d=-11.78%). Need discriminating factor: company cash runway, pipeline depth, drug credibility. Continuation cases: company wound down, drug clearly worthless. Reversal cases: company has other programs, cash to retry, partner support.",
+      "recorded": "2026-03-21T15:30:03.781918"
     }
   ]
 }
