@@ -278,16 +278,24 @@
   ],
   "next_session_priorities": [
     {
-      "task": "PRIORITY 1: FDA CRL SHORT SIGNAL - Need 3+ more clinical-primary CRL continuation cases to reach N=6 for hypothesis pre-registration. Current: N=3 (ARDX, APLT, OTLK). See research_queue for specific task.",
-      "set_by_session": "2026-03-21T14:05:37.546408"
+      "task": "IMMEDIATE (Monday March 23 at 9:30 AM ET): TWO TRADES to activate:\n  1. GO: python tools/activate_go_trade.py (hypothesis 1cb6140f, 3d hold, exit Thursday Mar 26)\n  2. WD: python tools/activate_wd_trade.py (hypothesis 76678219, 5d hold, exit Tuesday Mar 30)\n  Abort if either stock down >10% from Friday close.",
+      "set_by_session": "2026-03-21T14:15:00.000000"
     },
     {
-      "task": "PRIORITY 2: GO Insider Trade - Execute Monday March 23 open. See task a37aba18 in research_queue.",
-      "set_by_session": "2026-03-21T14:05:37.546414"
+      "task": "THURSDAY March 26: Close GO at market close (python tools/close_go_trade.py --entry-price XXXX). Complete hypothesis 1cb6140f.",
+      "set_by_session": "2026-03-21T14:15:00.000000"
     },
     {
-      "task": "PRIORITY 3: Insider cluster 3d hold signal - hypothesis 4a981cc8 needs activation.",
-      "set_by_session": "2026-03-21T14:05:37.546415"
+      "task": "TUESDAY March 30: Close WD at market close (python tools/close_wd_trade.py --entry-price XXXX). Complete hypothesis 76678219.",
+      "set_by_session": "2026-03-21T14:15:00.000000"
+    },
+    {
+      "task": "FDA CRL clinical SHORT research: N=4 events (ARDX, APLT, OTLK, NERV) ALL show continuation after >55% crash. Need N=6+ for formal hypothesis. Find 2+ more events: check BioPharmCatalyst PDUFA history, SEC 8-K filings (search item 8.01 for CRL language), consider AKBA (safety-primary, excluded) or older events 2016-2019.",
+      "set_by_session": "2026-03-21T14:15:00.000000"
+    },
+    {
+      "task": "After GO and WD close (April): run check_promotion_or_retirement() on insider_buying_cluster event type to see if signal should be promoted. Look for new live insider cluster signals using openinsider_scraper.py.",
+      "set_by_session": "2026-03-21T14:15:00.000000"
     }
   ],
   "session_handoff": {
@@ -304,5 +312,9 @@
     "what_blocked": "Most qualifying events (SESN, TCDA, YMAB, ORPH) are delisted and data not available via Tiingo or yfinance. 2019-2020 era very hard to verify.",
     "next_specific_step": "Search for additional 2022-2024 clinical-primary CRL events using BioPharmCatalyst calendar or similar FDA PDUFA tracker. Try to get SESN Aug 2021 data via direct SEC EDGAR stock price sources or Polygon.io API. If data gap persists, consider lowering threshold to >55% crash (would add NERV as candidate). Alternatively: write a tool to scrape SEC 8-K filings for CRL announcements and cross-reference with yfinance crash events.",
     "written_at": "2026-03-21T14:05:37.546417"
+  },
+  "handoff": {
+    "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
+    "set_by_session": "2026-03-21T14:15:00.000000"
   }
 }
