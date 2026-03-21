@@ -100,6 +100,15 @@
       "findings": "3d hypothesis already pre-registered as 1cb6140f. 2023-24 OOS confirms 3d optimal: 69.1% pos rate, +4.71% avg, p<0.0001."
     },
     {
+      "id": "d7e3b807",
+      "category": "signal_discovery",
+      "question": "Do large share buyback announcements (>5% market cap, or first-ever program) generate positive abnormal returns in the 3-5d window? Academic literature suggests +2-4%. Event source: 8-K Item 8.01. Advantage: announced any time, not just at earnings.",
+      "priority": 1,
+      "status": "pending",
+      "reasoning": "Buyback signal has strong literature support, clear event timing (8-K or press release), and clean causal mechanism (reduced float + management signal of undervaluation). Need to find events via EDGAR Item 8.01 with share repurchase filter for >5% market cap magnitude.",
+      "added": "2026-03-21T19:09:02.391627"
+    },
+    {
       "id": "seed-002",
       "category": "index_rebalancing",
       "question": "When a stock is announced for S&P 500 addition, what is the abnormal return between announcement and effective date, and does it reverse after inclusion? How does this compare to Russell 2000 rebalancing?",
@@ -223,6 +232,15 @@
       "findings": "Phase 2/3 failure research COMPLETED and MERGED with FDA CRL hypothesis into 'clinical_efficacy_failure_short' (d302c84b). Corrected previous session's wrong event dates: ATHX crash was 2022-05-20 (not 2021-11-30), PRQR crash was 2022-02-11 (not 2022-12-06). Clean Phase 2/3 failure dataset (>55% crash): FBRX 2021-09-03 (-82.3%), PRQR 2022-02-11 (-75.4%), ATHX 2022-05-20 (-65.5%), GOSS 2026-02-23 (-80.1%), IMMP 2026-03-13 (-82.6%). All 5 show continuation (3d abnormal: -26.0%, -24.3%, -41.4%, -37.2%, -26.2%). REVERSAL case: AVIR 2021-10-19 (-66% crash, +12.4% 3d) -- excluded by single-pipeline filter. Combined N=11 (6 CRL + 5 Phase 2/3): avg 3d abnormal=-27.45%, 0% positive rate, p=0.001. Temporal OOS: discovery 2019-2022 avg -28.45%, validation 2023-2026 avg -26.26%. Confidence 8."
     },
     {
+      "id": "835449be",
+      "category": "signal_discovery",
+      "question": "Do investment-grade-to-junk credit rating downgrades (fallen angels) cause significant negative abnormal stock returns? Check if announcement day still has residual -3%+ effect after pre-announcement trading.",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "Academic literature is clear on negative bond returns but equity effect is less certain. Low priority because we already have clinical efficacy short signal.",
+      "added": "2026-03-21T19:09:02.392290"
+    },
+    {
       "id": "seed-003",
       "category": "fda_decision",
       "question": "For Phase 3 FDA approvals/rejections of novel drugs (not generics, not supplements), what is the typical abnormal return at 1d and 5d horizons? Does the effect differ between first-time submissions and resubmissions after a Complete Response Letter?",
@@ -330,34 +348,45 @@
   ],
   "next_session_priorities": [
     {
-      "task": "IMMEDIATE (Monday March 23, 9:30 AM ET): Run python tools/activate_go_trade.py --yes AND python tools/activate_wd_trade.py --yes. Abort if either stock is down >10% from Friday close. GO expected at ~$5.79, WD expected at ~$43.82.",
-      "set_by_session": "2026-03-21T18:24:00"
+      "task": {
+        "task": "IMMEDIATE (Monday March 23, 9:30 AM ET): Run python tools/activate_go_trade.py --yes AND python tools/activate_wd_trade.py --yes. Abort if either stock is down >10% from Friday close. GO expected at ~$5.79, WD expected at ~$43.82.",
+        "set_by_session": "2026-03-21T18:24:00"
+      },
+      "set_by_session": "2026-03-21T19:09:11.989051"
     },
     {
-      "task": "THURSDAY March 26 close: Run python tools/close_go_trade.py --yes to close GO position (3d hold expires). Hypothesis 1cb6140f.",
-      "set_by_session": "2026-03-21T18:24:00"
+      "task": {
+        "task": "THURSDAY March 26 close: Run python tools/close_go_trade.py --yes to close GO position (3d hold expires). Hypothesis 1cb6140f.",
+        "set_by_session": "2026-03-21T18:24:00"
+      },
+      "set_by_session": "2026-03-21T19:09:11.989053"
     },
     {
-      "task": "TUESDAY March 30 close: Run python tools/close_wd_trade.py --yes to close WD position (5d hold expires). Hypothesis 76678219.",
-      "set_by_session": "2026-03-21T18:24:00"
+      "task": {
+        "task": "TUESDAY March 30 close: Run python tools/close_wd_trade.py --yes to close WD position (5d hold expires). Hypothesis 76678219.",
+        "set_by_session": "2026-03-21T18:24:00"
+      },
+      "set_by_session": "2026-03-21T19:09:11.989054"
     },
     {
-      "task": "SESSION START ROUTINE: Run python tools/edgar_clinical_failure_scanner.py --days 7 to check for new qualifying events for d302c84b (clinical efficacy failure short). Qualifying criteria: (1) market cap <500M, (2) crash >55%, (3) not pre-anticipated, (4) post-crash price >$0.50/share, (5) no stated path forward. If qualifies, check available hypothesis slots and activate immediately.",
-      "set_by_session": "2026-03-21T18:24:00"
+      "task": {
+        "task": "SESSION START ROUTINE: Run python tools/edgar_clinical_failure_scanner.py --days 7 to check for new qualifying events for d302c84b (clinical efficacy failure short). Run BEFORE anything else.",
+        "set_by_session": "2026-03-21T19:09:11.988932"
+      },
+      "set_by_session": "2026-03-21T19:09:11.989055"
     },
     {
-      "task": "RESEARCH: Check for S&P 500 addition announcements (off-cycle or Q2 2026 quarterly). Monitor press.spglobal.com for any new announcements. Hypothesis 061ae3a8 is pending with TBD symbol. Next quarterly rebalance announcement: expected June 7, 2026 after hours.",
-      "set_by_session": "2026-03-21T18:24:00"
-    },
-    {
-      "task": "RESEARCH: Explore new signal categories not yet tested: (1) Earnings restatement announcements - strong negative signal, (2) Dividend initiation effect - company pays first-ever dividend showing cash confidence, (3) Credit rating upgrade from junk to investment grade (fallen angel reversal). All have strong academic support and clear causal mechanisms.",
-      "set_by_session": "2026-03-21T18:24:00"
+      "task": {
+        "task": "RESEARCH: Build large buyback announcement scanner. Use EDGAR 8-K Item 8.01 search for share repurchase announcements. Filter for (1) first-ever or exceptionally large program, (2) >B market cap, (3) program size >5% of market cap. Run backtest on 2020-2024 events.",
+        "set_by_session": "2026-03-21T19:09:11.988938"
+      },
+      "set_by_session": "2026-03-21T19:09:11.989055"
     }
   ],
   "session_handoff": {
-    "notes": "Session 7 (March 21): (1) Fixed verify_data_integrity() bug - next_session_priorities had nested dict structure causing TypeError. Fixed in research.py line 1001. (2) Ran clinical failure scanner - no new qualifying events for d302c84b. (3) Explored Wells Notice signal: 22 events, 1d=-1.95% (p=0.0196, single horizon), DEAD END - heterogeneous event type, fails multiple testing. (4) Explored Activist 13D filing date signal: N=24 Starboard events, 1d=+0.26%, DEAD END - signal fully decayed from 2001-2006 era because market discovers position during accumulation before 13D filing date. (5) Fixed d302c84b validation_consistency_pct: was 80% (stale from wrong GOSS date), corrected to 100% (all 11 events now show continuation). (6) GO and WD paper trades still pending for Monday March 23 open. Both scripts verified working.",
-    "set_by_session": "2026-03-21T18:24:00",
-    "written_at": "2026-03-21T18:39:10.043596"
+    "notes": "Session 8 (March 21 afternoon): (1) Clinical failure scanner: checked ATRA, OTLK, TBPH, RYTM. No new qualifying events - OTLK price below $0.50 minimum, TBPH market cap >$500M, RYTM market cap $5.9B, ATRA had NO crash event. (2) S&P 500 March 2026 live validation: LITE/COHR/SATS/VRT all positive at 1d (avg +5.20%, 100% positive rate), confirms H-061ae3a8. (3) Earnings restatement signal DEAD END: 8-K filing date != announcement date for most events. Avg 1d abnormal -0.30%, passes_multiple_testing=False. SYM -36% crash genuine but showed reversal at 3d. Recorded in knowledge_base. (4) CEO unexpected departure signal: academic literature shows heterogeneous result (firing outperformer=negative, firing underperformer=positive). Not pursuing. (5) Credit rating upgrades: academic literature MIXED, pre-announcement effect captures most of the move. Not pursuing. (6) Added to research queue: large buyback announcements (medium priority) and fallen angel credit downgrades (low priority). (7) GO and WD paper trades still pending for Monday March 23 open.",
+    "set_by_session": "2026-03-21T19:09:11.988939",
+    "written_at": "2026-03-21T19:09:11.989056"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
