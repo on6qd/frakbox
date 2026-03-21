@@ -119,6 +119,16 @@
       "added": "2026-03-19T21:09:14.334968",
       "completed": "2026-03-20T19:53:27.001456",
       "findings": "Dead end. Pre-ex-dividend run-up for high-yield stocks (VZ/MO/T/PM/KMI): avg 3d abnormal +0.60% (discovery) vs +0.21% (validation). Below 1.5% threshold. No multiple testing pass. Effect is ~0.4% average - too small to trade."
+    },
+    {
+      "id": "a3f91c22",
+      "category": "insider_cluster_buying",
+      "question": "Backtest the insider buying cluster hypothesis: when 2+ corporate insiders (officers/directors) make open-market stock purchases within 30 days of each other (each >$50K), does the stock outperform over the next 1 month and 3 months? Use SEC EDGAR quarterly bulk data (free, no API key). Cover 2018-2024. Filter for market cap >$500M to ensure tradeable. Academic benchmark: Kang, Kim & Wang (2018) found 3.8% abnormal returns over 21 days for cluster purchases vs 2.0% for non-cluster. Key risk: signal may have decayed in liquid stocks post-2018.",
+      "priority": 1,
+      "status": "pending",
+      "reasoning": "Feasibility confirmed: SEC provides free quarterly bulk ZIPs. Data contains NONDERIV_TRANS.tsv (transaction code P = open market purchase, shares, price), SUBMISSION.tsv (ticker), REPORTINGOWNER.tsv (director/officer flag). End-to-end test on Q4 2024 found 1,330 qualified purchases and 487 cluster events in one quarter alone. Literature supports the signal (2001-2018 data). The 2020-2024 signal strength is the open empirical question. Build tools/insider_cluster_detector.py first, then pre-register hypothesis before measuring returns.",
+      "added": "2026-03-21T08:17:00.000000",
+      "implementation_notes": "1. Download ZIPs: https://www.sec.gov/files/structureddata/data/insider-transactions-data-sets/{YEAR}q{Q}_form345.zip for 2018Q1 through 2024Q4. 2. Parse NONDERIV_TRANS (TRANS_CODE=P, TRANS_SHARES*TRANS_PRICEPERSHARE>50000). 3. Join with SUBMISSION (ticker) and REPORTINGOWNER (Director or Officer roles). 4. Group by ticker+30-day window, find 2+ different insiders. 5. Filter for market cap >$500M at event date (use yfinance). 6. Output: list of cluster event dates + tickers. 7. Run measure_event_impact() on events. 8. Split discovery (2018-2021) vs validation (2022-2024). Min 3 validation instances required."
     }
   ],
   "event_watchlist": [
@@ -158,31 +168,27 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. MORNING: Note that March 2026 S&P 500 additions (VRT, LITE, COHR, SATS) announced Mar 6 - 5-day hold window ALREADY PASSED (Mar 9-13). Next trade opportunity: watch for next off-cycle addition announcement. Effective date March 23 - no trade needed.",
-      "set_by_session": "2026-03-19T21:09:14.335608"
+      "task": "1. INSIDER BUYING CLUSTER BACKTEST: Data pipeline is fully validated. Download quarterly ZIPs from https://www.sec.gov/files/structureddata/data/insider-transactions-data-sets/{YEAR}q{Q}_form345.zip for 2018-2024 (28 quarters). Build cluster detection script (tools/insider_cluster_detector.py). Detect all events where 2+ directors/officers bought >$50K open market (code P) within 30 days for same ticker. Expected ~1,000-2,000 cluster events per year. Then run measure_event_impact() on each event date. Pre-register hypothesis first.",
+      "set_by_session": "2026-03-21T08:17:00.000000"
     },
     {
       "task": "2. RESEARCH: Test mid-cap PEAD (task 9845a59d) - S&P 500 components $5-30B market cap with >10% EPS beats. Need 20+ events. Use finviz/finvizFinance or yfinance for earnings dates.",
       "set_by_session": "2026-03-19T21:09:14.335609"
     },
     {
-      "task": "3. RESEARCH: Begin dividend capture exploration (new task added). Start with high-yield S&P 500 stocks, find ex-dividend dates, measure pre-ex-dividend run-up.",
-      "set_by_session": "2026-03-19T21:09:14.335610"
-    },
-    {
-      "task": "4. RESEARCH: Find alternative data for SESN, ATNX, ICPT (delisted biotech tickers) - try Polygon.io, Tiingo API, or EDGAR 8-K price data.",
+      "task": "3. RESEARCH: Find alternative data for SESN, ATNX, ICPT (delisted biotech tickers) - try Polygon.io, Tiingo API, or EDGAR 8-K price data.",
       "set_by_session": "2026-03-19T21:09:14.335611"
     },
     {
-      "task": "5. RESEARCH: Consider whether to add index addition watchlist monitoring - look for Q2 2026 S&P 500 candidates (companies recently promoted to MidCap 400 or large enough for S&P 500).",
+      "task": "4. RESEARCH: Consider whether to add index addition watchlist monitoring - look for Q2 2026 S&P 500 candidates (companies recently promoted to MidCap 400 or large enough for S&P 500).",
       "set_by_session": "2026-03-19T21:09:14.335611"
     }
   ],
   "session_handoff": {
-    "attempted": "S&P 500 deletion effect backtest (N=21), post-effective-date reversal test (N=24), FDA small biotech CRL backtest (N=12, 4 delisted), March 2026 addition live validation, checked knowledge decay",
-    "accomplished": "DELETION: Dead end recorded - 1d effect flat/positive in validation (OOS fails). POST-EFFECTIVE REVERSAL: No reversal - gains are permanent (literature updated). MARCH 2026 LIVE VALIDATION: All 4 additions positive (VRT +8.46%, LITE +13.85%, COHR +6.17%, SATS +2.59%), avg +7.77% 1d - hypothesis 061ae3a8 confirmed. PDUFA CRL: Dead end for generic short. Key finding: CMC-only CRLs show positive 1d returns; clinical CRLs show large but variable crashes. Survivorship bias is severe (4/12 delisted). 2 new research tasks queued (FDA refined, dividend capture).",
-    "blocked_by": "FDA backtest blocked by delisted ticker data unavailability (SESN, ATNX, ICPT, CORV). YFinance cannot pull historical data for acquired/delisted tickers. March 2026 addition 5-day window has already passed - no trade needed now.",
-    "key_insight": "March 2026 S&P 500 additions (VRT +8.46%, LITE +13.85%, COHR +6.17%, SATS +2.59%) provide LIVE confirmation that hypothesis 061ae3a8 is working. ALL 4 additions positive on day 1. The addition effect is clearly alive. Main puzzle: Why does CMC-only FDA CRL cause POSITIVE stock reaction? Because market correctly identifies it as a temporary setback with high resubmission probability. Clinical CRL destroys the fundamental thesis. This distinction is now incorporated into FDA literature.",
-    "written_at": "2026-03-19T21:09:14.335612"
+    "attempted": "Feasibility study for insider buying cluster hypothesis: SEC EDGAR data availability, academic literature review, end-to-end pipeline test on Q4 2024 bulk data",
+    "accomplished": "FEASIBILITY CONFIRMED. Full findings:\n\n1. DATA SOURCE CONFIRMED: SEC provides free quarterly bulk ZIP downloads at https://www.sec.gov/files/structureddata/data/insider-transactions-data-sets/{YEAR}q{Q}_form345.zip. Q4 2024 = 8.5MB compressed. Each ZIP contains NONDERIV_TRANS.tsv (transaction code, shares, price, date), SUBMISSION.tsv (ticker, company name), REPORTINGOWNER.tsv (role: Director/Officer). All fields needed for cluster detection present.\n\n2. PIPELINE WORKS: End-to-end test on Q4 2024 found 1,330 qualified purchases (code P, >$50K, director/officer) and 487 cluster events (2+ insiders, same ticker, within 30 days). Sample: BHVN - 2 insiders each bought $999,970 on same day. Signal volume is adequate.\n\n3. ACADEMIC SUPPORT: Kang, Kim & Wang (2018, 1986-2016 data): cluster purchases yield 3.8% abnormal returns over 21 days vs 2.0% for non-cluster. Alldredge & Blank (2017): 2.1% monthly abnormal return for clustered vs 1.2% for solitary. Lakonishok & Lee (2001): 7-8% annual outperformance for heavily-bought stocks. Original cluster effect is real.\n\n4. SIGNAL DECAY CONCERN: Two 2024/2025 studies suggest the raw insider purchase signal has weakened. 'Insider filings as trading signals - Does it pay to be fast?' (2024): returns 'vanish and even become negative' with realistic position sizing. The signal is liquidity-sensitive. CLUSTER-specific signal decay is NOT directly studied in recent literature - this is an open question.\n\n5. KEY RISK: Cluster signal may be concentrated in microcaps/illiquid stocks where we can't trade $5K without moving the market. Need to filter for min market cap >$500M to test if signal persists in liquid stocks.\n\n6. FREE TOOLS: edgartools (pip install edgartools, MIT license, no API key needed) provides Python objects for Form 4 parsing. SEC bulk data is entirely free. No paid API needed.",
+    "blocked_by": "Nothing blocking. Pipeline is ready to build. Need to write tools/insider_cluster_detector.py to download and process 2018-2024 quarterly ZIPs.",
+    "key_insight": "The data infrastructure question is fully answered: yes, we can backtest this for free using SEC quarterly bulk data. The academic question (does the cluster signal still hold 2018-2024?) is genuinely unknown for large-cap stocks - the decay studies focus on individual insider signals, not clusters. The cluster hypothesis is higher-conviction because coordinated buying is harder to rationalize as routine/diversification. The critical unknown is whether the signal survives in liquid (>$500M market cap) stocks. This is a clean empirical question worth answering.",
+    "written_at": "2026-03-21T08:17:00.000000"
   }
 }
