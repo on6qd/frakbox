@@ -101,6 +101,15 @@ def filter_to_largecap(
         - Tickers with no data (delisted) are EXCLUDED by the filter,
           which is the primary goal: avoid yfinance failures during backtesting.
     """
+    # Guard against a common mistake: passing raw dollar amount instead of millions
+    # e.g., passing 500_000_000 instead of 500 (for $500M)
+    if min_market_cap_m > 1_000_000:
+        raise ValueError(
+            f"min_market_cap_m={min_market_cap_m:,.0f} looks like a raw dollar amount. "
+            f"This parameter is in MILLIONS. "
+            f"Pass {min_market_cap_m/1e6:.0f} for ${min_market_cap_m/1e6:.0f}M threshold."
+        )
+
     cache = _load_market_cap_cache()
     tickers = df[ticker_col].unique().tolist()
 

@@ -166,6 +166,18 @@
       ],
       "gaps": "Heterogeneous event type - procedural Wells notices (NDAQ, XYL, HAYW) show near-zero reaction. Would need news database to classify fraud vs procedural Wells notices.",
       "recorded": "2026-03-21T18:38:18.994493"
+    },
+    "ceo_sudden_departure_short": {
+      "summary": "Surveyed 20+ large-cap CEO/CFO sudden departures 2019-2024. Stock reactions are HIGHLY MIXED \u2014 some negative, some positive. Key insight: departures where CEO was fired FOR CAUSE (scandals, misconduct, performance failure) tend to be negative on announcement; departures where market sees the CEO as the problem (relief rally) are positive. A blanket short signal is NOT supported. Need to segment by departure reason.",
+      "known_magnitude": "Ranges from -19% (GME Furlong) to +8% (DIS Iger return) on announcement day. Abnormal returns vary widely.",
+      "known_timeframe": "1 day (announcement reaction dominates)",
+      "sources": [
+        "CNBC, CNN, Bloomberg coverage of individual events 2019-2024",
+        "LevelFields AI: CEO Departures and Stock Price Impact",
+        "Paragon Intel: What a CFO Departure Historically Means for Public Company Performance"
+      ],
+      "gaps": "Need to segment by: (1) fired for cause vs resigned under pressure vs planned; (2) whether stock was already in freefall; (3) company size. Also need systematic EDGAR 8-K Item 5.02 search for comprehensive dataset.",
+      "recorded": "2026-03-21T22:53:16.613804"
     }
   },
   "known_effects": {
@@ -490,6 +502,35 @@
       "constraint": "net returns after ~0.40% round-trip costs may be below 1% minimum threshold at shorter horizons",
       "tool": "tools/vwap_deviation_signal.py",
       "last_updated": "2026-03-21T21:33:45.174443"
+    },
+    "ceo_performance_failure_departure_short": {
+      "summary": "CEO sudden departure for performance failure \u2192 consistent negative 1d abnormal return when entering SHORT at next-day open",
+      "signal": "SHORT",
+      "entry": "Next-day open after announcement (announcement typically after hours)",
+      "hold_period": "1 day (signal does NOT persist beyond 1d)",
+      "avg_abnormal_1d": -3.27,
+      "positive_rate_1d": 0.0,
+      "wilcoxon_p_1d": 0.0039,
+      "bootstrap_ci_1d_excludes_zero": true,
+      "passes_multiple_testing": true,
+      "sample_size": 9,
+      "events": [
+        "WBA 2023-09-01",
+        "UAA 2022-05-18",
+        "INTC 2024-12-02",
+        "CVS 2024-10-18",
+        "MCD 2019-11-03",
+        "STLA 2024-12-02",
+        "PARA 2024-04-29",
+        "VFC 2022-12-13",
+        "AAP 2023-08-24"
+      ],
+      "discovery_period": "2019-2022",
+      "validation_period": "2023-2024",
+      "limitation": "N=9 below minimum 12 for formal hypothesis. Need 3 more clean events.",
+      "next_step": "Find 3 more large-cap CEO performance failure events 2019-2024 to reach N=12. Use EDGAR 8-K Item 5.02 scanner.",
+      "status": "STRONG EXPLORATORY FINDING \u2014 not yet a formal hypothesis",
+      "last_updated": "2026-03-21T23:04:24.703853"
     }
   },
   "dead_ends": [
@@ -607,6 +648,16 @@
       "event_type": "earnings_guidance_cut_large_cap",
       "reason": "Tested March 21 2026. N=9 large/mid-cap events (AAPL, FDX, TGT, WMT, MU, SNAP, NKE, INTC), 2018-2024. Results: avg_1d=-0.71% (pos_rate=56%), avg_5d=+0.11% - essentially random. passes_multiple_testing=False. HIGH HETEROGENEITY: blue chips (WMT +5.6%, TGT +2.5%, FDX +1.8% at 1d) BOUNCE after guidance cuts (buy-the-dip dynamic, quality floor). Growth/weaker companies (SNAP -11.0%) continue falling. Entry at next-day open captures post-gap drift which is mostly positive for blue chips. KEY INSIGHT: Mega-cap guidance cuts are ALREADY in the price before open - market efficiently prices the cut within the after-hours session. No tradeable drift. Potential sub-hypothesis: SHORT guidance cuts for high-growth stocks (EV/EBITDA >30) where the valuation depends on future earnings - SNAP-like situations. But N is very small and SNAP was an extreme outlier (-43% vs -11% benchmark-adjusted). DEAD END for general guidance cut signal. Similar finding to profit_warning_preannouncement dead end from earlier session.",
       "recorded": "2026-03-21T22:31:23.860170"
+    },
+    {
+      "event_type": "ceo_relief_rally_short",
+      "reason": "CEO relief rally (market celebrates bad CEO removal) \u2192 SHORT at next-day open does NOT work. N=12 expanded test shows avg 10d = -1.34%, p=0.5693. Original N=8 result (-5.47% at 10d) was small-sample noise. Individual events highly variable: DG +13.73%, KSS +8.92%, SBUX 2024 +0.39%, GE +4.57% vs PTON -19.64%, WFC -6.80%. No consistent pattern.",
+      "recorded": "2026-03-21T23:04:24.704714"
+    },
+    {
+      "event_type": "volume_disposition_effect_v4",
+      "reason": "Steer.md question (March 2026 session): tested 4 variations of volume/cost basis disposition effect signal. All dead ends. (1) Volume-adjusted VWAP deviation: p_5d=0.027 fails multiple testing. (2) VWAP breakout LONG 100-stock universe N=14,412: real 1d=-0.08% mean reversion. (3) PIP profile cost basis HIGH vs LOW: difference=-0.01% p=0.73. (4) CEO relief rally as disposition-effect proxy: dead end. The core concept \u2014 stocks with large unrealized gains facing more selling pressure \u2014 is NOT measurable/exploitable at the large-cap level in practice. Institutional momentum dominates.",
+      "recorded": "2026-03-21T23:04:24.705513"
     }
   ]
 }
