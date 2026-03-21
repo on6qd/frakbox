@@ -348,6 +348,15 @@
       "timing_finding_added": "2026-03-22"
     },
     {
+      "id": "1c75adb0",
+      "category": "new_signal",
+      "question": "Does ANY open-market share repurchase announcement in small-cap value stocks (P/B < 1.5) produce abnormal returns? Test N=50+ events. Different from first-ever \u2014 just initial or renewed programs announced via 8-K.",
+      "priority": 3,
+      "status": "pending",
+      "reasoning": "First-ever buyback signal dead-ended due to sample size. Broader version could reach power threshold. Academic literature (Ikenberry 1995) finds 3% effect for all buybacks; value-stock sub-group is strongest.",
+      "added": "2026-03-22T00:33:45.305908"
+    },
+    {
       "id": "d288c2b8",
       "category": "sec_wells_notice",
       "question": "Wells Notice sub-hypothesis: Are financial fraud Wells Notices different from procedural ones? If yes, test 10+ fraud-specific Wells Notices (like BEN -13%, NRDS -7%) vs procedural (NDAQ +1.5%, XYL -2.5%). Need manual classification or a legal database. Likely requires Bloomberg Law or SEC enforcement actions database. LOW PRIORITY: would need external data source.",
@@ -447,29 +456,42 @@
   ],
   "next_session_priorities": [
     {
-      "task": "Continue CEO performance failure departure SHORT signal (hypothesis 5dbcfb37) - search for more events to increase N",
-      "set_by_session": "2026-03-22T00:31:19.667531"
+      "task": "1. VERIFY GO and WD trade execution Monday March 23 (check Alpaca positions, confirm fills, log any slippage). Hypothesis IDs: 1cb6140f (GO) and 76678219 (WD).",
+      "set_by_session": "2026-03-22T00:33:45.306721"
     },
     {
-      "task": "Monitor active insider cluster trades (GO, WD) for close signals",
-      "set_by_session": "2026-03-22T00:31:19.667536"
+      "task": "2. CEO departure signal - explore after-hours entry: test whether Alpaca paper account allows after-hours short orders. If yes, add extended-hours support to trader.py. The signal fires in overnight gap (-3.11% avg) and is currently unexecutable.",
+      "set_by_session": "2026-03-22T00:33:45.306724"
+    },
+    {
+      "task": "3. Fresh insider cluster scan Monday/Tuesday - check OpenInsider for new filings. Next best candidates from this week's scan: AHCO (3 insiders, $20M purchases, $1.35B cap - entry window passed but monitor for continuation), BLCO (9 insiders), IP (3 insiders).",
+      "set_by_session": "2026-03-22T00:33:45.306725"
+    },
+    {
+      "task": "4. ADBE validation for 5dbcfb37 - run 5d return measurement once March 19 close is available (need full 5 trading days post-event). This will be the 13th validation point.",
+      "set_by_session": "2026-03-22T00:33:45.306725"
+    },
+    {
+      "task": "5. S&P 500 Q2 2026 rebalance monitoring - expected ~June 5, 2026. Hypothesis 061ae3a8 needs a symbol once additions are announced (~May 2026).",
+      "set_by_session": "2026-03-22T00:33:45.306726"
+    },
+    {
+      "task": "6. Explore broader small-cap buyback signal (any open-market repurchase, not first-ever) - lower priority, needs N=50+ dataset.",
+      "set_by_session": "2026-03-22T00:33:45.306727"
     }
   ],
   "session_handoff": {
-    "investigated": "Small-cap first-ever share buyback signal",
-    "current_state": "dead_end_recorded",
-    "findings": {
-      "N_clean_events": 8,
-      "3d_avg_abnormal": 2.18,
-      "3d_positive_rate": 75.0,
-      "3d_p_value": 0.1426,
-      "passes_multiple_testing": false,
-      "bootstrap_ci_3d_excludes_zero": false,
-      "required_N_for_power": 32
-    },
-    "blocked_by": "Insufficient clean sample size - most first-ever buybacks co-announced with earnings (earnings confounder), or companies are community banks with unverifiable prior buyback history",
-    "next_step": "Signal recorded as dead end. No further investigation needed on this specific variant. Consider investigating broader buyback signal (repeat buybacks) only if sample size constraints can be solved.",
-    "written_at": "2026-03-22T00:31:19.667538"
+    "last_session": "2026-03-21",
+    "trades_staged": [
+      "GO (1cb6140f) triggers Monday March 23",
+      "WD (76678219) triggers Monday March 23"
+    ],
+    "key_finding": "CEO departure signal fires entirely in overnight gap. Close-entry: avg -3.25% abnormal, 83% correct. Open-entry: avg -0.14%, p=1.0 \u2014 untradeable without after-hours infrastructure.",
+    "adbe_event": "CEO Narayen step-down March 12, 2026. Overnight abnormal: -8.18%. 13th data point for hypothesis 5dbcfb37. Validates pattern but entry window closed.",
+    "dead_end": "Small-cap first-ever buyback: N=8, fails all multiple testing, structurally limited by sample size and earnings contamination.",
+    "no_new_clusters": "All insider clusters from week of March 15-21 have passed entry windows (POOL, AMRZ, AHCO, BLCO, FFIN, IP). GO and WD from March 20 filings are the only fresh ones.",
+    "hypothesis_status": "5 pending, 0 active. GO and WD will become active Monday.",
+    "written_at": "2026-03-22T00:33:45.306729"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

@@ -180,16 +180,14 @@
       "recorded": "2026-03-21T22:53:16.613804"
     },
     "small_cap_first_buyback": {
-      "summary": "Ikenberry, Lakonishok, Vermaelen (1995) found 12.1% avg 4-year abnormal return after open market repurchase announcements. Short-run effect is ~3-3.5% at announcement. The effect is stronger for 'value' stocks (low market-to-book). Repeat buybacks are common; first-ever buybacks are a subset. Literature suggests the effect is driven by undervaluation signaling, not mechanical float reduction. Small-cap stocks may have stronger effect due to less analyst coverage (slower market reaction), but no paper specifically isolates first-ever buybacks in small-caps.",
-      "known_magnitude": "3-3.5% short-run (1-3 days), 12.1% 4-year cumulative. First-ever vs. repeat not distinguished in most literature.",
-      "known_timeframe": "1-5 days for announcement effect; long-run drift over 4 years",
+      "summary": "First-ever buyback announcements by small-caps ($100M-$2B) show no reliable short-run abnormal return. N=8 clean events, all horizons fail multiple testing. The Ikenberry 1995 effect holds for ALL repurchases but cannot be isolated for first-ever events due to sample size and contamination constraints.",
+      "known_magnitude": "N/A \u2014 signal not validated",
+      "known_timeframe": "N/A",
       "sources": [
-        "Ikenberry, Lakonishok, Vermaelen (1995) - JFE, 'Market Underreaction to Open Market Share Repurchases'",
-        "NBER Working Paper 4965 (1994)",
-        "Multiple confirmatory studies: 2.9-3.5% short-run abnormal return documented"
+        "Ikenberry, Lakonishok, Vermaelen (1995) - JFQA: 3-3.5% short-run, 12.1% 4-year CAR for all open-market repurchases. Effect concentrated in value stocks."
       ],
-      "gaps": "No paper specifically isolates FIRST-EVER buybacks vs. repeat programs in small-caps. The small-cap premium for first-time buybacks is theorized but not empirically validated. Major data challenge: many first-ever buybacks are co-announced with earnings (confounded).",
-      "recorded": "2026-03-22T00:30:59.668522"
+      "gaps": "Broader open-market repurchase signal in small-cap value stocks untested (N=50+ possible). First-ever buyback structurally hard to isolate at scale.",
+      "recorded": "2026-03-22T00:33:25.739138"
     }
   },
   "known_effects": {
@@ -719,8 +717,9 @@
     },
     {
       "event_type": "small_cap_first_buyback",
-      "reason": "Investigated small-cap ($100M-$2B) first-ever share buyback announcements (8-K, no prior repurchase in 8-Ks or annual reports, no same-day earnings). Found N=8 clean events (2018-2024). Results: 3d avg abnormal=2.18%, positive_rate=75%, p=0.1426 (not significant). Does NOT pass multiple testing (no horizon significant at p<0.05). Bootstrap CI includes zero for all horizons. Required N=32 for 80% power. Critical data limitations: (1) most first-ever buyback 8-Ks are co-announced with earnings (items 2.02 + 8.01) making clean isolation nearly impossible; (2) community banks with repeat buybacks dominate the universe; (3) identifying truly 'first-ever' buybacks requires exhaustive historical filing search that doesn't scale. The CYRX event showed -7.19% (stock had been declining prior week, buyback to support falling stock price). The ASTH event showed +13.4% but was a single observation. Community banks (FVCB, MBCN, BSRR, CIVB) showed muted 0-2% responses. Main obstacle: truly isolated first-ever buyback announcements are rare, hard to verify, and insufficient in number for statistical testing. Recommend abandoning this specific variant.",
-      "recorded": "2026-03-22T00:31:10.256155"
+      "reason": "Tested N=8 clean first-ever buyback events (2018-2024). No horizon passed p<0.05. Bootstrap CI includes zero at all horizons. Structural issues: (1) earnings contamination on same day makes clean isolation hard, (2) sample size capped ~15-20 due to rarity, well below N=32 power requirement, (3) heterogeneous motives (financial strength vs price support). Ikenberry et al 1995 covers ALL repurchases and shows 3% short-run effect, but that evidence does not hold for isolated first-ever small-cap events. Possible follow-on: broader open-market repurchase signal in small-cap value stocks (not first-ever) could reach N=50+ for testing.",
+      "recorded": "2026-03-22T00:31:10.256155",
+      "updated": "2026-03-22T00:33:19.414022"
     }
   ]
 }
