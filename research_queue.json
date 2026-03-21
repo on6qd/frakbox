@@ -263,58 +263,38 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. URGENT: Paper trade GO at Monday March 23 open (market opens ~9:30am ET). Choose between: (A) activate_hypothesis('4a981cc8', ...) for 1d hold, OR (B) activate_hypothesis('1cb6140f', ...) for 3d hold (better evidence). Use trader.py to buy GO. Position $5,000.",
-      "set_by_session": "2026-03-21T12:07:40.459532"
+      "task": "IMMEDIATE (Monday March 23): Activate GO trade. Run: python tools/activate_go_trade.py (markets open 9:30 AM ET). Use hypothesis 1cb6140f (3d hold, NOT 4a981cc8 the 1d hold).",
+      "set_by_session": "2026-03-21T12:54:34.668011"
     },
     {
-      "task": "2. On Monday also check if BLCO (9 insiders) or other recent cluster qualifies for second simultaneous trade (different hypothesis, different ticker).",
-      "set_by_session": "2026-03-21T12:07:40.459537"
+      "task": "THURSDAY March 26: Close GO trade at market close. Run: python tools/close_go_trade.py --entry-price XXXX. Complete hypothesis 1cb6140f with actual return.",
+      "set_by_session": "2026-03-21T12:54:34.668016"
     },
     {
-      "task": "3. After GO trade closes: review result and record post-mortem.",
-      "set_by_session": "2026-03-21T12:07:40.459539"
+      "task": "BLCO secondary candidate: 9 insiders including CEO bought Feb 19 - Mar 6 at avg $17.70. Current ~$15.72. Consider activating hypothesis 76678219 (2+ insiders, 5d hold) for BLCO if GO trade goes well.",
+      "set_by_session": "2026-03-21T12:54:34.668017"
     },
     {
-      "task": "4. Investigate S&P 500 June 2026 rebalance watchlist candidates (hypothesis 061ae3a8).",
-      "set_by_session": "2026-03-21T12:07:40.459539"
-    },
-    {
-      "task": "5. FDA CRL refined hypothesis: find clinical CRL events for single-asset biotech.",
-      "set_by_session": "2026-03-21T12:07:40.459540"
+      "task": "After GO result: Run largecap-filtered 2023-24 backtest using tools/largecap_filter.py to validate signal holds for large-cap subset (reduce noise from micro-cap outliers).",
+      "set_by_session": "2026-03-21T12:54:34.668021"
     }
   ],
   "session_handoff": {
-    "immediate_trade": {
-      "ticker": "GO",
-      "action": "BUY LONG at Monday open",
-      "hypotheses": [
-        "4a981cc8 (1d hold)",
-        "1cb6140f (3d hold) - BETTER EVIDENCE"
-      ],
-      "cluster_detail": "6 insiders incl CEO, $6.3M total, March 6-19 purchases, avg $6.02",
-      "current_price_estimate": 5.79,
-      "position_size": 5000
-    },
-    "secondary_candidates": {
-      "BLCO": "9 insiders incl CEO, filed March 10, avg $17.70, current $15.72 (-11%). Strong for 5d hold.",
-      "IP": "3 insiders filed March 12, avg $39.65, current $33.76 (-15%). Evaluate for 5d hold.",
-      "AMRZ": "5 insiders filed March 16, avg $57.95, current $52.56 (-9%). Cement company."
-    },
-    "2023_2024_oos_results": {
-      "n_measured": 120,
-      "1d_avg": 1.21,
-      "3d_avg": 3.8,
-      "5d_avg": 4.26,
-      "passes_mt": true,
-      "note": "3d/5d dominant. 1d weaker than expected. New hypothesis 1cb6140f created for 3d hold."
-    },
-    "session_date": "2026-03-21 (Saturday)",
-    "new_hypotheses": [
-      "1cb6140f (3+ insiders 3d hold, confidence 7/10 - evidence-optimal)"
+    "current_investigation": "Insider buying cluster - GO paper trade ready to execute Monday",
+    "state": "Hypothesis 1cb6140f (3d hold) pre-registered. GO: 6 insiders incl CEO bought $6.3M at avg $6.02, current $5.79. Script ready at tools/activate_go_trade.py",
+    "why_3d_not_1d": "2023-24 OOS shows 1d signal weakened to 55% positive (was 72-80%). 3d remains strong: 69% positive, +4.71% avg, p<0.0001. Use 1cb6140f (3d hold).",
+    "what_was_completed_this_session": [
+      "2023-24 OOS validation (n=311): 3d avg=+4.71% (winsorized +4.46%), 69.1% pos, p<0.0001. Signal not decaying.",
+      "Fixed CLAUDE.md doc mismatches for complete_research_task(), compute_confidence_score(), record_literature(), complete_hypothesis()",
+      "Built tools/largecap_filter.py to pre-filter events to >$500M market cap (reduces yfinance failures from 30-40% to <5%)",
+      "Created tools/activate_go_trade.py and tools/close_go_trade.py for Monday execution"
     ],
-    "tools_built": [
-      "tools/openinsider_scraper.py - fast cluster scanner, <5 seconds vs 90s+ for XML parser"
+    "open_scientific_questions": [
+      "Does 3d signal hold for large-cap only (>$5B)? Largecap filter available but not run yet.",
+      "BLCO signal: 9 insiders, 17 days old. Worth tracking but not top priority.",
+      "FDA CRL clinical sub-hypothesis (task 992b463d) still pending - needs delisted price data",
+      "S&P 500 addition watchlist: Next rebalance ~June 2026"
     ],
-    "written_at": "2026-03-21T12:07:40.459542"
+    "written_at": "2026-03-21T12:54:34.668023"
   }
 }
