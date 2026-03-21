@@ -475,6 +475,21 @@
         "8. NEW: Primary endpoint must be clearly failed (p>0.05, not p=0.03 vs 0.025 threshold)"
       ],
       "last_updated": "2026-03-21T18:02:49.096679"
+    },
+    "sp500_index_addition": {
+      "validation": "March 2026 quarterly rebalance (announced March 6, effective March 23)",
+      "symbols": [
+        "LITE",
+        "COHR",
+        "SATS",
+        "VRT"
+      ],
+      "avg_abnormal_1d": 5.2,
+      "avg_abnormal_3d": 7.66,
+      "avg_abnormal_5d": 4.87,
+      "positive_rate_1d": 1.0,
+      "notes": "All 4 additions positive at 1d and 3d. LITE strongest at +9.97% 1d. Consistent with prior live validation data (avg +7.77% 1d from session 7 measurement). Signal remains strong.",
+      "last_updated": "2026-03-21T19:06:31.745424"
     }
   },
   "dead_ends": [
@@ -527,6 +542,11 @@
       "event_type": "activist_investor_13d_filing",
       "reason": "Activist investor SC 13D filing date as signal: Tested Starboard Value initial 13D filings (N=24, 2020-2024). 1d avg=+0.26%, 3d avg=+0.30%, 5d avg=-0.17%. Positive rate 45.8% (below 50%). Does not pass multiple testing. MECHANISM FAILURE: SC 13D filings have a 10-day filing window after crossing 5% threshold. News of activist accumulation typically leaks before the official filing date, so the filing date is NOT the information event. The market reprices on news discovery (often during accumulation) rather than at filing. Brav et al (2008) found +7% for 2001-2006 data - this effect has DECAYED completely in 2020-2024. Could potentially recover signal using news discovery dates (first media coverage) rather than filing dates, but would require Bloomberg/Refinitiv news database. Causal mechanism still valid but signal access requires news data we do not have.",
       "recorded": "2026-03-21T18:33:07.456524"
+    },
+    {
+      "event_type": "earnings_restatement",
+      "reason": "Large-cap 8-K Item 4.02 filings show avg 1d abnormal return of -0.30% (heterogeneous, 67% positive rate). Three fundamental problems: (1) 8-K filing date is NOT the announcement date for most events - market often learns via earnings calls, press releases, or trading halts before the 8-K is filed; (2) Direction is ambiguous - some restatements are upward revisions (RGEN, LZ, TRU all went UP); (3) 2021 SPAC warrant restatements contaminate the dataset. PRCH showed -16% on actual-announcement-day but this is exceptional. N=12 large-cap events, passes_multiple_testing=False. Signal is not reliable enough to trade.",
+      "recorded": "2026-03-21T19:06:31.744515"
     }
   ]
 }

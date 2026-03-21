@@ -195,3 +195,35 @@ result = market_data.measure_event_impact(event_dates=[...], entry_price="open")
 
 ## Alpaca Paper Trading
 Cash: $100,000 | Fractional shares | Shorting enabled | $5,000 per experiment
+
+## Trade Execution
+
+Trades run on a **separate deterministic loop** (`trade_loop.py`, every 2 min via launchd).
+You do NOT need to call `activate_hypothesis()` or `place_experiment()` directly.
+Instead, set a trigger on the hypothesis and the trade loop will execute it.
+
+```python
+# Set a trigger — trade_loop.py will execute when the condition is met
+hypotheses = research.load_hypotheses()
+for h in hypotheses:
+    if h["id"] == hypothesis_id:
+        h["trigger"] = "next_market_open"       # execute at 9:30 ET
+        # h["trigger"] = "immediate"            # execute now (if market open)
+        # h["trigger"] = "2026-06-07T09:30"     # execute at specific time
+        h["trigger_position_size"] = 5000       # optional, default $5000
+        h["trigger_stop_loss_pct"] = 10         # optional, default 10%
+        h["trigger_take_profit_pct"] = 15       # optional, default None
+        break
+research.save_hypotheses(hypotheses)
+# Done — trade_loop.py handles the rest
+```
+
+The trade loop also handles:
+- Stop-loss (default 10%), take-profit, deadline auto-close
+- Position reconciliation (Alpaca vs hypotheses)
+- Email notifications on every trade action
+- Portfolio drawdown protection (blocks new trades at -15%)
+
+Manual commands:
+- `python trade_loop.py --dry-run` — show pending triggers without executing
+- `python trader.py --check-stops` — run stop-loss check manually

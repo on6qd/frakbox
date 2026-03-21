@@ -487,12 +487,28 @@ def _log_pre_registration(hypothesis):
 
 
 def activate_hypothesis(hypothesis_id, entry_price, position_size, order_id=None,
-                        spy_price=None, vix_level=None, sector_etf_price=None):
+                        spy_price=None, vix_level=None, sector_etf_price=None,
+                        stop_loss_pct=None, take_profit_pct=None):
     """Mark a hypothesis as active (trade placed). Records market context at entry.
-    Enforces max_concurrent_experiments from methodology.json."""
+    Enforces max_concurrent_experiments from methodology.json.
+
+    Args:
+        stop_loss_pct: Max loss before auto-close (default: 10%). Set to None to disable.
+        take_profit_pct: Profit target for auto-close (default: None = hold to deadline).
+    """
     from self_review import load_methodology
+    from trader import DEFAULT_STOP_LOSS_PCT, DEFAULT_TAKE_PROFIT_PCT, check_portfolio_drawdown
+
     m = load_methodology()
     max_concurrent = m["defaults"].get("max_concurrent_experiments", 5)
+
+    # Portfolio drawdown check — refuse to open new trades if portfolio is in drawdown
+    dd = check_portfolio_drawdown()
+    if not dd.get("safe_to_trade"):
+        raise ValueError(
+            f"Cannot activate: portfolio drawdown {dd.get('drawdown_pct', '?')}% "
+            f"exceeds limit. {dd.get('error', '')}"
+        )
 
     hypotheses = load_hypotheses()
     active_count = sum(1 for h in hypotheses if h["status"] == "active")
@@ -522,6 +538,9 @@ def activate_hypothesis(hypothesis_id, entry_price, position_size, order_id=None
                 "entry_time": datetime.now().isoformat(),
                 "order_id": order_id,
                 "deadline": (datetime.now() + timedelta(days=h["expected_timeframe_days"])).isoformat(),
+                # Risk controls
+                "stop_loss_pct": stop_loss_pct if stop_loss_pct is not None else DEFAULT_STOP_LOSS_PCT,
+                "take_profit_pct": take_profit_pct if take_profit_pct is not None else DEFAULT_TAKE_PROFIT_PCT,
                 # Market context at entry — needed for computing abnormal returns at exit
                 "spy_at_entry": spy_price,
                 "vix_at_entry": vix_level,

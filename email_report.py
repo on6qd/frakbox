@@ -198,6 +198,17 @@ def get_latest_journal_entry():
     return last
 
 
+def _to_str(val):
+    """Safely convert any value to a string for HTML rendering."""
+    if val is None:
+        return ""
+    if isinstance(val, list):
+        return "; ".join(str(v) for v in val)
+    if isinstance(val, dict):
+        return "; ".join(f"{k}: {v}" for k, v in val.items())
+    return str(val)
+
+
 def build_hypothesis_story(h):
     """Tell the story of a hypothesis in plain language."""
     import html as html_mod
@@ -218,8 +229,8 @@ def build_hypothesis_story(h):
     color = status_colors.get(status, "#333")
 
     # The idea (what and why)
-    desc = h.get("event_description", "")
-    mechanism = h.get("causal_mechanism", "")
+    desc = _to_str(h.get("event_description", ""))
+    mechanism = _to_str(h.get("causal_mechanism", ""))
 
     # What the evidence showed
     oos = h.get("out_of_sample_split", {})
@@ -321,7 +332,7 @@ def build_findings_section(knowledge):
             n = effect.get("sample_size", "?")
             rate = effect.get("reliability", 0)
             status = effect.get("status", "unknown")
-            desc = effect.get("description", "")
+            desc = _to_str(effect.get("description", ""))
 
             status_style = 'color: #2e7d32; font-weight: bold;' if status == 'strong' else ''
 
@@ -354,7 +365,7 @@ def build_findings_section(knowledge):
         for d in dead:
             name = d.get("event_type", "").replace("_", " ").title()
             # Extract just the first sentence of the reason
-            reason = d.get("reason", "")
+            reason = _to_str(d.get("reason", ""))
             first_sentence = reason.split(".")[0] + "." if "." in reason else reason[:120]
             html += f"<li><b>{html_mod.escape(name)}</b> — {html_mod.escape(first_sentence)}</li>"
         html += "</ul>"
@@ -373,7 +384,7 @@ def build_literature_section(knowledge):
     html = '<h3>Research Areas</h3>'
     for topic, data in lit.items():
         title = topic.replace("_", " ").title()
-        key = data.get("key_finding", data.get("summary", ""))[:200]
+        key = _to_str(data.get("key_finding", data.get("summary", "")))[:200]
         html += f'<div style="margin: 8px 0;"><b>{html_mod.escape(title)}</b> — {html_mod.escape(key)}</div>'
 
     return html
@@ -431,19 +442,17 @@ def send_session_report(session_type, status, log_file, validation_warnings=""):
     if journal.get("investigated"):
         html += f"""
         <h3>What was investigated</h3>
-        <p>{html_mod.escape(journal['investigated'])}</p>
+        <p>{html_mod.escape(_to_str(journal['investigated']))}</p>
         """
 
     # --- Key findings (from journal) ---
     if journal.get("findings"):
         html += '<h3>Findings</h3>'
-        # Split findings into paragraphs for readability
-        findings = journal["findings"]
+        findings = _to_str(journal["findings"])
         for paragraph in findings.split("\n\n"):
             paragraph = paragraph.strip()
             if not paragraph:
                 continue
-            # Bold text before first colon on lines that look like labels
             html += f'<p style="margin: 8px 0;">{html_mod.escape(paragraph)}</p>'
 
     # --- Surprises (from journal) ---
@@ -451,7 +460,7 @@ def send_session_report(session_type, status, log_file, validation_warnings=""):
         html += f"""
         <h3>Surprises</h3>
         <div style="background: #fff8e1; border-left: 4px solid #ffa000; padding: 12px 16px; margin: 12px 0;">
-            {html_mod.escape(journal['surprised_by'])}
+            {html_mod.escape(_to_str(journal['surprised_by']))}
         </div>
         """
 
@@ -479,7 +488,7 @@ def send_session_report(session_type, status, log_file, validation_warnings=""):
     if handoff.get("next_step") or next_priorities:
         html += '<h3>Next up</h3>'
         if handoff.get("next_step"):
-            html += f'<p>{html_mod.escape(handoff["next_step"])}</p>'
+            html += f'<p>{html_mod.escape(_to_str(handoff["next_step"]))}</p>'
         if next_priorities:
             html += "<ol>"
             for p in next_priorities[:5]:
@@ -488,7 +497,7 @@ def send_session_report(session_type, status, log_file, validation_warnings=""):
             html += "</ol>"
 
     if handoff.get("blockers"):
-        html += f'<p style="color: #c62828;">Blocked: {html_mod.escape(handoff["blockers"])}</p>'
+        html += f'<p style="color: #c62828;">Blocked: {html_mod.escape(_to_str(handoff["blockers"]))}</p>'
 
     # --- Scoreboard (compact) ---
     known_count = len(knowledge.get("known_effects", {}))
