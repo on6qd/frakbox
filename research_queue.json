@@ -82,18 +82,22 @@
       "category": "insider_buying_cluster",
       "question": "Run 2023-2024 OOS validation on 3+ insider cluster hypothesis (4a981cc8). Download 2023Q1-2024Q4 quarterly bulk data, filter for 3+ insider clusters, measure abnormal returns. This is mandatory for hypothesis confidence - currently only have 2021 discovery + 2022 OOS. Need 2023-2024 as third validation period. Also: check if signal decays in post-2022 bull market regime.",
       "priority": 1,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Per methodology: minimum 3 validation instances. Currently have discovery (2021) + OOS 2022. Need at least one more OOS period before elevating confidence to 9/10.",
-      "added": "2026-03-21T11:56:17.469724"
+      "added": "2026-03-21T11:56:17.469724",
+      "completed": "2026-03-21T12:50:25.487084",
+      "findings": "2023-24 OOS COMPLETE (n=311): 1d pos_rate=55.3% (WEAKENED from 72-80%), 3d pos_rate=69.1% avg=+4.71% p<0.0001 (STRONG). Signal not decaying at 3d. Best hold=3d. Use 1cb6140f (3d hold) for GO trade."
     },
     {
       "id": "51dbf89d",
       "category": "insider_buying_cluster",
       "question": "Create new hypothesis 'insider_cluster_3d_hold': 3+ insiders, buy at open day after filing, hold 3 trading days. Evidence: 3d avg +3.80% (2023-24 OOS), +3.89% (2022 OOS), +2.93% (2021 disc). This is a BETTER specification than the 1d hypothesis (4a981cc8) based on accumulated evidence. Pre-register before next trade. Use GO paper trade result to calibrate.",
       "priority": 1,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "3d signal is more reliable and larger than 1d (p<0.0001 vs p=0.006, avg +3.5-4% vs +1-1.5%). New hypothesis would be better evidence-aligned. Confidence 7/10 expected.",
-      "added": "2026-03-21T12:03:12.762264"
+      "added": "2026-03-21T12:03:12.762264",
+      "completed": "2026-03-21T12:50:25.487864",
+      "findings": "3d hypothesis already pre-registered as 1cb6140f. 2023-24 OOS confirms 3d optimal: 69.1% pos rate, +4.71% avg, p<0.0001."
     },
     {
       "id": "seed-002",

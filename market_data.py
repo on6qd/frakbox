@@ -1,7 +1,7 @@
 """
 Market data utilities — fetch historical prices and measure event impacts.
 
-Uses yfinance for historical data (goes back to IPO date for most stocks).
+Uses yfinance for historical data, with Tiingo as fallback for delisted tickers.
 
 IMPORTANT: All impact measurements compute ABNORMAL returns — the stock's return
 minus what the benchmark (SPY) did over the same period. This isolates the event
@@ -9,9 +9,144 @@ effect from broad market moves.
 """
 
 import math
+import sys
+import pandas as pd
+import requests
 import yfinance as yf
 from datetime import datetime, timedelta
 from scipy.stats import ttest_1samp, wilcoxon, norm, skew as scipy_skew
+
+from config import TIINGO_API_KEY
+
+
+# --- Tiingo fallback for delisted tickers ---
+
+_tiingo_request_count = 0
+_tiingo_request_date = None
+
+
+def _fetch_history_tiingo(symbol, start_str, end_str):
+    """
+    Fetch historical OHLCV from Tiingo. Used as fallback when yfinance returns
+    empty data (common for delisted tickers).
+
+    Returns a DataFrame with the same structure as yfinance output (DatetimeIndex,
+    Open/High/Low/Close/Volume columns), or an empty DataFrame on failure.
+    """
+    global _tiingo_request_count, _tiingo_request_date
+
+    if not TIINGO_API_KEY:
+        return pd.DataFrame()
+
+    # Daily rate limit guard (free tier: 500/day)
+    today = datetime.now().date()
+    if _tiingo_request_date != today:
+        _tiingo_request_count = 0
+        _tiingo_request_date = today
+    if _tiingo_request_count >= 490:
+        print(f"[tiingo] Rate limit approaching ({_tiingo_request_count}/500), skipping", file=sys.stderr)
+        return pd.DataFrame()
+
+    # Tiingo uses lowercase tickers, and "-" instead of "." (e.g., BRK-B not BRK.B)
+    tiingo_symbol = symbol.upper().replace(".", "-")
+
+    try:
+        url = f"https://api.tiingo.com/tiingo/daily/{tiingo_symbol}/prices"
+        resp = requests.get(url, params={
+            "startDate": start_str,
+            "endDate": end_str,
+            "token": TIINGO_API_KEY,
+        }, timeout=15)
+        _tiingo_request_count += 1
+
+        if resp.status_code == 404:
+            return pd.DataFrame()
+        resp.raise_for_status()
+
+        data = resp.json()
+        if not data:
+            return pd.DataFrame()
+
+        # Build DataFrame matching yfinance structure
+        rows = []
+        for d in data:
+            dt = pd.Timestamp(d["date"]).tz_localize(None)
+            rows.append({
+                "Date": dt,
+                "Open": d.get("adjOpen", d.get("open", 0)),
+                "High": d.get("adjHigh", d.get("high", 0)),
+                "Low": d.get("adjLow", d.get("low", 0)),
+                "Close": d.get("adjClose", d.get("close", 0)),
+                "Volume": d.get("adjVolume", d.get("volume", 0)),
+            })
+
+        df = pd.DataFrame(rows).set_index("Date")
+        print(f"[tiingo] Fetched {len(df)} days for {symbol} (delisted ticker fallback)", file=sys.stderr)
+        return df
+
+    except Exception as e:
+        print(f"[tiingo] Error fetching {symbol}: {e}", file=sys.stderr)
+        return pd.DataFrame()
+
+
+def _fetch_stock_data(symbol, start_str, end_str):
+    """Fetch stock data from yfinance, falling back to Tiingo for delisted tickers."""
+    df = yf.Ticker(symbol).history(start=start_str, end=end_str, interval="1d")
+    if df.empty:
+        df = _fetch_history_tiingo(symbol, start_str, end_str)
+    return df
+
+
+# --- Transaction cost estimation ---
+
+# Event-type cost defaults (round-trip %) when volume data unavailable
+_EVENT_COST_DEFAULTS = {
+    "sp500_index_addition": 0.25,
+    "sp500_index_deletion": 0.25,
+    "fda_decision": 0.30,
+    "insider_buying_cluster": 0.10,
+    "earnings_surprise": 0.20,
+}
+_DEFAULT_COST_PCT = 0.10
+
+
+def estimate_transaction_cost(event_type=None, avg_daily_volume=None,
+                               event_day_volume=None):
+    """
+    Estimate round-trip transaction cost including spread and market impact.
+
+    When volume data is available:
+        cost = 2 * (base_spread + impact_factor / sqrt(volume_ratio))
+        where volume_ratio = event_day_volume / avg_daily_volume
+
+    When volume data is unavailable, uses event-type-specific defaults.
+
+    Returns:
+        dict with 'round_trip_pct', 'spread_component', 'impact_component',
+        'model_used' ("volume_based" or "event_type_default")
+    """
+    if avg_daily_volume and event_day_volume and avg_daily_volume > 0:
+        base_spread = 0.05  # % per side
+        volume_ratio = event_day_volume / avg_daily_volume
+        impact = 0.15 / math.sqrt(volume_ratio) if volume_ratio > 0 else 0.15
+        round_trip = 2 * (base_spread + impact)
+        round_trip = max(0.05, min(1.0, round_trip))
+        return {
+            "round_trip_pct": round(round_trip, 3),
+            "spread_component": round(2 * base_spread, 3),
+            "impact_component": round(2 * impact, 3),
+            "volume_ratio": round(volume_ratio, 2),
+            "model_used": "volume_based",
+        }
+
+    cost = _EVENT_COST_DEFAULTS.get(event_type, _DEFAULT_COST_PCT)
+    return {
+        "round_trip_pct": cost,
+        "spread_component": None,
+        "impact_component": None,
+        "volume_ratio": None,
+        "model_used": "event_type_default",
+    }
 
 
 # Approximate weights of large constituents in sector ETFs.
@@ -35,13 +170,14 @@ SECTOR_ETF_MAJOR_CONSTITUENTS = {
 def get_price_history(symbol, days=90):
     """
     Fetch daily OHLCV data. Most recent last.
-    Can go back decades — not limited to 2 years.
+    Falls back to Tiingo for delisted tickers.
     """
     end = datetime.now()
     start = end - timedelta(days=days)
+    start_str = start.strftime("%Y-%m-%d")
+    end_str = end.strftime("%Y-%m-%d")
 
-    ticker = yf.Ticker(symbol)
-    df = ticker.history(start=start.strftime("%Y-%m-%d"), end=end.strftime("%Y-%m-%d"), interval="1d")
+    df = _fetch_stock_data(symbol, start_str, end_str)
 
     if df.empty:
         return []
@@ -61,7 +197,8 @@ def get_price_history(symbol, days=90):
 
 
 def get_price_around_date(symbol, event_date, days_before=5, days_after=20,
-                          benchmark="SPY", event_timing="unknown"):
+                          benchmark="SPY", event_timing="unknown",
+                          entry_price="close"):
     """
     Fetch prices around a specific event date and compute abnormal returns.
 
@@ -73,6 +210,9 @@ def get_price_around_date(symbol, event_date, days_before=5, days_after=20,
             - pre_market/intraday/unknown: reference price = close of day BEFORE event
             - after_hours: reference price = close of event day (before the event moved it)
               Post-event returns start from next trading day.
+        entry_price: "close" (default) or "open". When "open", uses next-day open as
+            the entry price instead of prior close. More realistic for after-hours events
+            since you can't actually buy at close.
     """
     event_dt = datetime.strptime(event_date, "%Y-%m-%d")
     start = event_dt - timedelta(days=days_before + 10)
@@ -80,35 +220,45 @@ def get_price_around_date(symbol, event_date, days_before=5, days_after=20,
     start_str = start.strftime("%Y-%m-%d")
     end_str = end.strftime("%Y-%m-%d")
 
-    # Fetch both stock and benchmark
-    stock_df = yf.Ticker(symbol).history(start=start_str, end=end_str, interval="1d")
+    # Fetch stock data (yfinance with Tiingo fallback)
+    stock_df = _fetch_stock_data(symbol, start_str, end_str)
     if stock_df.empty:
-        return {"error": f"No data for {symbol} around {event_date}"}
+        return {"error": f"No data for {symbol} around {event_date} (tried yfinance and Tiingo)"}
 
-    bench_df = yf.Ticker(benchmark).history(start=start_str, end=end_str, interval="1d") if symbol != benchmark else stock_df
+    bench_df = _fetch_stock_data(benchmark, start_str, end_str) if symbol != benchmark else stock_df
 
-    # Build date-indexed lookups
+    # Build date-indexed lookups (close and open)
     stock_by_date = {d.strftime("%Y-%m-%d"): round(row["Close"], 2) for d, row in stock_df.iterrows()}
+    stock_open_by_date = {d.strftime("%Y-%m-%d"): round(row["Open"], 2) for d, row in stock_df.iterrows()}
+    stock_volume_by_date = {d.strftime("%Y-%m-%d"): int(row["Volume"]) for d, row in stock_df.iterrows()}
     bench_by_date = {d.strftime("%Y-%m-%d"): round(row["Close"], 2) for d, row in bench_df.iterrows()}
 
     # Split into pre and post based on event timing
     stock_dates = sorted(stock_by_date.keys())
 
     if event_timing == "after_hours":
-        # After-hours: event day close is the reference (before the event)
-        # Post-event starts from the NEXT trading day
         pre_dates = [d for d in stock_dates if d <= event_date]
         post_dates = [d for d in stock_dates if d > event_date]
     else:
-        # Pre-market/intraday/unknown: day before event is reference
-        # Event day itself captures the reaction
         pre_dates = [d for d in stock_dates if d < event_date]
         post_dates = [d for d in stock_dates if d >= event_date]
 
     if not pre_dates or not post_dates:
         return {"error": "Not enough data around event date"}
 
-    pre_event_price = stock_by_date[pre_dates[-1]]
+    # Determine entry price
+    if entry_price == "open" and post_dates:
+        # Use next trading day's open — realistic entry for after-hours events
+        ref_price = stock_open_by_date.get(post_dates[0])
+        if ref_price is None or ref_price <= 0:
+            ref_price = stock_by_date[pre_dates[-1]]
+            entry_price_used = "close_fallback"
+        else:
+            entry_price_used = "open"
+    else:
+        ref_price = stock_by_date[pre_dates[-1]]
+        entry_price_used = "close"
+
     pre_event_bench = bench_by_date.get(pre_dates[-1])
 
     impact = {
@@ -116,16 +266,28 @@ def get_price_around_date(symbol, event_date, days_before=5, days_after=20,
         "benchmark": benchmark,
         "event_date": event_date,
         "event_timing": event_timing,
-        "pre_event_price": pre_event_price,
+        "pre_event_price": ref_price,
+        "entry_price_type": entry_price_used,
     }
+
+    # Volume data for transaction cost estimation
+    pre_volumes = [stock_volume_by_date[d] for d in pre_dates[-20:] if d in stock_volume_by_date]
+    if pre_volumes:
+        avg_volume = sum(pre_volumes) / len(pre_volumes)
+        event_day = post_dates[0] if post_dates else None
+        event_volume = stock_volume_by_date.get(event_day, 0)
+        impact["avg_daily_volume"] = int(avg_volume)
+        impact["event_day_volume"] = event_volume
+        if avg_volume > 0 and event_volume > 0:
+            impact["volume_ratio"] = round(event_volume / avg_volume, 2)
 
     for horizon_label, horizon_idx in [("1d", 0), ("3d", 2), ("5d", 4), ("10d", 9), ("20d", 19)]:
         if len(post_dates) > horizon_idx:
             target_date = post_dates[horizon_idx]
 
-            # Raw return
+            # Raw return from entry price to close at horizon
             post_price = stock_by_date[target_date]
-            raw_return = ((post_price - pre_event_price) / pre_event_price) * 100
+            raw_return = ((post_price - ref_price) / ref_price) * 100
 
             # Benchmark return
             bench_return = 0
@@ -133,7 +295,6 @@ def get_price_around_date(symbol, event_date, days_before=5, days_after=20,
                 bench_post = bench_by_date[target_date]
                 bench_return = ((bench_post - pre_event_bench) / pre_event_bench) * 100
 
-            # Abnormal return = raw - benchmark
             abnormal_return = raw_return - bench_return
 
             impact[f"raw_{horizon_label}"] = round(raw_return, 2)
@@ -147,7 +308,8 @@ def get_price_around_date(symbol, event_date, days_before=5, days_after=20,
 
 
 def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_etf=None,
-                         event_timing="unknown", known_events=None, regime_filter=None):
+                         event_timing="unknown", known_events=None, regime_filter=None,
+                         entry_price="close", estimate_costs=False, event_type=None):
     """
     Measure abnormal price impact across multiple instances of the same event type.
 
@@ -158,24 +320,18 @@ def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_
            {"symbol": "MSFT", "date": "2024-04-20", "timing": "after_hours"},
        ])
 
-    For each event, computes:
-    - Raw return (what the stock did)
-    - Benchmark return (what SPY did — controls for market-wide moves)
-    - Abnormal return (raw - benchmark — the event-specific effect)
-    - Optionally: sector-adjusted return (raw - sector ETF, corrected for large constituents)
-
     Args:
         symbol: Ticker to measure (None for multi-symbol mode)
         event_dates: List of date strings, or list of dicts with symbol/date/timing keys
         benchmark: Market benchmark (default SPY)
         sector_etf: Optional sector ETF (e.g., XLV for healthcare, XLF for financials)
         event_timing: Default timing if event_dates are strings (not dicts)
-        known_events: Optional list of {"symbol", "date"} dicts for contamination checking.
-                      If provided, flags events where another known event falls within
-                      the measurement window.
-        regime_filter: Optional VIX regime filter — "calm" (VIX<20), "elevated" (20-30),
-                      or "crisis" (VIX>30). Only events matching the specified regime are
-                      included in the analysis. Uses ^VIX close on event date.
+        known_events: Optional list of {"symbol", "date"} dicts for contamination checking
+        regime_filter: Optional VIX regime filter — "calm", "elevated", or "crisis"
+        entry_price: "close" (default) or "open". "open" uses next-day open as entry —
+                    more realistic for after-hours events.
+        estimate_costs: If True, estimate per-event transaction costs using volume data
+        event_type: Event type string for cost estimation defaults (e.g., "sp500_index_addition")
     """
     if event_dates is None:
         return {"error": "event_dates is required"}
@@ -239,10 +395,21 @@ def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_
 
         symbols_seen.add(event_symbol)
 
+        # Per-event entry_price override
+        evt_entry = date_entry.get("entry_price", entry_price) if isinstance(date_entry, dict) else entry_price
+
         try:
             impact = get_price_around_date(event_symbol, date, benchmark=benchmark,
-                                           event_timing=timing)
+                                           event_timing=timing, entry_price=evt_entry)
             if "error" not in impact:
+                # Transaction cost estimation
+                if estimate_costs:
+                    cost = estimate_transaction_cost(
+                        event_type=event_type,
+                        avg_daily_volume=impact.get("avg_daily_volume"),
+                        event_day_volume=impact.get("event_day_volume"),
+                    )
+                    impact["estimated_cost"] = cost
                 # Sector-adjusted returns with circular reference correction
                 if sector_etf and sector_etf != event_symbol:
                     sector_impact = get_price_around_date(sector_etf, date,
@@ -332,6 +499,19 @@ def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_
                 stats[f"min_{key}"] = round(min(returns), 2)
                 stats[f"max_{key}"] = round(max(returns), 2)
                 stats[f"stdev_{key}"] = round(_stdev(returns), 2)
+
+    # Aggregate transaction cost estimates
+    if estimate_costs:
+        costs = [i["estimated_cost"]["round_trip_pct"] for i in impacts if "estimated_cost" in i]
+        if costs:
+            stats["avg_estimated_cost_pct"] = round(sum(costs) / len(costs), 3)
+            stats["cost_model_breakdown"] = {
+                "volume_based": sum(1 for i in impacts if i.get("estimated_cost", {}).get("model_used") == "volume_based"),
+                "event_type_default": sum(1 for i in impacts if i.get("estimated_cost", {}).get("model_used") == "event_type_default"),
+            }
+
+    # Entry price mode
+    stats["entry_price_mode"] = entry_price
 
     # Statistical significance for abnormal returns using scipy
     significant_horizons = []

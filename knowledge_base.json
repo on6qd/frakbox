@@ -70,16 +70,17 @@
       "recorded": "2026-03-19T21:08:22.605216"
     },
     "insider_buying_cluster": {
-      "summary": "THIRD OUT-OF-SAMPLE VALIDATION (2023-2024, n=120): 3+ insider cluster signal CONFIRMED in bull market regime. Results:\n1d: avg +1.21% (p=0.006), 60.8% positive\n3d: avg +3.80% (p<0.0001), 70.0% positive\n5d: avg +4.26% (p<0.0001), 66.7% positive\n20d: avg +3.34% (p=0.016), 59.5% positive\npasses_multiple_testing=True. Data failure rate: 20% (improved from 40% in 2021).\n\nCOMPLETE VALIDATION SUMMARY:\nDiscovery 2021 (n=50): 1d 72% positive, p=0.0012\nOOS 2022 bear market (n=66): 1d 80% positive, 5d avg +4.85%, p<0.0001\nOOS 2023-2024 bull market (n=120): 3d 70% positive, avg +3.80%, p<0.0001\nSignal is REGIME-ROBUST - works in both bull and bear markets.",
-      "known_magnitude": "3d: +3-4% avg abnormal, 5d: +4-5% avg abnormal. 1d: +1-3% avg (lower, more variable).",
-      "known_timeframe": "Signal peaks at 3-5 days. Persists to 20d but with lower significance.",
+      "summary": "SEC Form 4 cluster insider buying (3+ insiders, >$50K each within 30 days). Signal confirmed in 3 independent OOS periods.",
+      "known_magnitude": "3d: 2.93-4.71% mean abnormal (median 2.98-3.80%). Winsorized mean: ~4.46%. Signal stable across bull/bear regimes.",
+      "known_timeframe": "Peaks at 3 trading days post-filing. 1d hold weakening in 2023-24 (55% pos vs 72-80% in 2021-22). 5d also strong but longer hold adds noise.",
       "sources": [
-        "SEC EDGAR Form 4 quarterly bulk data (2021-2024)",
-        "Discovery n=50 (2021), OOS 2022 n=66, OOS 2023-2024 n=120",
-        "Kang, Kim & Wang (2018) academic foundation"
+        "Kang, Kim & Wang (2018): cluster buys 3.8% abnormal/21d, 1986-2016",
+        "Own data: Discovery 2021 (n=1452, 3d +2.93% p<0.000001)",
+        "Own data: OOS 2022 (n=816, 3d +3.89% p<0.000001)",
+        "Own data: OOS 2023-24 (n=311, 3d +4.71% p<0.0001, winsorized +4.46%)"
       ],
-      "gaps": "1d magnitude (1.21%) lower than expected 2.5% for hypothesis 4a981cc8. The 3d/5d hold may be more reliable than 1d. 2025 validation not yet run (Q4 2025 bulk data available).",
-      "recorded": "2026-03-21T12:02:23.946475"
+      "gaps": "1d signal weakened in 2023-24. 10b5-1 plan contamination risk. Survivorship bias: favorable (acquisitions >> bankruptcies).",
+      "recorded": "2026-03-21T12:49:43.996962"
     },
     "activist_investor_13d": {
       "summary": "Brav, Jiang, Partnoy & Thomas (2008) JF: activist hedge fund 13D filings show 7% abnormal return in [-20, +20] day window around filing. Effect is robust across 2001-2006 sample. Greenwood & Schor (2009): only activist campaigns targeting M&A show persistent long-term returns; operational activists show weaker long-run effects. Gantchev (2013): contested activist campaigns cost activists on average $10.71M \u2014 so activists only escalate when stakes are high, making escalation a signal. Key: MUST distinguish activist 13D (intent to influence) from passive 5%+ ownership (13G). Activist funds to track: Elliott, Carl Icahn, ValueAct, Third Point, Pershing Square, Starboard Value, Jana Partners, Trian Fund, Engine Capital, Sachem Head.",
@@ -130,6 +131,17 @@
       "effect": "LIVE SIGNAL 2026-03-21: GO (Grocery Outlet) - 6 insiders including CEO+5 directors bought 6.3M total within 30 days (March 6-19). Cluster qualifies for 3+ insider hypothesis. Entry planned Monday March 23 open at ~5.79 vs insider avg 6.02.",
       "bias_finding": "Delisted ticker bias is FAVORABLE - dominated by acquisitions not bankruptcies. Measured signal understates true effect.",
       "last_updated": "2026-03-21T11:53:56.755329"
+    },
+    "insider_buying_cluster_3plus": {
+      "effect": "3+ insider cluster buys within 30 days: abnormal returns at 3d and 5d consistently positive",
+      "discovery_2021": "3d avg +2.93% (p<0.000001), n=1452",
+      "oos_2022": "3d avg +3.89% (p<0.000001), n=816",
+      "oos_2023_2024": "3d avg +4.71% (winsorized 4.46%), median +2.98%, pos_rate=69.1%, p<0.0001, n=311",
+      "1d_signal_decay": "1d weakened in 2023-24: 55.3% pos (vs 72-80% in 2021-22). 3d hold more robust.",
+      "best_hold_period": "3 trading days (optimal by Sharpe: high pos_rate, strong median)",
+      "signal_direction": "LONG at open day after last cluster filing",
+      "bias_note": "Favorable survivorship bias (acquisitions >> bankruptcies in delisted pool)",
+      "last_updated": "2026-03-21T12:49:07.809010"
     }
   },
   "dead_ends": [

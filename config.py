@@ -17,6 +17,9 @@ ALPACA_BASE_URL = os.environ.get("ALPACA_BASE_URL", "https://paper-api.alpaca.ma
 # Max percentage of portfolio per experiment
 MAX_POSITION_PCT = 0.05  # 5% per hypothesis test
 
+# Tiingo (fallback for delisted tickers — free tier, 500 req/day)
+TIINGO_API_KEY = os.environ.get("TIINGO_API_KEY", "")
+
 # Email reporting
 GMAIL_ADDRESS = os.environ.get("GMAIL_ADDRESS", "")
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
