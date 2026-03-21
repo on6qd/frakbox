@@ -446,8 +446,19 @@
       "last_updated": "2026-03-21T15:30:03.781291"
     },
     "clinical_efficacy_failure_short": {
-      "finding": "GOSS (Feb 23 2026) is the sole reversal case in N=11 dataset. Corrected stats: avg_abnormal_3d=-20.24% (not -27.45%), positive_rate_3d=9.1% (1/11 = GOSS). GOSS reversed because post-crash price was at liquidation cash value (~0.39/share). New exclusion criterion: post-crash stock price > 0.50/share required.",
-      "last_updated": "2026-03-21T17:36:00.831059"
+      "goss_reversal_explanation": "GOSS seralutinib Phase 3 p=0.032 (threshold was 0.025) - near-miss, NOT definitive failure. Company explicitly stated they will still seek FDA approval via subgroup analysis meeting. This is an ambiguous result, not a definitive clinical failure. GOSS should be EXCLUDED from d302c84b backtest by proposed new criterion: Company must have NO stated path forward for the drug.",
+      "immp_note": "IMMP March 13 2026 Phase 3 TACTI-004 failure: eftilagimod in NSCLC. IMMP has other programs (IMP761, other efti indications). Borderline qualifying - failed program was LEAD but company has other pipeline. Still showed -14.2% 3d continuation (consistent with signal). Cash runway EXTENDED because stopped expensive trial (bullish signal for company solvency).",
+      "refined_qualifying_criteria": [
+        "1. Initial crash >55% (unchanged)",
+        "2. Single primary drug/program - no other active clinical programs (unchanged)",
+        "3. Market cap <500M at time of event (unchanged)",
+        "4. NOT pre-anticipated - stock not down >20% in prior 10 days (unchanged)",
+        "5. Clinical/efficacy deficiency - NOT CMC/manufacturing only (unchanged)",
+        "6. NEW: Post-crash stock price >0.50/share at entry (avoid liquidation-value floor)",
+        "7. NEW: Company has NO stated path forward for the failed drug (exclude near-miss p-values or subgroup-analysis FDA meeting plans)",
+        "8. NEW: Primary endpoint must be clearly failed (p>0.05, not p=0.03 vs 0.025 threshold)"
+      ],
+      "last_updated": "2026-03-21T18:02:49.096679"
     }
   },
   "dead_ends": [
@@ -480,6 +491,16 @@
       "event_type": "clinical_trial_failure_undifferentiated",
       "reason": "Phase 2/3 trial failures are too heterogeneous without filtering: 67% continuation, 33% reversal. Does not pass multiple testing (pos_rate=33%, avg_3d=-11.78%). Need discriminating factor: company cash runway, pipeline depth, drug credibility. Continuation cases: company wound down, drug clearly worthless. Reversal cases: company has other programs, cash to retry, partner support.",
       "recorded": "2026-03-21T15:30:03.781918"
+    },
+    {
+      "event_type": "ceo_cfo_sudden_departure",
+      "reason": "Backtested N=10 mid-cap CEO/CFO sudden departure events (2022-2024). avg_abnormal_3d=+0.19%, positive_rate_3d=40%, passes_multiple_testing=False. Signal too noisy for 3-5 day hold. Events are idiosyncratic - LCID CFO departure (Dec 2023) showed +12.8% 3d reversal; FRPT CFO departure showed +11.2% 3d reversal. No discriminating factor found to separate continuation from reversal cases. Academic literature shows this as a 1-3 month signal, not 3-5 day. Would need 30+ day hold and different strategy. Not tradeable at our 3-5 day horizon with current methodology.",
+      "recorded": "2026-03-21T17:50:39.192556"
+    },
+    {
+      "event_type": "reverse_stock_split_announcement",
+      "reason": "Attempted to backtest reverse split announcement signal. N=3 (CLOV, NKLA, MVIS) shows avg_abnormal_1d=+3.2% (POSITIVE, unexpected), avg_abnormal_3d=-1.57%, positive_rate_3d=33%. Signal does not exist in 3-5 day post-announcement window. Main problems: (1) Most qualifying NASDAQ-compliance reverse splits involve micro-cap companies (<M market cap) with poor liquidity and high borrow costs. (2) Post-2023 NASDAQ rules require only 2 business days notice so announcement and effective date are simultaneous. (3) Signal is 12-month drift per academic literature (Desai & Jain 1997), not 3-5 day. (4) The 1d reaction is slightly positive (artificial demand from share consolidation). Not tradeable at 3-5 day horizon.",
+      "recorded": "2026-03-21T18:01:33.135319"
     }
   ]
 }
