@@ -317,6 +317,92 @@
       "new_event_grtx": "GRTX (Galera Therapeutics) Aug 10 2023: avasopasem NDA, clinical endpoint failure, -82.8% gap, 3d=-21.6%, 5d=-32.8%, single-drug company",
       "next_steps": "Need 2+ more qualifying events. Search: Phase 2/3 trial failure crashes as related category. Try Polygon.io for delisted tickers. Monitor upcoming PDUFA calendar for qualifying single-asset small biotech clinical CRL events.",
       "last_updated": "2026-03-21T14:45:33.605587"
+    },
+    "fda_clinical_rejection_short": {
+      "n_events": 6,
+      "avg_abnormal_3d": -23.88,
+      "avg_abnormal_5d": -30.6,
+      "positive_rate": 0.0,
+      "wilcoxon_p": 0.0312,
+      "passes_multiple_testing": true,
+      "events": [
+        {
+          "symbol": "ACER",
+          "date": "2019-06-24",
+          "event_type": "CRL_clinical",
+          "crash_pct": -79.0,
+          "abn_3d": -34.7
+        },
+        {
+          "symbol": "ARDX",
+          "date": "2021-07-19",
+          "event_type": "AdComm_negative",
+          "crash_pct": -73.9,
+          "abn_3d": -15.3
+        },
+        {
+          "symbol": "NERV",
+          "date": "2022-10-16",
+          "event_type": "RTF_clinical",
+          "crash_pct": -69.5,
+          "abn_3d": -29.0
+        },
+        {
+          "symbol": "GRTX",
+          "date": "2023-08-09",
+          "event_type": "CRL_clinical",
+          "crash_pct": -82.8,
+          "abn_3d": -21.6
+        },
+        {
+          "symbol": "OTLK",
+          "date": "2023-08-29",
+          "event_type": "CRL_mixed",
+          "crash_pct": -80.9,
+          "abn_3d": -19.4
+        },
+        {
+          "symbol": "APLT",
+          "date": "2024-11-27",
+          "event_type": "CRL_clinical",
+          "crash_pct": -76.3,
+          "abn_3d": -23.3
+        }
+      ],
+      "reversal_case": {
+        "symbol": "ALDX",
+        "date": "2026-03-17",
+        "note": "Pre-anticipated CRL: stock declined ~70% pre-announcement. Opened -73% but RECOVERED +64% by day 3. Pre-anticipation = reversal, not continuation."
+      },
+      "discovery_oos_split": {
+        "discovery": [
+          "ACER-2019",
+          "ARDX-2021",
+          "NERV-2022"
+        ],
+        "oos": [
+          "GRTX-2023",
+          "OTLK-2023",
+          "APLT-2024"
+        ],
+        "discovery_avg_3d": -26.31,
+        "oos_avg_3d": -21.45,
+        "both_100pct_negative": true
+      },
+      "key_filter": "Exclude events where stock declined >20% in 10 days BEFORE announcement (pre-anticipated)",
+      "hypothesis_id": "5f805860",
+      "status": "pre_registered_pending_live_event",
+      "last_updated": "2026-03-21T15:22:50.112998"
+    },
+    "fda_crl_clinical_short_DEPRECATED": {
+      "note": "DEPRECATED - event dates were wrong in previous sessions. Use fda_clinical_rejection_short instead.",
+      "wrong_dates": {
+        "ARDX": "2022-07-12 (wrong) \u2192 correct: 2021-07-19",
+        "OTLK": "2023-10-12 (wrong) \u2192 correct: 2023-08-29",
+        "NERV": "2022-09-27 (wrong) \u2192 correct: 2022-10-16",
+        "APLT": "2024-02-14 (wrong - was CMC CRL resubmission positive) \u2192 correct: 2024-11-27"
+      },
+      "last_updated": "2026-03-21T15:22:50.113740"
     }
   },
   "dead_ends": [

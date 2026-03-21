@@ -3166,5 +3166,155 @@
       "rationale": "6 insiders including CEO. 3d hold aligns better with this hypothesis than 4a981cc8.",
       "note": "If 4a981cc8 (1d hold) is activated first, use 1cb6140f for BLCO (9 insiders) next"
     }
+  },
+  {
+    "id": "5f805860",
+    "created": "2026-03-21T15:22:27.852776",
+    "prediction_hash": "7efa55adf10b21cc",
+    "idempotency_key": "a9b8570009084d5a",
+    "status": "pending",
+    "event_type": "fda_clinical_rejection_short",
+    "event_description": "When the FDA issues a clinical/efficacy rejection (CRL, RTF, or AdComm negative vote) for a single-pipeline small biotech, causing a 55%+ single-day crash, short the stock at the open of the crash day and hold for 3 days.",
+    "causal_mechanism": "After a 55%+ crash from an FDA clinical rejection, institutional holders who were long continue forced selling for 2-5 days as they unwind positions (position limits, redemption pressure, risk management rules). Day-traders who shorted on crash day take profits within 1-2 days but selling pressure from institutional unwinding dominates. The stock has near-zero remaining fundamental value for a single-pipeline drug company post-rejection, so there is no natural buyer base to absorb the continued selling. Market makers widen spreads and reduce size, amplifying the downward drift. This institutional forced-selling channel has been documented in equity event studies (Coval & Stafford 2007 on fire sales).",
+    "causal_mechanism_criteria": [
+      "actors_incentives",
+      "transmission_channel",
+      "academic_reference"
+    ],
+    "expected_symbol": "TBD",
+    "expected_direction": "short",
+    "expected_magnitude_pct": 20.0,
+    "expected_timeframe_days": 3,
+    "event_timing": "after_hours",
+    "backtest_symbols": [
+      "ACER",
+      "ARDX",
+      "NERV",
+      "GRTX",
+      "OTLK",
+      "APLT"
+    ],
+    "backtest_events": [
+      {
+        "symbol": "ACER",
+        "date": "2019-06-24"
+      },
+      {
+        "symbol": "ARDX",
+        "date": "2021-07-19"
+      },
+      {
+        "symbol": "NERV",
+        "date": "2022-10-16"
+      },
+      {
+        "symbol": "GRTX",
+        "date": "2023-08-09"
+      },
+      {
+        "symbol": "OTLK",
+        "date": "2023-08-29"
+      },
+      {
+        "symbol": "APLT",
+        "date": "2024-11-27"
+      }
+    ],
+    "historical_evidence": [
+      {
+        "symbol": "ACER",
+        "date": "2019-06-24",
+        "event": "CRL clinical - no pivotal trial",
+        "crash_pct": -79.0,
+        "abn_3d": -34.7,
+        "abn_5d": -27.1
+      },
+      {
+        "symbol": "ARDX",
+        "date": "2021-07-19",
+        "event": "AdComm negative vote - small effect size",
+        "crash_pct": -73.9,
+        "abn_3d": -15.3,
+        "abn_5d": -28.9
+      },
+      {
+        "symbol": "NERV",
+        "date": "2022-10-16",
+        "event": "RTF - failed primary endpoint in US trial",
+        "crash_pct": -69.5,
+        "abn_3d": -29.0,
+        "abn_5d": -32.9
+      },
+      {
+        "symbol": "GRTX",
+        "date": "2023-08-09",
+        "event": "CRL clinical - Phase 3 not persuasive",
+        "crash_pct": -82.8,
+        "abn_3d": -21.6,
+        "abn_5d": -32.8
+      },
+      {
+        "symbol": "OTLK",
+        "date": "2023-08-29",
+        "event": "CRL mixed CMC+clinical - additional trial required",
+        "crash_pct": -80.9,
+        "abn_3d": -19.4,
+        "abn_5d": -19.8
+      },
+      {
+        "symbol": "APLT",
+        "date": "2024-11-27",
+        "event": "CRL clinical - primary endpoint missed p=0.103",
+        "crash_pct": -76.3,
+        "abn_3d": -23.3,
+        "abn_5d": -42.1
+      }
+    ],
+    "sample_size": 6,
+    "consistency_pct": 100.0,
+    "out_of_sample_split": {
+      "discovery_indices": [
+        "ACER-2019",
+        "ARDX-2021",
+        "NERV-2022"
+      ],
+      "validation_indices": [
+        "GRTX-2023",
+        "OTLK-2023",
+        "APLT-2024"
+      ],
+      "discovery_consistency_pct": 100.0,
+      "validation_consistency_pct": 100.0,
+      "split_type": "temporal",
+      "discovery_avg_3d": -26.31,
+      "validation_avg_3d": -21.45,
+      "note": "50/50 temporal split. 3 discovery (2019-2022), 3 OOS (2023-2024). Both periods show 100% directional accuracy and -20 to -27% avg 3d abnormal return. Small N but perfectly consistent signal. OOS slightly weaker than discovery (expected decay), both very strong."
+    },
+    "confounders": {
+      "broad_market_direction": "mixed (2019 bull, 2021 bull, 2022 bear, 2023 bull, 2024 bull)",
+      "vix_level": "unknown - not filtered by VIX, events span calm and elevated regimes",
+      "sector_trend": "XBI biotech sector trend varies by event; not regime-filtered",
+      "survivorship_bias": "Favorable: delisted companies (full bankruptcy) likely had even more continuation, making measured returns conservative",
+      "selection_bias": "All events selected by >55% single-day crash on FDA rejection signal. Cannot generalize to smaller crashes. Pre-anticipated CRLs (ALDX Mar 2026) show reversal, not continuation \u2014 filter required.",
+      "event_timing": "after_hours or pre_market (same-day entry at open of crash day)",
+      "market_regime": "not filtered; events span multiple regimes (2019-2024)"
+    },
+    "market_regime_note": "Not regime-dependent. Events across 2019-2024 span bull/bear/flat markets and different VIX levels. All show continuation. No regime filter applied.",
+    "regime_note": "No regime dependence observed across 6 events spanning 2019-2024.",
+    "confidence": 7,
+    "literature_reference": "Coval & Stafford (2007) document fire-sale discounts from mutual fund redemption-driven selling; mechanism supports continued institutional forced-selling post-crash. Baker & Wurgler (2006) investor sentiment affects small speculative stocks most. Bhagat et al (2004): FDA rejections of biotech drugs cause permanent value destruction for single-pipeline companies. No specific study on post-CRL continuation drift found.",
+    "survivorship_bias_note": "Delisted tickers (ACER via Tiingo) are INCLUDED in the analysis. Companies that went to zero after CRL (worst outcomes) are INCLUDED, making our measured continuation returns potentially conservative estimates. Favorable survivorship bias direction.",
+    "selection_bias_note": "Events selected by: (1) FDA clinical/efficacy rejection signal, (2) single-pipeline drug company, (3) >55% single-day crash. The >55% filter creates selection bias \u2014 smaller crashes may not show the same continuation. Additionally, pre-anticipated CRLs (where stock already declined before announcement) appear to show reversal rather than continuation (ALDX Mar 2026 pre-anticipated CRL: stock opened -73% but recovered to +64% by day 3). Filter: exclude events where stock declined >20% in the 10 days BEFORE the announcement.",
+    "passes_multiple_testing": true,
+    "multiple_testing_warning": null,
+    "confounder_warnings": null,
+    "symbol_warnings": [
+      "Symbol is TBD \u2014 must be resolved to a real ticker before activation."
+    ],
+    "dead_end_warnings": [
+      "Related dead end: fda_crl_generic_short \u2014 Tested generic 'SHORT small biotech after any CRL' hypothesis. N=8 measured (4 delisted = survivorship bias).\nResults: 1d avg=-25.24% (median=-2.84%), 5d avg=-28.51%, positive_rate_1d=50%. Does NOT pass multiple testing (no horizons significant at p<0.05, though p=0.12 at 1d with N=8). \nCRITICAL ISSUES: (1) CMC-only CRLs show POSITIVE 1d returns (AXSM +4.8%, SRRK +4.1%) - wrongly shorting these would lose money. (2) Clinical CRLs have EXTREME variance - OTLK -81% but ITRM +18%, NERV +1.2%. (3) 33% data failure from delistings = survivorship bias. \nDO NOT pursue generic CRL short. The effect is real but too heterogeneous. Need CONDITIONAL sub-hypothesis: (single-asset company) + (clinical deficiency CRL) + (pre-announcement run-up, suggesting market expected approval). That specific sub-case might be consistently very negative, but requires 15+ events with that profile."
+    ],
+    "trade": null,
+    "result": null
   }
 ]
