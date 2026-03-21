@@ -111,6 +111,15 @@
       "findings": "SIGNAL WEAKENED BY LITERATURE. Key findings: (1) Academic consensus: long-horizon abnormal returns on buyback announcements dropped to near-zero post-2007 as markets became efficient to this signal. (2) Short-term (3d) CAR is still ~1.4-1.6% per European studies, but US large-caps show diminishing effect. (3) First-ever buyback announcements are NOT reliably positive -- Salesforce first-ever B buyback (Aug 2022) caused a 10% DROP because investors read it as management signaling low-growth outlook. (4) Large routine buybacks (Apple B, MSFT B, etc.) have muted 1d stock reactions because they are expected and priced in. (5) The sub-signal with most promise: small/mid-cap companies announcing buyback for first time AND buying back >10% of float. Academic paper (Vermaelen) documents 16% long-horizon excess returns for large tender-offer buybacks, but tender offers are rare and well-known. (6) DECISION: Do not backtest this as-is. The causal mechanism (undervaluation signaling) is well-documented but efficiency has eroded the edge. NEXT STEP: If pursuing, narrow to (a) first-ever programs at companies with <B market cap, (b) buying back >10% of shares outstanding, (c) announced with earnings miss (contradicts growth pessimism narrative). This sub-hypothesis has not been tested and may have edge."
     },
     {
+      "id": "8114ee1f",
+      "category": "insider_buying_cluster",
+      "question": "Set up and monitor cluster_auto_scanner.py results. The scanner runs daily at 9:15 PM ET and logs qualifying clusters to research_queue.json. Review these entries at each session start and set triggers if appropriate. First check: did POOL (Pool Corp, 3 insiders, $3.6M, filed March 17) or AMRZ (5 insiders, $4.6M, filed March 16) generate returns? Also look for new clusters that the scanner identifies.",
+      "priority": 1,
+      "status": "pending",
+      "reasoning": "Auto-scanner detected POOL and AMRZ as missed opportunities. These are now stale but future scans will catch fresh events. Session discipline: check cluster_scanner.log at session start.",
+      "added": "2026-03-21T20:10:22.936285"
+    },
+    {
       "id": "seed-002",
       "category": "index_rebalancing",
       "question": "When a stock is announced for S&P 500 addition, what is the abnormal return between announcement and effective date, and does it reverse after inclusion? How does this compare to Russell 2000 rebalancing?",
@@ -238,9 +247,11 @@
       "category": "signal_discovery",
       "question": "Do investment-grade-to-junk credit rating downgrades (fallen angels) cause significant negative abnormal stock returns? Check if announcement day still has residual -3%+ effect after pre-announcement trading.",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Academic literature is clear on negative bond returns but equity effect is less certain. Low priority because we already have clinical efficacy short signal.",
-      "added": "2026-03-21T19:09:02.392290"
+      "added": "2026-03-21T19:09:02.392290",
+      "completed": "2026-03-21T20:10:22.934914",
+      "findings": "DEAD END. Fallen angel credit downgrades (IG-to-junk) not actionable as short equity signal. Issues: (1) events cluster in 2020 COVID crisis making isolation impossible, (2) only 4-5 clean non-crisis events in 2018-2024 (insufficient for OOS split), (3) GE Oct 2018 downgrade day saw +7% (pre-anticipated/relief), (4) academic literature shows bond markets more affected than equity. Dead end recorded in knowledge_base.json."
     },
     {
       "id": "da0e1d25",
@@ -250,6 +261,15 @@
       "status": "pending",
       "reasoning": "General large buyback signal is dead (market efficient post-2007). But extreme-size first-ever buybacks at small-caps may still signal undervaluation meaningfully. Requires EDGAR 8-K item 8.01 parsing to find events. Academic paper by Vermaelen shows 16% long-horizon excess returns for large tender offers but this has not been tested for small-cap open-market repurchases.",
       "added": "2026-03-21T19:30:39.570109"
+    },
+    {
+      "id": "91533711",
+      "category": "signal_discovery",
+      "question": "Explore reverse merger / blank check SPAC completion announcements: when a SPAC announces merger target (De-SPAC), measure abnormal returns at 1d, 3d, 5d. The initial announcement causes large positive move for target. Key question: does the SPAC acquiring company (SPAC itself) show positive or negative drift after announcement? Academic finding: SPAC acquirers underperform by 15-30% in first year post-merger, but ANNOUNCEMENT day effect may be different.",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "SPAC market produced many events 2020-2022. The mechanism is clear: initial enthusiasm followed by dilution reality. Short the SPAC acquirer 1-5 days after announcement? Or look at the target company optionality.",
+      "added": "2026-03-21T20:10:22.935754"
     },
     {
       "id": "seed-003",
@@ -359,41 +379,36 @@
   ],
   "next_session_priorities": [
     {
-      "task": "MONDAY MARCH 23 9:30 AM ET: trade_loop.py fires GO (1cb6140f) and WD (76678219) triggers automatically. Check by 9:45 ET that both trades appear in Alpaca. DO NOT run activate scripts manually.",
-      "set_by_session": "2026-03-21T19:36:24.929784"
+      "task": "1. VERIFY GO/WD TRADES EXECUTED: Check trade_loop.py executed both trades at Monday open. View Alpaca paper account positions. If not executed, debug trade_loop.py.",
+      "set_by_session": "2026-03-21T20:10:36.379270"
     },
     {
-      "task": "THURSDAY March 26 close: Run python tools/close_go_trade.py --yes to close GO position (3d hold). Hypothesis 1cb6140f.",
-      "set_by_session": "2026-03-21T19:36:24.929789"
+      "task": "2. CLOSE GO TRADE: Thursday March 26 close, run python tools/close_go_trade.py. MUST be done within session.",
+      "set_by_session": "2026-03-21T20:10:36.379275"
     },
     {
-      "task": "TUESDAY March 30 close: Run python tools/close_wd_trade.py --yes to close WD position (5d hold). Hypothesis 76678219.",
-      "set_by_session": "2026-03-21T19:36:24.929790"
+      "task": "3. CHECK CLUSTER SCANNER LOG: Review /logs/cluster_scanner.log for any new qualifying clusters detected Mon/Tue/Wed. Set triggers immediately if fresh clusters found.",
+      "set_by_session": "2026-03-21T20:10:36.379276"
     },
     {
-      "task": "SESSION START: Run python tools/edgar_clinical_failure_scanner.py --days 7 to scan for new clinical failures. March 14-21 scan was clean (7 candidates, none qualified).",
-      "set_by_session": "2026-03-21T19:36:24.929791"
+      "task": "4. CHECK EDGAR CLINICAL FAILURE SCANNER: Run edgar_clinical_failure_scanner.py --days 7 for new d302c84b candidates.",
+      "set_by_session": "2026-03-21T20:10:36.379277"
     },
     {
-      "task": "RESEARCH: Fallen angel credit downgrades (IG to junk, forced institutional selling). High priority, task 835449be.",
-      "set_by_session": "2026-03-21T19:36:24.929791"
+      "task": "5. CLOSE WD TRADE: Tuesday March 31 close, run python tools/close_wd_trade.py.",
+      "set_by_session": "2026-03-21T20:10:36.379278"
     },
     {
-      "task": "RESEARCH: Refined buyback sub-hypothesis - build EDGAR 8-K Item 8.01 scanner for first-ever small-cap buyback programs >10% of float.",
-      "set_by_session": "2026-03-21T19:36:24.929792"
+      "task": "6. POST-TRADE ANALYSIS: After both trades close, compute actual vs expected returns. Was the 3d/5d signal validated? Update hypothesis confidence if significant deviation.",
+      "set_by_session": "2026-03-21T20:10:36.379279"
     }
   ],
   "session_handoff": {
-    "active_trades": {
-      "GO_1cb6140f": "trigger=next_market_open set, fires Monday March 23 9:30 ET, 3d hold, close Thursday March 26",
-      "WD_76678219": "trigger=next_market_open set, fires Monday March 23 9:30 ET, 5d hold, close Tuesday March 30"
-    },
-    "trade_loop_status": "trade_loop.py handles execution automatically. Check logs if trades do not appear in Alpaca by 9:45 ET Monday.",
-    "clinical_failure_scan_march_14_21": "CLEAN SCAN - 7 candidates, NONE qualified for d302c84b. ALDX disqualified: 3rd CRL same drug + pre-anticipation -24.7%. TBPH disqualified: only -26% crash (need >55%). RYTM disqualified: mixed results, multi-product, only -6% reaction. ATRA: no new crash event this week. HUMA: positive news week.",
-    "buyback_research": "DEAD END recorded earlier session. Small-cap tender offer sub-hypothesis added to queue.",
-    "next_research": "fallen_angel_credit_downgrades - investment grade bonds losing IG status creates forced institutional selling pressure. High signal potential.",
-    "duplicate_hypothesis": "hypothesis 4a981cc8 (GO, no trigger) is a duplicate of 1cb6140f (GO, has trigger). Consider retiring 4a981cc8 once 1cb6140f trade executes.",
-    "written_at": "2026-03-21T19:36:24.929793"
+    "what_investigated": "Signal discovery: fallen angel downgrades (dead end), profit warnings (dead end), secondary equity offerings (dead end), IPO lock-up expiry (dead end). CEO/CFO sub-filter for insider clusters (marginal, not worth pursuing). Built cluster_auto_scanner.py to catch missed opportunities.",
+    "key_finding": "We have been missing fresh insider cluster opportunities (POOL $3.6M, AMRZ $4.6M) because the scanner only runs when Claude sessions are active. Built and scheduled tools/cluster_auto_scanner.py to run daily at 9:15 PM ET via launchd.",
+    "blocked_by": "No new qualifying events for d302c84b. S&P 500 next addition unknown date.",
+    "next_step": "Monday: Verify GO+WD trades executed. Thursday: Close GO. Tuesday March 31: Close WD. Check cluster_scanner.log for fresh opportunities daily.",
+    "written_at": "2026-03-21T20:10:36.379280"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

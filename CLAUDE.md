@@ -174,6 +174,8 @@ result['avg_estimated_cost_pct']     # avg round-trip cost (when estimate_costs=
 | `activate_wd_trade.py` | Activate WD insider cluster paper trade |
 | `close_go_trade.py` | Close GO paper trade and complete hypothesis |
 | `close_wd_trade.py` | Close WD paper trade and complete hypothesis |
+| `cluster_auto_scanner.py` | Daily auto-scanner for fresh insider clusters (runs via launchd 9:15 PM ET) |
+| `edgar_clinical_failure_scanner.py` | Scan EDGAR 8-K filings for Phase 2/3 clinical failures |
 
 **Standard backtest workflow:**
 ```python
