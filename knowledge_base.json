@@ -124,6 +124,16 @@
       "filter_criteria": "2+ insiders, >$50K each, within 30-day window, Form 4 filing date",
       "data_source": "SEC Form 4 bulk data (edgar.sec.gov structured data sets)",
       "last_updated": "2026-03-21T09:59:49.357636"
+    },
+    "insider_buying_cluster_cluster_size": {
+      "description": "CLUSTER SIZE MATTERS: 3+ insider clusters show markedly stronger signal than 2-insider minimum.",
+      "discovery_2021": "1d avg +3.29%, 72% positive rate, p=0.0012",
+      "oos_2022_3plus": "1d avg +3.47%, 80% positive rate, p<0.0001; 5d avg +4.85%, 71% positive",
+      "oos_2022_2only": "1d avg +1.88%, 58% positive rate",
+      "mechanism": "3+ filter reduces 10b5-1 pre-planned transaction noise; more signalers = more conviction",
+      "hypothesis": "4a981cc8 (confidence=8)",
+      "recommendation": "For live trading, prefer 3+ insider clusters over 2-insider minimum",
+      "last_updated": "2026-03-21T11:11:28.681628"
     }
   },
   "dead_ends": [

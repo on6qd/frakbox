@@ -9,8 +9,8 @@ cd "$(dirname "$0")"
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 LOCKFILE="${TMPDIR:-/tmp}/research_bot_$(id -u).lock"
-INTERVAL=3600
-MAX_SESSIONS_PER_DAY=3
+INTERVAL=900
+MAX_SESSIONS_PER_DAY=24
 
 set -a; source .env; set +a
 source venv/bin/activate 2>/dev/null || true

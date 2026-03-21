@@ -142,10 +142,54 @@ def send_report(subject=None, body_html=None):
     send_email(subject, body_html)
 
 
+def parse_token_usage(log_file):
+    """Parse token usage from a stream-json log file."""
+    import json
+
+    totals = {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cache_read_tokens": 0,
+        "cache_creation_tokens": 0,
+    }
+    message_count = 0
+
+    try:
+        with open(log_file) as f:
+            for line in f:
+                line = line.strip()
+                if not line or not line.startswith("{"):
+                    continue
+                try:
+                    obj = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                usage = None
+                if obj.get("type") == "assistant" and "message" in obj:
+                    usage = obj["message"].get("usage")
+                elif obj.get("type") == "message" and "usage" in obj:
+                    usage = obj["usage"]
+                if usage:
+                    message_count += 1
+                    totals["input_tokens"] += usage.get("input_tokens", 0)
+                    totals["output_tokens"] += usage.get("output_tokens", 0)
+                    totals["cache_read_tokens"] += usage.get("cache_read_input_tokens", 0)
+                    totals["cache_creation_tokens"] += usage.get("cache_creation_input_tokens", 0)
+    except Exception:
+        pass
+
+    totals["total_tokens"] = totals["input_tokens"] + totals["output_tokens"] + totals["cache_read_tokens"] + totals["cache_creation_tokens"]
+    totals["api_calls"] = message_count
+    return totals
+
+
 def send_session_report(session_type, status, log_file, validation_warnings=""):
     """Send a post-session summary email. Called by daily_research.sh after every run."""
     import json
     import os
+
+    # Parse token usage from log
+    token_usage = parse_token_usage(log_file) if log_file else {}
 
     # Load current state for the report
     research = get_research_summary()
@@ -209,6 +253,21 @@ def send_session_report(session_type, status, log_file, validation_warnings=""):
         <tr><td style="padding: 4px 12px;">Dead ends</td><td style="padding: 4px 12px;">{len(knowledge.get('dead_ends', []))}</td></tr>
         <tr><td style="padding: 4px 12px;">Research queue</td><td style="padding: 4px 12px;">{queue_pending} pending, {queue_completed} completed</td></tr>
         <tr><td style="padding: 4px 12px;">Event watchlist</td><td style="padding: 4px 12px;">{watchlist_count} events</td></tr>
+    </table>
+    """
+
+    if token_usage and token_usage.get("total_tokens", 0) > 0:
+        def fmt_k(n):
+            return f"{n/1000:,.1f}k" if n >= 1000 else str(n)
+        html += f"""
+    <h3>Token Usage</h3>
+    <table style="border-collapse: collapse;">
+        <tr><td style="padding: 4px 12px;">Input</td><td style="padding: 4px 12px;">{fmt_k(token_usage['input_tokens'])}</td></tr>
+        <tr><td style="padding: 4px 12px;">Output</td><td style="padding: 4px 12px;">{fmt_k(token_usage['output_tokens'])}</td></tr>
+        <tr><td style="padding: 4px 12px;">Cache read</td><td style="padding: 4px 12px;">{fmt_k(token_usage['cache_read_tokens'])}</td></tr>
+        <tr><td style="padding: 4px 12px;">Cache creation</td><td style="padding: 4px 12px;">{fmt_k(token_usage['cache_creation_tokens'])}</td></tr>
+        <tr><td style="padding: 4px 12px;"><b>Total</b></td><td style="padding: 4px 12px;"><b>{fmt_k(token_usage['total_tokens'])}</b></td></tr>
+        <tr><td style="padding: 4px 12px;">API calls</td><td style="padding: 4px 12px;">{token_usage['api_calls']}</td></tr>
     </table>
     """
 

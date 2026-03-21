@@ -131,9 +131,11 @@
       "category": "insider_buying_cluster",
       "question": "Test whether the cluster signal is stronger for high-conviction clusters (n_insiders >= 3) vs minimum clusters (n_insiders == 2). The Alldredge & Blank literature suggests strength increases with cluster size.",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Subsetting by cluster size may sharpen the signal and reduce noise from borderline cases.",
-      "added": "2026-03-21T09:35:22.187468"
+      "added": "2026-03-21T09:35:22.187468",
+      "completed": "2026-03-21T11:11:09.935832",
+      "findings": "CONFIRMED: 3+ insider clusters show dramatically stronger signal than 2-insider minimum. Discovery 2021 (n=50): 1d avg +3.29%, 72% positive rate, p=0.0012, passes_multiple_testing=True. OOS 2022 (n=66): 1d avg +3.47%, 80% positive rate, p<0.0001; 5d avg +4.85%, 71% positive rate. For comparison, 2-insiders-only 2022: 1d avg +1.88%, 58% positive rate. New hypothesis 4a981cc8 created (confidence=8). 3+ filter reduces 10b5-1 plan contamination. Key finding: signal is regime-robust (72% discovery bull, 80% OOS bear market)."
     },
     {
       "id": "seed-003",

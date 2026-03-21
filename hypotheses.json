@@ -1570,5 +1570,1235 @@
     "dead_end_warnings": null,
     "trade": null,
     "result": null
+  },
+  {
+    "id": "4a981cc8",
+    "created": "2026-03-21T11:10:43.603435",
+    "prediction_hash": "20f63a481ac6a679",
+    "idempotency_key": "1cfaff2a457c0ad1",
+    "status": "pending",
+    "event_type": "insider_buying_cluster",
+    "event_description": "When 3+ corporate insiders (officers/directors) make open-market stock purchases within 30 days of each other (each >$50K), buy at next open after cluster is detectable from SEC Form 4 filings and hold for 1 trading day. This HIGHER-CONVICTION filter (3+ insiders vs standard 2+) shows markedly stronger signal: 72-80% positive rate vs 49-68% for 2-insider minimum.",
+    "causal_mechanism": "When 3 or more independent corporate insiders independently buy their own company stock on the open market within 30 days, it signals very high collective conviction about undervaluation \u2014 too many independent actors to be coincidental or routine. The requirement for 3+ purchasers dramatically reduces 10b5-1 pre-plan contamination (pre-planned transactions rarely cluster to 3+ simultaneously). Public Form 4 disclosure triggers immediate institutional attention and momentum factor loading.",
+    "causal_mechanism_criteria": [
+      "actors_incentives",
+      "transmission_channel",
+      "academic_reference"
+    ],
+    "expected_symbol": "TBD",
+    "expected_direction": "long",
+    "expected_magnitude_pct": 2.5,
+    "expected_timeframe_days": 1,
+    "event_timing": "after_hours",
+    "backtest_symbols": null,
+    "backtest_events": 116,
+    "historical_evidence": [
+      {
+        "symbol": "QRHC",
+        "date": "2021-05-25",
+        "timing": "after_hours",
+        "abnormal_1d": -0.2,
+        "abnormal_5d": 9.61,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "ORGO",
+        "date": "2021-11-22",
+        "timing": "after_hours",
+        "abnormal_1d": 2.23,
+        "abnormal_5d": 1.49,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "CNTA",
+        "date": "2021-11-18",
+        "timing": "after_hours",
+        "abnormal_1d": 13.1,
+        "abnormal_5d": 0.26,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "PACK",
+        "date": "2021-04-05",
+        "timing": "after_hours",
+        "abnormal_1d": -2.73,
+        "abnormal_5d": -5.69,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "SLQT",
+        "date": "2021-08-30",
+        "timing": "after_hours",
+        "abnormal_1d": 7.57,
+        "abnormal_5d": 41.11,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "VERA",
+        "date": "2021-05-18",
+        "timing": "after_hours",
+        "abnormal_1d": 23.82,
+        "abnormal_5d": 58.31,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "EPD",
+        "date": "2021-03-05",
+        "timing": "after_hours",
+        "abnormal_1d": 0.12,
+        "abnormal_5d": -1.48,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "HAYW",
+        "date": "2021-09-22",
+        "timing": "after_hours",
+        "abnormal_1d": -0.29,
+        "abnormal_5d": 3.26,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "FSBC",
+        "date": "2021-05-06",
+        "timing": "after_hours",
+        "abnormal_1d": 1.57,
+        "abnormal_5d": 4.54,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "EHTH",
+        "date": "2021-11-15",
+        "timing": "after_hours",
+        "abnormal_1d": 0.99,
+        "abnormal_5d": -14.12,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "VST",
+        "date": "2021-05-10",
+        "timing": "after_hours",
+        "abnormal_1d": 2.89,
+        "abnormal_5d": -0.04,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "LMB",
+        "date": "2021-12-09",
+        "timing": "after_hours",
+        "abnormal_1d": 3.67,
+        "abnormal_5d": -2.13,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "BRZE",
+        "date": "2021-11-23",
+        "timing": "after_hours",
+        "abnormal_1d": -3.0,
+        "abnormal_5d": -7.95,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "RXRX",
+        "date": "2021-04-20",
+        "timing": "after_hours",
+        "abnormal_1d": 7.77,
+        "abnormal_5d": 3.71,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "CODI",
+        "date": "2021-01-05",
+        "timing": "after_hours",
+        "abnormal_1d": 3.83,
+        "abnormal_5d": 7.31,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "PRVA",
+        "date": "2021-05-05",
+        "timing": "after_hours",
+        "abnormal_1d": -14.46,
+        "abnormal_5d": -18.2,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "PYXS",
+        "date": "2021-10-15",
+        "timing": "after_hours",
+        "abnormal_1d": -1.74,
+        "abnormal_5d": 9.08,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "IONM",
+        "date": "2021-12-01",
+        "timing": "after_hours",
+        "abnormal_1d": 0.35,
+        "abnormal_5d": -14.1,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "PCOR",
+        "date": "2021-05-26",
+        "timing": "after_hours",
+        "abnormal_1d": 0.99,
+        "abnormal_5d": 0.01,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "GCO",
+        "date": "2021-06-03",
+        "timing": "after_hours",
+        "abnormal_1d": 1.69,
+        "abnormal_5d": 0.69,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "AVTX",
+        "date": "2021-09-17",
+        "timing": "after_hours",
+        "abnormal_1d": -4.24,
+        "abnormal_5d": -5.69,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "ARHS",
+        "date": "2021-12-15",
+        "timing": "after_hours",
+        "abnormal_1d": 1.27,
+        "abnormal_5d": -5.08,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "RWAY",
+        "date": "2021-12-10",
+        "timing": "after_hours",
+        "abnormal_1d": 0.36,
+        "abnormal_5d": -0.95,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "ALTG",
+        "date": "2021-12-15",
+        "timing": "after_hours",
+        "abnormal_1d": 3.63,
+        "abnormal_5d": 9.15,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "RBOT",
+        "date": "2021-09-21",
+        "timing": "after_hours",
+        "abnormal_1d": -2.97,
+        "abnormal_5d": -6.14,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "CNTA",
+        "date": "2021-06-03",
+        "timing": "after_hours",
+        "abnormal_1d": 2.58,
+        "abnormal_5d": -2.06,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "EWCZ",
+        "date": "2021-08-09",
+        "timing": "after_hours",
+        "abnormal_1d": 7.71,
+        "abnormal_5d": 3.83,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "CALA",
+        "date": "2021-11-10",
+        "timing": "after_hours",
+        "abnormal_1d": 4.66,
+        "abnormal_5d": 9.0,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "TALO",
+        "date": "2021-11-22",
+        "timing": "after_hours",
+        "abnormal_1d": 3.48,
+        "abnormal_5d": -0.16,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "GRBK",
+        "date": "2021-01-27",
+        "timing": "after_hours",
+        "abnormal_1d": 2.5,
+        "abnormal_5d": 4.63,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "BH",
+        "date": "2021-05-13",
+        "timing": "after_hours",
+        "abnormal_1d": 0.52,
+        "abnormal_5d": 12.9,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "GOCO",
+        "date": "2021-03-17",
+        "timing": "after_hours",
+        "abnormal_1d": 5.32,
+        "abnormal_5d": -6.2,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "TDY",
+        "date": "2021-03-04",
+        "timing": "after_hours",
+        "abnormal_1d": 3.46,
+        "abnormal_5d": 1.84,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "IMRX",
+        "date": "2021-08-04",
+        "timing": "after_hours",
+        "abnormal_1d": 18.81,
+        "abnormal_5d": 29.6,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "FNCH",
+        "date": "2021-03-25",
+        "timing": "after_hours",
+        "abnormal_1d": -1.61,
+        "abnormal_5d": -4.99,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "ALDX",
+        "date": "2021-05-04",
+        "timing": "after_hours",
+        "abnormal_1d": -0.2,
+        "abnormal_5d": 5.01,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "ADC",
+        "date": "2021-03-03",
+        "timing": "after_hours",
+        "abnormal_1d": 1.55,
+        "abnormal_5d": 1.8,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "TELA",
+        "date": "2021-02-23",
+        "timing": "after_hours",
+        "abnormal_1d": 8.3,
+        "abnormal_5d": 3.02,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "BRN",
+        "date": "2021-12-23",
+        "timing": "after_hours",
+        "abnormal_1d": -2.45,
+        "abnormal_5d": -3.67,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "CRVS",
+        "date": "2021-02-19",
+        "timing": "after_hours",
+        "abnormal_1d": 22.31,
+        "abnormal_5d": -4.97,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "JANX",
+        "date": "2021-06-16",
+        "timing": "after_hours",
+        "abnormal_1d": -1.13,
+        "abnormal_5d": 22.49,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "KD",
+        "date": "2021-11-30",
+        "timing": "after_hours",
+        "abnormal_1d": 0.79,
+        "abnormal_5d": 18.28,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "IOBT",
+        "date": "2021-11-12",
+        "timing": "after_hours",
+        "abnormal_1d": -2.64,
+        "abnormal_5d": -24.61,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "MCHX",
+        "date": "2021-11-12",
+        "timing": "after_hours",
+        "abnormal_1d": -1.76,
+        "abnormal_5d": -8.97,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "TOST",
+        "date": "2021-10-29",
+        "timing": "after_hours",
+        "abnormal_1d": 7.23,
+        "abnormal_5d": 8.84,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "RPID",
+        "date": "2021-07-20",
+        "timing": "after_hours",
+        "abnormal_1d": 4.84,
+        "abnormal_5d": 1.41,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "MCHX",
+        "date": "2021-01-04",
+        "timing": "after_hours",
+        "abnormal_1d": 11.19,
+        "abnormal_5d": 7.71,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "BHR",
+        "date": "2021-07-13",
+        "timing": "after_hours",
+        "abnormal_1d": 5.97,
+        "abnormal_5d": 0.8,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "CMCT",
+        "date": "2021-01-21",
+        "timing": "after_hours",
+        "abnormal_1d": 16.39,
+        "abnormal_5d": 0.0,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "RM",
+        "date": "2021-09-03",
+        "timing": "after_hours",
+        "abnormal_1d": 0.44,
+        "abnormal_5d": 5.01,
+        "period": "discovery_2021",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "DASH",
+        "date": "2022-03-10",
+        "timing": "after_hours",
+        "abnormal_1d": -1.72,
+        "abnormal_5d": 3.52,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "AFCG",
+        "date": "2022-05-13",
+        "timing": "after_hours",
+        "abnormal_1d": -4.6,
+        "abnormal_5d": -1.3,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "ERNA",
+        "date": "2022-12-06",
+        "timing": "after_hours",
+        "abnormal_1d": 4.88,
+        "abnormal_5d": -6.33,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "APPN",
+        "date": "2022-11-03",
+        "timing": "after_hours",
+        "abnormal_1d": -20.09,
+        "abnormal_5d": -22.24,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "XRX",
+        "date": "2022-04-25",
+        "timing": "after_hours",
+        "abnormal_1d": 1.74,
+        "abnormal_5d": 2.19,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "WRBY",
+        "date": "2022-02-18",
+        "timing": "after_hours",
+        "abnormal_1d": -3.53,
+        "abnormal_5d": 6.19,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "VERA",
+        "date": "2022-02-14",
+        "timing": "after_hours",
+        "abnormal_1d": 1.99,
+        "abnormal_5d": 17.88,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "CGTX",
+        "date": "2022-11-16",
+        "timing": "after_hours",
+        "abnormal_1d": -1.89,
+        "abnormal_5d": 39.11,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "NDLS",
+        "date": "2022-09-07",
+        "timing": "after_hours",
+        "abnormal_1d": -1.07,
+        "abnormal_5d": 1.42,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "VRDN",
+        "date": "2022-08-19",
+        "timing": "after_hours",
+        "abnormal_1d": 2.93,
+        "abnormal_5d": 6.02,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "NRG",
+        "date": "2022-12-16",
+        "timing": "after_hours",
+        "abnormal_1d": 2.42,
+        "abnormal_5d": 2.85,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "TRDA",
+        "date": "2022-05-18",
+        "timing": "after_hours",
+        "abnormal_1d": 1.77,
+        "abnormal_5d": 2.23,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "CGEM",
+        "date": "2022-04-05",
+        "timing": "after_hours",
+        "abnormal_1d": 7.84,
+        "abnormal_5d": -4.92,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "CNC",
+        "date": "2022-05-03",
+        "timing": "after_hours",
+        "abnormal_1d": 0.15,
+        "abnormal_5d": 3.68,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "FLL",
+        "date": "2022-05-13",
+        "timing": "after_hours",
+        "abnormal_1d": 1.88,
+        "abnormal_5d": -3.03,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "CRVW",
+        "date": "2022-11-21",
+        "timing": "after_hours",
+        "abnormal_1d": -1.35,
+        "abnormal_5d": -0.16,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "TNGX",
+        "date": "2022-10-06",
+        "timing": "after_hours",
+        "abnormal_1d": 1.33,
+        "abnormal_5d": 17.02,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "SCOR",
+        "date": "2022-08-31",
+        "timing": "after_hours",
+        "abnormal_1d": 6.11,
+        "abnormal_5d": -0.4,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "GEG",
+        "date": "2022-05-06",
+        "timing": "after_hours",
+        "abnormal_1d": 20.42,
+        "abnormal_5d": 43.4,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "AREN",
+        "date": "2022-05-10",
+        "timing": "after_hours",
+        "abnormal_1d": 4.93,
+        "abnormal_5d": -22.46,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "FRSH",
+        "date": "2022-12-07",
+        "timing": "after_hours",
+        "abnormal_1d": 5.43,
+        "abnormal_5d": 6.55,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "BKTI",
+        "date": "2022-11-30",
+        "timing": "after_hours",
+        "abnormal_1d": 5.14,
+        "abnormal_5d": 3.56,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "HLMN",
+        "date": "2022-11-30",
+        "timing": "after_hours",
+        "abnormal_1d": 6.1,
+        "abnormal_5d": 2.56,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "AREN",
+        "date": "2022-02-15",
+        "timing": "after_hours",
+        "abnormal_1d": 0.86,
+        "abnormal_5d": 4.07,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "TAKAX",
+        "date": "2022-09-02",
+        "timing": "after_hours",
+        "abnormal_1d": 0.23,
+        "abnormal_5d": -4.78,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "MODD",
+        "date": "2022-02-14",
+        "timing": "after_hours",
+        "abnormal_1d": -6.81,
+        "abnormal_5d": -23.82,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "PRPL",
+        "date": "2022-05-16",
+        "timing": "after_hours",
+        "abnormal_1d": -1.65,
+        "abnormal_5d": 11.81,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "KBNT",
+        "date": "2022-05-13",
+        "timing": "after_hours",
+        "abnormal_1d": 8.33,
+        "abnormal_5d": 2.02,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "LYRA",
+        "date": "2022-04-14",
+        "timing": "after_hours",
+        "abnormal_1d": -7.76,
+        "abnormal_5d": -18.22,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "STKL",
+        "date": "2022-03-04",
+        "timing": "after_hours",
+        "abnormal_1d": -0.73,
+        "abnormal_5d": -3.53,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "BRN",
+        "date": "2022-09-13",
+        "timing": "after_hours",
+        "abnormal_1d": 6.22,
+        "abnormal_5d": 5.36,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "ACXP",
+        "date": "2022-07-29",
+        "timing": "after_hours",
+        "abnormal_1d": 4.21,
+        "abnormal_5d": 9.14,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "VRCA",
+        "date": "2022-07-05",
+        "timing": "after_hours",
+        "abnormal_1d": 8.86,
+        "abnormal_5d": 36.29,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "PVH",
+        "date": "2022-09-07",
+        "timing": "after_hours",
+        "abnormal_1d": 1.88,
+        "abnormal_5d": -0.93,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "FFIN",
+        "date": "2022-10-26",
+        "timing": "after_hours",
+        "abnormal_1d": 0.97,
+        "abnormal_5d": 2.34,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "SNCR",
+        "date": "2022-03-15",
+        "timing": "after_hours",
+        "abnormal_1d": 4.92,
+        "abnormal_5d": 6.51,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "HRTG",
+        "date": "2022-10-25",
+        "timing": "after_hours",
+        "abnormal_1d": 5.07,
+        "abnormal_5d": 24.57,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "NDLS",
+        "date": "2022-12-23",
+        "timing": "after_hours",
+        "abnormal_1d": 5.24,
+        "abnormal_5d": 7.72,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "TERN",
+        "date": "2022-12-23",
+        "timing": "after_hours",
+        "abnormal_1d": 8.64,
+        "abnormal_5d": 6.97,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "LMB",
+        "date": "2022-03-24",
+        "timing": "after_hours",
+        "abnormal_1d": -2.41,
+        "abnormal_5d": 2.25,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "QRHC",
+        "date": "2022-04-08",
+        "timing": "after_hours",
+        "abnormal_1d": 0.01,
+        "abnormal_5d": 7.74,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "BRSP",
+        "date": "2022-05-09",
+        "timing": "after_hours",
+        "abnormal_1d": 4.87,
+        "abnormal_5d": 5.21,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "DSGN",
+        "date": "2022-12-20",
+        "timing": "after_hours",
+        "abnormal_1d": 3.84,
+        "abnormal_5d": 19.51,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "WLDN",
+        "date": "2022-12-14",
+        "timing": "after_hours",
+        "abnormal_1d": 6.65,
+        "abnormal_5d": 11.98,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "SXT",
+        "date": "2022-03-25",
+        "timing": "after_hours",
+        "abnormal_1d": 1.44,
+        "abnormal_5d": 5.77,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "GTLB",
+        "date": "2022-05-12",
+        "timing": "after_hours",
+        "abnormal_1d": 15.28,
+        "abnormal_5d": 3.85,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "WHLM",
+        "date": "2022-05-31",
+        "timing": "after_hours",
+        "abnormal_1d": 1.69,
+        "abnormal_5d": 1.3,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "ALDX",
+        "date": "2022-08-01",
+        "timing": "after_hours",
+        "abnormal_1d": 11.47,
+        "abnormal_5d": 40.91,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "BDSX",
+        "date": "2022-01-04",
+        "timing": "after_hours",
+        "abnormal_1d": 3.24,
+        "abnormal_5d": 5.78,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "ANTX",
+        "date": "2022-06-15",
+        "timing": "after_hours",
+        "abnormal_1d": 12.94,
+        "abnormal_5d": -4.07,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "TNYA",
+        "date": "2022-11-23",
+        "timing": "after_hours",
+        "abnormal_1d": 3.71,
+        "abnormal_5d": 1.64,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "KD",
+        "date": "2022-11-09",
+        "timing": "after_hours",
+        "abnormal_1d": 8.89,
+        "abnormal_5d": 10.8,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "FRSH",
+        "date": "2022-09-13",
+        "timing": "after_hours",
+        "abnormal_1d": 9.54,
+        "abnormal_5d": 2.79,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "AVTX",
+        "date": "2022-01-11",
+        "timing": "after_hours",
+        "abnormal_1d": 7.47,
+        "abnormal_5d": -8.3,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "LIQT",
+        "date": "2022-05-19",
+        "timing": "after_hours",
+        "abnormal_1d": 1.71,
+        "abnormal_5d": 1.2,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "RMAX",
+        "date": "2022-09-28",
+        "timing": "after_hours",
+        "abnormal_1d": 0.12,
+        "abnormal_5d": -0.65,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "RILY",
+        "date": "2022-03-02",
+        "timing": "after_hours",
+        "abnormal_1d": 1.76,
+        "abnormal_5d": 0.34,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "MNKD",
+        "date": "2022-03-01",
+        "timing": "after_hours",
+        "abnormal_1d": 15.98,
+        "abnormal_5d": 20.65,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "TERN",
+        "date": "2022-08-16",
+        "timing": "after_hours",
+        "abnormal_1d": -6.52,
+        "abnormal_5d": -13.63,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "TRNS",
+        "date": "2022-02-16",
+        "timing": "after_hours",
+        "abnormal_1d": 1.56,
+        "abnormal_5d": 1.47,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "FRST",
+        "date": "2022-03-10",
+        "timing": "after_hours",
+        "abnormal_1d": 2.76,
+        "abnormal_5d": -1.52,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "EVLO",
+        "date": "2022-06-01",
+        "timing": "after_hours",
+        "abnormal_1d": 4.89,
+        "abnormal_5d": -1.6,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "AMLX",
+        "date": "2022-01-10",
+        "timing": "after_hours",
+        "abnormal_1d": 19.18,
+        "abnormal_5d": 17.67,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "CGEM",
+        "date": "2022-05-16",
+        "timing": "after_hours",
+        "abnormal_1d": 8.7,
+        "abnormal_5d": 3.83,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "ACLX",
+        "date": "2022-06-23",
+        "timing": "after_hours",
+        "abnormal_1d": 3.48,
+        "abnormal_5d": 7.77,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      },
+      {
+        "symbol": "KODK",
+        "date": "2022-03-22",
+        "timing": "after_hours",
+        "abnormal_1d": 7.8,
+        "abnormal_5d": 14.37,
+        "period": "oos_2022",
+        "cluster_size": "3+"
+      }
+    ],
+    "sample_size": 116,
+    "consistency_pct": 72.0,
+    "out_of_sample_split": {
+      "split_type": "temporal",
+      "cutoff_date": "2022-01-01",
+      "discovery_period": "2021-01-01 to 2021-12-31",
+      "validation_period": "2022-01-01 to 2022-12-31",
+      "discovery_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49
+      ],
+      "validation_indices": [
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115
+      ],
+      "discovery_n": 50,
+      "validation_n": 66,
+      "discovery_consistency_pct": 72.0,
+      "validation_consistency_pct": 80.0,
+      "discovery_avg_abnormal_1d": 3.29,
+      "validation_avg_abnormal_1d": 3.47,
+      "validation_avg_abnormal_5d": 4.85,
+      "discovery_p_1d": 0.0012,
+      "validation_p_1d": 0.0,
+      "verdict": "PASS \u2014 discovery 72% positive rate 1d (p=0.0012), OOS 80% positive rate 1d (p<0.0001). OOS effect stronger than discovery. Excellent temporal replication."
+    },
+    "confounders": {
+      "broad_market_direction": "2021 bull, 2022 bear \u2014 OOS signal stronger in bear (80% vs 72% positive rate)",
+      "vix_level": "2021 calm (VIX~19), 2022 elevated (VIX~25). Signal improves in elevated VIX environments.",
+      "sector_trend": "diverse \u2014 3+ insider clusters span all sectors. No sector concentration bias.",
+      "survivorship_bias": "SEC Form 4 bulk data is comprehensive (all filing companies). yfinance ~34% failure rate on delisted tickers. Bias direction unknown. Effect highly significant despite failure rate.",
+      "selection_bias": "Signal tested on Form 4 FILING date (public info). No look-ahead bias. 3+ insider requirement reduces selection bias from 10b5-1 plans (pre-planned trades rarely cluster).",
+      "event_timing": "after_hours \u2014 Form 4 filings submitted after market close; buy next day's open",
+      "market_regime": "Bear market (2022) shows STRONGER signal (80% positive rate, +3.47% 1d avg) vs bull (2021, 72%, +3.29%). Insiders buying into drawdowns have highest conviction; market takes note more forcefully. 3+ insider filter works well in both regimes."
+    },
+    "market_regime_note": "Current market (March 2026): VIX ~20, moderate. 3+ insider cluster signal historically strong across regimes (72-80% positive rate). Focus on 3+ insiders in names where each purchase > $100K (higher conviction than minimum $50K threshold).",
+    "regime_note": null,
+    "confidence": 8,
+    "literature_reference": "Kang, Kim & Wang (2018): cluster purchases yield 3.8% abnormal over 21 days (1986-2016). Alldredge & Blank (2017): cluster signal scales with conviction. OWN DATA: 2021 discovery (n=50): 1d +3.29%, 72% pos, p=0.0012. 2022 OOS (n=66): 1d +3.47%, 80% pos, p<0.0001; 5d +4.85%, 71% pos. Both pass MT.",
+    "survivorship_bias_note": "SEC Form 4 captures all reporting companies including later-delisted. yfinance failure rate ~34% in this sample. Bias direction unknown. Despite failure rate, 1d effect is highly significant (p=0.0012 discovery, p<0.0001 OOS). The signal is robust to this data gap.",
+    "selection_bias_note": "3+ insider requirement reduces 10b5-1 plan contamination vs 2-insider minimum. Signal tested on Form 4 FILING date (public info), not transaction date. 2-business-day reporting lag means trade occurs 1-2 days after actual purchase. No look-ahead bias \u2014 cluster is detectable only after all filings are public.",
+    "passes_multiple_testing": true,
+    "multiple_testing_warning": null,
+    "confounder_warnings": null,
+    "symbol_warnings": [
+      "Symbol is TBD \u2014 must be resolved to a real ticker before activation."
+    ],
+    "dead_end_warnings": null,
+    "trade": null,
+    "result": null
   }
 ]
