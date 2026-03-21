@@ -447,56 +447,29 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. TRADES: Monday March 23 open - GO (1cb6140f) and WD (76678219) auto-execute via trigger=next_market_open. Run trade_loop.py --dry-run Monday AM to verify.",
-      "set_by_session": "2026-03-21T23:40:50.832237"
+      "task": "Continue CEO performance failure departure SHORT signal (hypothesis 5dbcfb37) - search for more events to increase N",
+      "set_by_session": "2026-03-22T00:31:19.667531"
     },
     {
-      "task": "2. TRADE CLOSE: GO closes Thursday March 26 (3d deadline). Run close_go_trade.py or let trade_loop auto-close.",
-      "set_by_session": "2026-03-21T23:40:50.832242"
-    },
-    {
-      "task": "3. TRADE CLOSE: WD closes ~Monday March 30 (5d deadline via calendar days). Run close_wd_trade.py or let trade_loop auto-close.",
-      "set_by_session": "2026-03-21T23:40:50.832243"
-    },
-    {
-      "task": "4. CEO DEPARTURE MONITORING: hypothesis 5dbcfb37 pending. Run edgar_ceo_departure_scanner.py --start 2025-01-01 --end 2026-03-21 --min-cap 2000 --check-direction to find recent qualifying events. Next candidate to watch: any large-cap forced CEO firing. CRITICAL: Signal fires in overnight gap only. Open-entry is noise (avg -0.14%, p=1.0). trader.py has no extended-hours support. Signal is UNEXECUTABLE with current infrastructure. Next step: research Alpaca extended-hours short selling API or put hypothesis on hold.",
-      "set_by_session": "2026-03-21T23:40:50.832244",
-      "updated": "2026-03-22"
-    },
-    {
-      "task": "5. FRESH INSIDER CLUSTERS: AMRZ (5x, B Holcim NA spinoff, trades Mar 9) and POOL (3x, .5B, trades Mar 13) both past 5d window. Check OpenInsider next week for new signals.",
-      "set_by_session": "2026-03-21T23:40:50.832245"
-    },
-    {
-      "task": "6. SMALL-CAP BUYBACK SIGNAL (task da0e1d25): Build EDGAR 8-K scanner for first-ever repurchase authorization. Filter: market cap <B, repurchase >10% float, no prior buyback history.",
-      "set_by_session": "2026-03-21T23:40:50.832245"
-    },
-    {
-      "task": "7. S&P 500 Q2 2026 rebalance (~June 5): monitor for additions announcement. Hypothesis 061ae3a8 ready.",
-      "set_by_session": "2026-03-21T23:40:50.832246"
+      "task": "Monitor active insider cluster trades (GO, WD) for close signals",
+      "set_by_session": "2026-03-22T00:31:19.667536"
     }
   ],
   "session_handoff": {
-    "session_date": "2026-03-21",
-    "steer_md_pickup": "Volume/cost-basis question from steer.md was answered in prior session (4 dead ends). No new steer.md directions taken.",
-    "completed_this_session": [
-      "Formalized CEO performance failure departure SHORT as hypothesis 5dbcfb37 (N=12, p=0.0034)",
-      "Added 3 new confirmed events: DOCU (2022-06-14), FIVE (2024-07-17), BA (2024-03-25)",
-      "Updated edgar_ceo_departure_scanner.py with N=12 and relief-rally exclusion list",
-      "Verified GO/WD triggers set for Monday open (trigger=next_market_open)",
-      "Identified AMRZ (Holcim NA) and POOL as new clusters - past trade window, note for next occurrence"
-    ],
-    "key_signal_status": {
-      "GO 1cb6140f": "trigger=next_market_open, executes Monday March 23, closes Thursday March 26",
-      "WD 76678219": "trigger=next_market_open, executes Monday March 23, closes ~Monday March 30",
-      "CEO departure 5dbcfb37": "pending, TBD symbol - need next qualifying event"
+    "investigated": "Small-cap first-ever share buyback signal",
+    "current_state": "dead_end_recorded",
+    "findings": {
+      "N_clean_events": 8,
+      "3d_avg_abnormal": 2.18,
+      "3d_positive_rate": 75.0,
+      "3d_p_value": 0.1426,
+      "passes_multiple_testing": false,
+      "bootstrap_ci_3d_excludes_zero": false,
+      "required_N_for_power": 32
     },
-    "watch_for": [
-      "Any large-cap (>B) CEO abruptly fired after sustained performance failure \u2014 SHORT at next open, 1d hold",
-      "AMRZ new insider cluster (next occurrence \u2014 company just went public as Holcim NA spinoff)"
-    ],
-    "specific_next_step": "Monday: verify GO and WD executed via trade_loop.py --dry-run. Then scan EDGAR for any CEO departure filings from past 7 days using edgar_ceo_departure_scanner.py --start 2026-03-14 --end 2026-03-21 --min-cap 2000 --check-direction",
-    "written_at": "2026-03-21T23:40:50.832247"
+    "blocked_by": "Insufficient clean sample size - most first-ever buybacks co-announced with earnings (earnings confounder), or companies are community banks with unverifiable prior buyback history",
+    "next_step": "Signal recorded as dead end. No further investigation needed on this specific variant. Consider investigating broader buyback signal (repeat buybacks) only if sample size constraints can be solved.",
+    "written_at": "2026-03-22T00:31:19.667538"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

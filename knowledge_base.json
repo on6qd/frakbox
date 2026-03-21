@@ -178,6 +178,18 @@
       ],
       "gaps": "Need to segment by: (1) fired for cause vs resigned under pressure vs planned; (2) whether stock was already in freefall; (3) company size. Also need systematic EDGAR 8-K Item 5.02 search for comprehensive dataset.",
       "recorded": "2026-03-21T22:53:16.613804"
+    },
+    "small_cap_first_buyback": {
+      "summary": "Ikenberry, Lakonishok, Vermaelen (1995) found 12.1% avg 4-year abnormal return after open market repurchase announcements. Short-run effect is ~3-3.5% at announcement. The effect is stronger for 'value' stocks (low market-to-book). Repeat buybacks are common; first-ever buybacks are a subset. Literature suggests the effect is driven by undervaluation signaling, not mechanical float reduction. Small-cap stocks may have stronger effect due to less analyst coverage (slower market reaction), but no paper specifically isolates first-ever buybacks in small-caps.",
+      "known_magnitude": "3-3.5% short-run (1-3 days), 12.1% 4-year cumulative. First-ever vs. repeat not distinguished in most literature.",
+      "known_timeframe": "1-5 days for announcement effect; long-run drift over 4 years",
+      "sources": [
+        "Ikenberry, Lakonishok, Vermaelen (1995) - JFE, 'Market Underreaction to Open Market Share Repurchases'",
+        "NBER Working Paper 4965 (1994)",
+        "Multiple confirmatory studies: 2.9-3.5% short-run abnormal return documented"
+      ],
+      "gaps": "No paper specifically isolates FIRST-EVER buybacks vs. repeat programs in small-caps. The small-cap premium for first-time buybacks is theorized but not empirically validated. Major data challenge: many first-ever buybacks are co-announced with earnings (confounded).",
+      "recorded": "2026-03-22T00:30:59.668522"
     }
   },
   "known_effects": {
@@ -704,6 +716,11 @@
       "event_type": "volume_disposition_effect_v4",
       "reason": "Steer.md question (March 2026 session): tested 4 variations of volume/cost basis disposition effect signal. All dead ends. (1) Volume-adjusted VWAP deviation: p_5d=0.027 fails multiple testing. (2) VWAP breakout LONG 100-stock universe N=14,412: real 1d=-0.08% mean reversion. (3) PIP profile cost basis HIGH vs LOW: difference=-0.01% p=0.73. (4) CEO relief rally as disposition-effect proxy: dead end. The core concept \u2014 stocks with large unrealized gains facing more selling pressure \u2014 is NOT measurable/exploitable at the large-cap level in practice. Institutional momentum dominates.",
       "recorded": "2026-03-21T23:04:24.705513"
+    },
+    {
+      "event_type": "small_cap_first_buyback",
+      "reason": "Investigated small-cap ($100M-$2B) first-ever share buyback announcements (8-K, no prior repurchase in 8-Ks or annual reports, no same-day earnings). Found N=8 clean events (2018-2024). Results: 3d avg abnormal=2.18%, positive_rate=75%, p=0.1426 (not significant). Does NOT pass multiple testing (no horizon significant at p<0.05). Bootstrap CI includes zero for all horizons. Required N=32 for 80% power. Critical data limitations: (1) most first-ever buyback 8-Ks are co-announced with earnings (items 2.02 + 8.01) making clean isolation nearly impossible; (2) community banks with repeat buybacks dominate the universe; (3) identifying truly 'first-ever' buybacks requires exhaustive historical filing search that doesn't scale. The CYRX event showed -7.19% (stock had been declining prior week, buyback to support falling stock price). The ASTH event showed +13.4% but was a single observation. Community banks (FVCB, MBCN, BSRR, CIVB) showed muted 0-2% responses. Main obstacle: truly isolated first-ever buyback announcements are rare, hard to verify, and insufficient in number for statistical testing. Recommend abandoning this specific variant.",
+      "recorded": "2026-03-22T00:31:10.256155"
     }
   ]
 }
