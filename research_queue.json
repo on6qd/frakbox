@@ -259,39 +259,58 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. URGENT: Activate hypothesis 4a981cc8 with GO trade at Monday open (activate_hypothesis then trader.py buy order)",
-      "set_by_session": "2026-03-21T11:56:17.470622"
+      "task": "1. URGENT: Paper trade GO at Monday March 23 open (market opens ~9:30am ET). Choose between: (A) activate_hypothesis('4a981cc8', ...) for 1d hold, OR (B) activate_hypothesis('1cb6140f', ...) for 3d hold (better evidence). Use trader.py to buy GO. Position $5,000.",
+      "set_by_session": "2026-03-21T12:07:40.459532"
     },
     {
-      "task": "2. Run 2023-2024 OOS validation on 3+ insider cluster hypothesis",
-      "set_by_session": "2026-03-21T11:56:17.470623"
+      "task": "2. On Monday also check if BLCO (9 insiders) or other recent cluster qualifies for second simultaneous trade (different hypothesis, different ticker).",
+      "set_by_session": "2026-03-21T12:07:40.459537"
     },
     {
-      "task": "3. Evaluate BLCO cluster for 5d hold hypothesis (76678219)",
-      "set_by_session": "2026-03-21T11:56:17.470624"
+      "task": "3. After GO trade closes: review result and record post-mortem.",
+      "set_by_session": "2026-03-21T12:07:40.459539"
     },
     {
-      "task": "4. Continue FDA CRL research for clinical single-asset biotech",
-      "set_by_session": "2026-03-21T11:56:17.470625"
+      "task": "4. Investigate S&P 500 June 2026 rebalance watchlist candidates (hypothesis 061ae3a8).",
+      "set_by_session": "2026-03-21T12:07:40.459539"
+    },
+    {
+      "task": "5. FDA CRL refined hypothesis: find clinical CRL events for single-asset biotech.",
+      "set_by_session": "2026-03-21T12:07:40.459540"
     }
   ],
   "session_handoff": {
-    "live_trade_ready": {
-      "hypothesis_id": "4a981cc8",
-      "symbol": "GO",
-      "direction": "LONG",
-      "entry": "Monday March 23 market open",
-      "exit": "Tuesday March 24 market close",
-      "position_size": 5000,
-      "cluster_summary": "6 unique insiders + CEO bought $6.3M total March 6-19 at avg $6.02. Current $5.79 (-4%)."
+    "immediate_trade": {
+      "ticker": "GO",
+      "action": "BUY LONG at Monday open",
+      "hypotheses": [
+        "4a981cc8 (1d hold)",
+        "1cb6140f (3d hold) - BETTER EVIDENCE"
+      ],
+      "cluster_detail": "6 insiders incl CEO, $6.3M total, March 6-19 purchases, avg $6.02",
+      "current_price_estimate": 5.79,
+      "position_size": 5000
     },
-    "bias_finding_resolved": "40% yfinance failure rate is dominated by acquisitions (42%), not bankruptcies (7%). Bias is UPWARD (favorable). Measured 3-5% abnormal return understates true effect.",
-    "session_date": "2026-03-21 (Saturday - market closed)",
-    "tasks_completed": [
-      "69d48652 (bias analysis)",
-      "af63e65e (2022 OOS done prev session)",
-      "84945cda (full pop backtest done prev session)"
+    "secondary_candidates": {
+      "BLCO": "9 insiders incl CEO, filed March 10, avg $17.70, current $15.72 (-11%). Strong for 5d hold.",
+      "IP": "3 insiders filed March 12, avg $39.65, current $33.76 (-15%). Evaluate for 5d hold.",
+      "AMRZ": "5 insiders filed March 16, avg $57.95, current $52.56 (-9%). Cement company."
+    },
+    "2023_2024_oos_results": {
+      "n_measured": 120,
+      "1d_avg": 1.21,
+      "3d_avg": 3.8,
+      "5d_avg": 4.26,
+      "passes_mt": true,
+      "note": "3d/5d dominant. 1d weaker than expected. New hypothesis 1cb6140f created for 3d hold."
+    },
+    "session_date": "2026-03-21 (Saturday)",
+    "new_hypotheses": [
+      "1cb6140f (3+ insiders 3d hold, confidence 7/10 - evidence-optimal)"
     ],
-    "written_at": "2026-03-21T11:56:17.470626"
+    "tools_built": [
+      "tools/openinsider_scraper.py - fast cluster scanner, <5 seconds vs 90s+ for XML parser"
+    ],
+    "written_at": "2026-03-21T12:07:40.459542"
   }
 }
