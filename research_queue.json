@@ -344,7 +344,8 @@
       "reasoning": "Was mentioned as promising in session 3 but CEO turnaround was N too small. Flip side: sudden departures may be stronger signal. Need 8-K Item 5.02 filing scanner.",
       "added": "2026-03-21T22:06:13.579419",
       "completed": "2026-03-21T23:40:28.931726",
-      "findings": "CEO performance failure departure SHORT signal FORMALIZED as hypothesis 5dbcfb37. N=12, avg_abnormal_1d=-3.25%, p=0.0034, bootstrap CI [-5.16, -1.52] excludes zero. Discovery (2019-22): MCD, UAA, DOCU, VFC \u2014 100% negative. Validation (2023-24): WBA, AAP, PARA, CVS, STLA, INTC, FIVE, BA \u2014 75% negative. New events beyond N=9: DOCU (Dan Springer, -4.20%), FIVE (Joel Anderson, -9.97%), BA (Dave Calhoun, -2.07%). Signal is 1d ONLY \u2014 3d p=0.077, not actionable. Entry at next-day market open. Exclusion list: PTON, VSCO, DIS/Iger, LYFT, SBUX all showed relief rallies \u2014 do NOT short. Expected_symbol=TBD until next qualifying event is identified. EDGAR scanner updated with N=12 confirmed events and relief-rally exclusion list."
+      "findings": "CEO performance failure departure SHORT signal FORMALIZED as hypothesis 5dbcfb37. N=12, avg_abnormal_1d=-3.25%, p=0.0034, bootstrap CI [-5.16, -1.52] excludes zero. Discovery (2019-22): MCD, UAA, DOCU, VFC \u2014 100% negative. Validation (2023-24): WBA, AAP, PARA, CVS, STLA, INTC, FIVE, BA \u2014 75% negative. New events beyond N=9: DOCU (Dan Springer, -4.20%), FIVE (Joel Anderson, -9.97%), BA (Dave Calhoun, -2.07%). Signal is 1d ONLY \u2014 3d p=0.077, not actionable. Entry at next-day market open. Exclusion list: PTON, VSCO, DIS/Iger, LYFT, SBUX all showed relief rallies \u2014 do NOT short. Expected_symbol=TBD until next qualifying event is identified. EDGAR scanner updated with N=12 confirmed events and relief-rally exclusion list. | TIMING FINDING (2026-03-22): Signal fires entirely in overnight gap. Close-entry (N=13): avg -3.25% abnormal, 83% directionally correct. Open-entry (N=13): avg -0.14% abnormal, p=1.0 \u2014 statistical noise. Gap contribution: -3.11% of -3.25% is overnight. ADBE 2026-03-12 validation: overnight_abnormal=-8.18%, open_entry_1d=+0.69% (noise/reversal). ACTIONABILITY: Signal requires after-hours entry (post-announcement, pre-gap). Intraday-only and standard paper accounts CANNOT trade this signal. trader.py has NO extended-hours support \u2014 signal is currently UNEXECUTABLE.",
+      "timing_finding_added": "2026-03-22"
     },
     {
       "id": "d288c2b8",
@@ -434,6 +435,14 @@
       "hypothesis_template": "5dbcfb37 \u2014 SHORT next-day open, 1d hold, expected -3.25% abnormal return",
       "added": "2026-03-21T23:38:27.695496",
       "status": "watching"
+    },
+    {
+      "event": "Pool Corporation (POOL) insider cluster monitoring - 3 insiders bought March 13, $3M. Entry window passed. Monitor for next cluster formation (pool season May-Aug)",
+      "expected_date": "2026-07-01",
+      "symbol": "POOL",
+      "hypothesis_template": "insider_buying_cluster_3plus",
+      "added": "2026-03-22T00:11:21.807759",
+      "status": "watching"
     }
   ],
   "next_session_priorities": [
@@ -450,8 +459,9 @@
       "set_by_session": "2026-03-21T23:40:50.832243"
     },
     {
-      "task": "4. CEO DEPARTURE MONITORING: hypothesis 5dbcfb37 pending. Run edgar_ceo_departure_scanner.py --start 2025-01-01 --end 2026-03-21 --min-cap 2000 --check-direction to find recent qualifying events. Next candidate to watch: any large-cap forced CEO firing.",
-      "set_by_session": "2026-03-21T23:40:50.832244"
+      "task": "4. CEO DEPARTURE MONITORING: hypothesis 5dbcfb37 pending. Run edgar_ceo_departure_scanner.py --start 2025-01-01 --end 2026-03-21 --min-cap 2000 --check-direction to find recent qualifying events. Next candidate to watch: any large-cap forced CEO firing. CRITICAL: Signal fires in overnight gap only. Open-entry is noise (avg -0.14%, p=1.0). trader.py has no extended-hours support. Signal is UNEXECUTABLE with current infrastructure. Next step: research Alpaca extended-hours short selling API or put hypothesis on hold.",
+      "set_by_session": "2026-03-21T23:40:50.832244",
+      "updated": "2026-03-22"
     },
     {
       "task": "5. FRESH INSIDER CLUSTERS: AMRZ (5x, B Holcim NA spinoff, trades Mar 9) and POOL (3x, .5B, trades Mar 13) both past 5d window. Check OpenInsider next week for new signals.",

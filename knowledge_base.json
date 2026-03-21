@@ -553,6 +553,30 @@
       "estimated_cost_pct": 0.302,
       "status": "FORMAL HYPOTHESIS 5dbcfb37",
       "last_updated": "2026-03-21T23:37:53.994540"
+    },
+    "ceo_performance_departure": {
+      "finding": "Signal fires entirely in overnight gap, not intraday",
+      "close_entry_stats": {
+        "n": 13,
+        "avg_abnormal_1d": -3.25,
+        "positive_rate": 0.17,
+        "directionally_correct": "83%"
+      },
+      "open_entry_stats": {
+        "n": 13,
+        "avg_abnormal_1d": -0.14,
+        "p_value": 1.0,
+        "conclusion": "Not tradeable from next-day open"
+      },
+      "gap_contribution": "avg -3.11% of total -3.25% effect is in overnight gap",
+      "adbe_validation": {
+        "date": "2026-03-12",
+        "overnight_abnormal": -8.18,
+        "open_entry_1d_abnormal": 0.69,
+        "note": "CEO Narayen step-down amid AI competition"
+      },
+      "actionability_conclusion": "Signal requires after-hours entry (post-announcement, pre-gap) to capture. Intraday-only accounts cannot trade this signal.",
+      "last_updated": "2026-03-22T00:11:19.333449"
     }
   },
   "dead_ends": [
