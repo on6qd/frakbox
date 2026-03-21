@@ -283,6 +283,15 @@
       "findings": "DEAD END. SPAC De-SPAC announcement day effect: 5 events measured, 1d pos_rate=40%, avg=-0.38% (p=0.92). Direction heterogeneous. Problems: (1) Leak contamination - CCIV pre-ran +400% before official announcement; (2) Regime-specific to 2020-2021 SPAC bubble (post-Q1 2021 market normalized to $10); (3) 3 of 8 events delisted/unmeasurable. Dead end recorded in knowledge base."
     },
     {
+      "id": "284c6c2f",
+      "category": "signal_discovery",
+      "question": "Test earnings guidance cut (intra-quarter pre-announcement) as a SHORT signal. Companies that issue negative guidance pre-announcements before their official earnings. Does the stock continue to fall after the announcement? What is the persistence at 1d, 3d, 5d?",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "Guidance cuts are information events with clear causal mechanism (management has visibility, revelation of bad news). Unlike analyst downgrades (secondary), this is primary corporate disclosure. Likely under-researched in our pipeline. Can use EDGAR 8-K Item 2.02 (Earnings Guidance) filings to find events.",
+      "added": "2026-03-21T22:06:13.578541"
+    },
+    {
       "id": "seed-003",
       "category": "fda_decision",
       "question": "For Phase 3 FDA approvals/rejections of novel drugs (not generics, not supplements), what is the typical abnormal return at 1d and 5d horizons? Does the effect differ between first-time submissions and resubmissions after a Complete Response Letter?",
@@ -323,6 +332,15 @@
       "status": "pending",
       "reasoning": "Discovered as opposite of tested disposition effect. 489 events over 20 stocks shows +0.64-1.19% abnormal returns, all horizons, OOS confirmed. High-volume variant is strongest. But economic edge after costs is thin (~0.42-0.82% net). Need larger universe, tighter threshold, and regime filter before a hypothesis can be formed. Tools exist: tools/vwap_deviation_signal.py",
       "added": "2026-03-21T21:33:45.176032"
+    },
+    {
+      "id": "de9e7aaf",
+      "category": "signal_discovery",
+      "question": "Test CEO/CFO sudden departure SHORT signal. Focus on: (1) executives who leave with no explanation or vague explanation, (2) departures at mid-quarter (not end of quarter), (3) within 90 days of earnings. Causal mechanism: insider information, governance concerns.",
+      "priority": 3,
+      "status": "pending",
+      "reasoning": "Was mentioned as promising in session 3 but CEO turnaround was N too small. Flip side: sudden departures may be stronger signal. Need 8-K Item 5.02 filing scanner.",
+      "added": "2026-03-21T22:06:13.579419"
     },
     {
       "id": "d288c2b8",
@@ -408,37 +426,41 @@
   ],
   "next_session_priorities": [
     {
-      "task": "URGENT Monday March 23: Verify GO (1cb6140f) and WD (76678219) trades executed at market open via `python trade_loop.py --dry-run` before market opens, then check positions after open",
-      "set_by_session": "2026-03-21T21:34:49.434028"
+      "task": "MONDAY March 23 AM: Confirm GO (1cb6140f) and WD (76678219) trades executed. Run: python trade_loop.py --dry-run to check. Both should flip from pending to active.",
+      "set_by_session": "2026-03-21T22:06:13.579957"
     },
     {
-      "task": "Thursday March 26: Close GO trade using tools/close_go_trade.py",
-      "set_by_session": "2026-03-21T21:34:49.434033"
+      "task": "THURSDAY March 26: Close GO trade with tools/close_go_trade.py",
+      "set_by_session": "2026-03-21T22:06:13.579959"
     },
     {
-      "task": "Run cluster_auto_scanner.py to check for new insider clusters (prioritize Energy/Industrials)",
-      "set_by_session": "2026-03-21T21:34:49.434034"
+      "task": "TUESDAY March 31: Close WD trade with tools/close_wd_trade.py",
+      "set_by_session": "2026-03-21T22:06:13.579960"
     },
     {
-      "task": "Tuesday March 31: Close WD trade using tools/close_wd_trade.py",
-      "set_by_session": "2026-03-21T21:34:49.434035"
+      "task": "Run cluster_auto_scanner.py to check for new insider clusters (prioritize Energy/Industrials sectors)",
+      "set_by_session": "2026-03-21T22:06:13.579960"
     },
     {
-      "task": "VWAP momentum deeper investigation: expand to 100+ stock universe, test 20%/25% VWAP thresholds, calm VIX regime filter \u2014 see research queue task added this session",
-      "set_by_session": "2026-03-21T21:34:49.434036"
+      "task": "Test earnings guidance cut SHORT signal (see new research task). Use EDGAR 8-K Item 2.02 filings.",
+      "set_by_session": "2026-03-21T22:06:13.579961"
     },
     {
-      "task": "S&P 500 June 2026 prep: monitor for May announcement of June 5 quarterly additions",
-      "set_by_session": "2026-03-21T21:34:49.434037"
+      "task": "S&P 500 Q2 2026: Monitor for May announcement of June 5 quarterly additions (next addition batch)",
+      "set_by_session": "2026-03-21T22:06:13.579962"
     }
   ],
   "session_handoff": {
-    "investigating": "VWAP breakout momentum signal (disposition effect inverse) \u2014 preliminary finding, not yet hypothesis quality",
-    "intermediate_findings": "VWAP momentum: 20 large-cap stocks 2018-2023 (n=489): +0.64% to +1.19% abnormal returns LONG after VWAP 15% breakout, all horizons, OOS 2024 confirms. High-volume variant strongest (+0.87% 1d, +1.19% 20d). Net after ~0.40% costs is 0.42-0.82% \u2014 below 1% minimum threshold at most horizons. NEEDS: larger universe, 20-25% threshold, calm VIX filter.",
-    "blocked_by": "Methodology requires >1% net return and >1.5% expected magnitude. Current signal is 0.64-1.19% abnormal which barely qualifies at 20d but not at shorter horizons. Need tighter entry threshold.",
-    "next_step": "Run tools/vwap_deviation_signal.py with threshold=1.20 and threshold=1.25 on expanded 100-stock S&P 500 universe. Use calm VIX regime filter. Check if high-volume variant at 20d threshold clears both the 1.5% magnitude and 1% net return bars.",
-    "active_trades_pending": "GO (1cb6140f, 3-day hold) and WD (76678219) both trigger=next_market_open for Monday March 23 open. Close dates: GO by March 26, WD by March 31.",
-    "written_at": "2026-03-21T21:34:49.434038"
+    "notes": "Session March 21: Investigated steer.md direction (volume-disposition effect) and VWAP momentum signal.",
+    "findings": [
+      "Volume-disposition effect (steer.md): DEAD END. High-volume rises slightly underperform at 5d, low-volume slightly outperform, but FAILS multiple testing correction. Signal too weak to trade.",
+      "VWAP momentum breakout: DEAD END confirmed with 100-stock universe N=14,412. Previous session finding (+0.64-1.19%) was noise. Real signal: -0.08% at 1d (slight mean reversion), ~0% at 3-5d, +0.25-0.52% at 10d (too small to trade).",
+      "GO and WD triggers set to next_market_open \u2014 will execute Monday automatically. Verify after open.",
+      "Volume-disposition conceptual insight: true average investor cost basis requires tick data or intraday order flow, not available via yfinance. MVRV ratio concept from crypto is more applicable there."
+    ],
+    "blocked_by": "GO/WD trades not yet executed (market closed, Saturday)",
+    "next_step": "Monday: Verify GO/WD execution. Begin earnings guidance cut research using EDGAR 8-K Item 2.02 scanner.",
+    "written_at": "2026-03-21T22:06:13.579963"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

@@ -587,6 +587,16 @@
       "event_type": "vwap_overextension_disposition_effect_short",
       "reason": "Tested 20 large-cap stocks 2018-2023 (n=489 events). Hypothesis: stocks trading >15% above 1-year rolling VWAP face selling pressure from investors with unrealized gains (disposition effect). REJECTED: Stocks above VWAP 15% consistently OUTPERFORM over all horizons 1-20 days (abnormal +0.64% to +0.86%, all p<0.01). Low-volume filter (n=363) also shows positive returns, contradicting the specific mechanism. High-volume breakouts show strongest momentum (+0.87% to +1.19%). Signal is the opposite direction \u2014 momentum, not mean reversion. OOS 2024 (n=120) confirms. See tools/vwap_deviation_signal.py.",
       "recorded": "2026-03-21T21:33:45.173372"
+    },
+    {
+      "event_type": "volume_disposition_effect",
+      "reason": "Tested March 21 2026. Hypothesis: stocks rising on LOW volume have more unrealized gains among existing investors -> selling pressure -> bearish. HIGH volume rise -> more turnover -> new holders -> less selling -> bullish. Results: Directional intuition PARTIALLY REVERSED. High-turnover (volume >1.2x normal during 60d rise) underperforms at 5d (-0.04% to -0.54%) but OUTPERFORMS at 20d (+1.83%). Low-turnover rises show +0.22% to +1.22% across horizons. FAILS multiple testing correction: only 1 horizon significant at p<0.05 for each group (need 2+ or 1 at p<0.01). Signal cannot be distinguished from noise. The MOMENTUM effect (stocks already rising 10%+ tend to keep rising) dominates any disposition selling pressure. Volume during the rise adds no meaningful predictive power on top of price momentum. For a precise cost-basis computation (MVRV ratio), tick-level data or intraday order flow data is required \u2014 not available with yfinance daily OHLCV. Recommendation: Do not pursue as standalone signal. Might be usable as a weak confirmation signal but evidence insufficient.",
+      "recorded": "2026-03-21T22:03:38.148986"
+    },
+    {
+      "event_type": "vwap_momentum_breakout",
+      "reason": "DEEPER TEST March 21 2026: Previous session (small universe) found +0.64-1.19% at 1d for stocks >15% above 252d VWAP. Re-tested with 100-stock universe, N=14,412 observations (2014-2024), monthly sampling. Results: 1d abnormal = -0.08% (p<0.0001, NEGATIVE and significant), 3d = ~0%, 5d = +0.05 to +0.19%, 10d = +0.25 to +0.52%. Higher thresholds (20-30%) do not improve signal meaningfully. Calm VIX filter makes results WORSE (more negative at 1-5d). With N=14,412 the signal-to-noise ratio is clear: the short-term VWAP breakout momentum does NOT exist. What does exist: slight mean reversion at 1d (statistically significant but economically tiny at -0.08%). The 10d drift of +0.25-0.52% is real but far too small to trade profitably after costs (min threshold 1.5%). CONCLUSION: Do not pursue VWAP breakout as a standalone trading signal. Previous session finding was small-sample noise.",
+      "recorded": "2026-03-21T22:05:51.178321"
     }
   ]
 }
