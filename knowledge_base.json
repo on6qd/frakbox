@@ -532,6 +532,21 @@
       "hypothesis_id": "416556df",
       "status": "missed_window_negative_outcome",
       "last_updated": "2026-03-22T06:08:01.389373"
+    },
+    "clinical_efficacy_failure_reversal_criterion": {
+      "finding": "REFINED CRITERION: 'Stated path forward' does NOT prevent 3d continuation. Only CONCRETE POSITIVE REGULATORY EVIDENCE causes reversal.",
+      "continuation_examples": [
+        "CRVO Dec 2024: company stated 'proof of concept' from extension data, planning Phase 3 -- stock still -11.9% at 3d (institutional exit overrode management optimism)",
+        "NEUP Oct 2025: company stated evaluating BNC210 for PTSD -- stock still -17.4% at 3d",
+        "ORMP Jan 2023: company halted program cleanly -- stock -10.7% at 3d"
+      ],
+      "reversal_examples": [
+        "GOSS Feb 2026: SIMULTANEOUS announcement of (1) positive subgroup p=0.021 AND (2) explicit FDA Type C meeting plans -- strong reversal +1.55% at 3d",
+        "AVIR Oct 2021: Roche partnership announced same day as failure -- concrete positive catalyst"
+      ],
+      "mechanism": "The market distinguishes management spin ('we still believe in this') from concrete evidence (positive subgroup data meeting FDA threshold, partnership announcement, alternative path with actual data). Vague optimism does not prevent institutional selling pressure over 3d.",
+      "revised_exclusion_criterion": "EXCLUDE if: (A) same 8-K announces positive subgroup data that meets FDA threshold OR (B) company announces partnership/licensing deal OR (C) FDA confirms alternative path with documented precedent. DO NOT EXCLUDE based solely on management commentary about future development.",
+      "last_updated": "2026-03-22T06:38:45.426701"
     }
   },
   "dead_ends": [
@@ -612,8 +627,9 @@
     },
     {
       "event_type": "ipo_lockup_expiry",
-      "reason": "IPO lock-up expiry (typically 180 days post-IPO) tested as short signal. Tested 12 events 2020-2022. Results: 1d avg=+0.12% (flat), 3d avg=+1.66% (positive). Fails multiple testing. 50% positive rate = random. Key issues: (1) Effect has been pre-arbitraged - sophisticated traders SHORT before expiry, creating price pressure weeks before the event date, then BUY on the expiry date itself. This means the expiry DATE shows mean reversion (positive), not continuation (negative). (2) Heterogeneous outcomes: RIVN -5.7%, BRZE -4.6% vs DOCS +3.7%, MNDY +7.2%, COIN +1.9%. (3) Exact lock-up date uncertain - varies by share class, can be extended. Academic literature (Field & Hanka 2001): -2% at expiry in 1990s has likely decayed. NOT actionable.",
-      "recorded": "2026-03-21T20:00:43.102056"
+      "reason": "Tested 23 major tech IPO lockup expirations (2019-2022). Strategy: SHORT at close on expiry date, measure 1-5d abnormal returns vs QQQ benchmark. Results: 1d avg=-1.87% p=0.19, 3d avg=-2.53% p=0.18, 5d avg=-0.63% p=0.77. Does NOT pass multiple testing. Stdev=8.72% vs avg=-2.53% (noise >> signal). Bootstrap 3d CI [-6.10%, 0.81%] includes zero. Root cause: lockup dates are public and widely anticipated, so market pre-prices the supply. High variance driven by market regime differences between events. Pre-expiry entry (SHORT 2d before) also failed: 5d p=0.012 passes but only 1 horizon, stdev=11.7%. RIVN was -30.8% outlier -- without it, 5d avg ~-5.5% but even less significant. CONCLUSION: Lockup expirations as a systematic SHORT signal do not meet our standards for large, liquid IPOs. May work for less-anticipated small-cap lockups but finding those events programmatically is not tractable.",
+      "recorded": "2026-03-21T20:00:43.102056",
+      "updated": "2026-03-22T06:32:15.717585"
     },
     {
       "event_type": "spac_demerger_announcement",
@@ -675,6 +691,11 @@
       "event_type": "ceo_performance_failure_departure_smci_2026",
       "reason": "SMCI 2026-03-20 was a FALSE POSITIVE for hypothesis 5dbcfb37 (CEO departure short). The -27% overnight + -8.6% intraday crash was caused by a federal criminal indictment (Operation Gatekeeper) against co-founder/board-member Wally Liaw for smuggling $2.5B in Nvidia chips to China. The CEO (Charles Liang) did NOT depart. The EDGAR scanner flagged it because Item 5.02 8-K mentioned board member resignation which contains boilerplate CEO language. This is a board-member departure, not a CEO performance failure. Do NOT use as evidence for hypothesis 5dbcfb37. Criminal-indictment-driven crashes may represent a different, separate hypothesis. Scanner improvement needed: verify departing officer role is specifically CEO/President, not just any officer or director.",
       "recorded": "2026-03-22T06:00:33.181368"
+    },
+    {
+      "event_type": "ipo_lockup_expiry_short",
+      "reason": "Short strategy at IPO lockup expiry (180d after IPO). Tested N=23 major tech/growth IPOs 2019-2022 vs QQQ benchmark. Results: 3d avg=-2.53%, p=0.18 (fails MT); bootstrap CI [-6.1%, +0.8%] includes zero; stdev=8.72%; wilcoxon p=0.34. Pre-expiry entry (SHORT 2d before): 5d p=0.012 but single horizon, stdev=11.7%, driven by RIVN outlier (-30.8%). ROOT CAUSE: lockup dates are publicly announced and widely tracked by institutional desks; market front-runs the anticipated selling. Verdict: does not pass multiple testing. Methodology note: stdev >> avg means this is noise-dominated, not signal-dominated.",
+      "recorded": "2026-03-22T06:38:45.427773"
     }
   ]
 }
