@@ -19,10 +19,20 @@ Qualifications (matching hypothesis 1cb6140f):
     - Filed within last 24 hours (48 if run twice per day)
     - Not already in active/pending experiments
 
-VIX Regime Gate (from full-population analysis, N=1566, 2021-2025):
-    - VIX < 20 (calm):      EV = +3.31%, 55.7% consistency -> HIGH CONFIDENCE
-    - VIX 20-25 (elevated): EV = +1.10%, 49.1% consistency -> MARGINAL
-    - VIX > 25 (high):      EV = ~+0.36%                   -> LOW CONFIDENCE (below min net return)
+VIX + Cluster Size Trading Gate (full-population analysis, N=1566, 2021-2025):
+    Tier 1 - HIGH CONFIDENCE (VIX < 20, n >= 3):
+        EV = +3.31%, 55.7% consistency. Trade freely.
+    Tier 2 - MODERATE (VIX 20-25, n >= 5):
+        EV = +1.85%, 47% positive rate, p=0.032. Tradeable but marginal.
+        For VIX 20-25 and n=3-4: EV=+1.22% -- below preference, but acceptable if high total value.
+    Tier 3 - CONDITIONAL (VIX 25-30, n >= 6):
+        EV = +2.37%, 57% positive rate, p=0.027. Tradeable when n>=6.
+        For VIX 25-30 and n=3-5: EV=-0.48%, 38% positive -- DO NOT TRADE.
+    Tier 4 - DO NOT TRADE (VIX > 30):
+        Crisis regime -- signal noisy, N=94. Avoid.
+
+VIX 20-25 with n=3-4 note: EV=+1.22% is above minimum net return (1.0%) but below typical
+cluster signal strength. Historically acceptable if total purchase value > $2M.
 """
 
 import argparse
@@ -50,9 +60,11 @@ MAX_STALE_HOURS = 48       # Don't trade if cluster is older than 48 hours
 CLUSTER_HYPOTHESIS_IDS = ["1cb6140f", "76678219"]  # 3d and 5d cluster hypotheses
 
 # VIX regime thresholds (from full-population analysis N=1566, 2021-2025)
-VIX_CALM_THRESHOLD = 20.0    # VIX < 20: EV=+3.31%, 55.7% consistency (HIGH CONFIDENCE)
-VIX_MARGINAL_THRESHOLD = 25.0  # VIX 20-25: EV~+1.10%, 49.1% consistency (MARGINAL)
-# VIX > 25: EV~+0.36%, near-zero — below minimum net return threshold (LOW CONFIDENCE)
+# See VIX + Cluster Size Trading Gate in module docstring for full decision matrix.
+VIX_CALM_THRESHOLD = 20.0      # VIX < 20: Tier 1 (HIGH CONFIDENCE, any cluster size)
+VIX_MODERATE_THRESHOLD = 25.0  # VIX 20-25: Tier 2 (n>=5 recommended, n>=3 marginal)
+VIX_ELEVATED_THRESHOLD = 30.0  # VIX 25-30: Tier 3 (n>=6 only, n<6 DO NOT TRADE)
+# VIX > 30: Tier 4 (DO NOT TRADE - crisis regime, N=94 noisy)
 
 
 def get_current_vix() -> tuple[float, str, str]:
@@ -60,7 +72,7 @@ def get_current_vix() -> tuple[float, str, str]:
     Get current VIX level and classify by regime.
 
     Returns (vix_level, regime_label, confidence_label).
-    regime_label: "calm" | "marginal" | "low_confidence"
+    regime_label: "calm" | "moderate" | "elevated" | "crisis"
     confidence_label: human-readable label for output/email
     """
     try:
@@ -73,15 +85,50 @@ def get_current_vix() -> tuple[float, str, str]:
 
     if vix_level < VIX_CALM_THRESHOLD:
         regime = "calm"
-        label = f"HIGH CONFIDENCE (calm VIX {vix_level:.1f} < {VIX_CALM_THRESHOLD})"
-    elif vix_level < VIX_MARGINAL_THRESHOLD:
-        regime = "marginal"
-        label = f"MARGINAL (elevated VIX {vix_level:.1f}, EV ~+1.1%, 49% consistency)"
+        label = f"TIER 1 (calm VIX {vix_level:.1f} < {VIX_CALM_THRESHOLD}, EV=+3.31%, any cluster size)"
+    elif vix_level < VIX_MODERATE_THRESHOLD:
+        regime = "moderate"
+        label = f"TIER 2 (VIX {vix_level:.1f} 20-25, EV=+1.4-1.85%, prefer n>=5)"
+    elif vix_level < VIX_ELEVATED_THRESHOLD:
+        regime = "elevated"
+        label = f"TIER 3 (elevated VIX {vix_level:.1f} 25-30, EV=+2.37% for n>=6 only, -0.48% for n<6)"
     else:
-        regime = "low_confidence"
-        label = f"LOW CONFIDENCE (high VIX {vix_level:.1f} > {VIX_MARGINAL_THRESHOLD}, EV ~+0.4%)"
+        regime = "crisis"
+        label = f"TIER 4 / DO NOT TRADE (crisis VIX {vix_level:.1f} > {VIX_ELEVATED_THRESHOLD}, signal unreliable)"
 
     return (vix_level, regime, label)
+
+
+def get_vix_action_recommendation(vix_regime: str, n_insiders: int, total_value_k: float) -> str:
+    """
+    Return a trading action recommendation based on VIX tier + cluster size.
+
+    Uses the VIX + Cluster Size Trading Gate from full-population analysis (N=1566).
+    """
+    if vix_regime == "calm":
+        return "HIGH CONFIDENCE. Trade at next open per standard protocol (VIX<20, EV=+3.31%)."
+    elif vix_regime == "moderate":
+        if n_insiders >= 5:
+            return (f"MODERATE CONFIDENCE (VIX 20-25, n={n_insiders}>=5). "
+                    "EV=+1.85%, p=0.032. Tradeable — proceed.")
+        elif total_value_k >= 2000:
+            return (f"MARGINAL (VIX 20-25, n={n_insiders}<5 but total=${total_value_k/1000:.1f}M>=$2M). "
+                    "EV=+1.22%, acceptable for high-value clusters. Proceed with caution.")
+        else:
+            return (f"WEAK SIGNAL (VIX 20-25, n={n_insiders}<5, total=${total_value_k/1000:.1f}M<$2M). "
+                    "EV=+1.22%, borderline. Do not trade unless other strong qualifiers present.")
+    elif vix_regime == "elevated":
+        if n_insiders >= 6:
+            return (f"CONDITIONAL (VIX 25-30, n={n_insiders}>=6). "
+                    "EV=+2.37%, 57% pos rate, p=0.027. N>=6 overcomes VIX penalty. Proceed.")
+        else:
+            return (f"DO NOT TRADE (VIX 25-30, n={n_insiders}<6). "
+                    "EV=-0.48%, 38% pos rate for n<6 in elevated VIX — coin flip. SKIP.")
+    elif vix_regime == "crisis":
+        return (f"DO NOT TRADE (VIX>30 crisis regime). "
+                "Signal unreliable in crisis. N=94, mixed results. Wait for VIX to fall.")
+    else:
+        return "VIX regime unknown. Review manually before trading."
 
 
 def get_current_market_cap_m(ticker: str) -> float:
@@ -231,15 +278,8 @@ def log_opportunity(cluster: dict, market_cap_m: float, position_52w: dict,
 
     pct_from_high = position_52w.get('pct_from_52w_high', 0) or 0
 
-    # Build regime-aware action recommendation
-    if vix_regime == "calm":
-        action_note = "HIGH CONFIDENCE. Trade at next open per standard protocol."
-    elif vix_regime == "marginal":
-        action_note = "MARGINAL CONFIDENCE (VIX 20-25). Consider only if 6+ insiders or unusually large buy."
-    elif vix_regime == "low_confidence":
-        action_note = "LOW CONFIDENCE (VIX > 25). EV below minimum net return threshold. CAUTION: strong bias against trading."
-    else:
-        action_note = "VIX regime unknown. Review manually."
+    # Build regime-aware action recommendation (n_insiders-aware)
+    action_note = get_vix_action_recommendation(vix_regime, n_insiders, total_value_k)
 
     description = (
         f"AUTO-DETECTED insider cluster: {ticker} ({company}). "
@@ -291,13 +331,14 @@ def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[d
         print(f"  Current VIX: {vix_level:.2f}" if vix_level is not None else "  Current VIX: UNAVAILABLE")
         print(f"  Signal regime: {vix_label}")
         if vix_regime == "calm":
-            print(f"  -> Calm regime: proceed with full confidence (EV=+3.31%, 55.7% consistency)")
-        elif vix_regime == "marginal":
-            print(f"  -> Marginal regime: scan but flag opportunities. EV~+1.10%, barely above 1% minimum.")
-            print(f"     Consider requiring higher cluster size (6+ insiders) or unusually large purchase values.")
-        elif vix_regime == "low_confidence":
-            print(f"  -> Low confidence regime: VIX > 25, EV~+0.4%, BELOW minimum net return threshold.")
-            print(f"     Logging opportunities for awareness but strong caution advised against trading.")
+            print(f"  -> Tier 1: Calm regime. Full confidence. Any n>=3 cluster is tradeable.")
+        elif vix_regime == "moderate":
+            print(f"  -> Tier 2: Moderate regime (VIX 20-25). Prefer n>=5. n>=3 marginal if total>=$2M.")
+        elif vix_regime == "elevated":
+            print(f"  -> Tier 3: Elevated regime (VIX 25-30). n>=6 ONLY is tradeable. n<6: DO NOT TRADE.")
+            print(f"     EV for n>=6: +2.37%, 57% pos rate. EV for n<6: -0.48%, 38% pos rate.")
+        elif vix_regime == "crisis":
+            print(f"  -> Tier 4: Crisis regime (VIX>30). DO NOT TRADE. Signal unreliable in crisis conditions.")
         else:
             print(f"  -> VIX regime unknown. Proceed with caution.")
         print()

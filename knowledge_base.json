@@ -70,17 +70,14 @@
       "recorded": "2026-03-19T21:08:22.605216"
     },
     "insider_buying_cluster": {
-      "summary": "SEC Form 4 cluster insider buying (3+ insiders, >$50K each within 30 days). Signal confirmed in 3 independent OOS periods.",
-      "known_magnitude": "3d: 2.93-4.71% mean abnormal (median 2.98-3.80%). Winsorized mean: ~4.46%. Signal stable across bull/bear regimes.",
-      "known_timeframe": "Peaks at 3 trading days post-filing. 1d hold weakening in 2023-24 (55% pos vs 72-80% in 2021-22). 5d also strong but longer hold adds noise.",
+      "summary": "Full-population VIX regime and cluster size interaction analysis. N=1566 (2021-2025). Key finding: VIX 25-30 signal is NOT uniform -- it depends critically on cluster size. For n>=6 clusters: VIX 25-30 shows +2.37% mean, 57% positive rate, p=0.027 -- TRADEABLE. For n<6 clusters in VIX 25-30: -0.48% mean, 38% positive rate, p=0.68 -- DO NOT TRADE. Previous finding of VIX<20 being the single threshold is now SUPERSEDED by this interaction model.",
+      "known_magnitude": "VIX-tier means: <15 = +5.70%, 15-20 = +2.22%, 20-25 = +1.40%, 25-30 = +0.33% overall, 25-30 n>=6 = +2.37%",
+      "known_timeframe": "5d hold from cluster detection date",
       "sources": [
-        "Kang, Kim & Wang (2018): cluster buys 3.8% abnormal/21d, 1986-2016",
-        "Own data: Discovery 2021 (n=1452, 3d +2.93% p<0.000001)",
-        "Own data: OOS 2022 (n=816, 3d +3.89% p<0.000001)",
-        "Own data: OOS 2023-24 (n=311, 3d +4.71% p<0.0001, winsorized +4.46%)"
+        "Own analysis 2026-03-22: cluster_with_returns.csv N=1566 2021-2025"
       ],
-      "gaps": "1d signal weakened in 2023-24. 10b5-1 plan contamination risk. Survivorship bias: favorable (acquisitions >> bankruptcies).",
-      "recorded": "2026-03-21T12:49:43.996962"
+      "gaps": "Discrepancy between full-population 2021-2022 results (negative) vs original sampled backtest (positive +2.93%) needs resolution. Possible causes: (1) original used open-entry vs current close-entry, (2) different event filtering, (3) original used sector adjustment not just SPY. Critical to resolve before lowering confidence in 2021-2022 era.",
+      "recorded": "2026-03-22T03:00:03.191057"
     },
     "activist_investor_13d": {
       "summary": "Activist investor 13D filing date (public SC 13D filing) as signal: Tested Starboard Value 13D initial filings N=24 (2020-2024). 1d avg=+0.26%, 3d avg=+0.30%, 5d avg=-0.17%. Positive rate 45.8%. Does NOT pass multiple testing. Signal has fully decayed from Brav et al (2008) +7% finding. Reason: 10-day filing window means markets discover position during accumulation (news leaks), so the 13D filing date is NOT the information event.",
@@ -228,13 +225,71 @@
       "last_updated": "2026-03-21T11:11:28.681628"
     },
     "insider_buying_cluster": {
-      "effect": "full_population_regime_analysis_1566_events",
-      "details": "N=1566 insider cluster events (3+ insiders, 2021-2025). Signal performance by VIX regime: Calm VIX<20: mean abnormal 5d=+3.31%, consistency=55.7%, N=971; Elevated VIX 20-30: mean=+1.10%, consistency=49.1%, N=501; Crisis VIX>30: mean=+1.38%, consistency=55.3%, N=94. Bootstrap CIs: calm excludes zero (CI [2.36%, 4.33%]), elevated barely excludes zero (CI [0.17%, 2.14%]). Year breakdown: 2021=-0.51%, 2022=-0.37%, 2023=+3.59%, 2024=+6.33%, 2025=+3.96% -- signal essentially only works in calm VIX environments of 2023-2025. SPY 5d prior trend is NOT a meaningful predictor (r=0.030, p=0.23, no significance in any VIX regime). The 3 recent failures (POOL, AMRZ, BLCO) in elevated VIX are consistent with historical: 49% consistency = near coin flip. VIX 25-30 + SPY<-3% shows negative EV (-3.12%, N=24) but 75% from 2022 bear market.",
-      "implication": "Trade insider clusters ONLY when VIX < 20 for high-confidence EV (+3.31%). VIX 20-25 = marginal positive (EV +1.1-1.5%, barely above 1.0% minimum). VIX 25-30 = near-zero EV (~0.36%), may be below minimum net return threshold. Consider adding VIX < 20 gate to auto-scanner to avoid marginal trades.",
-      "analysis_date": "2026-03-22",
-      "dataset_size": 1566,
-      "dataset_period": "2021-2025",
-      "last_updated": "2026-03-22T02:34:25.089319"
+      "finding": "VIX 4-tier signal strength analysis (2026-03-22)",
+      "method": "Full-population N=1566, 2021-2025",
+      "vix_tier_results": {
+        "<15": {
+          "N": 305,
+          "mean_5d": 5.7,
+          "pos_rate": 56.1,
+          "p": "<0.0001"
+        },
+        "15-20": {
+          "N": 666,
+          "mean_5d": 2.22,
+          "pos_rate": 51.7,
+          "p": "<0.0001"
+        },
+        "20-25": {
+          "N": 360,
+          "mean_5d": 1.4,
+          "pos_rate": 46.4,
+          "p": 0.0205
+        },
+        "25-30": {
+          "N": 141,
+          "mean_5d": 0.33,
+          "pos_rate": 43.3,
+          "p": 0.717
+        },
+        ">30": {
+          "N": 94,
+          "mean_5d": 1.38,
+          "pos_rate": 50.0,
+          "p": 0.2
+        }
+      },
+      "cluster_size_interaction": {
+        "n>=6_VIX_25-30": {
+          "N": 42,
+          "mean_5d": 2.37,
+          "pos_rate": 57.1,
+          "p": 0.027,
+          "insight": "High cluster size OVERCOMES VIX 25-30 penalty"
+        },
+        "n=3-5_VIX_25-30": {
+          "N": 101,
+          "mean_5d": -0.48,
+          "pos_rate": 37.6,
+          "p": 0.682,
+          "insight": "DO NOT TRADE small clusters in VIX 25-30"
+        },
+        "n>=5_VIX_20-25": {
+          "N": 150,
+          "mean_5d": 1.85,
+          "pos_rate": 47.0,
+          "p": 0.032,
+          "insight": "Tradeable in moderate VIX if n>=5"
+        }
+      },
+      "trading_rule_update": {
+        "tier_1": "VIX<20, any n>=3: TRADE (EV=+3.31%)",
+        "tier_2": "VIX 20-25, n>=5: TRADE (EV=+1.85%). n=3-4 with >M: marginal",
+        "tier_3": "VIX 25-30, n>=6 ONLY: TRADE (EV=+2.37%). n<6: DO NOT TRADE (EV=-0.48%)",
+        "tier_4": "VIX>30: DO NOT TRADE"
+      },
+      "data_warning": "2021-2022 full-population shows negative means (-0.51%, -0.37%) but original backtest showed positive (+2.93%). Discrepancy under investigation - original backtest may have used different event sampling or entry price assumptions. Use cluster_with_returns.csv results with caution for 2021-2022 regime analysis.",
+      "last_updated": "2026-03-22T02:59:53.598678"
     },
     "insider_buying_cluster_3plus": {
       "effect": "3+ insider cluster buys within 30 days: abnormal returns at 3d and 5d consistently positive",
