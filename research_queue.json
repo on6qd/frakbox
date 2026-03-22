@@ -546,18 +546,22 @@
       "category": "pre_earnings_runup",
       "question": "Test pre-earnings run-up signal on mid-cap universe (B-B market cap). Large-cap S&P 500 shows dead end (avg +0.23%, fails multiple testing). Mid-cap hypothesis: information diffuses more slowly in mid-cap stocks, so consistent beaters may show larger pre-earnings drift as institutional analysts gradually build positions. Use Russell 2000 components or screener. Need at least 50 stocks with 12+ quarters of data (2021-2025). Target: avg abnormal > 0.5%, pos_rate > 50%, p < 0.05 (Wilcoxon).",
       "priority": 3,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Large-cap version dead-ended due to market efficiency. Mid-cap test is natural follow-up. Frazzini & Lamont (2007) documented drift in 1980s-90s data when market efficiency was lower for smaller stocks.",
-      "added": "2026-03-22T12:24:37.370198"
+      "added": "2026-03-22T12:24:37.370198",
+      "completed": "2026-03-22T15:41:24.942852",
+      "findings": "DEAD END confirmed. Mid-cap (45 stocks, N=407 beater events): 5d avg=+0.50% p=0.007, pos_rate=55%. Statistically significant but below min_abnormal_return_pct=1.5% threshold. Not tradeable after costs. Effect has decayed since Frazzini & Lamont (2007). Dead end for both large-cap and mid-cap."
     },
     {
       "id": "2298d644",
       "category": "sp500_52w_low",
       "question": "Schedule fiftytwo_week_low_scanner.py as daily scan (weekdays at 8 PM ET or after market close). Should run after cluster_auto_scanner.py. Add launchd plist similar to cluster_auto_scanner.",
       "priority": 3,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Scanner needs to run daily to catch new 52-week low events before the entry window closes. Currently manual only.",
-      "added": "2026-03-22T14:58:01.622998"
+      "added": "2026-03-22T14:58:01.622998",
+      "completed": "2026-03-22T15:38:55.803728",
+      "findings": "COMPLETED. fiftytwo_week_low_scanner.py scheduled via launchd as com.financialresearcher.52wlow-scanner. Runs weekdays at 8:00 PM ET. Log: logs/52w_low_scanner.log. Scanner state file: logs/52w_low_scanner_state.json (tracks triggered tickers to avoid re-entry)."
     },
     {
       "id": "f5857b08",

@@ -837,8 +837,9 @@
     },
     {
       "event_type": "pre_earnings_runup_midcap",
-      "reason": "Mid-cap (B-B) pre-earnings drift dead end. Universe: 42 S&P MidCap stocks, 2021-2025. Consistent beaters (n=367): +0.12% 5d abnormal, p=0.494, 52.3% positive rate. Consistent missers (n=40): -0.15%, p=0.834. Mixed (n=302): +0.31%, p=0.154. No window (2d, 3d, 5d) showed significance. Conclusion: Pre-earnings drift is absent for mid-caps in this universe, consistent with large-cap dead end. The signal simply does not exist for US equities with consistent earnings histories, likely because the EPS beat/miss pattern is already priced in via analyst estimates.",
-      "recorded": "2026-03-22T12:52:30.963456"
+      "reason": "Mid-cap S&P 400 / Russell mid-cap consistent EPS beaters show pre-earnings drift of +0.50% at 5d (p=0.007, N=407 events). Statistically significant (p<0.05 at 2d, 3d, 5d) but below 1.5% minimum abnormal return threshold. Net return after 0.1% round-trip costs = +0.40% -- insufficient for hypothesis formation. Universe: 45 mid-cap stocks ($5B-$30B market cap), 2021-2026. Missers show +0.91% but N=39 only (p=0.18, not significant). CONFIRMED dead end for pre-earnings runup across both large-cap (-) and mid-cap (+0.50% but too small). Frazzini & Lamont (2007) effect has decayed to below tradeable threshold. The effect MAY exist for micro-cap (<$1B) stocks with fewer analysts but that market cap is below our tradeable threshold.",
+      "recorded": "2026-03-22T12:52:30.963456",
+      "updated": "2026-03-22T15:41:24.941610"
     },
     {
       "event_type": "small_cap_buyback_announcement",
