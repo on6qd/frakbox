@@ -328,6 +328,15 @@ def create_hypothesis(
             "Split historical evidence 70/30 and verify pattern holds in both sets."
         )
 
+    # Enforce minimum 3 OOS validation instances
+    oos = out_of_sample_split or {}
+    validation_indices = oos.get("validation_indices", [])
+    if len(validation_indices) < 3:
+        raise ValueError(
+            f"out_of_sample_split.validation_indices must have >= 3 entries. "
+            f"Got {len(validation_indices)}. Minimum 3 real named validation instances required."
+        )
+
     # Load methodology for validation checks
     from self_review import load_methodology
     m = load_methodology()
