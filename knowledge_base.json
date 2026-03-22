@@ -598,6 +598,11 @@
       "reason": "Tested N=8 clean first-ever buyback events (2018-2024). No horizon passed p<0.05. Bootstrap CI includes zero at all horizons. Structural issues: (1) earnings contamination on same day makes clean isolation hard, (2) sample size capped ~15-20 due to rarity, well below N=32 power requirement, (3) heterogeneous motives (financial strength vs price support). Ikenberry et al 1995 covers ALL repurchases and shows 3% short-run effect, but that evidence does not hold for isolated first-ever small-cap events. Possible follow-on: broader open-market repurchase signal in small-cap value stocks (not first-ever) could reach N=50+ for testing.",
       "recorded": "2026-03-22T00:31:10.256155",
       "updated": "2026-03-22T00:33:19.414022"
+    },
+    {
+      "event_type": "vwap_breakout_momentum",
+      "reason": "VWAP_252 breakout signal (Close/VWAP >= 1.15): tested N=489 events across 20 large-cap stocks (2018-2023) with OOS 2024 confirmation. Best abnormal return was +1.19% at 20d, which is below the min_abnormal_return_pct threshold of 1.5%. Signal direction is correct (momentum, not mean-reversion as hypothesized) but magnitude is too small to trade. Regime filtering (calm VIX) and high-volume filter both tested; neither brings any horizon above 1.5% abnormal. Conclusion: signal is real but not large enough to be tradeable within current methodology constraints. No hypothesis formed.",
+      "recorded": "2026-03-22T03:43:14.678380"
     }
   ]
 }

@@ -542,53 +542,98 @@
   ],
   "next_session_priorities": [
     {
-      "task": {
-        "task": "1. CRITICAL: Check GO (1cb6140f) and WD (76678219) trade outcomes. GO entered March 23, 3d exit March 26. WD entered March 23, 5d exit March 27-28. Record P&L and update hypothesis live_validation field. GO is in n=6-9 elevated VIX tier (expected to work). WD is n=3 elevated VIX (expected to be marginal/fail).",
-        "set_by_session": "2026-03-22"
-      },
-      "set_by_session": "2026-03-22T03:24:25.298406"
+      "task": "Activate n=6-9 hypothesis (id=7b5d0120): find fresh n=6-9 cluster from openinsider_scraper, resolve TBD symbol, set trigger",
+      "set_by_session": "2026-03-22T03:51:08.861166"
     },
     {
-      "task": {
-        "task": "2. Run n=6-9 specialized multi-horizon backtest. Use insider_cluster_detector output filtered to n=6-9 events, run measure_event_impact() with 1d,3d,5d,10d,20d horizons. Verify passes_multiple_testing=True. If yes, pre-register n=6-9 hypothesis as described in research queue.",
-        "set_by_session": "2026-03-22"
-      },
-      "set_by_session": "2026-03-22T03:24:25.298413"
+      "task": "Check cluster_auto_scanner output for any recent n=6-9 clusters to deploy",
+      "set_by_session": "2026-03-22T03:51:08.861171"
     },
     {
-      "task": {
-        "task": "3. Monitor DNLI PDUFA (April 5, 2026) for hypothesis 5f805860 activation. If CRL, SHORT at next open. Drug: DNL310 for Hunter syndrome -- first NDA, priority review. Pre-verify single-pipeline status and post-crash price >$0.50.",
-        "set_by_session": "2026-03-22"
-      },
-      "set_by_session": "2026-03-22T03:24:25.298414"
+      "task": "Consider sector-adjusted analysis for n=6-9 to address the sector_trend confounder",
+      "set_by_session": "2026-03-22T03:51:08.861172"
     },
     {
-      "task": {
-        "task": "4. Test VWAP momentum signal (task 6730a683). Large universe (100 stocks, N>5000), threshold 15% above VWAP_252. Regime filter: calm VIX only. Check if net return exceeds 1% after costs. Tools exist at tools/vwap_deviation_signal.py.",
-        "set_by_session": "2026-03-22"
-      },
-      "set_by_session": "2026-03-22T03:24:25.298414"
-    },
-    {
-      "task": {
-        "task": "5. SSP (16-insider cluster) is at $3.37, below all insider purchase prices (was $3.86-4.60 range during buying). This is a live test of the n>=10=noise finding. Record outcome when exit window passes.",
-        "set_by_session": "2026-03-22"
-      },
-      "set_by_session": "2026-03-22T03:24:25.298415"
+      "task": "Run VIX-filtered backtest: measure n=6-9 in calm VIX only vs full population to quantify regime sensitivity",
+      "set_by_session": "2026-03-22T03:51:08.861173"
     }
   ],
   "session_handoff": {
-    "regime_finding_CORRECTED": "CORRECTION to prior handoff: Full population (N=1566) shows CALM VIX < 20 is the best regime (EV=+3.31%, 55.7%), NOT elevated VIX. Prior 'elevated=best' finding was a small-sample artifact from 2023-2024 bull market data. VIX gate now added to cluster_auto_scanner.py.",
-    "current_vix": 26.78,
-    "vix_regime": "LOW CONFIDENCE (VIX 26.78 > 25, EV ~0.4%, below minimum net return)",
-    "go_trade": "triggers at next_market_open (Monday March 23), hypothesis 1cb6140f, 6 insiders incl CEO, $6.3M purchase, confidence=7. Exit Thursday March 26 (3d hold).",
-    "wd_trade": "triggers at next_market_open (Monday March 23), hypothesis 76678219, 3 insiders, confidence=5 (marginal). Exit March 27-28 (5d hold).",
-    "recommendation": "Both GO and WD enter in elevated VIX (26.78). Per full-population data, this means ~49% consistency = near coin flip. GO has highest conviction (6 insiders, CEO + $6.3M) which may partially offset regime penalty. Monitor stop-loss closely on both.",
-    "dnli_note": "DNLI spike March 9 was analyst upgrade + PDUFA positioning. PDUFA April 5 still upcoming. If CRL, short per 5f805860.",
-    "repl_note": "REPL spike March 6 was sector sympathy (CGON). PDUFA April 10. BLA RE-SUBMISSION after July 2025 CRL. If rejected again, repeat CRL rule applies -- do NOT trade (market bounces, not crashes).",
-    "ssp_note": "SSP 16-insider cluster is underwater vs all purchase prices. Live test of whether extraordinary cluster size fights macro headwinds. Monitor.",
-    "full_regime_analysis": "COMPLETE. N=1566, 2021-2025. SPY 5d prior trend r=0.030 p=0.23 -- NOT predictive. VIX is the ONLY significant regime factor. Calm <20: EV=+3.31%. Elevated 20-30: EV=+1.10%. Crisis >30: EV=+1.38% (but N=94 only). 3 consecutive failures (POOL, AMRZ, BLCO) in elevated VIX (23-27) are historically expected.",
-    "written_at": "2026-03-22T02:30:00.000000"
+    "last_action": "Pre-registered hypothesis insider_buying_cluster_n6to9 (id=7b5d0120)",
+    "backtest_numbers": {
+      "discovery_2021_2022": {
+        "n": 173,
+        "1d": {
+          "avg": 0.46,
+          "pos_rate": 50.3,
+          "p": 0.4725
+        },
+        "3d": {
+          "avg": 3.3,
+          "pos_rate": 67.6,
+          "p": 0.0
+        },
+        "5d": {
+          "avg": 3.57,
+          "pos_rate": 59.0,
+          "p": 0.0001
+        },
+        "10d": {
+          "avg": 3.59,
+          "pos_rate": 56.1,
+          "p": 0.0052
+        },
+        "20d": {
+          "avg": 0.88,
+          "pos_rate": 51.2,
+          "p": 0.8458
+        },
+        "passes_multiple_testing": true,
+        "bootstrap_ci_5d": {
+          "lower": 1.959,
+          "upper": 5.271,
+          "excludes_zero": true
+        }
+      },
+      "validation_2023_2025": {
+        "n": 178,
+        "1d": {
+          "avg": 1.19,
+          "pos_rate": 52.8,
+          "p": 0.0685
+        },
+        "3d": {
+          "avg": 4.13,
+          "pos_rate": 64.6,
+          "p": 0.0
+        },
+        "5d": {
+          "avg": 7.8,
+          "pos_rate": 62.9,
+          "p": 0.0
+        },
+        "10d": {
+          "avg": 8.4,
+          "pos_rate": 60.7,
+          "p": 0.0
+        },
+        "20d": {
+          "avg": 8.02,
+          "pos_rate": 52.3,
+          "p": 0.0281
+        },
+        "passes_multiple_testing": true,
+        "bootstrap_ci_5d": {
+          "lower": 4.592,
+          "upper": 11.68,
+          "excludes_zero": true
+        }
+      }
+    },
+    "hypothesis_id": "7b5d0120",
+    "status": "pending \u2014 needs symbol resolution to activate",
+    "next_step": "Run openinsider_scraper.py or cluster_auto_scanner.py to find a fresh n=6-9 cluster. Resolve expected_symbol from TBD to a real ticker, then set trigger=next_market_open to activate.",
+    "written_at": "2026-03-22T03:51:08.861175"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
