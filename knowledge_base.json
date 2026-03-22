@@ -439,11 +439,29 @@
       "last_updated": "2026-03-21T21:33:45.174443"
     },
     "ceo_performance_failure_departure_short": {
-      "finding": "GPOR (Mar 9, 2026): CEO departure confirmed signal. Close-entry abnormal 1d = -7.68%. Open-entry abnormal 1d = -3.11% (better than average but gap was missed). 5d reversal to +3.03% (signal fades by day 5).",
-      "interpretation": "GPOR is a missed trade that supports the gap-entry mechanism. Open entry still shows -3.11% which is directionally correct and above the 0.5% threshold, unlike the average of -0.14% for the full N=12 sample.",
-      "note": "GPOR may be a special case \u2014 oil & gas CEO departure may have different dynamics than tech/retail. Do not add to formal hypothesis without checking sector-specific patterns.",
-      "date_verified": "2026-03-22",
-      "last_updated": "2026-03-22T01:25:43.719723"
+      "event": "CVBF CVB Financial 8-K filed 2026-03-18",
+      "ticker": "CVBF",
+      "market_cap_m": 2526,
+      "departure_type": "NOT_A_CEO_DEPARTURE",
+      "scanner_classification": "unknown -- manual review needed (false positive)",
+      "actual_classification": "DISQUALIFIED - FALSE POSITIVE",
+      "qualification_check": {
+        "market_cap_above_1B": true,
+        "is_ceo_departure": false,
+        "qualifies": false
+      },
+      "disqualification_reasons": [
+        "(1) The March 18, 2026 8-K is NOT an officer departure filing. It reports Item 8.01 (Other Events), not Item 5.02.",
+        "(2) The 8-K is a supplement to the Heritage Commerce merger proxy statement, disclosing shareholder lawsuits and financial metric updates.",
+        "(3) David Brager remains CEO of CVB Financial and will continue as CEO of the combined entity post-merger.",
+        "(4) CVB Financial is performing well: Q4 2025 EPS $0.40/share, FY2025 EPS $1.52 (+5.6% YoY), no earnings misses.",
+        "(5) The scanner false-positive likely occurred because the 8-K text mentions officers in the context of executive compensation disclosures for the merger."
+      ],
+      "scanner_false_positive_reason": "The 8-K keyword scan matched officer-related language in a merger proxy supplement. No Item 5.02 filed. No CEO departure occurred.",
+      "filing_date": "2026-03-18",
+      "action": "NO TRADE - not a CEO departure event at all",
+      "date_reviewed": "2026-03-22",
+      "last_updated": "2026-03-22T13:45:56.493042"
     },
     "ceo_performance_departure": {
       "finding": "Signal fires entirely in overnight gap, not intraday",
@@ -588,6 +606,26 @@
       "actionable_finding": "CEO/CFO + n3_5 + calm VIX appears strongest (avg +7.87% vs +4.67% without CEO/CFO). But Bonferroni correction for 12 cells would require p<0.004 - FAILS.",
       "next_step": "Re-run CEO/CFO role classifier on all 1566 return events to get proper coverage. Current 18.5% coverage is insufficient.",
       "last_updated": "2026-03-22T12:26:24.206733"
+    },
+    "edgar_ceo_departure_scanner_false_positives": {
+      "pattern": "Scanner false positive patterns observed 2026-03-22",
+      "false_positive_types": [
+        {
+          "type": "merger_proxy_supplement",
+          "example": "CVBF 2026-03-18",
+          "cause": "8-K Item 8.01 (Other Events) for merger proxy supplements mentions officer compensation, triggering keyword match. No Item 5.02 present.",
+          "fix": "Require Item 5.02 to be explicitly present in filing index before classifying as departure candidate."
+        },
+        {
+          "type": "orderly_internal_promotion_with_termination_language",
+          "example": "SDRL 2026-03-12/18",
+          "cause": "\"Effective immediately\" language present but in context of internal CCO-to-CEO promotion, not a firing. Board language was explicitly positive. Stock had outperformed sector 72% YoY.",
+          "fix": "Add post-classification check: does stock underperform sector 20%+ in past 12 months? If not, disqualify even if scanner says performance_failure."
+        }
+      ],
+      "false_positive_rate_observation": "2/2 candidates from 2026-03-18 scan were false positives. Scanner needs Item 5.02 filtering.",
+      "recommended_scanner_improvement": "Before keyword classification, verify Item 5.02 is listed in the 8-K exhibit index. This eliminates merger proxy supplements, earnings releases, and other Item 8.01 filings that mention officers incidentally.",
+      "last_updated": "2026-03-22T13:46:08.253612"
     }
   },
   "dead_ends": [
