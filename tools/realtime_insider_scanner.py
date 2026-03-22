@@ -1,14 +1,27 @@
 """
 Real-Time Insider Cluster Scanner
 
+DEPRECATED — USE openinsider_scraper.py INSTEAD.
+
+This tool parses EDGAR XML for Form 4 filings but requires ~6 minutes of
+sequential HTTP requests (500 CIKs × 2 requests × 0.35s each) and consistently
+times out in automated sessions. It has been superseded by:
+
+    python tools/openinsider_scraper.py
+
+openinsider_scraper.py finds the same clusters (and more) in under 5 seconds
+by querying OpenInsider's pre-processed cluster screener.
+
+This file is retained for reference only.
+
+---
+
+Original description:
 Uses EDGAR quarterly full-index (form.idx) to find recent Form 4 filings,
 then parses XML to identify open-market purchase clusters (2+ or 3+ insiders
 each buying >$50K within 30 days of each other).
 
-Unlike the bulk quarterly TSV approach (insider_cluster_detector.py), this tool
-works with the current quarter's data even before the full bulk ZIPs are released.
-
-Usage:
+Usage (deprecated):
     python tools/realtime_insider_scanner.py --min-insiders 3 --days 30 --min-value 50000
 
 Data source: https://www.sec.gov/Archives/edgar/full-index/{year}/QTR{q}/form.idx
