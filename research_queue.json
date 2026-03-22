@@ -790,47 +790,37 @@
   ],
   "next_session_priorities": [
     {
-      "task": {
-        "priority": 1,
-        "task": "CRITICAL Mon March 23: Verify GO (1cb6140f) and HD (86d28864) executed. Run python run.py --status."
-      },
-      "set_by_session": "2026-03-22T16:13:37.996928"
+      "task": "1. Monday March 23: HD short should execute at open via trade_loop.py \u2014 verify position exists",
+      "set_by_session": "2026-03-22T16:17:00.949201"
     },
     {
-      "task": {
-        "priority": 2,
-        "task": "CRITICAL Thu March 26: Close GO long. Run python tools/close_go_trade.py."
-      },
-      "set_by_session": "2026-03-22T16:13:37.996934"
+      "task": "2. Track ABT watchlist event: 5d outcome due March 27 \u2014 add to OOS validation log for 86d28864",
+      "set_by_session": "2026-03-22T16:17:00.949205"
     },
     {
-      "task": {
-        "priority": 3,
-        "task": "CRITICAL Fri March 27: Close HD short. Run python tools/close_hd_trade.py."
-      },
-      "set_by_session": "2026-03-22T16:13:37.996935"
+      "task": "3. Friday March 27: run tools/close_hd_trade.py at market close to exit HD position and complete hypothesis",
+      "set_by_session": "2026-03-22T16:17:00.949206"
     },
     {
-      "task": {
-        "priority": 4,
-        "task": "ABT OOS: ABT hit 52w low on March 20 (close=105.46). Measure 5d/20d return from March 23 open as free OOS for 52w-low short hypothesis 86d28864."
-      },
-      "set_by_session": "2026-03-22T16:13:37.996936"
+      "task": "4. After HD closes: run research.check_promotion_or_retirement('sp500_52w_low_momentum_short') to update pattern library",
+      "set_by_session": "2026-03-22T16:17:00.949207"
     },
     {
-      "task": {
-        "priority": 5,
-        "task": "SEO announcement date signal - task 8517e522. Insider selling >5B dead end confirmed (p=0.53, 20d=+0.01%, n=78)."
-      },
-      "set_by_session": "2026-03-22T16:13:37.996936"
+      "task": "5. Continue looking for new 52-week low first-touch signals in S&P 500 large-caps for additional OOS events",
+      "set_by_session": "2026-03-22T16:17:00.949208"
     }
   ],
   "session_handoff": {
-    "investigated": "ALDX blacklist, insider selling cluster >5B, ABT 52w-low OOS, GO/HD triggers",
-    "partial_results": "Insider selling cluster large-cap >5B: p=0.53, 20d=+0.01%, positive_rate=48% (n=78). Signal is noise. ABT hit 52w low on March 20 close=105.46 = exact 52w low.",
-    "blocked_by": "Nothing blocking. All research tasks complete for this session.",
-    "key_insight": "GO (1cb6140f) and HD (86d28864) both have trigger=next_market_open confirmed. Insider selling cluster signal is definitively dead at large-cap. ABT is a free OOS test of the 52w-low short thesis - measure it Monday.",
-    "written_at": "2026-03-22T16:13:37.996938"
+    "current_investigation": "S&P 500 52-week low momentum SHORT (hypothesis 86d28864). HD trade queued for Monday open.",
+    "intermediate_findings": {
+      "ABT_qualifies": "ABT touched fresh 52w low on 2026-03-20 at 105.46. 35 trading days since Jan cluster (prior low 106.05). Confirmed first-touch. Market cap $183B. Added to watchlist for OOS tracking.",
+      "close_hd_script": "tools/close_hd_trade.py exists and is correct. Run at Friday March 27 close.",
+      "HD_trigger": "86d28864 trigger=next_market_open confirmed via trade_loop dry-run. Will execute Monday 9:30 ET.",
+      "ABT_decision": "NOT trading ABT separately \u2014 capital limit $5K per experiment already deployed via HD. Tracking as passive OOS event."
+    },
+    "blockers": "None. Waiting for Monday market open.",
+    "next_step": "Monday session: verify HD short position exists in Alpaca. If not, check trade_loop logs. ABT tracking is passive via watchlist.",
+    "written_at": "2026-03-22T16:17:00.949210"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
