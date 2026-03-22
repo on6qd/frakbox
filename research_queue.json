@@ -579,47 +579,39 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. CHECK GO and WD trade outcomes (GO exits ~March 26 at 3d close, WD exits ~March 27-28 at 5d close)",
-      "set_by_session": "2026-03-22T04:30:15.832314"
+      "task": "1. MONITOR GO trade outcome (enters Monday March 23 open ~$5.79, exits Wednesday March 26 close). VIX=26.78 Tier 3, n=6. Expected +2.78% abnormal return.",
+      "set_by_session": "2026-03-22T05:07:26.495897"
     },
     {
-      "task": "2. Run cluster_auto_scanner for new n=6-9 opportunities after GO/WD close",
-      "set_by_session": "2026-03-22T04:30:15.832320"
+      "task": "2. PDUFA WATCH: DNLI April 5 \u2014 if FDA issues CRL, immediately short (set trigger on 5f805860 with symbol=DNLI, after_hours_immediate). If approved, no trade (no validated approval hypothesis).",
+      "set_by_session": "2026-03-22T05:07:26.495902"
     },
     {
-      "task": "3. DNLI BLA PDUFA April 5 \u2014 not tradeable under existing hypotheses. If you want to research BLA rejection patterns as a new hypothesis, begin with historical BLA PDUFA outcomes for Accelerated Approval rare diseases (2018-2024)",
-      "set_by_session": "2026-03-22T04:30:15.832321"
+      "task": "3. PDUFA WATCH: REPL April 10 \u2014 if FDA issues second CRL, short via 5f805860 (symbol=REPL, after_hours_immediate). PoS=60% so ~40% rejection probability. Watch AH announcement.",
+      "set_by_session": "2026-03-22T05:07:26.495903"
     },
     {
-      "task": "4. S&P 500 Q2 rebalance June 7 \u2014 monitor for announcement (~4-6 weeks before effective date). Check news weekly. March 2026 additions (VRT, LITE, COHR, SATS) took effect March 23 \u2014 window already closed.",
-      "set_by_session": "2026-03-22T04:30:15.832322"
+      "task": "4. Cluster scan: Run openinsider_scraper for fresh n=6-9 clusters. VIX likely still elevated (26-28 range). Only n=6-9 qualifies in Tier 3. Next fresh cluster window: watch for clusters filed after March 22.",
+      "set_by_session": "2026-03-22T05:07:26.495904"
     },
     {
-      "task": "5. CEO departure signal (5dbcfb37) remains unexecutable without after-hours order support. Engineering task ad6b0f64 (build AH support in trader.py) has highest leverage \u2014 one-time build unlocks validated signal permanently.",
-      "set_by_session": "2026-03-22T04:30:15.832322"
+      "task": "5. S&P 500 Q2 rebalance: Announcement expected ~April 20 - May 1 for June 7 effective date. Check S&P press releases weekly. Hypothesis 061ae3a8 (symbol=TBD, long) ready to activate when announcement comes.",
+      "set_by_session": "2026-03-22T05:07:26.495905"
     }
   ],
   "session_handoff": {
-    "completed_this_session": [
-      "CRITICAL compliance fix: superseded 9f8a4c61 (only 2 validation indices) and 7b5d0120 (phantom indices). New hypothesis 416556df is the active n=6-9 cluster template with 4 real named validation events (CODI, NSIT, IRON, CRM) and validation_consistency_pct=64.6%.",
-      "Deprecated realtime_insider_scanner.py with warnings.warn() at import time",
-      "DNLI PDUFA April 5 verified: BLA on Accelerated Approval basis (Phase 1/2 biomarker data). NOT a clinical failure \u2014 not tradeable under d302c84b. FDA extension was for clinical pharmacology data, explicitly not efficacy/safety concerns.",
-      "Cluster scanner: 0 new clusters. GO and WD are the only active signals. VIX=26.78, Tier 3, n=6-9 only rule applies.",
-      "Data integrity: clean (verify_data_integrity returned ok=True, no issues)",
-      "S&P 500 March 2026 rebalance: VRT, LITE, COHR, SATS added effective March 23 (tomorrow). Announcement was March 6 \u2014 window already closed. No actionable trade under 061ae3a8."
+    "investigated": "GO/WD trigger review + DNLI/REPL PDUFA research + cluster scan + S&P500 scan",
+    "key_findings": [
+      "CRITICAL: WD trigger REMOVED. WD has n=3 insiders, VIX=26.78 (Tier 3). Rule: n<6 in Tier 3 = DO NOT TRADE (EV=-0.48%). Prevents likely losing trade.",
+      "GO trigger KEPT: n=6 insiders (.3M), VIX Tier 3 qualifies for n=6-9 tier (EV=+2.78%). Enters Monday March 23 open. No earnings until May 5.",
+      "DNLI April 5: Clean first BLA, BTD+PRV, analyst consensus 8/8 Buy, price $20.17 (analyst target ~$29). Main risk: small single-arm Phase 1/2 dataset. No validated approval long hypothesis.",
+      "REPL April 10: Second-attempt BLA after July 2025 CRL. 60% PoS (Leerink). Price $6.98. If rejected: short via 5f805860 (AH trigger on April 10).",
+      "No new n=6-9 clusters: Only GO (n=6, too recent to rescan) and SSP (n=16, noise) and BLCO (n=9, filed March 10 = 12 days stale) in last 30 days.",
+      "After-hours order support CONFIRMED working in trade_loop.py (after_hours_immediate trigger type). CEO departure signal (5dbcfb37) is now operationally executable."
     ],
-    "active_trades_to_monitor": {
-      "GO_1cb6140f": "3d hold, trigger Monday 9:30 ET, exit ~March 26. n=6 cluster (Tier 3 VIX). Expected +3.46% at 3d.",
-      "WD_76678219": "5d hold, trigger Monday 9:30 ET, exit ~March 27-28. n=3 cluster (below Tier 3 threshold \u2014 NOTE: this was set before 4-tier rule was finalized). Monitor closely."
-    },
-    "hypothesis_state": {
-      "416556df": "Active n=6-9 template (3d hold). 4 validation events, 64.6% consistency. TBD symbol \u2014 will be resolved when next cluster is found.",
-      "061ae3a8": "S&P 500 addition template. TBD \u2014 waiting for announcement. Next window: Q2 rebalance ~June 7 (announcement expected ~late April).",
-      "5dbcfb37": "CEO departure template. VALIDATED but unexecutable without AH order support.",
-      "d302c84b": "Clinical efficacy failure short. Ready to use when Phase 2/3 failure occurs."
-    },
-    "warning": "WD (76678219) was pre-registered under n=2+ rule, not the refined Tier 3 n=6-9 rule. n=3 at VIX=26.78 Tier 3 had expected_value=-0.48% (noise). Trade is already triggered \u2014 let it run but document this as a learning case for the outcome review.",
-    "written_at": "2026-03-22T04:30:15.832324"
+    "blocked_by": "Nothing currently blocked. GO trade executes autonomously Monday.",
+    "next_exact_step": "On April 5 (DNLI PDUFA): check FDA announcement. On April 10 (REPL PDUFA): if CRL, set trigger on 5f805860 with symbol=REPL, trigger=after_hours_immediate, direction=short.",
+    "written_at": "2026-03-22T05:07:26.495908"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
