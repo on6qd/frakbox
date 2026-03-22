@@ -790,94 +790,37 @@
   ],
   "next_session_priorities": [
     {
-      "task": {
-        "task": "PRIORITY 1: Verify GO (1cb6140f) trade executed at March 23 market open. Expected: LONG GO ~$5000. Run run.py --status."
-      },
-      "set_by_session": "2026-03-23T00:15:33.381730"
+      "task": "PRIORITY 1: Retrieve March 23 ABT open price and compute OOS return for 86d28864",
+      "set_by_session": "2026-03-23T00:22:17.595059"
     },
     {
-      "task": {
-        "task": "PRIORITY 2: Verify HD (86d28864) trade executed at March 23 market open. Expected: SHORT HD ~$5000."
-      },
-      "set_by_session": "2026-03-23T00:15:33.381735"
+      "task": "PRIORITY 2: Check GO (1cb6140f) and HD (86d28864) trade execution status after market open",
+      "set_by_session": "2026-03-23T00:22:17.595063"
     },
     {
-      "task": {
-        "task": "PRIORITY 3: Monitor ABT OOS data point. ABT first-touched 52w-low March 20 at 105.46. Track ABT close March 23 through March 27 for OOS validation of hypothesis 86d28864. ABT was not traded (was overwritten by HD before scanner fix). Now logged in logs/52w_low_signals.jsonl for OOS tracking."
-      },
-      "set_by_session": "2026-03-23T00:15:33.381737"
+      "task": "PRIORITY 3: Monitor NKE - it is 2.7% above its 52w low (51.00 from Apr 10, 2025); trigger SHORT if it touches",
+      "set_by_session": "2026-03-23T00:22:17.595065"
     },
     {
-      "task": {
-        "task": "PRIORITY 4: WD hypothesis (76678219) VIX gate still active. VIX closed at 26.78 on March 20 (most recent data) -- above 25 threshold. n=3 cluster, DO NOT TRADE until VIX < 25. Check VIX at session start each day. Gate: n=3-5 requires VIX < 25."
-      },
-      "set_by_session": "2026-03-23T00:15:33.381737"
+      "task": "PRIORITY 4: VIX watch - if VIX drops below 25, activate WD (76678219) and AMRZ (1f3ac0ec)",
+      "set_by_session": "2026-03-23T00:22:17.595065"
     },
     {
-      "task": {
-        "task": "PRIORITY 5: AMRZ hypothesis (1f3ac0ec) entry window EXPIRED March 23. VIX gate blocked trade (n=4, VIX>25). Hypothesis remains pending for next AMRZ cluster formation. No action needed this session -- but review if insider cluster still valid or if stock has moved too far."
-      },
-      "set_by_session": "2026-03-23T00:15:33.381738"
-    },
-    {
-      "task": {
-        "task": "PRIORITY 6: DNLI PDUFA April 5. Multi-pipeline so 5f805860 clinical failure short likely does not apply. Monitor outcome. If CRL issued, assess crash magnitude before trading."
-      },
-      "set_by_session": "2026-03-23T00:15:33.381741"
-    },
-    {
-      "task": {
-        "task": "PRIORITY 7: ARVN PDUFA June 5. Single-pipeline NDA for PROTAC. If CRL issued, would qualify under 5f805860. Set reminder/watchlist check."
-      },
-      "set_by_session": "2026-03-23T00:15:33.381742"
+      "task": "PRIORITY 5: S&P 500 addition hypothesis 061ae3a8 - all 4 March 2026 additions confirmed positive (VRT +4.24%, LITE +9.97%, COHR +5.86%, SATS +0.73% at 1d). Next quarterly announcement expected late May 2026.",
+      "set_by_session": "2026-03-23T00:22:17.595066"
     }
   ],
   "session_handoff": {
-    "investigations_in_progress": {
-      "GO_trade": {
-        "hypothesis_id": "1cb6140f",
-        "symbol": "GO",
-        "trigger": "next_market_open",
-        "position_size": 5000,
-        "direction": "long",
-        "stop_loss_pct": 10,
-        "hold_days": 3,
-        "expected_abnormal_return": "2.5% over 3d",
-        "oos_consistency": "75%",
-        "notes": "First live test of insider cluster hypothesis. 6 insiders including CEO filed in March 2026."
-      },
-      "HD_trade": {
-        "hypothesis_id": "86d28864",
-        "symbol": "HD",
-        "trigger": "next_market_open",
-        "position_size": 5000,
-        "direction": "short",
-        "stop_loss_pct": 8,
-        "take_profit_pct": 10,
-        "hold_days": 5,
-        "expected_abnormal_return": "-1.68% over 5d",
-        "signal_date": "2026-03-20",
-        "close_at_signal": 320.75,
-        "notes": "First-touch 52w-low on March 20, breach=-1.9%"
-      },
-      "ABT_OOS": {
-        "hypothesis_id": "86d28864",
-        "symbol": "ABT",
-        "signal_date": "2026-03-20",
-        "close_at_signal": 105.46,
-        "52w_low": 106.05,
-        "breach_pct": -0.6,
-        "entry_price": "open on March 23 (first trading day)",
-        "notes": "ABT detected by scanner as separate signal on March 20. Scanner only set HD trigger (last write wins). ABT is valid OOS data point but no paper trade was placed. Track for 5 trading days from March 23 open.",
-        "oos_instance_number": "would be instance 4+ in validation period"
-      }
-    },
-    "blocked_hypotheses": {
-      "WD_76678219": "VIX gate: VIX=26.78 (Tier 3). n=3 cluster = DO NOT TRADE at VIX>25. Monitor VIX daily."
-    },
-    "scanner_bug": "fiftytwo_week_low_scanner.py: When 2+ signals detected simultaneously, only last signal is set as trigger. ABT was overwritten by HD on March 20. Fix needed.",
-    "data_note": "ABT March 20 close = 105.46 = 52w low. No March 21-22 data (weekend). March 23 is first trading day after signal -- entry should be March 23 open.",
-    "written_at": "2026-03-23T00:10:36.234560"
+    "session_date": "2026-03-22",
+    "market_status": "Closed (Sunday 7:17 PM ET). Monday March 23 open is next.",
+    "go_hd_triggers": "Both GO (1cb6140f LONG) and HD (86d28864 SHORT) have trigger=next_market_open. Trade loop will execute at 9:30 AM ET.",
+    "abt_oos": "ABT touched 52w low (105.27) on March 20 close at 105.46. Entry at March 23 open is PENDING. No March 23 data available yet.",
+    "vix_regime": "VIX closed at 26.78 on March 20 -- elevated regime. Rising trend (22.37->26.78 over the week). WD and AMRZ gates are CLOSED.",
+    "sp500_additions": "March 2026: VRT, LITE, COHR, SATS added effective March 23. All showed positive abnormal returns (1d: +4.24%, +9.97%, +5.86%, +0.73%). These are included in hypothesis 061ae3a8 validation set (14 OOS events, 100% positive rate).",
+    "new_clusters": "OpenInsider shows POOL (7.4B, 3x, March 13) and GRNT (722M, 5x, March 12). POOL is viable size but VIX too high for new experiments. AVBC and GCBC below 500M filter.",
+    "nke_watch": "NKE at 52.37, 52w low is 51.00 (2.7% away). Not a signal yet but closest to breach. Fiftytwo_week_low_scanner will catch it.",
+    "commits": "Scanner fix already committed (62c216f). No new files to commit this session.",
+    "written_at": "2026-03-23T00:22:17.595068"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
