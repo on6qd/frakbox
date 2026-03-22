@@ -3599,6 +3599,11 @@
         "date": "2026-03-22",
         "type": "data_correction",
         "text": "GOSS abnormal_3d corrected from -37.21 to +1.55 (the correct measured value). The -37.21 figure in historical_evidence was a recording error from session 2026-03-21. Actual measurement: GOSS Feb 23 2026 Phase 3 PROSERA failure, entry at open Feb 24 (0.388), 1d abnormal=+4.40%, 3d abnormal=+1.55%, 5d abnormal=+9.67%. GOSS is a REVERSAL case, not a continuation case. ROOT CAUSE of reversal: Gossamer Bio simultaneously announced FDA Type C meeting plans and strong subgroup results (intermediate/high-risk PAH p=0.021), giving market a stated regulatory path forward. Same mechanism as AVIR reversal (Roche partnership kept path open). GOSS stock bounced +49% from entry by March 4 as market priced subgroup FDA path. RECOMMENDATION: Add qualifying criterion 6 to event_description: company must have NO stated regulatory path forward (no announced FDA meeting / no subgroup NDA plan). With GOSS as reversal: N=11, consistency_pct=90.9% (10/11), avg_3d=-23.93%, stdev=11.72%. Validation period consistency: 80% (4/5). Signal still passes multiple testing. Confidence reduced from 8 to 7 to reflect one known reversal exception."
+      },
+      {
+        "date": "2026-03-22",
+        "type": "exclusion_analysis",
+        "text": "ALDX (March 17, 2026 reproxalap CRL) evaluated for inclusion. EXCLUDED on 2 criteria: (1) Criterion 2 FAIL: multi-pipeline company -- has ADX-2191 (Phase 2 active, vitreoretinal lymphoma/RP) and ADX-248/ADX-246 (IND filings planned 2026, metabolic inflammation and dry AMD respectively). Not a single-pipeline company. (2) Criterion 6 FAIL: company announced intent to request Type A FDA meeting within 30 days to understand actions needed for NDA approval -- this is a stated regulatory path forward for the failed drug. Price action confirms exclusion was correct: stock BOUNCED +50.8% raw / +53.88% abnormal over 3 days post-crash (entry .20 March 18 open, exit .81 March 20 close). Pre-anticipation: 10-day decline was -17.2% (would have passed the 20% threshold). Crash magnitude: -70.7% (would have passed the 55% threshold). This is the second GOSS-like case confirming criterion 6 (path forward = reversal, not continuation)."
       }
     ],
     "avg_abnormal_return": -23.93,
