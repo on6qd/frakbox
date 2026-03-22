@@ -336,6 +336,15 @@
       "findings": "COMPLETED. Full population N=1566 (2021-2025): Calm VIX<20: EV=+3.31% (N=971), Elevated VIX 20-30: EV=+1.10% (N=501), Crisis VIX>30: EV=+1.38% (N=94). SPY trend r=0.030 p=0.23 -- NOT predictive. VIX gate added to cluster_auto_scanner.py. Prior finding of 'elevated VIX = best regime' was a small-sample artifact."
     },
     {
+      "id": "81fe0d5c",
+      "category": "insider_buying_cluster",
+      "question": "Pre-register a specialized n=6-9 cluster hypothesis with multi-horizon backtest. Current cluster_with_returns.csv only has 5d returns. Need: run measure_event_impact() on n=6-9 events with full 1d,3d,5d,10d,20d horizons to confirm passes_multiple_testing=True at n=6-9 tier. Discovery: 2022 (n=58). Validation: 2023 (n=61), 2024 (n=66), 2025 (n=56). If passes: pre-register as 'insider_cluster_n69' hypothesis, expected_magnitude=3.0%, expected_timeframe=5d, VIX restriction: 'all regimes except crisis (VIX>30)'.",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "n=6-9 tier is regime-robust (works in elevated VIX, p=0.002). n>=10 is noise. A formal hypothesis would allow GO/WD-like trades specifically when VIX is elevated AND n=6-9, which current hypotheses don't cleanly cover.",
+      "added": "2026-03-22T03:24:10.678857"
+    },
+    {
       "id": "seed-003",
       "category": "fda_decision",
       "question": "For Phase 3 FDA approvals/rejections of novel drugs (not generics, not supplements), what is the typical abnormal return at 1d and 5d horizons? Does the effect differ between first-time submissions and resubmissions after a Complete Response Letter?",
@@ -533,24 +542,39 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. CRITICAL: Check GO (1cb6140f) and WD (76678219) trade outcomes. GO entered March 23, 3d exit March 26/27. WD entered March 23, 5d exit March 27/28. Record P&L and update hypothesis live_validation field.",
-      "set_by_session": "2026-03-22"
+      "task": {
+        "task": "1. CRITICAL: Check GO (1cb6140f) and WD (76678219) trade outcomes. GO entered March 23, 3d exit March 26. WD entered March 23, 5d exit March 27-28. Record P&L and update hypothesis live_validation field. GO is in n=6-9 elevated VIX tier (expected to work). WD is n=3 elevated VIX (expected to be marginal/fail).",
+        "set_by_session": "2026-03-22"
+      },
+      "set_by_session": "2026-03-22T03:24:25.298406"
     },
     {
-      "task": "2. Monitor DNLI PDUFA (April 5, 2026) for hypothesis 5f805860 activation. If CRL, SHORT at next open. Check drug: DNL310 for Hunter syndrome -- first-ever NDA, high bar.",
-      "set_by_session": "2026-03-22"
+      "task": {
+        "task": "2. Run n=6-9 specialized multi-horizon backtest. Use insider_cluster_detector output filtered to n=6-9 events, run measure_event_impact() with 1d,3d,5d,10d,20d horizons. Verify passes_multiple_testing=True. If yes, pre-register n=6-9 hypothesis as described in research queue.",
+        "set_by_session": "2026-03-22"
+      },
+      "set_by_session": "2026-03-22T03:24:25.298413"
     },
     {
-      "task": "3. Monitor REPL PDUFA (April 10, 2026). This is a BLA RE-SUBMISSION after July 2025 CRL. If rejected AGAIN: do NOT trade (repeat CRL = market bounce, not crash). Only trade 5f805860 if approved and then immediately rejected in future cycle.",
-      "set_by_session": "2026-03-22"
+      "task": {
+        "task": "3. Monitor DNLI PDUFA (April 5, 2026) for hypothesis 5f805860 activation. If CRL, SHORT at next open. Drug: DNL310 for Hunter syndrome -- first NDA, priority review. Pre-verify single-pipeline status and post-crash price >$0.50.",
+        "set_by_session": "2026-03-22"
+      },
+      "set_by_session": "2026-03-22T03:24:25.298414"
     },
     {
-      "task": "4. INVESTIGATION NEEDED: n=6-9 clusters vs n>=10 clusters. Full-population data shows n>=10 has ZERO signal (p=0.96). Why? 10b5-1 contamination? Large-cap bias? Test n=6-9 as optimal tier explicitly. This could sharpen the cluster rule significantly.",
-      "set_by_session": "2026-03-22"
+      "task": {
+        "task": "4. Test VWAP momentum signal (task 6730a683). Large universe (100 stocks, N>5000), threshold 15% above VWAP_252. Regime filter: calm VIX only. Check if net return exceeds 1% after costs. Tools exist at tools/vwap_deviation_signal.py.",
+        "set_by_session": "2026-03-22"
+      },
+      "set_by_session": "2026-03-22T03:24:25.298414"
     },
     {
-      "task": "5. SSP (16-insider cluster) is underwater vs all purchase prices. Continue monitoring as live test. When exit window arrives, record outcome in knowledge base.",
-      "set_by_session": "2026-03-22"
+      "task": {
+        "task": "5. SSP (16-insider cluster) is at $3.37, below all insider purchase prices (was $3.86-4.60 range during buying). This is a live test of the n>=10=noise finding. Record outcome when exit window passes.",
+        "set_by_session": "2026-03-22"
+      },
+      "set_by_session": "2026-03-22T03:24:25.298415"
     }
   ],
   "session_handoff": {
