@@ -446,6 +446,15 @@
       "findings": "3-WAY INTERACTION (CEO/CFO x cluster_size x VIX): DEAD END for new hypothesis. n3_5+CEO/CFO+calm VIX shows +7.05% mean (2023+, N=198) but CEO/CFO PREMIUM within n3_5 vs n3_5 without CEO/CFO fails Mann-Whitney (p=0.22) and Bonferroni correction. Key insight: n6_9 hypothesis (416556df) is more symmetric (skewness=1.90 vs 8.23) and does NOT benefit from CEO/CFO filter (CEO/CFO adds nothing for n6_9: +4.62 vs +5.10). The pre-registered hypotheses (2bbe0f04 for CEO/CFO, 416556df for n6_9) are the correct trading rules. No new hypothesis warranted. VIX gate confirmed: calm VIX is critical for n3_5 CEO/CFO but n6_9 works in VIX<=30 as well."
     },
     {
+      "id": "cd2e18f3",
+      "category": "sp500_52w_low",
+      "question": "ABT (Abbott) also breached 52-week low on March 20 (-0.6%). Did NOT trade due to capacity. Check ABT performance on March 23-27 as additional OOS validation data point for hypothesis 86d28864. Also run fiftytwo_week_low_scanner.py --dry-run weekly to catch new signals.",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "Second concurrent signal validates the scanner works. ABT outcome is free data for hypothesis 86d28864 even if we didnt trade it.",
+      "added": "2026-03-22T14:58:01.622136"
+    },
+    {
       "id": "seed-003",
       "category": "fda_decision",
       "question": "For Phase 3 FDA approvals/rejections of novel drugs (not generics, not supplements), what is the typical abnormal return at 1d and 5d horizons? Does the effect differ between first-time submissions and resubmissions after a Complete Response Letter?",
@@ -540,6 +549,15 @@
       "status": "pending",
       "reasoning": "Large-cap version dead-ended due to market efficiency. Mid-cap test is natural follow-up. Frazzini & Lamont (2007) documented drift in 1980s-90s data when market efficiency was lower for smaller stocks.",
       "added": "2026-03-22T12:24:37.370198"
+    },
+    {
+      "id": "2298d644",
+      "category": "sp500_52w_low",
+      "question": "Schedule fiftytwo_week_low_scanner.py as daily scan (weekdays at 8 PM ET or after market close). Should run after cluster_auto_scanner.py. Add launchd plist similar to cluster_auto_scanner.",
+      "priority": 3,
+      "status": "pending",
+      "reasoning": "Scanner needs to run daily to catch new 52-week low events before the entry window closes. Currently manual only.",
+      "added": "2026-03-22T14:58:01.622998"
     },
     {
       "id": "d288c2b8",
@@ -728,36 +746,68 @@
       "hypothesis_template": "061ae3a8",
       "added": "2026-03-22T07:17:09.510886",
       "status": "watching"
+    },
+    {
+      "event": "HD SHORT: Close at market close Friday March 27. Run: python tools/close_hd_trade.py. Verify position in Alpaca first.",
+      "expected_date": "2026-03-27",
+      "symbol": "HD",
+      "hypothesis_template": {
+        "hypothesis_id": "86d28864",
+        "action": "close short position"
+      },
+      "added": "2026-03-22T14:58:01.621137",
+      "status": "watching"
     }
   ],
   "next_session_priorities": [
     {
-      "task": "1. CRITICAL (Mon March 23): Confirm GO trade (1cb6140f) executed at open via 'python run.py --status'. Account should show active position in GO.",
-      "set_by_session": "2026-03-22T14:22:56.105539"
+      "task": {
+        "task": "1. CRITICAL (Mon March 23): Confirm GO (1cb6140f) AND HD (86d28864) both executed at open via python run.py --status. GO is LONG, HD is SHORT.",
+        "set_by_session": "2026-03-22T15:00:00"
+      },
+      "set_by_session": "2026-03-22T14:58:16.039163"
     },
     {
-      "task": "2. CRITICAL (Thu March 26): Close GO trade via 'python tools/close_go_trade.py'; record actual P&L to complete hypothesis 1cb6140f with spy_return_pct and actual_return_pct.",
-      "set_by_session": "2026-03-22T14:22:56.105548"
+      "task": {
+        "task": "2. CRITICAL (Thu March 26): Close GO long via python tools/close_go_trade.py. Record actual return vs expected 2.5% abnormal.",
+        "set_by_session": "2026-03-22T15:00:00"
+      },
+      "set_by_session": "2026-03-22T14:58:16.039168"
     },
     {
-      "task": "3. Research: Short-interest spike signal. When a stock's short interest as % of float rises sharply (>5pp in 2 weeks), test 10-20d subsequent returns. Use FINRA bimonthly short sale reports (free at finra.org). Hypothesis: rising short interest predicts underperformance (not squeeze). Academic base: Asquith, Pathak & Ritter (2005).",
-      "set_by_session": "2026-03-22T14:22:56.105549"
+      "task": {
+        "task": "3. CRITICAL (Fri March 27): Close HD short via python tools/close_hd_trade.py. Record actual return vs expected -1.68% abnormal.",
+        "set_by_session": "2026-03-22T15:00:00"
+      },
+      "set_by_session": "2026-03-22T14:58:16.039169"
     },
     {
-      "task": "4. Research: Insider selling cluster (mirror of buying). Use EDGAR Form 4 bulk data (same infrastructure as insider_cluster_detector.py) but filter for open-market SELLS (transaction_type='S'). Test if 3+ insider sells within 30 days predicts underperformance in 2023+ regime. Caveat: insiders sell for many non-informative reasons (diversification, tax, exercise) so signal expected to be weaker than buying.",
-      "set_by_session": "2026-03-22T14:22:56.105549"
+      "task": {
+        "task": "4. Research: Short-interest spike signal (FINRA bimonthly data). NASDAQ API provides 24-period short interest history for NASDAQ stocks. Test: when short interest increases >25% in one bimonthly period, does stock underperform in next 10-20 days? Asquith, Pathak & Ritter (2005). Note: only 12 months of history available via NASDAQ API - may need alternative data source.",
+        "set_by_session": "2026-03-22T15:00:00"
+      },
+      "set_by_session": "2026-03-22T14:58:16.039170"
     },
     {
-      "task": "5. Research: 52-week low contrarian bounce for S&P 500 large-caps. Pure yfinance signal. Collect dates when each S&P 500 stock first touches 52-week low (i.e., new low not seen in prior 12 months), measure 5-20d abnormal returns. Hypothesis: mean reversion after capitulation.",
-      "set_by_session": "2026-03-22T14:22:56.105550"
+      "task": {
+        "task": "5. Research: Insider selling cluster (mirror of buying). Use EDGAR Form 4 bulk, filter transaction_type=S. Test if 3+ insider sells within 30 days predicts underperformance. Expected to be weaker than buy signal due to non-informative selling (diversification, tax).",
+        "set_by_session": "2026-03-22T15:00:00"
+      },
+      "set_by_session": "2026-03-22T14:58:16.039170"
     },
     {
-      "task": "6. Monitor VIX for WD hypothesis (76678219): WD cluster has n=3 insiders - only tradeable when VIX<25. Check VIX at session start. Entry window likely closed if VIX stays elevated.",
-      "set_by_session": "2026-03-22T14:22:56.105551"
+      "task": {
+        "task": "6. Run fiftytwo_week_low_scanner.py --dry-run to check for new 52-week low signals. ABT also breached on March 20 (not traded). Check ABT return as free OOS validation for 86d28864.",
+        "set_by_session": "2026-03-22T15:00:00"
+      },
+      "set_by_session": "2026-03-22T14:58:16.039172"
     },
     {
-      "task": "7. Low priority: Fix edgar_ceo_departure_scanner.py false positives (3+ friction entries). Note: ceo_performance_failure_departure_short already dead-ended so scanner fix is informational only.",
-      "set_by_session": "2026-03-22T14:22:56.105551"
+      "task": {
+        "task": "7. Check VIX for WD hypothesis (76678219): needs VIX<25 for n=3 cluster. If VIX drops below 25 this week, activate WD trade.",
+        "set_by_session": "2026-03-22T15:00:00"
+      },
+      "set_by_session": "2026-03-22T14:58:16.039173"
     }
   ],
   "session_handoff": {
