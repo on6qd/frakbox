@@ -520,29 +520,32 @@
   ],
   "next_session_priorities": [
     {
-      "task": "Regime-conditional insider cluster signal: POOL and AMRZ both went against the signal during SPY -3% drawdown (Mar 17-20). Need to test whether insider cluster signal should be gated by VIX/SPY trend filter.",
-      "set_by_session": "2026-03-22T01:53:24.673661"
+      "task": "1. Monitor GO and WD trades (open Monday March 23). GO closes Thursday March 26. WD closes Tuesday March 31.",
+      "set_by_session": "2026-03-22T01:53:57.122640"
     },
     {
-      "task": "Management-flag (M) insider clusters: AHCO showed strong 1d abnormal (+3.98%) but faded by day 5 (-0.72%). Test whether M-flag clusters systematically generate faster, stronger 1-3d returns compared to director-only clusters.",
-      "set_by_session": "2026-03-22T01:53:24.673670"
+      "task": "2. Monitor DNLI April 5 PDUFA - if FDA issues CRL, assess quickly for hypothesis 5f805860 short.",
+      "set_by_session": "2026-03-22T01:53:57.122651"
     },
     {
-      "task": "WD and GO trades still pending with next_market_open triggers \u2014 verify they execute correctly on Monday March 23 open.",
-      "set_by_session": "2026-03-22T01:53:24.673672"
+      "task": "3. Scan for CEO departure events (EDGAR 8-K scanner) - first qualifying event should be traded using after_hours_immediate trigger.",
+      "set_by_session": "2026-03-22T01:53:57.122654"
     },
     {
-      "task": "AHCO is not actionable: 7+ trading days have passed, 1d signal already fired and faded. Use as validation data point only.",
-      "set_by_session": "2026-03-22T01:53:24.673673"
+      "task": "4. Check POOL/AMRZ outcomes as insider cluster validation data.",
+      "set_by_session": "2026-03-22T01:53:57.122655"
+    },
+    {
+      "task": "5. Research new signal: government contract awards to small/mid-cap defense/tech contractors (DoD, NASA, NIH awards).",
+      "set_by_session": "2026-03-22T01:53:57.122655"
     }
   ],
   "session_handoff": {
-    "investigation": "Outcome check on missed clusters POOL/AMRZ and AHCO assessment",
-    "current_state": "All three measured. POOL and AMRZ missed (negative abnormal returns, market selloff overwhelmed signal). AHCO showed +3.98% abnormal on day 1 but is no longer tradeable \u2014 window has closed.",
-    "key_finding": "Market regime (SPY direction) appears to interact with insider cluster signal. Both POOL and AMRZ filed clusters at the start of a broad 3% SPY selloff and underperformed. This is consistent with the documented regime_note on hypothesis 0a093c90 that the 20d signal is regime-dependent.",
-    "blocked_by": "Need more regime-filtered backtest data to determine if a SPY trend gate would improve signal. Cannot conclude from 3 observations.",
-    "next_step": "Run the existing insider cluster backtest (hypothesis 32be9d90 or 0a093c90) with regime_filter=calm to quantify how much the calm-regime signal differs from the full-sample signal. This would support or refute a regime gate.",
-    "written_at": "2026-03-22T01:53:24.673675"
+    "current_investigation": "Session wrap-up after GOSS verification, after-hours engineering, and disposition effect dead end.",
+    "intermediate_findings": "After-hours order support added to trader.py + trade_loop.py (extended_hours=True, after_hours_immediate trigger). GO/WD pending at next_market_open. GOSS verified: clinical failure short signal confidence 7, consistency 90.9%. CEO departure signal (5dbcfb37) now tradeable. DNTI CAPTIVATE Q2 2026 is upcoming clinical failure candidate. No new insider clusters today. POOL/AMRZ outcomes not yet checked.",
+    "blocked_by": "Nothing blocking. GO/WD trades staged and will execute automatically.",
+    "key_insight": "CEO departure short (5dbcfb37) is now fully tradeable with after_hours_immediate trigger. On next qualifying event (sudden unexpected CEO departure at large-cap), set trigger immediately after 8-K filing. GOSS qualifying criterion updated: no stated regulatory path forward required.",
+    "written_at": "2026-03-22T01:53:57.122657"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
