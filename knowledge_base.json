@@ -626,6 +626,17 @@
       "false_positive_rate_observation": "2/2 candidates from 2026-03-18 scan were false positives. Scanner needs Item 5.02 filtering.",
       "recommended_scanner_improvement": "Before keyword classification, verify Item 5.02 is listed in the 8-K exhibit index. This eliminates merger proxy supplements, earnings releases, and other Item 8.01 filings that mention officers incidentally.",
       "last_updated": "2026-03-22T13:46:08.253612"
+    },
+    "sp500_52w_low_momentum_short": {
+      "direction": "short",
+      "avg_abnormal_5d": -1.68,
+      "consistency_pct": 62.2,
+      "n_events": 209,
+      "p_value": 0.0001,
+      "time_period": "2021-2025",
+      "regime": "all_vix_regimes",
+      "note": "First touch of 52-week low predicts continued decline, not bounce. Signal is SHORT at next-day open. Hypothesis pre-registered as 86d28864.",
+      "last_updated": "2026-03-22T14:55:22.573637"
     }
   },
   "dead_ends": [
@@ -832,6 +843,11 @@
       "reason": "Tested analyst downgrades (Bullish->Hold/Neutral) from major banks across 40 S&P 500 large-caps, 2021-2025, N=425 events. Signal IS real: avg_abnormal_3d=-0.64%, negative_rate=59.3%, wilcoxon_p<0.0001, bootstrap CI [-0.925%,-0.350%] excludes zero. Passes multiple testing. However: avg round-trip transaction cost=0.367% (volume-based, large-cap), leaving net expected return of only ~0.27% \u2014 well below 1.0% minimum net return threshold. Dead end due to insufficient edge after realistic execution costs, not due to absence of signal. Note: if data source improves (pre-market data, access to analyst notes before open), this signal may become tradeable.",
       "recorded": "2026-03-22T14:20:26.503811",
       "updated": "2026-03-22T14:22:13.713326"
+    },
+    {
+      "event_type": "sp500_52w_low_bounce",
+      "reason": "52-week low first-touch for large-cap S&P 500 stocks does NOT generate positive returns (bounces). Tested 209 events 2021-2025. Results: 1d avg=-1.28% (76% negative), 5d avg=-1.68% (62% negative). The signal is REVERSED from hypothesis. Signal is a SHORT, not LONG. Momentum continuation dominates mean reversion for large-cap stocks. This is consistent with George & Hwang (2004): 52-week price levels act as momentum anchors, not mean-reversion triggers.",
+      "recorded": "2026-03-22T14:55:22.572291"
     }
   ]
 }
