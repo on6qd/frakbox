@@ -403,37 +403,37 @@
       "additions": [
         {
           "symbol": "VRT",
-          "1d_abnormal": 4.2,
+          "1d_abnormal": 4.24,
           "3d_abnormal": 6.1,
-          "5d_abnormal": 4.4
+          "5d_abnormal": 4.44
         },
         {
           "symbol": "LITE",
-          "1d_abnormal": 10.0,
+          "1d_abnormal": 9.97,
           "3d_abnormal": 15.7,
           "5d_abnormal": 9.2
         },
         {
           "symbol": "COHR",
-          "1d_abnormal": 5.9,
+          "1d_abnormal": 5.86,
           "3d_abnormal": 5.8,
-          "5d_abnormal": 4.2
+          "5d_abnormal": 4.19
         },
         {
           "symbol": "SATS",
-          "1d_abnormal": 0.7,
+          "1d_abnormal": 0.73,
           "3d_abnormal": 3.1,
-          "5d_abnormal": 1.6
+          "5d_abnormal": 1.65
         }
       ],
       "avg_1d_abnormal": 5.2,
       "avg_3d_abnormal": 7.66,
+      "avg_5d_abnormal": 4.87,
       "positive_rate_1d": 100.0,
       "positive_rate_3d": 100.0,
-      "note": "We missed this trade (watchlist only had June 2026). Added to backtest evidence. Confirms signal strength in Q1 2026 market (AI infrastructure theme: VRT/COHR/LITE all AI-adjacent).",
-      "missed_opportunity_pct": 5.2,
-      "next_opportunity": "June 2026 Q2 rebalance announcement, expected ~June 5-7, 2026",
-      "last_updated": "2026-03-21T20:43:15.229218"
+      "passes_multiple_testing": false,
+      "note": "N=4 insufficient for multiple testing correction standalone, but all 4 events positive. Fully consistent with hypothesis 061ae3a8. Confirms signal strength in Q1 2026. SATS is weakest (+0.73% abnormal 1d) \u2014 likely largest-cap and most anticipated. LITE strongest (+9.97% abnormal 1d). Missed this trade (watchlist only had June 2026). Next: June 2026 Q2 rebalance.",
+      "last_updated": "2026-03-22T07:13:55.763817"
     },
     "vwap_breakout_momentum": {
       "direction": "long",

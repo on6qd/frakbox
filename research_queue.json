@@ -605,6 +605,22 @@
       "added": "2026-03-22T05:05:53.070469",
       "status": "watching",
       "note": " | PIPELINE CHECK: REPL has multi-pipeline (RP1, RP2, RP3) - verify whether RP2/RP3 are material to valuation before trading on second CRL. If RP2/RP3 provide floor, may not qualify as single-pipeline for d302c84b. Monitor April 10."
+    },
+    {
+      "event": "RCKT (Rocket Pharmaceuticals) PDUFA March 28, 2026 for KRESLADI (gene therapy LAD-I). BLA resubmission after prior CRL. If FDA issues a second CRL with clinical/efficacy deficiency AND stock crashes >55%, evaluate for d302c84b short. PRE-QUALIFY: market cap ~$449M (qualifies <$500M). Check single-pipeline status (Fanconi Anemia and PKD programs paused). Base case is approval - do NOT pre-short.",
+      "expected_date": "2026-03-28",
+      "symbol": "RCKT",
+      "hypothesis_template": "d302c84b",
+      "added": "2026-03-22T07:13:04.656924",
+      "status": "watching"
+    },
+    {
+      "event": "S&P 500 Q2 2026 quarterly rebalance announcement expected Friday June 5, 2026 after market close (~5:15 PM ET). Effective date June 19, 2026. Entry at Monday June 8 open. 5-day hold. Watch spglobal.com/press-releases for announcement. Candidate names: SOFI, ARES, MSTR. Hypothesis 061ae3a8 (conf=9, avg +5% abnormal at 5d, 100% recent consistency).",
+      "expected_date": "2026-06-05",
+      "symbol": "TBD",
+      "hypothesis_template": "061ae3a8",
+      "added": "2026-03-22T07:13:04.657724",
+      "status": "watching"
     }
   ],
   "next_session_priorities": [
