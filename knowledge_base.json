@@ -185,6 +185,17 @@
       ],
       "gaps": "Broader open-market repurchase signal in small-cap value stocks untested (N=50+ possible). First-ever buyback structurally hard to isolate at scale.",
       "recorded": "2026-03-22T00:33:25.739138"
+    },
+    "analyst_coverage_initiation": {
+      "summary": "Analyst coverage initiation (first 'buy' or 'strong buy' rating from major broker-dealer) generates positive abnormal returns. Literature: Irvine (2003) found +3.8% cumulative abnormal returns in 14 days pre-announcement (information leakage) and +1.2% on announcement day itself for initiations with 'buy' recommendation. Barber et al (2001): upgrades (from hold to buy) generate +0.35% day 0, but effect has decayed. Key problem: data availability - consensus analyst data typically requires Bloomberg/FactSet paid API. EDGAR does not contain analyst ratings. Cannot backtest without paid data source.",
+      "known_magnitude": "+1-4% on initiation day for 'buy' recommendations; effect stronger for small/mid-cap stocks with few analysts",
+      "known_timeframe": "Primarily day-0 to day+1 for intraday effect; post-announcement drift weaker than PEAD",
+      "sources": [
+        "Irvine (2003) JF: Analyst Forecasts and Brokerage-Firm Trading",
+        "Barber et al (2001) JF: Can Investors Profit from the Prophets"
+      ],
+      "gaps": "Cannot backtest without paid analyst data (Bloomberg/Refinitiv). Free data sources do not have reliable analyst initiation dates. Signal likely decayed in liquid large-caps but may persist in mid-cap coverage initiations.",
+      "recorded": "2026-03-22T05:38:32.398662"
     }
   },
   "known_effects": {
@@ -478,6 +489,15 @@
       "confidence": 7,
       "passes_multiple_testing": true,
       "last_updated": "2026-03-22T03:56:37.686580"
+    },
+    "insider_buying_cluster_n6to9": {
+      "signal_period": "2023-2025 (but NOT 2021-2022)",
+      "effect": "n=6-9 cluster 3d abnormal returns: 2023-2025 N=179 avg=+4.53% pos=67% p<0.0001; 2021-2022 N=133 avg=+0.77% pos=53% p=0.23 -- NO SIGNAL",
+      "note": "The n=6-9 signal is ONLY statistically significant in 2023-2025 data. The 2021-2022 period shows no signal, likely contaminated by SPAC-era insider mechanics and micro-cap noise. Full 2021-2025 population (N=353) passes multiple testing at 3d/5d/10d but this is driven by the 2023-2025 subset.",
+      "implication": "Hypothesis 416556df pre-registered with 2021-2022 as 'discovery' but this period shows no signal. The true discovery is 2023-2025. This means we lack a proper pre-2023 discovery period. Treat hypothesis as exploratory until a proper temporal OOS split is available with 2026+ data.",
+      "discovery_backtest": "All 2021-2025: N=353, 3d avg=+2.39% p<0.0001, 5d avg=+3.72% p<0.0001, passes_multiple_testing=True",
+      "by_period": "2021-2022: N=133, 3d avg=+0.77% p=0.23, NOT significant; 2022-only: N=56, p=0.16 NOT significant; 2023-2025: N=179, 3d avg=+4.53% p<0.0001, STRONG signal",
+      "last_updated": "2026-03-22T05:35:56.829072"
     }
   },
   "dead_ends": [

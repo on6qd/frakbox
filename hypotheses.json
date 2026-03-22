@@ -4618,13 +4618,14 @@
     "survivorship_bias_note": "Discovery (2021-2022): 39% measurement failure due to delisted tickers (SPAC-era companies, micro-cap acquisitions). Exceeds 30% threshold but failures are predominantly acquired companies (positive survivorship bias). Validation (2023-2025): <1% failure rate, clean data.",
     "selection_bias_note": "Events selected from SEC quarterly bulk data (objective). The 6-9 sub-tier is a data-snooped refinement discovered through tier analysis. Mitigated by strict temporal OOS: discovery closed before validation began.",
     "passes_multiple_testing": true,
-    "multiple_testing_warning": null,
+    "multiple_testing_warning": "Full population 2021-2022 discovery does NOT pass multiple testing when tested systematically. Signal only significant in 2023-2025 and full 2021-2025 aggregate. Treat as early-stage confidence, not validated.",
     "confounder_warnings": null,
     "symbol_warnings": [
       "Symbol is TBD \u2014 must be resolved to a real ticker before activation."
     ],
     "dead_end_warnings": null,
     "trade": null,
-    "result": null
+    "result": null,
+    "data_quality_note": "IMPORTANT: Full-population n=6-9 backtest (2021-2025, N=353) confirms signal (3d avg=+2.39%, p<0.0001, passes_multiple_testing=True). However, temporal OOS analysis reveals the signal is concentrated in 2023-2025 (N=179, avg 3d=+4.53%, 67% pos, p<0.0001) while 2021-2022 shows NO signal (N=133, avg 3d=+0.77%, p=0.23). The hypothesis was pre-registered based on a 16-event quality-filtered sample that showed 62.5% consistency. The full-population 2021-2022 period fails due to SPAC-era insider mechanics and micro-cap contamination. CAUTION: Discovery period weakness means this hypothesis should be treated as exploratory-grade confidence. GO trade (first live test) will provide the first true prospective OOS test."
   }
 ]

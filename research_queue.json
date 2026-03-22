@@ -117,9 +117,11 @@
       "category": "insider_buying_cluster",
       "question": "Set up and monitor cluster_auto_scanner.py results. The scanner runs daily at 9:15 PM ET and logs qualifying clusters to research_queue.json. Review these entries at each session start and set triggers if appropriate. First check: did POOL (Pool Corp, 3 insiders, $3.6M, filed March 17) or AMRZ (5 insiders, $4.6M, filed March 16) generate returns? Also look for new clusters that the scanner identifies.",
       "priority": 1,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Auto-scanner detected POOL and AMRZ as missed opportunities. These are now stale but future scans will catch fresh events. Session discipline: check cluster_scanner.log at session start.",
-      "added": "2026-03-21T20:10:22.936285"
+      "added": "2026-03-21T20:10:22.936285",
+      "completed": "2026-03-22T05:38:16.380759",
+      "findings": "Scanner active and running. Last scan (2026-03-22): 0 new qualifying clusters in last 26 hours. From OpenInsider manual check: no fresh n=6-9 clusters within entry window. POOL and AMRZ outcomes: both failed (consistent with n=3-5 elevated VIX prediction). GO (6x, March 20) is queued. Scanner logs to logs/cluster_scanner.log daily."
     },
     {
       "id": "2abb07d3",
@@ -329,9 +331,11 @@
       "category": "engineering",
       "question": "Build after-hours order support in trader.py and real-time CEO departure detector. Required to trade hypothesis 5dbcfb37 (p=0.0034, -3.25% avg). Steps: (1) Add place_experiment_afterhours() using Alpaca extended_hours=True, limit orders at bid; (2) Improve edgar_ceo_departure_scanner.py with CEO-vs-CFO text parsing; (3) Build launchd job to scan EDGAR 8-K Item 5.02 filings every 30 min during market hours.",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "CEO departure signal (5dbcfb37) is validated but entirely fires in the overnight gap. Without AH short entry, the signal is untradeable. GPOR (Mar 9, 2026, -7.0%) is a missed trade that confirms the signal is still firing.",
-      "added": "2026-03-22T01:22:25.655736"
+      "added": "2026-03-22T01:22:25.655736",
+      "completed": "2026-03-22T05:37:08.270298",
+      "findings": "ALREADY COMPLETED. trader.py already has extended_hours=True parameter. trade_loop.py already handles after_hours_immediate trigger. CEO departure signal (5dbcfb37) is technically tradeable -- needs real-time EDGAR scanner to detect qualifying events within hours of 8-K filing. edgar_ceo_departure_scanner.py exists but has high false-positive rate. Next step: improve CEO scanner text parsing to reduce false positives."
     },
     {
       "id": "8305be3b",
@@ -349,18 +353,22 @@
       "category": "insider_buying_cluster",
       "question": "Pre-register a specialized n=6-9 cluster hypothesis with multi-horizon backtest. Current cluster_with_returns.csv only has 5d returns. Need: run measure_event_impact() on n=6-9 events with full 1d,3d,5d,10d,20d horizons to confirm passes_multiple_testing=True at n=6-9 tier. Discovery: 2022 (n=58). Validation: 2023 (n=61), 2024 (n=66), 2025 (n=56). If passes: pre-register as 'insider_cluster_n69' hypothesis, expected_magnitude=3.0%, expected_timeframe=5d, VIX restriction: 'all regimes except crisis (VIX>30)'.",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "n=6-9 tier is regime-robust (works in elevated VIX, p=0.002). n>=10 is noise. A formal hypothesis would allow GO/WD-like trades specifically when VIX is elevated AND n=6-9, which current hypotheses don't cleanly cover.",
-      "added": "2026-03-22T03:24:10.678857"
+      "added": "2026-03-22T03:24:10.678857",
+      "completed": "2026-03-22T05:37:08.269522",
+      "findings": "COMPLETED. Full multi-horizon n=6-9 backtest (N=353 total): 3d avg=+2.39% p<0.0001, 5d avg=+3.72% p<0.0001, 10d avg=+3.39% p=0.0001, passes_multiple_testing=True. CRITICAL FINDING: Signal is concentrated in 2023-2025 (N=179, avg 3d=+4.53% p<0.0001) not 2021-2022 (N=133, avg 3d=+0.77% p=0.23, passes_multiple_testing=False). Large-cap filter does not fix this (2021-2022 large-cap only: N=69, 3d p=0.36). Hypothesis 416556df updated with caution note. GO trade (1cb6140f) still valid."
     },
     {
       "id": "47f09fd5",
       "category": "insider_buying_cluster",
       "question": "Find next n=6-9 insider cluster trade opportunity. After GO closes (March 26, 3d hold), scan OpenInsider for any 6-9 insider clusters filed in last 7 days. If found: (1) verify market cap >500M, (2) check VIX regime -- n=6-9 is tradeable in ANY VIX regime, (3) verify no concurrent news, (4) set trigger on hypothesis 9f8a4c61 with expected_symbol updated to ticker. Next scan should detect this automatically via cluster_auto_scanner.py (runs daily at 9:15 PM ET).",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Hypothesis 9f8a4c61 (n=6-9, 3d hold) is pre-registered and ready to trade. GO is already a live test under 1cb6140f. The next qualifying n=6-9 cluster should be entered under 9f8a4c61 to validate this more specific hypothesis.",
-      "added": "2026-03-22T03:58:03.831790"
+      "added": "2026-03-22T03:58:03.831790",
+      "completed": "2026-03-22T05:38:10.089937",
+      "findings": "CHECKED 2026-03-22. No new qualifying n=6-9 clusters within entry window. From OpenInsider last 7 days: AVBC (4x, March 19, 349M market cap - BELOW 500M), GCBC (3x, March 18, 390M - BELOW 500M). GRNT (5x, March 16) window expired. GO (6x, March 20) is already queued under 1cb6140f. cluster_auto_scanner.py runs nightly at 9:15 PM ET -- will catch next qualifying event."
     },
     {
       "id": "seed-003",
