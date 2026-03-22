@@ -1635,9 +1635,8 @@
     "trade": null,
     "result": null,
     "trigger_removed_reason": "VIX=26.78 (Tier 3, 25-30). WD has n=3 insiders. Rule: n<6 in Tier 3 = DO NOT TRADE (EV=-0.48%, 38% pos rate). Removed 2026-03-22.",
-    "trigger": "next_market_open",
-    "trigger_position_size": 5000,
-    "trigger_stop_loss_pct": 10
+    "vix_gate_note": "VIX=26.78 (Tier 3, 25-30). n=3 cluster falls in n=3-5 tier. VIX gate: DO NOT TRADE at VIX>25 for n<6. EV=-0.48%, 38% positive in elevated VIX for n=3-5. Will trade when VIX drops below 25 or find 6+ insider cluster.",
+    "trigger_blocked_reason": "VIX gate: n=3 in VIX>25 regime"
   },
   {
     "id": "4a981cc8",
@@ -4914,8 +4913,7 @@
     "dead_end_warnings": null,
     "trade": null,
     "result": null,
-    "trigger": "next_market_open",
-    "trigger_position_size": 5000,
-    "trigger_stop_loss_pct": 10
+    "vix_gate_note": "VIX=26.78 (Tier 3, 25-30). n=4 cluster falls in n=3-5 tier. VIX gate: DO NOT TRADE at VIX>25 for n<6. AMRZ entry window closes March 23 so will not trade this instance. Hypothesis remains for future AMRZ signals.",
+    "trigger_blocked_reason": "VIX gate: n=4 in VIX>25 regime + entry window will expire"
   }
 ]
