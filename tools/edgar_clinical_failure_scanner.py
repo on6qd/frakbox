@@ -30,6 +30,9 @@ from pathlib import Path
 # Add parent dir to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+# Symbol-level blacklist (persistent across all dates for a ticker)
+from tools.blacklist_manager import is_blacklisted, get_blacklist_reason
+
 EDGAR_SEARCH_URL = "https://efts.sec.gov/LATEST/search-index"
 HEADERS = {"User-Agent": "financial-researcher-bot contact@example.com"}
 
@@ -338,14 +341,18 @@ def main():
     # Sort by filing date descending
     results.sort(key=lambda x: x["filing_date"], reverse=True)
 
-    # Filter out previously disqualified events
+    # Filter out previously disqualified events (event-level cache + symbol-level blacklist)
     n_before = len(results)
     results_filtered = []
     skipped_known = []
     for r in results:
         key = f"{r['ticker']}:{r['filing_date']}"
+        ticker = r['ticker']
         if key in disqualified:
-            skipped_known.append((r['ticker'], r['filing_date'], disqualified[key]['reason']))
+            skipped_known.append((ticker, r['filing_date'], disqualified[key]['reason']))
+        elif is_blacklisted('clinical_scanner', ticker):
+            reason = get_blacklist_reason('clinical_scanner', ticker)
+            skipped_known.append((ticker, r['filing_date'], f"[SYMBOL BLACKLIST] {reason}"))
         else:
             results_filtered.append(r)
     if skipped_known:

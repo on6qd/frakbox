@@ -871,6 +871,11 @@
       "event_type": "insider_selling_cluster_large_n",
       "reason": "n>=6 insider selling cluster (30-day window, K+ each) failed OOS in 2022 bear market: 10d=-0.20% p=0.44, fails multiple testing. Discovery 2021 signal (10d=-1.80% p=0.002) did not replicate. Root cause: 2021 signal may be confounded by bull market peak insiders selling into strength before 2022 crash. Not a reliable short signal across regimes. All n>=3 selling cluster shows 10d=-1.57% in 2022 but this is also regime-dependent (weakens to 10d=-0.92% in 2023-24 bull market).",
       "recorded": "2026-03-22T15:37:47.146811"
+    },
+    {
+      "event_type": "insider_selling_cluster_largecap",
+      "reason": "Re-tested insider selling clusters (2+ insiders, same month, >50K each, Officer/Director) filtered to large-cap >5B companies (207 tickers, 1968 de-duped events 2020-2024). 80-event random sample backtest: avg abnormal 20d = +0.01%, positive rate 48%, p=0.53 (non-significant). Large-cap filter does NOT rescue the selling signal. At large companies, cluster selling is still dominated by 10b5-1 plans and compensation-driven sales. No directional edge found. Task f5857b08 complete.",
+      "recorded": "2026-03-22T16:12:16.078968"
     }
   ]
 }
