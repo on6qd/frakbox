@@ -1634,7 +1634,10 @@
     "dead_end_warnings": null,
     "trade": null,
     "result": null,
-    "trigger_removed_reason": "VIX=26.78 (Tier 3, 25-30). WD has n=3 insiders. Rule: n<6 in Tier 3 = DO NOT TRADE (EV=-0.48%, 38% pos rate). Removed 2026-03-22."
+    "trigger_removed_reason": "VIX=26.78 (Tier 3, 25-30). WD has n=3 insiders. Rule: n<6 in Tier 3 = DO NOT TRADE (EV=-0.48%, 38% pos rate). Removed 2026-03-22.",
+    "trigger": "next_market_open",
+    "trigger_position_size": 5000,
+    "trigger_stop_loss_pct": 10
   },
   {
     "id": "4a981cc8",
@@ -3474,7 +3477,8 @@
         "abnormal_1d": -23.1,
         "abnormal_3d": -34.66,
         "abnormal_5d": -35.5,
-        "event_type": "fda_crl_clinical"
+        "event_type": "fda_crl_clinical",
+        "abnormal_10d": -33.6
       },
       {
         "symbol": "ARDX",
@@ -3483,7 +3487,8 @@
         "abnormal_1d": -4.4,
         "abnormal_3d": -15.28,
         "abnormal_5d": -28.9,
-        "event_type": "fda_crl_clinical"
+        "event_type": "fda_crl_clinical",
+        "abnormal_10d": -20.2
       },
       {
         "symbol": "FBRX",
@@ -3492,7 +3497,8 @@
         "abnormal_1d": -27.2,
         "abnormal_3d": -18.0,
         "abnormal_5d": -27.2,
-        "event_type": "phase_23_failure"
+        "event_type": "phase_23_failure",
+        "abnormal_10d": -28.6
       },
       {
         "symbol": "PRQR",
@@ -3501,7 +3507,8 @@
         "abnormal_1d": -21.7,
         "abnormal_3d": -11.7,
         "abnormal_5d": -20.3,
-        "event_type": "phase_23_failure"
+        "event_type": "phase_23_failure",
+        "abnormal_10d": -20.4
       },
       {
         "symbol": "ATHX",
@@ -3510,7 +3517,8 @@
         "abnormal_1d": -42.3,
         "abnormal_3d": -33.5,
         "abnormal_5d": -21.9,
-        "event_type": "phase_23_failure"
+        "event_type": "phase_23_failure",
+        "abnormal_10d": 6.5
       },
       {
         "symbol": "NERV",
@@ -3519,7 +3527,8 @@
         "abnormal_1d": -29.0,
         "abnormal_3d": -29.0,
         "abnormal_5d": -33.7,
-        "event_type": "fda_crl_clinical"
+        "event_type": "fda_crl_clinical",
+        "abnormal_10d": -46.5
       },
       {
         "symbol": "ORMP",
@@ -3529,7 +3538,8 @@
         "abnormal_3d": -10.7,
         "abnormal_5d": -16.6,
         "event_type": "phase_23_failure",
-        "note": "NEW: Phase 3 oral insulin T2D failure, company halted program"
+        "note": "NEW: Phase 3 oral insulin T2D failure, company halted program",
+        "abnormal_10d": -23.8
       },
       {
         "symbol": "GRTX",
@@ -3538,7 +3548,8 @@
         "abnormal_1d": -20.8,
         "abnormal_3d": -14.95,
         "abnormal_5d": -23.1,
-        "event_type": "fda_crl_clinical"
+        "event_type": "fda_crl_clinical",
+        "abnormal_10d": -29.2
       },
       {
         "symbol": "OTLK",
@@ -3547,7 +3558,8 @@
         "abnormal_1d": -81.0,
         "abnormal_3d": -19.45,
         "abnormal_5d": -19.8,
-        "event_type": "fda_crl_clinical"
+        "event_type": "fda_crl_clinical",
+        "abnormal_10d": -14.8
       },
       {
         "symbol": "CRVO",
@@ -3557,7 +3569,8 @@
         "abnormal_3d": -11.9,
         "abnormal_5d": -10.0,
         "event_type": "phase_23_failure",
-        "note": "NEW: Phase 2b DLB dementia failure. Company stated continuation plans but stock continued lower 3-5d (institutional exit before 10d recovery)"
+        "note": "NEW: Phase 2b DLB dementia failure. Company stated continuation plans but stock continued lower 3-5d (institutional exit before 10d recovery)",
+        "abnormal_10d": 3.2
       },
       {
         "symbol": "APLT",
@@ -3566,7 +3579,8 @@
         "abnormal_1d": -77.0,
         "abnormal_3d": -33.53,
         "abnormal_5d": -42.1,
-        "event_type": "fda_crl_clinical"
+        "event_type": "fda_crl_clinical",
+        "abnormal_10d": -44.2
       },
       {
         "symbol": "NEUP",
@@ -3576,7 +3590,8 @@
         "abnormal_3d": -17.4,
         "abnormal_5d": -9.6,
         "event_type": "phase_23_failure",
-        "note": "NEW: Phase 3 BNC210 SAD failure. Halted program, stated PTSD evaluation. Stock continued lower."
+        "note": "NEW: Phase 3 BNC210 SAD failure. Halted program, stated PTSD evaluation. Stock continued lower.",
+        "abnormal_10d": -12.4
       },
       {
         "symbol": "GOSS",
@@ -3595,7 +3610,8 @@
         "abnormal_1d": -28.6,
         "abnormal_3d": -14.2,
         "abnormal_5d": -25.8,
-        "event_type": "phase_23_failure"
+        "event_type": "phase_23_failure",
+        "abnormal_10d": null
       }
     ],
     "sample_size": 14,
@@ -3691,7 +3707,8 @@
       "consistency_pct": 92.9,
       "positive_rate_1d": 14.3,
       "positive_rate_3d": 7.1
-    }
+    },
+    "hold_period_analysis": "3d hold confirmed optimal. Per-event analysis N=13 continuation events (excluding GOSS reversal): 3d avg=-20.33% pos_rate=0.0% p<0.0001, 5d avg=-21.59% pos_rate=0.0% p<0.0001, 10d avg=-22.02% pos_rate=16.7% p=0.0007 (ATHX +6.5%, CRVO +3.2% reverse). Reversals at 10d are stocks that were already heavily beaten - value buyers step in. 3d has 100% hit rate vs 5d (also 100%) but 3d avoids ATHX/CRVO risk window. Expected_timeframe_days=3 confirmed correct."
   },
   {
     "id": "5dbcfb37",

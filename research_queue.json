@@ -650,33 +650,32 @@
   ],
   "next_session_priorities": [
     {
-      "task": "URGENT (March 26): Close GO trade (hypothesis 1cb6140f) \u2014 run python tools/close_go_trade.py or check if trade_loop auto-closes.",
-      "set_by_session": "2026-03-22T08:04:44.331479"
+      "task": "1. SSP (E.W. Scripps): market_cap=$300M \u2014 DISQUALIFIED for hypothesis 416556df (<$500M threshold). Do not trade.",
+      "set_by_session": "2026-03-22T08:19:14.515922"
     },
     {
-      "task": "URGENT (March 28): Monitor RCKT PDUFA decision. If CRL: evaluate d302c84b criteria and enter short if all pass.",
-      "set_by_session": "2026-03-22T08:04:44.331484"
+      "task": "2. BLCO (Bausch & Lomb): market_cap=$5.58B, 9 trading days since filing (2026-03-10) \u2014 WINDOW CLOSED (>5 days). Do not trade.",
+      "set_by_session": "2026-03-22T08:19:14.515927"
     },
     {
-      "task": "Monitor REPL PDUFA April 10. If CRL (second): check pipeline floor.",
-      "set_by_session": "2026-03-22T08:04:44.331485"
+      "task": "3. POOL (Pool Corp): market_cap=$7.46B, 4 trading days since filing (2026-03-17) \u2014 ELIGIBLE if n=6-9 insiders confirmed. Need to verify insider count from OpenInsider.",
+      "set_by_session": "2026-03-22T08:19:14.515928"
     },
     {
-      "task": "Run edgar_clinical_failure_scanner.py --auto-qualify for past 7 days at each session start.",
-      "set_by_session": "2026-03-22T08:04:44.331486"
+      "task": "4. SEO bought-deal next step: run seo_bought_deal_scanner.py --resolve-tickers --filter-market-cap --sample 258 to get tickers, then run measure_event_impact on qualified events.",
+      "set_by_session": "2026-03-22T08:19:14.515929"
     },
     {
-      "task": "SEO FOLLOW-UP: The pure announcement-day signal exists in literature (-3%) but requires exact announcement dates. Path forward: build EDGAR 8-K item 8.01 scanner to get announcement dates, or focus on the bought-deal subsample (N=23, -3.67% median 10d, 70% neg). Need N>=30 clean bought-deal events to pass multiple testing. Use EDGAR full-index to identify 424B4 filings WHERE the 8-K item 8.01 was filed same day (lag=0 proxy without price-based selection).",
-      "set_by_session": "2026-03-22T08:04:44.331487"
-    },
-    {
-      "task": "S&P 500 Q2 rebalance: Watch June 5, 2026 after 5:15 PM ET for announcement.",
-      "set_by_session": "2026-03-22T08:04:44.331487"
+      "task": "5. After ticker resolution, backtest bought deals vs SPY to check if announcement-day short signal is cleanly measurable.",
+      "set_by_session": "2026-03-22T08:19:14.515929"
     }
   ],
   "session_handoff": {
-    "notes": "SEO session: Collected 142 large-cap secondary offering events (EDGAR 424B4, 2020-2024). Found that 424B4 filing date lags announcement by 0-7 days (median 3 days) \u2014 this is the core problem. Backtest with filing date shows no signal (p>0.5 at all horizons, full dataset). Calm-regime subset (N=81, VIX<20) shows 5d p=0.049 and 10d p=0.019 but Wilcoxon fails (p>0.05), consistency only 54-58% (below 60% threshold). Recorded as dead end. Bought-deal sub-sample (N=23, lag=0) shows more promising -3.67% median at 10d with 70% neg but fails multiple testing due to low N and circular selection. Key next step: build 8-K item 8.01 scanner to get exact announcement dates, OR use EDGAR filing timing (8-K same day as 424B4) as non-circular bought-deal identifier. Files: data/seo_events_filtered.csv (142 events), data/seo_events_raw.csv (1495), data/seo_offering_gaps.csv.",
-    "written_at": "2026-03-22T08:04:44.331489"
+    "investigation": "SEO bought-deal scanner built and initial dataset ready (258 events 2022-2024). Insider clusters: SSP disqualified (small cap), BLCO window closed, POOL pending n count verification.",
+    "intermediate_findings": "EDGAR form.idx requires regex parsing (not pipe-split or fixed-offset). Regex pattern: r\"^(\\S+)\\s+(.*?)\\s{2,}(\\d+)\\s+(\\d{4}-\\d{2}-\\d{2})\\s+(edgar/\\S+)\". Of 258 candidates: 62% same-day gap, 17% 1-day. Next gate: ticker resolution + market-cap filter + backtest.",
+    "blocked_by": "Ticker resolution requires ~258 EDGAR API calls (0.15s each = ~40s). No blockers, just time. Run with --resolve-tickers --filter-market-cap.",
+    "next_step": "python tools/seo_bought_deal_scanner.py --years 2022 2023 2024 --resolve-tickers --filter-market-cap > data/seo_bought_deals_qualified.txt, then load JSON, extract (ticker, date) pairs, run measure_event_impact with entry_price=open, benchmark=SPY.",
+    "written_at": "2026-03-22T08:19:14.515931"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

@@ -1,0 +1,299 @@
+[
+  {
+    "cik": "1144879",
+    "company_name": "Applied Blockchain, Inc.",
+    "announcement_date": "2022-04-13",
+    "424b4_date": "2022-04-13",
+    "8k_date": "2022-04-13",
+    "days_between": 0,
+    "ticker": "APLD"
+  },
+  {
+    "cik": "1481582",
+    "company_name": "Ryerson Holding Corp",
+    "announcement_date": "2022-05-12",
+    "424b4_date": "2022-05-12",
+    "8k_date": "2022-05-11",
+    "days_between": 1,
+    "ticker": "RYZ"
+  },
+  {
+    "cik": "1014739",
+    "company_name": "Option Care Health, Inc.",
+    "announcement_date": "2022-08-18",
+    "424b4_date": "2022-08-18",
+    "8k_date": "2022-08-18",
+    "days_between": 0,
+    "ticker": "OPCH"
+  },
+  {
+    "cik": "1599298",
+    "company_name": "Summit Therapeutics Inc.",
+    "announcement_date": "2022-07-18",
+    "424b4_date": "2022-07-18",
+    "8k_date": "2022-07-18",
+    "days_between": 0,
+    "ticker": "SMMT"
+  },
+  {
+    "cik": "1819928",
+    "company_name": "DoubleVerify Holdings, Inc.",
+    "announcement_date": "2022-11-14",
+    "424b4_date": "2022-11-14",
+    "8k_date": "2022-11-14",
+    "days_between": 0,
+    "ticker": "DV"
+  },
+  {
+    "cik": "1819928",
+    "company_name": "DoubleVerify Holdings, Inc.",
+    "announcement_date": "2023-03-07",
+    "424b4_date": "2023-03-07",
+    "8k_date": "2023-03-07",
+    "days_between": 0,
+    "ticker": "DV"
+  },
+  {
+    "cik": "1014739",
+    "company_name": "Option Care Health, Inc.",
+    "announcement_date": "2023-03-03",
+    "424b4_date": "2023-03-03",
+    "8k_date": "2023-03-03",
+    "days_between": 0,
+    "ticker": "OPCH"
+  },
+  {
+    "cik": "1481582",
+    "company_name": "Ryerson Holding Corp",
+    "announcement_date": "2023-02-27",
+    "424b4_date": "2023-02-27",
+    "8k_date": "2023-02-27",
+    "days_between": 0,
+    "ticker": "RYZ"
+  },
+  {
+    "cik": "1849253",
+    "company_name": "RYAN SPECIALTY HOLDINGS, INC.",
+    "announcement_date": "2023-05-24",
+    "424b4_date": "2023-05-24",
+    "8k_date": "2023-05-24",
+    "days_between": 0,
+    "ticker": "RYAN"
+  },
+  {
+    "cik": "1687187",
+    "company_name": "Ramaco Resources, Inc.",
+    "announcement_date": "2023-06-15",
+    "424b4_date": "2023-06-15",
+    "8k_date": "2023-06-12",
+    "days_between": 3,
+    "ticker": "METC"
+  },
+  {
+    "cik": "1481582",
+    "company_name": "Ryerson Holding Corp",
+    "announcement_date": "2023-05-05",
+    "424b4_date": "2023-05-05",
+    "8k_date": "2023-05-05",
+    "days_between": 0,
+    "ticker": "RYZ"
+  },
+  {
+    "cik": "1952073",
+    "company_name": "Madison Square Garden Entertainment Corp.",
+    "announcement_date": "2023-09-21",
+    "424b4_date": "2023-09-21",
+    "8k_date": "2023-09-21",
+    "days_between": 0,
+    "ticker": "MSGE"
+  },
+  {
+    "cik": "1481582",
+    "company_name": "Ryerson Holding Corp",
+    "announcement_date": "2023-08-07",
+    "424b4_date": "2023-08-07",
+    "8k_date": "2023-08-07",
+    "days_between": 0,
+    "ticker": "RYZ"
+  },
+  {
+    "cik": "1956744",
+    "company_name": "SRM Entertainment, Inc.",
+    "announcement_date": "2023-08-16",
+    "424b4_date": "2023-08-16",
+    "8k_date": "2023-08-16",
+    "days_between": 0,
+    "ticker": "TRON"
+  },
+  {
+    "cik": "1955520",
+    "company_name": "Knife River Corp",
+    "announcement_date": "2023-11-06",
+    "424b4_date": "2023-11-06",
+    "8k_date": "2023-11-06",
+    "days_between": 0,
+    "ticker": "KNF"
+  },
+  {
+    "cik": "1520358",
+    "company_name": "Mama's Creations, Inc.",
+    "announcement_date": "2023-12-19",
+    "424b4_date": "2023-12-19",
+    "8k_date": "2023-12-19",
+    "days_between": 0,
+    "ticker": "MAMA"
+  },
+  {
+    "cik": "1849635",
+    "company_name": "Digital World Acquisition Corp.",
+    "announcement_date": "2024-02-16",
+    "424b4_date": "2024-02-16",
+    "8k_date": "2024-02-16",
+    "days_between": 0,
+    "ticker": "DJT"
+  },
+  {
+    "cik": "1932393",
+    "company_name": "GE HealthCare Technologies Inc.",
+    "announcement_date": "2024-02-16",
+    "424b4_date": "2024-02-16",
+    "8k_date": "2024-02-16",
+    "days_between": 0,
+    "ticker": "GEHC"
+  },
+  {
+    "cik": "1823144",
+    "company_name": "CompoSecure, Inc.",
+    "announcement_date": "2024-05-08",
+    "424b4_date": "2024-05-08",
+    "8k_date": "2024-05-06",
+    "days_between": 2,
+    "ticker": "GPGI"
+  },
+  {
+    "cik": "1832483",
+    "company_name": "Serve Robotics Inc. /DE/",
+    "announcement_date": "2024-04-19",
+    "424b4_date": "2024-04-19",
+    "8k_date": "2024-04-18",
+    "days_between": 1,
+    "ticker": "SERV"
+  },
+  {
+    "cik": "1888886",
+    "company_name": "Structure Therapeutics Inc.",
+    "announcement_date": "2024-06-06",
+    "424b4_date": "2024-06-06",
+    "8k_date": "2024-06-03",
+    "days_between": 3,
+    "ticker": "GPCR"
+  },
+  {
+    "cik": "946581",
+    "company_name": "TAKE TWO INTERACTIVE SOFTWARE INC",
+    "announcement_date": "2024-06-12",
+    "424b4_date": "2024-06-12",
+    "8k_date": "2024-06-12",
+    "days_between": 0,
+    "ticker": "TTWO"
+  },
+  {
+    "cik": "1717115",
+    "company_name": "Tempus AI, Inc.",
+    "announcement_date": "2024-06-17",
+    "424b4_date": "2024-06-17",
+    "8k_date": "2024-06-17",
+    "days_between": 0,
+    "ticker": "TEM"
+  },
+  {
+    "cik": "101382",
+    "company_name": "UMB FINANCIAL CORP",
+    "announcement_date": "2024-04-30",
+    "424b4_date": "2024-04-30",
+    "8k_date": "2024-04-29",
+    "days_between": 1,
+    "ticker": "UMBF"
+  },
+  {
+    "cik": "1838406",
+    "company_name": "BKV Corp",
+    "announcement_date": "2024-09-27",
+    "424b4_date": "2024-09-27",
+    "8k_date": "2024-09-27",
+    "days_between": 0,
+    "ticker": "BKV"
+  },
+  {
+    "cik": "1868159",
+    "company_name": "Lineage, Inc.",
+    "announcement_date": "2024-07-26",
+    "424b4_date": "2024-07-26",
+    "8k_date": "2024-07-26",
+    "days_between": 0,
+    "ticker": "LINE"
+  },
+  {
+    "cik": "1819576",
+    "company_name": "Liquidia Corp",
+    "announcement_date": "2024-09-11",
+    "424b4_date": "2024-09-11",
+    "8k_date": "2024-09-11",
+    "days_between": 0,
+    "ticker": "LQDA"
+  },
+  {
+    "cik": "1980088",
+    "company_name": "MACH NATURAL RESOURCES LP",
+    "announcement_date": "2024-09-09",
+    "424b4_date": "2024-09-09",
+    "8k_date": "2024-09-09",
+    "days_between": 0,
+    "ticker": "MNR"
+  },
+  {
+    "cik": "1923891",
+    "company_name": "Nano Nuclear Energy Inc.",
+    "announcement_date": "2024-07-15",
+    "424b4_date": "2024-07-15",
+    "8k_date": "2024-07-15",
+    "days_between": 0,
+    "ticker": "NNE"
+  },
+  {
+    "cik": "883948",
+    "company_name": "Atlantic Union Bankshares Corp",
+    "announcement_date": "2024-10-22",
+    "424b4_date": "2024-10-22",
+    "8k_date": "2024-10-22",
+    "days_between": 0,
+    "ticker": "AUB"
+  },
+  {
+    "cik": "2002473",
+    "company_name": "Bowhead Specialty Holdings Inc.",
+    "announcement_date": "2024-10-24",
+    "424b4_date": "2024-10-24",
+    "8k_date": "2024-10-21",
+    "days_between": 3,
+    "ticker": "BOW"
+  },
+  {
+    "cik": "1844452",
+    "company_name": "Intuitive Machines, Inc.",
+    "announcement_date": "2024-12-03",
+    "424b4_date": "2024-12-03",
+    "8k_date": "2024-12-03",
+    "days_between": 0,
+    "ticker": "LUNR"
+  },
+  {
+    "cik": "707179",
+    "company_name": "OLD NATIONAL BANCORP /IN/",
+    "announcement_date": "2024-11-26",
+    "424b4_date": "2024-11-26",
+    "8k_date": "2024-11-26",
+    "days_between": 0,
+    "ticker": "ONB"
+  }
+]
