@@ -389,6 +389,15 @@
       "added": "2026-03-22T06:39:24.226366"
     },
     {
+      "id": "8517e522",
+      "category": "secondary_equity_offering",
+      "question": "Can we collect exact SEO announcement dates from EDGAR 8-K filings (item 8.01) to enable a proper announcement-day backtest?",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "Primary SEO signal (announcement-day -3%) is documented in academic literature but requires exact announcement date. 424B4 filing lags by 0-7 days. 8-K item 8.01 may provide the announcement date. Alternative: focus on same-day bought deals (N=23, -3.67% median 10d drift, 70% neg) which do not have this timing problem.",
+      "added": "2026-03-22T08:04:24.655356"
+    },
+    {
       "id": "seed-003",
       "category": "fda_decision",
       "question": "For Phase 3 FDA approvals/rejections of novel drugs (not generics, not supplements), what is the typical abnormal return at 1d and 5d horizons? Does the effect differ between first-time submissions and resubmissions after a Complete Response Letter?",
@@ -641,41 +650,33 @@
   ],
   "next_session_priorities": [
     {
-      "task": "URGENT (March 26): Close GO trade (hypothesis 1cb6140f) \u2014 run `python tools/close_go_trade.py` or check if trade_loop auto-closes. Verify via Alpaca positions first.",
-      "set_by_session": "2026-03-22T07:19:06.267929"
+      "task": "URGENT (March 26): Close GO trade (hypothesis 1cb6140f) \u2014 run python tools/close_go_trade.py or check if trade_loop auto-closes.",
+      "set_by_session": "2026-03-22T08:04:44.331479"
     },
     {
-      "task": "URGENT (March 28): Monitor RCKT PDUFA decision. If CRL issued with clinical/efficacy deficiency AND crash >55% at open, evaluate d302c84b criteria (single-pipeline?, market cap <$500M?, no stated path forward?) and enter short at next-day open if all pass.",
-      "set_by_session": "2026-03-22T07:19:06.267933"
+      "task": "URGENT (March 28): Monitor RCKT PDUFA decision. If CRL: evaluate d302c84b criteria and enter short if all pass.",
+      "set_by_session": "2026-03-22T08:04:44.331484"
     },
     {
-      "task": "Monitor REPL PDUFA April 10. If approved: no trade. If CRL (second): check if RP2/RP3 provide valuation floor \u2014 if negligible, may qualify for 5f805860 IF crash >55%. Do not pre-position.",
-      "set_by_session": "2026-03-22T07:19:06.267934"
+      "task": "Monitor REPL PDUFA April 10. If CRL (second): check pipeline floor.",
+      "set_by_session": "2026-03-22T08:04:44.331485"
     },
     {
       "task": "Run edgar_clinical_failure_scanner.py --auto-qualify for past 7 days at each session start.",
-      "set_by_session": "2026-03-22T07:19:06.267935"
+      "set_by_session": "2026-03-22T08:04:44.331486"
     },
     {
-      "task": "Research NEW SIGNAL: Secondary Equity Offerings (SEO dilution short). Literature: -2 to -3% abnormal on announcement day (well-documented). Research question: does the abnormal return continue for 3-5 days? Data source: SEC EDGAR 424B4 filings (actual pricing date) or S-3 filing date. Next step: collect 50+ events from 2020-2024, filter to large-cap only, run backtest with measure_event_impact.",
-      "set_by_session": "2026-03-22T07:19:06.267936"
+      "task": "SEO FOLLOW-UP: The pure announcement-day signal exists in literature (-3%) but requires exact announcement dates. Path forward: build EDGAR 8-K item 8.01 scanner to get announcement dates, or focus on the bought-deal subsample (N=23, -3.67% median 10d, 70% neg). Need N>=30 clean bought-deal events to pass multiple testing. Use EDGAR full-index to identify 424B4 filings WHERE the 8-K item 8.01 was filed same day (lag=0 proxy without price-based selection).",
+      "set_by_session": "2026-03-22T08:04:44.331487"
     },
     {
-      "task": "S&P 500 Q2 rebalance: Watch June 5, 2026 after 5:15 PM ET at spglobal.com/press-releases for announcement. Entry Monday June 8 open, 5-day hold.",
-      "set_by_session": "2026-03-22T07:19:06.267937"
+      "task": "S&P 500 Q2 rebalance: Watch June 5, 2026 after 5:15 PM ET for announcement.",
+      "set_by_session": "2026-03-22T08:04:44.331487"
     }
   ],
   "session_handoff": {
-    "current_state": "No active experiments. GO trade fires Monday March 23 automatically. WD correctly skipped (VIX elevated). All scanners operational.",
-    "key_findings_not_in_knowledge_base": [
-      "ALDX March 17 CRL: +50.8% bounce in 3 days post-crash. Confirms d302c84b exclusion criteria (multi-pipeline + stated path forward = bounce, not continuation). Second case after GOSS. Criteria are working.",
-      "March 2026 S&P 500 additions (VRT/LITE/COHR/SATS): 4/4 positive, avg +5.20% 1d abnormal. Pure out-of-sample validation for 061ae3a8. Trade missed due to watchlist gap \u2014 now fixed.",
-      "DNLI April 5 PDUFA: disqualified ($3.2B cap + multi-pipeline). Do not trade.",
-      "REPL April 10 PDUFA: disqualified as d302c84b (multi-pipeline RP1/RP2/RP3). Only 5f805860 possible IF crash >55% on second CRL \u2014 monitor only."
-    ],
-    "what_blocked_or_unclear": "GO trade has not fired yet (market closed Sunday). Cannot verify execution until Monday. Need to confirm by Tuesday March 24 that the Alpaca position is open.",
-    "exact_next_step": "Monday March 24: Check Alpaca positions to confirm GO trade executed at open. If it did not execute, diagnose trade_loop.py. If it did, set close deadline for March 26 close.",
-    "written_at": "2026-03-22T07:19:06.267938"
+    "notes": "SEO session: Collected 142 large-cap secondary offering events (EDGAR 424B4, 2020-2024). Found that 424B4 filing date lags announcement by 0-7 days (median 3 days) \u2014 this is the core problem. Backtest with filing date shows no signal (p>0.5 at all horizons, full dataset). Calm-regime subset (N=81, VIX<20) shows 5d p=0.049 and 10d p=0.019 but Wilcoxon fails (p>0.05), consistency only 54-58% (below 60% threshold). Recorded as dead end. Bought-deal sub-sample (N=23, lag=0) shows more promising -3.67% median at 10d with 70% neg but fails multiple testing due to low N and circular selection. Key next step: build 8-K item 8.01 scanner to get exact announcement dates, OR use EDGAR filing timing (8-K same day as 424B4) as non-circular bought-deal identifier. Files: data/seo_events_filtered.csv (142 events), data/seo_events_raw.csv (1495), data/seo_offering_gaps.csv.",
+    "written_at": "2026-03-22T08:04:44.331489"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

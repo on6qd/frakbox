@@ -196,6 +196,20 @@
       ],
       "gaps": "Cannot backtest without paid analyst data (Bloomberg/Refinitiv). Free data sources do not have reliable analyst initiation dates. Signal likely decayed in liquid large-caps but may persist in mid-cap coverage initiations.",
       "recorded": "2026-03-22T05:38:32.398662"
+    },
+    "secondary_equity_offering_dilution_short": {
+      "summary": "Secondary equity offering announcement causes significant negative abnormal returns on announcement day. Well-documented across multiple studies.",
+      "known_magnitude": "-2% to -3% abnormal return on announcement day (Asquith & Mullins 1986, Masulis & Korwar 1986, Mikkelson & Partch 1986). An additional -3% on pricing/issue day (Gao & Ritter 2010). Meta-analysis: -0.98% CAR [-1,+1].",
+      "known_timeframe": "Primary signal: announcement day (day 0). Post-announcement drift: 3-5 days (information asymmetry, Myers & Majluf 1984)",
+      "sources": [
+        "Asquith & Mullins (1986): Equity issues and offering dilution. Journal of Financial Economics.",
+        "Masulis & Korwar (1986): Seasoned equity offerings: An empirical investigation. Journal of Financial Economics.",
+        "Mikkelson & Partch (1986): Valuation effects of security offerings and the issuance process. Journal of Financial Economics.",
+        "Gao & Ritter (2010): The marketing of seasoned equity offerings. Journal of Financial Economics.",
+        "Myers & Majluf (1984): Corporate financing and investment decisions when firms have information investors do not have. Journal of Financial Economics."
+      ],
+      "gaps": "Post-pricing drift (after 424B4 filing) is NOT the primary signal. Requires exact announcement dates from commercial data (CRSP) or real-time press release monitoring to trade. 424B4 lag (0-7 days) makes EDGAR-only approach unreliable for backtesting the primary signal.",
+      "recorded": "2026-03-22T08:03:45.830449"
     }
   },
   "known_effects": {
@@ -696,6 +710,11 @@
       "event_type": "ipo_lockup_expiry_short",
       "reason": "Short strategy at IPO lockup expiry (180d after IPO). Tested N=23 major tech/growth IPOs 2019-2022 vs QQQ benchmark. Results: 3d avg=-2.53%, p=0.18 (fails MT); bootstrap CI [-6.1%, +0.8%] includes zero; stdev=8.72%; wilcoxon p=0.34. Pre-expiry entry (SHORT 2d before): 5d p=0.012 but single horizon, stdev=11.7%, driven by RIVN outlier (-30.8%). ROOT CAUSE: lockup dates are publicly announced and widely tracked by institutional desks; market front-runs the anticipated selling. Verdict: does not pass multiple testing. Methodology note: stdev >> avg means this is noise-dominated, not signal-dominated.",
       "recorded": "2026-03-22T06:38:45.427773"
+    },
+    {
+      "event_type": "secondary_equity_offering_dilution_short",
+      "reason": "SEO dilution short signal investigated using EDGAR 424B4 filings 2020-2024 (N=142 large-cap events, >B market cap, true secondaries after filtering IPOs).\n\nMETHODOLOGY: Used 424B4 filing date as pricing proxy. Entry at close after pricing (intraday timing). Benchmarked vs SPY.\n\nFULL DATASET RESULTS (N=142):\n- 1d: avg=-0.24%, median=-0.66%, neg_rate=58%, wilcoxon_p=0.11\n- 3d: avg=-0.13%, neg_rate=51%, p=0.87\n- 5d: avg=+0.27%, neg_rate=54%, p=0.83\n- passes_multiple_testing: False\n\nCALM REGIME ONLY (VIX<20, N=81):\n- 1d: avg=-0.84%, median=-0.63%, neg_rate=58%, wilcoxon_p=0.058\n- 5d: avg=-1.88%, median=-1.23%, neg_rate=54%, t-test p=0.049, wilcoxon_p=0.14\n- 10d: avg=-2.74%, median=-1.19%, neg_rate=57%, t-test p=0.019, wilcoxon_p=0.096\n- passes_multiple_testing: True (by t-test only)\n- avg_estimated_cost: 0.31%\n\nCRITICAL FAILURE REASONS:\n1. Consistency: 54-58% negative \u2014 below minimum 60% threshold (methodology.json)\n2. Wilcoxon robustness: non-significant at all horizons (p>0.05) \u2014 signal is mean-driven by outliers, not median\n3. Timing problem: 424B4 filing date lags true announcement by 0-7 days (median 3 days) \u2014 measurement is noisy\n4. Look-ahead in regime conditioning: calm VIX filter drops 43% of events, introducing selection bias\n5. Post-pricing drift (after deal priced) is NOT the announcement effect \u2014 literature documents the announcement-day drop, not post-pricing continuation\n\nACADEMIC LITERATURE SUMMARY:\n- Asquith & Mullins (1986), Masulis & Korwar (1986): -3% avg on ANNOUNCEMENT day\n- Post-announcement drift documented in academic literature but requires exact announcement date\n- 424B4 is the pricing prospectus filed 0-7 days AFTER announcement \u2014 wrong date for the primary signal\n\nNEXT STEPS (if pursuing):\n1. Need exact announcement dates \u2014 use 8-K item 8.01 filings as proxy (varies by company)\n2. OR use a commercial data provider (CRSP SEO dataset) with proper announcement dates\n3. The signal exists on ANNOUNCEMENT DAY but requires same-day identification (not detectable from EDGAR alone without event-day real-time scanning)\n4. Consider focusing only on 'bought deals' (same-day announcement and pricing) where 424B4 filing = announcement",
+      "recorded": "2026-03-22T08:03:35.059662"
     }
   ]
 }
