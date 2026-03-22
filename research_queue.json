@@ -325,6 +325,15 @@
       "added": "2026-03-22T01:22:25.655736"
     },
     {
+      "id": "8305be3b",
+      "category": "insider_buying_cluster",
+      "question": "Run full historical backtest with regime_filter=calm vs elevated vs crisis to quantify regime sensitivity on FULL population (1452 discovery + 816 OOS events, not just the 117-event sample). Current 117-event sample suggests ELEVATED VIX is best regime (mean_1d=+2.57%, 63.6% pos rate) but sample is too small for definitive conclusions. If confirmed on full population, consider only pausing at VIX>30 crisis.",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "POOL/AMRZ both failed in elevated VIX but n=2 is not significant. Regime analysis on 117-event WD sample shows elevated VIX is actually the BEST regime. Need full population confirmation before adding any regime gate to the scanner.",
+      "added": "2026-03-22T01:59:43.737058"
+    },
+    {
       "id": "seed-003",
       "category": "fda_decision",
       "question": "For Phase 3 FDA approvals/rejections of novel drugs (not generics, not supplements), what is the typical abnormal return at 1d and 5d horizons? Does the effect differ between first-time submissions and resubmissions after a Complete Response Letter?",
@@ -520,32 +529,29 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. Monitor GO and WD trades (open Monday March 23). GO closes Thursday March 26. WD closes Tuesday March 31.",
-      "set_by_session": "2026-03-22T01:53:57.122640"
+      "task": "Check GO and WD trade outcomes (3d for GO = Thursday March 26, 5d for WD = Friday March 27)",
+      "set_by_session": "2026-03-22T01:59:43.737858"
     },
     {
-      "task": "2. Monitor DNLI April 5 PDUFA - if FDA issues CRL, assess quickly for hypothesis 5f805860 short.",
-      "set_by_session": "2026-03-22T01:53:57.122651"
+      "task": "Run full-population regime analysis: reload all 1452+ cluster events and apply VIX regime filter",
+      "set_by_session": "2026-03-22T01:59:43.737860"
     },
     {
-      "task": "3. Scan for CEO departure events (EDGAR 8-K scanner) - first qualifying event should be traded using after_hours_immediate trigger.",
-      "set_by_session": "2026-03-22T01:53:57.122654"
+      "task": "Investigate BLCO (9 insiders) cluster from prior session - is it still a valid candidate?",
+      "set_by_session": "2026-03-22T01:59:43.737861"
     },
     {
-      "task": "4. Check POOL/AMRZ outcomes as insider cluster validation data.",
-      "set_by_session": "2026-03-22T01:53:57.122655"
-    },
-    {
-      "task": "5. Research new signal: government contract awards to small/mid-cap defense/tech contractors (DoD, NASA, NIH awards).",
-      "set_by_session": "2026-03-22T01:53:57.122655"
+      "task": "Review DNLI PDUFA outcome (expected ~March 27-28)",
+      "set_by_session": "2026-03-22T01:59:43.737862"
     }
   ],
   "session_handoff": {
-    "current_investigation": "Session wrap-up after GOSS verification, after-hours engineering, and disposition effect dead end.",
-    "intermediate_findings": "After-hours order support added to trader.py + trade_loop.py (extended_hours=True, after_hours_immediate trigger). GO/WD pending at next_market_open. GOSS verified: clinical failure short signal confidence 7, consistency 90.9%. CEO departure signal (5dbcfb37) now tradeable. DNTI CAPTIVATE Q2 2026 is upcoming clinical failure candidate. No new insider clusters today. POOL/AMRZ outcomes not yet checked.",
-    "blocked_by": "Nothing blocking. GO/WD trades staged and will execute automatically.",
-    "key_insight": "CEO departure short (5dbcfb37) is now fully tradeable with after_hours_immediate trigger. On next qualifying event (sudden unexpected CEO departure at large-cap), set trigger immediately after 8-K filing. GOSS qualifying criterion updated: no stated regulatory path forward required.",
-    "written_at": "2026-03-22T01:53:57.122657"
+    "regime_finding": "ELEVATED VIX is historically BEST regime for insider cluster signal (mean_1d=+2.57% vs +0.39% in calm). Do NOT add VIX<20 gate.",
+    "current_vix": 26.78,
+    "go_trade": "pending, trigger=next_market_open (Monday March 23), 6 insiders incl CEO, confidence=7",
+    "wd_trade": "pending, trigger=next_market_open (Monday March 23), confidence=5, basic cluster",
+    "recommendation": "PROCEED with GO trade (strong signal). WD is marginal -- monitor stop-loss closely.",
+    "written_at": "2026-03-22T01:59:43.737863"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

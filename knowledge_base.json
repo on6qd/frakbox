@@ -228,20 +228,29 @@
       "last_updated": "2026-03-21T11:11:28.681628"
     },
     "insider_buying_cluster": {
-      "observation": "AHCO cluster (Mar 12 2026): 3 insiders, 20M total, management flag (M). Abnormal: 1d=+3.98%, 3d=+1.24%, 5d=-0.72%. Strong 1d signal, faded by day 5.",
-      "observation_type": "observed_outcome_post_hoc",
-      "symbol": "AHCO",
-      "cluster_date": "2026-03-12",
-      "cluster_size": 3,
-      "cluster_value_usd": 20000000,
-      "flags": "M (management)",
-      "market_cap": 1346915840,
-      "sector": "Healthcare",
-      "abnormal_1d": 3.98,
-      "abnormal_3d": 1.24,
-      "abnormal_5d": -0.72,
-      "note": "Management flag (M) cluster with very large dollar value showed strong 1d abnormal return. By day 5 (March 19 close=10.08 vs entry ~10.25), returned to near flat vs benchmark. The fast mean-reversion suggests the 3d window may be optimal for M-flag clusters of this size.",
-      "last_updated": "2026-03-22T01:53:11.322932"
+      "regime_analysis_date": "2026-03-22",
+      "finding": "Regime analysis on 117 WD hypothesis events (2021-2022): signal is STRONGEST in ELEVATED VIX (20-30) at mean_1d=+2.57% and 63.6% positive rate. CALM regime (VIX<20) is weakest at +0.39% and 46.7% pos rate. CRISIS (VIX>30) intermediate at +1.89% and 47.1% pos rate. Counter-intuitive: elevated VIX may amplify contrarian value of insider signal.",
+      "recommended_filter": "Do NOT add VIX<20 gate -- elevated VIX is historically the BEST regime for this signal. Only consider pausing at true CRISIS (VIX>30).",
+      "current_regime_note": "As of March 22 2026: VIX=26.78 (elevated, not crisis). SPY -1.80% past 5 days. This is the historically strongest regime for insider clusters.",
+      "pool_amrz_note": "POOL and AMRZ both failed (VIX 22-25 range). n=2 misses has p=13.3% chance under 63.6% success rate. Not statistically meaningful as regime breakdown evidence.",
+      "regime_breakdown": {
+        "CALM_lt20": {
+          "n": 45,
+          "mean_1d": 0.39,
+          "pos_rate": 46.7
+        },
+        "ELEVATED_20to30": {
+          "n": 55,
+          "mean_1d": 2.57,
+          "pos_rate": 63.6
+        },
+        "CRISIS_gt30": {
+          "n": 17,
+          "mean_1d": 1.89,
+          "pos_rate": 47.1
+        }
+      },
+      "last_updated": "2026-03-22T01:59:29.960610"
     },
     "insider_buying_cluster_3plus": {
       "effect": "3+ insider cluster buys within 30 days: abnormal returns at 3d and 5d consistently positive",
