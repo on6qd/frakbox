@@ -4232,7 +4232,7 @@
     "created": "2026-03-22T03:56:19.172258",
     "prediction_hash": "a1045afc924896b8",
     "idempotency_key": "bc395fd7925de3ed",
-    "status": "pending",
+    "status": "superseded",
     "event_type": "insider_cluster_6_to_9",
     "event_description": "When 6-9 corporate insiders (officers/directors) make open-market stock purchases within 30 days of each other (each >$50K), the stock outperforms the market over the following 3 trading days. This is the optimal cluster size tier: regime-robust (works in both calm and elevated VIX) unlike 3-5 clusters, and signal-clean (unlike 10+ clusters which are noise).",
     "causal_mechanism": "Strong insider conviction signal. 6-9 coordinated buyers indicates management expects imminent positive catalyst. Unlike 3-5 insiders (fails in elevated VIX p=0.27), 6-9 insiders overcome market noise even in volatile regimes (p=0.027 in VIX 25-30). Unlike 10+ insiders (coin flip p=0.64 -- contaminated by compensation plans and SPAC mechanics), 6-9 represents genuine coordinated conviction. Entry: long at next open after last cluster filing. Exit: 3 trading days later.",
@@ -4382,6 +4382,233 @@
       "sector_trend": "Signal measured across all sectors with no sector filter. Mechanism is insider-conviction-driven, not sector momentum. No sector concentration observed.",
       "survivorship_bias": "Discovery (2021-2022): 39% failure due to delisted tickers (SPAC-era, micro-cap acquisitions). Failures predominantly acquired companies (positive bias: acquirees receive premium). Validation (2023-2025): <1% failure rate. Net: favorable bias.",
       "selection_bias": "Events from SEC quarterly bulk data (objective). Open-market purchases only (code P), each >$50K, within 30-day window. The 6-9 sub-tier is a data-snooped refinement -- mitigated by strict temporal OOS split.",
+      "event_timing": "Entry at next market open after cluster detection. 30-day window means filing can span a month. No same-day entries -- always next-day-open to avoid look-ahead bias.",
+      "market_regime": "Tested across 2021-2025 including bull (2021, 2023-2025), bear (2022), and elevated volatility (March 2020-type tariff shock). Signal persists across regimes for n=6-9 tier."
+    },
+    "market_regime_note": "Extensively tested across VIX regimes. n=6-9 is uniquely regime-robust vs all other cluster tiers. n=3-5 fails in elevated VIX (p=0.27). n>=10 is noise (p=0.64). n=6-9 maintains significance through VIX 25-30.",
+    "regime_note": null,
+    "confidence": 7,
+    "literature_reference": "Kang, Kim & Wang (2018) \"Informed Trading before Corporate Events.\" Lakonishok & Lee (2001). Seyhun (1998).",
+    "survivorship_bias_note": "Discovery (2021-2022): 39% measurement failure due to delisted tickers (SPAC-era companies, micro-cap acquisitions). Exceeds 30% threshold but failures are predominantly acquired companies (positive survivorship bias). Validation (2023-2025): <1% failure rate, clean data.",
+    "selection_bias_note": "Events selected from SEC quarterly bulk data (objective). The 6-9 sub-tier is a data-snooped refinement discovered through tier analysis. Mitigated by strict temporal OOS: discovery closed before validation began.",
+    "passes_multiple_testing": true,
+    "multiple_testing_warning": null,
+    "confounder_warnings": null,
+    "symbol_warnings": [
+      "Symbol is TBD \u2014 must be resolved to a real ticker before activation."
+    ],
+    "dead_end_warnings": null,
+    "trade": null,
+    "result": null,
+    "superseded_reason": "Compliance violation: validation_indices [10,11] contained only 2 entries (minimum 3 required). The two entries referenced aggregate synthetic records, not individual named events. Superseded by corrected hypothesis with >=3 specific named OOS validation instances."
+  },
+  {
+    "id": "416556df",
+    "created": "2026-03-22T04:23:20.686267",
+    "prediction_hash": "0f04bd4390ce31f8",
+    "idempotency_key": "3c7152a97999f6ed",
+    "status": "pending",
+    "event_type": "insider_buying_cluster_n6to9",
+    "event_description": "When 6-9 corporate insiders (officers/directors) make open-market stock purchases within 30 days of each other (each >50K), the stock outperforms the market over the following 3 trading days. This is the optimal cluster size tier: regime-robust (works in both calm and elevated VIX) unlike 3-5 clusters, and signal-clean (unlike 10+ clusters which are noise).",
+    "causal_mechanism": "Strong insider conviction signal. 6-9 coordinated buyers indicates management expects imminent positive catalyst. Unlike 3-5 insiders (fails in elevated VIX p=0.27), 6-9 insiders overcome market noise even in volatile regimes (p=0.027 in VIX 25-30). Unlike 10+ insiders (coin flip p=0.64 -- contaminated by compensation plans and SPAC mechanics), 6-9 represents genuine coordinated conviction. Entry: long at next open after last cluster filing. Exit: 3 trading days later.",
+    "causal_mechanism_criteria": {
+      "actors_and_incentives": "Officers and directors risk own capital in open-market purchases. Form 4 disclosure within 2 days creates accountability. When 6-9 different insiders independently buy, each faces legal risk from trading on material non-public information. 6-9 threshold filters most 10b5-1 pre-planned transactions and compensation plan activity.",
+      "transmission_channel": "Multiple-insider buying signals positive expectations to the market. Investors monitoring SEC EDGAR Form 4 filings detect the pattern and trade on it, transmitting the signal to prices. Effect peaks at 3-5 days as institutional investors complete position-building.",
+      "academic_reference": "Kang, Kim & Wang (2018): cluster purchases yield 3.8% abnormal return over 21 days. Lakonishok & Lee (2001): insider purchases strongly predictive. Seyhun (1998): insider buying clusters particularly informative. Extended to 2021-2025 confirming persistence."
+    },
+    "expected_symbol": "TBD",
+    "expected_direction": "long",
+    "expected_magnitude_pct": 3.48,
+    "expected_timeframe_days": 3,
+    "event_timing": "unknown",
+    "backtest_symbols": [
+      "KFS",
+      "CODI",
+      "GTX",
+      "DFH",
+      "NOG",
+      "NSIT",
+      "IRON",
+      "CRM"
+    ],
+    "backtest_events": [
+      {
+        "symbol": "KFS",
+        "date": "2021-01-04"
+      },
+      {
+        "symbol": "CODI",
+        "date": "2021-01-05"
+      },
+      {
+        "symbol": "GTX",
+        "date": "2021-01-11"
+      },
+      {
+        "symbol": "DFH",
+        "date": "2021-01-27"
+      },
+      {
+        "symbol": "NOG",
+        "date": "2021-02-09"
+      },
+      {
+        "symbol": "CODI",
+        "date": "2023-01-03"
+      },
+      {
+        "symbol": "NSIT",
+        "date": "2023-02-14"
+      },
+      {
+        "symbol": "IRON",
+        "date": "2023-02-15"
+      },
+      {
+        "symbol": "CRM",
+        "date": "2024-06-03"
+      }
+    ],
+    "historical_evidence": [
+      {
+        "symbol": "KFS",
+        "date": "2021-01-04",
+        "abnormal_1d": 2.65,
+        "abnormal_3d": -2.06,
+        "abnormal_5d": 13.3
+      },
+      {
+        "symbol": "CODI",
+        "date": "2021-01-05",
+        "abnormal_1d": 1.1,
+        "abnormal_3d": 4.5,
+        "abnormal_5d": 5.8
+      },
+      {
+        "symbol": "GTX",
+        "date": "2021-01-11",
+        "abnormal_1d": 4.15,
+        "abnormal_3d": 6.29,
+        "abnormal_5d": 6.67
+      },
+      {
+        "symbol": "AFRM",
+        "date": "2021-01-15",
+        "abnormal_1d": -4.19,
+        "abnormal_3d": -15.12,
+        "abnormal_5d": -3.69
+      },
+      {
+        "symbol": "DFH",
+        "date": "2021-01-27",
+        "abnormal_1d": 2.13,
+        "abnormal_3d": 6.23,
+        "abnormal_5d": 9.89
+      },
+      {
+        "symbol": "TRIN",
+        "date": "2021-02-02",
+        "abnormal_1d": -2.11,
+        "abnormal_3d": -1.81,
+        "abnormal_5d": -0.74
+      },
+      {
+        "symbol": "EVLO",
+        "date": "2021-02-04",
+        "abnormal_1d": -4.9,
+        "abnormal_3d": 9.75,
+        "abnormal_5d": -2.65
+      },
+      {
+        "symbol": "NOG",
+        "date": "2021-02-09",
+        "abnormal_1d": 4.5,
+        "abnormal_3d": 2.27,
+        "abnormal_5d": 4.29
+      },
+      {
+        "symbol": "KLDO",
+        "date": "2021-02-10",
+        "abnormal_1d": -4.55,
+        "abnormal_3d": -0.44,
+        "abnormal_5d": -2.37
+      },
+      {
+        "symbol": "ONTF",
+        "date": "2021-02-05",
+        "abnormal_1d": 0.18,
+        "abnormal_3d": 7.55,
+        "abnormal_5d": -2.02
+      },
+      {
+        "symbol": "CODI",
+        "date": "2023-01-03",
+        "abnormal_1d": 4.58,
+        "abnormal_3d": 1.9,
+        "abnormal_5d": 6.29,
+        "note": "Validation event: n=8 insiders, VIX=22.9, measured at open entry. Directionally correct at 3d."
+      },
+      {
+        "symbol": "NSIT",
+        "date": "2023-02-14",
+        "abnormal_1d": 0.04,
+        "abnormal_3d": 3.21,
+        "abnormal_5d": 5.07,
+        "note": "Validation event: n=7 insiders, VIX=18.9, measured at open entry. Directionally correct at 3d."
+      },
+      {
+        "symbol": "IRON",
+        "date": "2023-02-15",
+        "abnormal_1d": -2.14,
+        "abnormal_3d": 0.03,
+        "abnormal_5d": 5.52,
+        "note": "Validation event: n=9 insiders, VIX=18.2, measured at open entry. Near-zero at 3d (noise)."
+      },
+      {
+        "symbol": "CRM",
+        "date": "2024-06-03",
+        "abnormal_1d": 0.77,
+        "abnormal_3d": -0.57,
+        "abnormal_5d": 1.82,
+        "note": "Validation event: n=8 insiders, VIX=13.1, measured at open entry. Marginally negative at 3d."
+      },
+      {
+        "symbol": "AGGREGATE_DISCOVERY_2021_2022",
+        "date": "2022-12-31",
+        "abnormal_1d": 0.49,
+        "abnormal_3d": 3.48,
+        "abnormal_5d": 3.87,
+        "note": "Aggregate of 132 measured discovery events. avg_3d=3.48%, stdev=8.95%, pos_rate=69.7%, p<0.000001"
+      },
+      {
+        "symbol": "AGGREGATE_VALIDATION_2023_2025",
+        "date": "2025-12-31",
+        "abnormal_1d": 1.19,
+        "abnormal_3d": 4.13,
+        "abnormal_5d": 7.8,
+        "note": "Aggregate of 178 measured validation events. avg_3d=4.13%, stdev=12.06%, pos_rate=64.6%, p<0.000001"
+      }
+    ],
+    "sample_size": 132,
+    "consistency_pct": 69.7,
+    "out_of_sample_split": {
+      "discovery_period": "2021-2022",
+      "validation_period": "2023-2025",
+      "validation_indices": [
+        10,
+        11,
+        12,
+        13
+      ],
+      "validation_consistency_pct": 64.6,
+      "validation_note": "Indices 10-13 are 4 named individual events measured at open entry from the 178-event validation population: CODI 2023-01-03, NSIT 2023-02-14, IRON 2023-02-15, CRM 2024-06-03. 75% directionally correct at 3d (3/4). Full validation population: avg_3d=+4.13%, 64.6% positive, n=178, p<0.000001."
+    },
+    "confounders": {
+      "broad_market_direction": "SPY 5d prior trend tested as filter -- NOT predictive (r=0.030, p=0.23). Signal works regardless of recent SPY direction.",
+      "vix_level": "VIX is the primary regime factor (r=-0.096, p<0.001). n=6-9 remains significant in BOTH calm VIX<20 (p=0.0004) AND elevated VIX 20-30 (p=0.027). Best returns in VIX<15 (+5.70% EV) through weakest in VIX 25-30 (+2.37% EV). Trade when VIX<30.",
+      "sector_trend": "Signal measured across all sectors with no sector filter. Mechanism is insider-conviction-driven, not sector momentum. No sector concentration observed.",
+      "survivorship_bias": "Discovery (2021-2022): 39% failure due to delisted tickers (SPAC-era, micro-cap acquisitions). Failures predominantly acquired companies (positive bias: acquirees receive premium). Validation (2023-2025): <1% failure rate. Net: favorable bias.",
+      "selection_bias": "Events from SEC quarterly bulk data (objective). Open-market purchases only (code P), each >50K, within 30-day window. The 6-9 sub-tier is a data-snooped refinement -- mitigated by strict temporal OOS split.",
       "event_timing": "Entry at next market open after cluster detection. 30-day window means filing can span a month. No same-day entries -- always next-day-open to avoid look-ahead bias.",
       "market_regime": "Tested across 2021-2025 including bull (2021, 2023-2025), bear (2022), and elevated volatility (March 2020-type tariff shock). Signal persists across regimes for n=6-9 tier."
     },
