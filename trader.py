@@ -60,7 +60,7 @@ def get_account_summary():
     }
 
 
-def place_experiment(symbol, direction, notional_amount):
+def place_experiment(symbol, direction, notional_amount, extended_hours=False):
     """
     Place a paper trade for a research experiment.
 
@@ -68,6 +68,9 @@ def place_experiment(symbol, direction, notional_amount):
         symbol: Stock ticker
         direction: "long" or "short"
         notional_amount: Dollar amount to invest
+        extended_hours: If True, place a limit order for extended hours trading
+            (pre-market / after-hours). Only limit orders work outside regular
+            hours on Alpaca. time_in_force is forced to "day".
 
     Returns:
         dict with order details
@@ -99,24 +102,52 @@ def place_experiment(symbol, direction, notional_amount):
         return {"success": False, "error": f"Could not get price: {e}"}
 
     try:
-        # Alpaca only supports notional for buy-side market orders.
-        # For short sells, compute qty from notional amount.
-        order_kwargs = dict(
-            symbol=symbol,
-            side=side,
-            type="market",
-            time_in_force="day",
-        )
-        if direction == "short":
+        # Extended-hours orders must use limit orders with time_in_force="day".
+        # Regular-hours orders use market orders (or notional for longs).
+        if extended_hours:
+            # Set limit price slightly aggressive to improve fill probability:
+            #   shorts: limit slightly below last price (we sell, so lower is worse for us
+            #           but still within the spread — use -0.1% to stay near bid)
+            #   longs:  limit slightly above last price (+0.1% to stay near ask)
+            if direction == "short":
+                limit_price = round(price * 0.999, 2)
+            else:
+                limit_price = round(price * 1.001, 2)
+
             qty = int(notional_amount / price)
             if qty < 1:
                 return {"success": False, "error": f"Notional ${notional_amount} too small for {symbol} at ${price}"}
-            order_kwargs["qty"] = qty
+
+            order_kwargs = dict(
+                symbol=symbol,
+                side=side,
+                type="limit",
+                time_in_force="day",
+                limit_price=limit_price,
+                qty=qty,
+                extended_hours=True,
+            )
+            print(f"[EXTENDED HOURS] Placing {side.upper()} limit order: {symbol} x{qty} @ ${limit_price:.2f} "
+                  f"(last trade ${price:.2f})")
         else:
-            order_kwargs["notional"] = round(notional_amount, 2)
+            # Alpaca only supports notional for buy-side market orders.
+            # For short sells, compute qty from notional amount.
+            order_kwargs = dict(
+                symbol=symbol,
+                side=side,
+                type="market",
+                time_in_force="day",
+            )
+            if direction == "short":
+                qty = int(notional_amount / price)
+                if qty < 1:
+                    return {"success": False, "error": f"Notional ${notional_amount} too small for {symbol} at ${price}"}
+                order_kwargs["qty"] = qty
+            else:
+                order_kwargs["notional"] = round(notional_amount, 2)
 
         order = api.submit_order(**order_kwargs)
-        return {
+        result = {
             "success": True,
             "order_id": order.id,
             "symbol": symbol,
@@ -124,7 +155,11 @@ def place_experiment(symbol, direction, notional_amount):
             "notional": notional_amount,
             "approx_qty": round(notional_amount / price, 4),
             "price_at_order": price,
+            "extended_hours": extended_hours,
         }
+        if extended_hours:
+            result["limit_price"] = limit_price
+        return result
     except Exception as e:
         return {"success": False, "error": str(e)}
 

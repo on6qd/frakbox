@@ -5,10 +5,12 @@ The LLM creates hypotheses and sets triggers. This loop checks triggers
 and executes trades without waiting for an LLM session.
 
 Trigger types:
-  "immediate"           — execute now
-  "next_market_open"    — execute at next market open (9:30 ET)
-  "2026-06-07T09:30"    — execute at specific datetime
-  None                  — no trigger, LLM will activate manually
+  "immediate"              — execute now (market hours only)
+  "next_market_open"       — execute at next market open (9:30 ET)
+  "after_hours_immediate"  — execute now as an extended-hours limit order
+                             (works 4:00 PM – 8:00 PM ET on weekdays)
+  "2026-06-07T09:30"       — execute at specific datetime (market hours)
+  None                     — no trigger, LLM will activate manually
 
 Also handles:
   - Stop-loss / take-profit / deadline enforcement
@@ -78,16 +80,44 @@ def _is_near_open():
     return 0 <= diff <= 300  # within 5 minutes after open
 
 
-def _trigger_is_ready(trigger):
-    """Check if a trigger condition is met."""
-    if trigger is None:
+def _extended_hours_is_available():
+    """
+    Check if the after-hours session is currently active.
+
+    Alpaca supports extended-hours limit orders during:
+      - Pre-market:  4:00 AM – 9:30 AM ET
+      - After-hours: 4:00 PM – 8:00 PM ET
+    on weekdays only.
+
+    For CEO departure shorts we target the after-hours window only
+    (news typically drops after the close), so we check 4:00–8:00 PM ET.
+    """
+    now_et = datetime.now(ET)
+    if now_et.weekday() >= 5:  # Saturday/Sunday
         return False
+    after_hours_start = now_et.replace(hour=16, minute=0, second=0, microsecond=0)
+    after_hours_end = now_et.replace(hour=20, minute=0, second=0, microsecond=0)
+    return after_hours_start <= now_et <= after_hours_end
+
+
+def _trigger_is_ready(trigger):
+    """
+    Check if a trigger condition is met.
+
+    Returns a tuple (ready: bool, use_extended_hours: bool) so callers can
+    decide which order type to use.
+    """
+    if trigger is None:
+        return False, False
 
     if trigger == "immediate":
-        return _market_is_open()
+        return _market_is_open(), False
 
     if trigger == "next_market_open":
-        return _is_near_open()
+        return _is_near_open(), False
+
+    if trigger == "after_hours_immediate":
+        return _extended_hours_is_available(), True
 
     # Specific datetime trigger: "2026-06-07T09:30"
     try:
@@ -97,9 +127,9 @@ def _trigger_is_ready(trigger):
             trigger_dt = trigger_dt.replace(tzinfo=ET)
         now = datetime.now(ET)
         # Trigger if we're past the time and market is open
-        return now >= trigger_dt and _market_is_open()
+        return now >= trigger_dt and _market_is_open(), False
     except (ValueError, TypeError):
-        return False
+        return False, False
 
 
 def _send_trade_email(subject, actions):
@@ -153,7 +183,11 @@ def execute_pending_triggers():
             continue
 
         trigger = h.get("trigger")
-        if not trigger or not _trigger_is_ready(trigger):
+        if not trigger:
+            continue
+
+        trigger_ready, use_extended_hours = _trigger_is_ready(trigger)
+        if not trigger_ready:
             continue
 
         symbol = h.get("expected_symbol")
@@ -182,8 +216,10 @@ def execute_pending_triggers():
             })
             continue
 
-        # Place the trade
-        result = place_experiment(symbol, direction, position_size)
+        # Place the trade (extended_hours=True for after_hours_immediate trigger)
+        if use_extended_hours:
+            print(f"[TRADE LOOP] after_hours_immediate trigger for {symbol} — using extended hours limit order")
+        result = place_experiment(symbol, direction, position_size, extended_hours=use_extended_hours)
 
         if result.get("success"):
             # Get current SPY price for context
@@ -203,6 +239,8 @@ def execute_pending_triggers():
                 "vix_at_entry": None,
                 "sector_etf_at_entry": None,
                 "activated_by": "trade_loop",
+                "extended_hours": use_extended_hours,
+                "limit_price": result.get("limit_price"),
             }
             h["trigger"] = None  # consumed
             modified = True
@@ -343,12 +381,14 @@ if __name__ == "__main__":
         hypotheses = _load_hypotheses()
         print(f"Market open: {_market_is_open()}")
         print(f"Near open: {_is_near_open()}")
+        print(f"Extended hours available: {_extended_hours_is_available()}")
         print()
         for h in hypotheses:
             trigger = h.get("trigger")
             if trigger:
-                ready = _trigger_is_ready(trigger)
-                print(f"  {h['id'][:8]} | {h.get('expected_symbol','TBD'):6s} | trigger={trigger} | ready={ready}")
+                ready, ext = _trigger_is_ready(trigger)
+                ext_flag = " [ext-hours]" if ext else ""
+                print(f"  {h['id'][:8]} | {h.get('expected_symbol','TBD'):6s} | trigger={trigger} | ready={ready}{ext_flag}")
         active = [h for h in hypotheses if h.get("status") == "active"]
         if active:
             print(f"\nActive positions: {len(active)}")
