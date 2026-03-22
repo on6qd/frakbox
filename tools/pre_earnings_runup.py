@@ -144,7 +144,7 @@ def measure_pre_earnings_drift(
 
             # Take last days_before trading days before earnings
             stock_window = stock_slice.tail(days_before)
-            spy_window = spy_slice.tail(stock_window.index)
+            spy_window = spy_slice.tail(len(stock_window))
             # Align on same dates
             common = stock_window.index.intersection(spy_window.index)
             if len(common) < 2:

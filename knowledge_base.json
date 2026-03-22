@@ -838,6 +838,11 @@
       "event_type": "pre_earnings_runup_beater",
       "reason": "Pre-earnings run-up for consistent EPS beaters: DEAD END for large-cap S&P 500. Measured 44-stock universe 2021-2025 (874 events). 5d abnormal: avg=+0.23%, pos_rate=44.9%, Wilcoxon p=0.082. FAILS: (1) Below 0.5% direction threshold, (2) Bonferroni-corrected p threshold (tested 3 windows), (3) Beater classification adds zero value vs all-stocks baseline (p_diff=0.35), (4) 2021 shows OPPOSITE direction for beaters (-1.12%, p=0.005). The general 5d pre-earnings drift (all stocks) also fails: p=0.021, marginal, no direction signal. Conclusion: large-cap S&P 500 is too efficient for pre-earnings drift to be tradeable. Possible follow-up: test on mid-cap or small-cap universe (<B) where information diffusion is slower.",
       "recorded": "2026-03-22T12:24:19.465112"
+    },
+    {
+      "event_type": "pre_earnings_runup_midcap",
+      "reason": "Mid-cap (B-B) pre-earnings drift dead end. Universe: 42 S&P MidCap stocks, 2021-2025. Consistent beaters (n=367): +0.12% 5d abnormal, p=0.494, 52.3% positive rate. Consistent missers (n=40): -0.15%, p=0.834. Mixed (n=302): +0.31%, p=0.154. No window (2d, 3d, 5d) showed significance. Conclusion: Pre-earnings drift is absent for mid-caps in this universe, consistent with large-cap dead end. The signal simply does not exist for US equities with consistent earnings histories, likely because the EPS beat/miss pattern is already priced in via analyst estimates.",
+      "recorded": "2026-03-22T12:52:30.963456"
     }
   ]
 }

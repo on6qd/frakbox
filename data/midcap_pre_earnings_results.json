@@ -1,0 +1,51 @@
+{
+  "date_run": "2026-03-22T12:51:35.157956",
+  "universe_size": 51,
+  "n_total_events": 709,
+  "tickers_succeeded": 42,
+  "tickers_failed": 9,
+  "results": {
+    "consistent_beater": {
+      "n": 367,
+      "avg_abnormal_pct": 0.122,
+      "median_abnormal_pct": 0.1155,
+      "stdev": 3.4103,
+      "positive_rate": 0.5232,
+      "t_stat": 0.685,
+      "p_value": 0.4936,
+      "wilcoxon_p": 0.5957,
+      "avg_abnormal_2d": 0.2109,
+      "p_value_2d": 0.12,
+      "avg_abnormal_3d": 0.2084,
+      "p_value_3d": 0.205
+    },
+    "consistent_misser": {
+      "n": 40,
+      "avg_abnormal_pct": -0.1537,
+      "median_abnormal_pct": -0.328,
+      "stdev": 4.5965,
+      "positive_rate": 0.45,
+      "t_stat": -0.211,
+      "p_value": 0.8337,
+      "wilcoxon_p": 0.5627,
+      "avg_abnormal_2d": -0.0027,
+      "p_value_2d": 0.9954,
+      "avg_abnormal_3d": -0.3575,
+      "p_value_3d": 0.5265
+    },
+    "mixed": {
+      "n": 302,
+      "avg_abnormal_pct": 0.3111,
+      "median_abnormal_pct": 0.1367,
+      "stdev": 3.7829,
+      "positive_rate": 0.5166,
+      "t_stat": 1.429,
+      "p_value": 0.154,
+      "wilcoxon_p": 0.2846,
+      "avg_abnormal_2d": 0.2643,
+      "p_value_2d": 0.0949,
+      "avg_abnormal_3d": 0.1859,
+      "p_value_3d": 0.2987
+    }
+  }
+}
