@@ -657,8 +657,8 @@
       "symbol": "REPL",
       "hypothesis_template": "5f805860",
       "added": "2026-03-22T01:22:01.003715",
-      "status": "watching",
-      "note": " | PIPELINE CHECK: REPL has multi-pipeline (RP1, RP2, RP3) - verify whether RP2/RP3 are material to valuation before trading on second CRL. If RP2/RP3 provide floor, may not qualify as single-pipeline for d302c84b. Monitor April 10."
+      "status": "disqualified",
+      "note": " | PIPELINE CHECK: REPL has multi-pipeline (RP1, RP2, RP3) - verify whether RP2/RP3 are material to valuation before trading on second CRL. If RP2/RP3 provide floor, may not qualify as single-pipeline for d302c84b. Monitor April 10. | CONFIRMED DISQUALIFIED: RP2 in active Phase 2/3 (uveal melanoma REVEAL trial) = multi-pipeline. Even if RP1 gets 2nd CRL, RP2 provides floor. d302c84b requires SINGLE-pipeline. DO NOT TRADE REPL."
     },
     {
       "event": "DNLI (Denali Therapeutics) PDUFA date for DNL310 (tividenofusp alfa) \u2014 Hunter syndrome (MPS II). BLA PDUFA \u2014 not tradeable under existing hypotheses (hypothesis 5f805860 requires CRL event, not a PDUFA). Monitor for outcome data to potentially build new hypothesis around BLA PDUFA outcomes.",
@@ -693,8 +693,8 @@
       "symbol": "REPL",
       "hypothesis_template": "5f805860 (short entry if second CRL issued). Watch for FDA announcement AH on April 10.",
       "added": "2026-03-22T05:05:53.070469",
-      "status": "watching",
-      "note": " | PIPELINE CHECK: REPL has multi-pipeline (RP1, RP2, RP3) - verify whether RP2/RP3 are material to valuation before trading on second CRL. If RP2/RP3 provide floor, may not qualify as single-pipeline for d302c84b. Monitor April 10."
+      "status": "disqualified",
+      "note": " | PIPELINE CHECK: REPL has multi-pipeline (RP1, RP2, RP3) - verify whether RP2/RP3 are material to valuation before trading on second CRL. If RP2/RP3 provide floor, may not qualify as single-pipeline for d302c84b. Monitor April 10. | CONFIRMED DISQUALIFIED: RP2 in active Phase 2/3 (uveal melanoma REVEAL trial) = multi-pipeline. Even if RP1 gets 2nd CRL, RP2 provides floor. d302c84b requires SINGLE-pipeline. DO NOT TRADE REPL."
     },
     {
       "event": "RCKT (Rocket Pharmaceuticals) PDUFA March 28, 2026 for KRESLADI (gene therapy LAD-I). BLA resubmission after prior CRL. If FDA issues a second CRL with clinical/efficacy deficiency AND stock crashes >55%, evaluate for d302c84b short. PRE-QUALIFY: market cap ~$449M (qualifies <$500M). Check single-pipeline status (Fanconi Anemia and PKD programs paused). Base case is approval - do NOT pre-short.",
@@ -732,33 +732,42 @@
   ],
   "next_session_priorities": [
     {
-      "task": "MONDAY MARCH 23: Confirm GO trade executed at open. Run: python trade_loop.py --dry-run. Check position in Alpaca.",
-      "set_by_session": "2026-03-22T13:01:01.344671"
+      "task": "CRITICAL: Monday March 23 confirm GO trade executed at open (check Alpaca dashboard or trade_loop logs)",
+      "set_by_session": "2026-03-22T13:40:54.016018"
     },
     {
-      "task": "THURSDAY MARCH 26: Close GO trade via tools/close_go_trade.py. VIX should still be elevated (~27), holding period = 5d.",
-      "set_by_session": "2026-03-22T13:01:01.344678"
+      "task": "Thursday March 26: Close GO trade using tools/close_go_trade.py (3d hold from Monday open)",
+      "set_by_session": "2026-03-22T13:40:54.016024"
     },
     {
-      "task": "Scan OpenInsider for NEW clusters NOT already covered by GO (1cb6140f). Need n>=6 in VIX<30 regime. Any CEO/CFO cluster qualifies for 2bbe0f04 activation. Current VIX=26.78 (elevated Tier 3).",
-      "set_by_session": "2026-03-22T13:01:01.344679"
+      "task": "After close GO: Record actual P&L to complete hypothesis 1cb6140f",
+      "set_by_session": "2026-03-22T13:40:54.016025"
     },
     {
-      "task": "Run build_roles_from_bulk.py regularly to keep clusters_with_roles_full.csv current with new events. Data now has 98.3% coverage (up from 18.5%).",
-      "set_by_session": "2026-03-22T13:01:01.344681"
+      "task": "Monitor REPL PDUFA April 10: confirmed DISQUALIFIED (RP2 multi-pipeline). No action needed.",
+      "set_by_session": "2026-03-22T13:40:54.016026"
     },
     {
-      "task": "FDA PDUFA calendar research: Build a scanner that pulls FDA upcoming PDUFA dates, filters for small-cap (<M) biotechs, and alerts 2-3 weeks before decision date. This enables pre-announcement shorts for d302c84b. ALDX was a missed opportunity (-73.5% crash March 17).",
-      "set_by_session": "2026-03-22T13:01:01.344682"
+      "task": "Clinical failure scanner: run at session start, already skips ALDX automatically",
+      "set_by_session": "2026-03-22T13:40:54.016027"
+    },
+    {
+      "task": "Fresh cluster scan: run cluster_auto_scanner.py --dry-run at session start",
+      "set_by_session": "2026-03-22T13:40:54.016027"
+    },
+    {
+      "task": "Next new signal research: consider (1) short-interest spike signal - when weekly short interest rises >20%, continuation or squeeze? (2) analyst initiation of coverage LONG signal, (3) look into DNTH Phase 3 CAPTIVATE interim readout for d302c84b (watchlist already set for June 2026)",
+      "set_by_session": "2026-03-22T13:40:54.016028"
     }
   ],
   "session_handoff": {
-    "current_state": "VIX=26.78 (elevated). GO triggered for Monday open. WD blocked (n=3, VIX>25). AMRZ entry window expired March 23.",
-    "what_was_done": "CEO/CFO bulk role classifier completed (98.3% coverage). VIX gate validated - elevated VIX shows zero signal. Mid-cap pre-earnings dead end recorded. ALDX clinical failure observed (missed, -73.5% crash). CEO/CFO differential: +2.02% in 2023+, p=0.069 - real but borderline significant.",
-    "key_finding": "CEO/CFO clusters add +2% in 2023+, but elevated VIX (25-30) kills BOTH CEO/CFO and non-CEO/CFO signals. The VIX gate is the dominant factor, not CEO/CFO presence.",
-    "blocked_on": "Need new cluster signals in VIX<25 regime OR VIX to drop below 25 to trade WD.",
-    "next_step": "Monday: confirm GO trade. Look for next fresh cluster signal. Consider building FDA PDUFA scanner as new signal source for clinical failure hypothesis d302c84b.",
-    "written_at": "2026-03-22T13:01:01.344684"
+    "current_state": "GO trade queued for Monday March 23 open. VIX=26.78, n=6 insiders (qualifies Tier 3). All other triggers removed (VIX gate).",
+    "active_experiments": 0,
+    "pending_trades": "GO (1cb6140f) at next_market_open Monday March 23",
+    "ongoing_research": "All 3-way interaction / conviction-tier analysis complete and recorded as dead ends. Buyback signal dead end recorded. Scanner memory fix deployed.",
+    "blocking_issues": "None. Clinical scanner now has persistent disqualification memory. REPL confirmed disqualified for April 10.",
+    "next_specific_action": "Monday: verify GO executed. Thursday: run close_go_trade.py. New signal research after GO closes.",
+    "written_at": "2026-03-22T13:40:54.016031"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
