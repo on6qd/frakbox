@@ -621,7 +621,8 @@
       "symbol": "RCKT",
       "hypothesis_template": "d302c84b",
       "added": "2026-03-22T07:13:04.656924",
-      "status": "watching"
+      "status": "DISQUALIFIED - multi-pipeline (RP-L401 Krabbe, RP-L201 LAD-I, RP-A501 Fabry, RP-L301 SCD). d302c84b requires single-pipeline. Do not trade even if CRL issued 2026-03-28.",
+      "disqualified": true
     },
     {
       "event": "S&P 500 Q2 2026 quarterly rebalance announcement expected Friday June 5, 2026 after market close (~5:15 PM ET). Effective date June 19, 2026. Entry at Monday June 8 open. 5-day hold. Watch spglobal.com/press-releases for announcement. Candidate names: SOFI, ARES, MSTR. Hypothesis 061ae3a8 (conf=9, avg +5% abnormal at 5d, 100% recent consistency).",
@@ -650,24 +651,28 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. SSP (E.W. Scripps): market_cap=$300M \u2014 DISQUALIFIED for hypothesis 416556df (<$500M threshold). Do not trade.",
-      "set_by_session": "2026-03-22T08:19:14.515922"
+      "task": "1. GO trade: verify execution at Monday March 23 open (hypothesis 1cb6140f). Close at 3d hold = March 26 open. Run close_go_trade.py after 3 trading days.",
+      "set_by_session": "2026-03-22T10:02:28.847744"
     },
     {
-      "task": "2. BLCO (Bausch & Lomb): market_cap=$5.58B, 9 trading days since filing (2026-03-10) \u2014 WINDOW CLOSED (>5 days). Do not trade.",
-      "set_by_session": "2026-03-22T08:19:14.515927"
+      "task": "2. RCKT PDUFA March 28: DISQUALIFIED (multi-pipeline). Do NOT trade even if CRL issued. Remove from watch.",
+      "set_by_session": "2026-03-22T10:02:28.847747"
     },
     {
-      "task": "3. POOL (Pool Corp): market_cap=$7.46B, 4 trading days since filing (2026-03-17) \u2014 ELIGIBLE if n=6-9 insiders confirmed. Need to verify insider count from OpenInsider.",
-      "set_by_session": "2026-03-22T08:19:14.515928"
+      "task": "3. WD (76678219): VIX gate blocks entry at VIX=26.78. Wait for VIX to drop below 25, then re-evaluate. If VIX<25 on Monday morning before market open, can restore trigger.",
+      "set_by_session": "2026-03-22T10:02:28.847748"
     },
     {
-      "task": "4. SEO bought-deal next step: run seo_bought_deal_scanner.py --resolve-tickers --filter-market-cap --sample 258 to get tickers, then run measure_event_impact on qualified events.",
-      "set_by_session": "2026-03-22T08:19:14.515929"
+      "task": "4. AMRZ (1f3ac0ec): Entry window expires March 23. VIX gate blocks entry. AMRZ hypothesis remains for any future AMRZ clusters that appear when VIX<25.",
+      "set_by_session": "2026-03-22T10:02:28.847749"
     },
     {
-      "task": "5. After ticker resolution, backtest bought deals vs SPY to check if announcement-day short signal is cleanly measurable.",
-      "set_by_session": "2026-03-22T08:19:14.515929"
+      "task": "5. New signal investigation: Consider testing dividend initiation/increase announcements via EDGAR 8-K Item 8.01. Literature: 3-5% abnormal return on initiation (signals financial confidence). Can be sourced from free EDGAR 8-K search.",
+      "set_by_session": "2026-03-22T10:02:28.847749"
+    },
+    {
+      "task": "6. Clinical failure signal: scan EDGAR weekly for new qualifying events. Current qualifying pipeline: none active. Next PDUFA to watch: check for Q2 2026 PDUFA dates for single-pipeline small biotechs.",
+      "set_by_session": "2026-03-22T10:02:28.847750"
     }
   ],
   "session_handoff": {
