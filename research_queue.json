@@ -775,66 +775,51 @@
   "next_session_priorities": [
     {
       "task": {
-        "task": "1. CRITICAL (Mon March 23): Confirm GO (1cb6140f) AND HD (86d28864) both executed at open via python run.py --status. GO is LONG, HD is SHORT.",
-        "set_by_session": "2026-03-22T15:00:00"
+        "priority": 1,
+        "task": "CRITICAL Mon March 23: Verify GO (1cb6140f) and HD (86d28864) both executed at 9:30 AM open. Run python run.py --status to confirm.",
+        "context": "GO is LONG at Monday open (3d hold, exits Thu March 26 close). HD is SHORT at Monday open (5d hold, exits Fri March 27 close). Trade loop handles execution."
       },
-      "set_by_session": "2026-03-22T14:58:16.039163"
+      "set_by_session": "2026-03-22T15:42:57.971370"
     },
     {
       "task": {
-        "task": "2. CRITICAL (Thu March 26): Close GO long via python tools/close_go_trade.py. Record actual return vs expected 2.5% abnormal.",
-        "set_by_session": "2026-03-22T15:00:00"
+        "priority": 2,
+        "task": "CRITICAL Thu March 26: Close GO long. Run python tools/close_go_trade.py. Record vs expected +2.5% abnormal. Also check ABT 52w-low outcome (free OOS data point for 86d28864 - ABT breached March 20 same as HD).",
+        "context": "ABT entry was March 21 open (capacity was at max so we did not trade it). ABT 52w low breach -0.6%, less significant than HD -1.9%."
       },
-      "set_by_session": "2026-03-22T14:58:16.039168"
+      "set_by_session": "2026-03-22T15:42:57.971375"
     },
     {
       "task": {
-        "task": "3. CRITICAL (Fri March 27): Close HD short via python tools/close_hd_trade.py. Record actual return vs expected -1.68% abnormal.",
-        "set_by_session": "2026-03-22T15:00:00"
+        "priority": 3,
+        "task": "CRITICAL Fri March 27: Close HD short. Run python tools/close_hd_trade.py. Record vs expected -1.68% abnormal.",
+        "context": "First test of 52-week low short hypothesis 86d28864."
       },
-      "set_by_session": "2026-03-22T14:58:16.039169"
+      "set_by_session": "2026-03-22T15:42:57.971376"
     },
     {
       "task": {
-        "task": "4. Research: Short-interest spike signal (FINRA bimonthly data). NASDAQ API provides 24-period short interest history for NASDAQ stocks. Test: when short interest increases >25% in one bimonthly period, does stock underperform in next 10-20 days? Asquith, Pathak & Ritter (2005). Note: only 12 months of history available via NASDAQ API - may need alternative data source.",
-        "set_by_session": "2026-03-22T15:00:00"
+        "priority": 4,
+        "task": "Research: Re-test insider selling cluster with large-cap filter (market_cap >5B). Use tools/largecap_filter.py. Discovery 2021-2022, OOS 2023-2024. Key question: does large-cap filter fix the regime-dependence problem? Also try excluding 10b5-1 plan filings.",
+        "context": "All-ticker selling signal shows 20d=-2.86% in 2021 but -1.11% in 2023-24 (passes MT only in 2021-2022). Large-cap may be more robust. Task f5857b08 in queue."
       },
-      "set_by_session": "2026-03-22T14:58:16.039170"
+      "set_by_session": "2026-03-22T15:42:57.971377"
     },
     {
       "task": {
-        "task": "5. Research: Insider selling cluster (mirror of buying). Use EDGAR Form 4 bulk, filter transaction_type=S. Test if 3+ insider sells within 30 days predicts underperformance. Expected to be weaker than buy signal due to non-informative selling (diversification, tax).",
-        "set_by_session": "2026-03-22T15:00:00"
+        "priority": 5,
+        "task": "Research: SEO announcement date signal - test EDGAR 8-K item 8.01 parser for exact SEO announcement dates (not 424B4 filing date which lags by 0-7 days). If exact dates obtainable, backtest announcement-day -3% signal. Task 8517e522 in queue.",
+        "context": "Bought deal SEOs showed -3.67% median 10d drift (70% neg, N=23). Primary announcement SEO may have larger effect but needs exact event date."
       },
-      "set_by_session": "2026-03-22T14:58:16.039170"
-    },
-    {
-      "task": {
-        "task": "6. Run fiftytwo_week_low_scanner.py --dry-run to check for new 52-week low signals. ABT also breached on March 20 (not traded). Check ABT return as free OOS validation for 86d28864.",
-        "set_by_session": "2026-03-22T15:00:00"
-      },
-      "set_by_session": "2026-03-22T14:58:16.039172"
-    },
-    {
-      "task": {
-        "task": "7. Check VIX for WD hypothesis (76678219): needs VIX<25 for n=3 cluster. If VIX drops below 25 this week, activate WD trade.",
-        "set_by_session": "2026-03-22T15:00:00"
-      },
-      "set_by_session": "2026-03-22T14:58:16.039173"
+      "set_by_session": "2026-03-22T15:42:57.971377"
     }
   ],
   "session_handoff": {
-    "current_state": "GO trade (1cb6140f) has trigger=next_market_open. Will execute Monday March 23 at 9:30 ET. n=6 insiders including CEO. VIX=26.78 (Tier 3) - n>=6 passes gate. No active positions as of session end.",
-    "completed_this_session": [
-      "Verified GO cluster: n=6 insiders (passes VIX Tier 3 gate at VIX=26.78). Trade confirmed valid for Monday open.",
-      "WD (n=3) and AMRZ (n=4) confirmed VIX-gated \u2014 DO NOT TRADE until VIX<25 or new cluster with n>=6 found.",
-      "No new clusters found by auto-scanner (0 clusters meeting thresholds).",
-      "DEAD END: Analyst initiation BUY signal. N=177 events from 40 large-caps, 2021-2025. All p>0.45, 48-53% positive rate (pure coin flip at every horizon). Signal priced in before next-day open.",
-      "DEAD END: Analyst downgrade signal (Bullish->Hold/Sell). N=425 events. Real signal exists (p<0.0001, 59% negative rate, CI excludes zero) but net return after costs ~0.27% \u2014 below 1.0% threshold. Edge too thin for execution."
-    ],
-    "blocked_on": "Nothing. Waiting for Monday market open for GO execution.",
-    "next_step": "Monday confirm GO executed. Thursday close GO. Then research short-interest spike using FINRA bimonthly data.",
-    "written_at": "2026-03-22T14:22:56.105553"
+    "current_investigation": "Session completed: short interest spike (dead end), insider selling cluster (partial signal, not formable), pre-earnings mid-cap (dead end), 52w-low scanner scheduled",
+    "session_findings": "(1) FINRA REGSHO short interest spike: dead end for large-caps (p=0.84 disc, p=0.31 OOS). (2) Insider selling cluster: 20d signal real (-2.86% to -2.30%) but regime-dependent; fails MT in 2023-24 bull market. n>=6 fails 2022 OOS. Not formable as hypothesis. (3) Pre-earnings runup mid-cap: +0.50% at 5d (p=0.007) but below 1.5% threshold. Dead end. (4) 52-week low scanner: now scheduled daily at 8 PM ET weekdays.",
+    "blocked_by": "No blockers. Two live trades (GO long, HD short) set for Monday March 23 open.",
+    "next_step": "Monday: verify GO and HD trade execution. Thu: close GO. Fri: close HD. Research: try insider selling with large-cap filter.",
+    "written_at": "2026-03-22T15:42:57.971379"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
