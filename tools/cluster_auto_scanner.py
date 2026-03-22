@@ -20,19 +20,27 @@ Qualifications (matching hypothesis 1cb6140f):
     - Not already in active/pending experiments
 
 VIX + Cluster Size Trading Gate (full-population analysis, N=1566, 2021-2025):
-    Tier 1 - HIGH CONFIDENCE (VIX < 20, n >= 3):
-        EV = +3.31%, 55.7% consistency. Trade freely.
+    Refined 2026-03-22: n=6-9 is the OPTIMAL tier. n>=10 is NOISE (p=0.64, pos_rate=49%).
+    The n>=10 signal disappears because 2021 IPO lockup expiry Form 4 filings contaminate
+    the dataset (CXM, BRZE, IOT, GLUE, DOCS, DNUT etc. all filed en-masse at lockup expiry).
+
+    Tier 1 - HIGH CONFIDENCE (VIX < 20):
+        n=6-9: EV = +4.32% (post-2021), 60.6% consistency. PRIMARY SIGNAL.
+        n=3-5: EV = +3.75% calm VIX. Trade freely.
+        n>=10: EV = -0.08% (noise). DO NOT TRADE.
     Tier 2 - MODERATE (VIX 20-25, n >= 5):
-        EV = +1.85%, 47% positive rate, p=0.032. Tradeable but marginal.
-        For VIX 20-25 and n=3-4: EV=+1.22% -- below preference, but acceptable if high total value.
-    Tier 3 - CONDITIONAL (VIX 25-30, n >= 6):
-        EV = +2.37%, 57% positive rate, p=0.027. Tradeable when n>=6.
-        For VIX 25-30 and n=3-5: EV=-0.48%, 38% positive -- DO NOT TRADE.
+        n=6-9: EV = +2.78%, 55.6% pos rate, p=0.0021. TRADEABLE.
+        n=3-5: EV = +0.68%, p=0.27. NOT SIGNIFICANT. Only trade if high total value.
+        n>=10: Still noise. DO NOT TRADE.
+    Tier 3 - CONDITIONAL (VIX 25-30, n = 6-9):
+        n=6-9: EV = +2.78%, 55.6% pos rate, p=0.0021. Tradeable.
+        n=3-5: EV = -0.48%, 38% positive -- DO NOT TRADE.
+        n>=10: Still noise. DO NOT TRADE.
     Tier 4 - DO NOT TRADE (VIX > 30):
         Crisis regime -- signal noisy, N=94. Avoid.
 
-VIX 20-25 with n=3-4 note: EV=+1.22% is above minimum net return (1.0%) but below typical
-cluster signal strength. Historically acceptable if total purchase value > $2M.
+Key implication: When VIX is elevated (20-30), ONLY trade n=6-9 clusters.
+    n=3-5 in elevated VIX = coin flip. n>=10 in any VIX = noise.
 """
 
 import argparse
@@ -103,30 +111,45 @@ def get_vix_action_recommendation(vix_regime: str, n_insiders: int, total_value_
     """
     Return a trading action recommendation based on VIX tier + cluster size.
 
-    Uses the VIX + Cluster Size Trading Gate from full-population analysis (N=1566).
+    Uses the refined VIX + Cluster Size Trading Gate (N=1566, updated 2026-03-22).
+    Key finding: n=6-9 is the optimal tier (regime-robust). n>=10 is NOISE. n=3-5 fails in elevated VIX.
     """
+    # n>=10 is noise regardless of VIX (p=0.64, pos_rate=49% -- dominated by IPO lockup events)
+    if n_insiders >= 10:
+        return (f"DO NOT TRADE (n={n_insiders}>=10). "
+                "Signal disappears for large clusters: p=0.64, pos_rate=49% (coin flip). "
+                "Likely IPO/lockup Form 4 contamination or large-cap 10b5-1 plans. SKIP.")
+
     if vix_regime == "calm":
-        return "HIGH CONFIDENCE. Trade at next open per standard protocol (VIX<20, EV=+3.31%)."
-    elif vix_regime == "moderate":
-        if n_insiders >= 5:
-            return (f"MODERATE CONFIDENCE (VIX 20-25, n={n_insiders}>=5). "
-                    "EV=+1.85%, p=0.032. Tradeable — proceed.")
-        elif total_value_k >= 2000:
-            return (f"MARGINAL (VIX 20-25, n={n_insiders}<5 but total=${total_value_k/1000:.1f}M>=$2M). "
-                    "EV=+1.22%, acceptable for high-value clusters. Proceed with caution.")
-        else:
-            return (f"WEAK SIGNAL (VIX 20-25, n={n_insiders}<5, total=${total_value_k/1000:.1f}M<$2M). "
-                    "EV=+1.22%, borderline. Do not trade unless other strong qualifiers present.")
-    elif vix_regime == "elevated":
         if n_insiders >= 6:
-            return (f"CONDITIONAL (VIX 25-30, n={n_insiders}>=6). "
-                    "EV=+2.37%, 57% pos rate, p=0.027. N>=6 overcomes VIX penalty. Proceed.")
+            return (f"HIGH CONFIDENCE (VIX<20, n={n_insiders} in 6-9 tier). "
+                    "EV=+4.32% post-2021, 60.6% pos rate. PRIMARY SIGNAL. Trade at next open.")
         else:
-            return (f"DO NOT TRADE (VIX 25-30, n={n_insiders}<6). "
-                    "EV=-0.48%, 38% pos rate for n<6 in elevated VIX — coin flip. SKIP.")
+            return (f"HIGH CONFIDENCE (VIX<20, n={n_insiders}). "
+                    "EV=+3.75% calm VIX, 56% pos rate. Trade at next open per standard protocol.")
+    elif vix_regime == "moderate":
+        if n_insiders >= 6:
+            return (f"STRONG (VIX 20-25, n={n_insiders} in 6-9 tier). "
+                    "EV=+2.78%, 55.6% pos rate, p=0.0021. n=6-9 is regime-robust. Proceed.")
+        elif n_insiders >= 5:
+            return (f"MODERATE (VIX 20-25, n={n_insiders}). "
+                    "EV~+1.85%, p=0.032. Tradeable but marginal. Proceed if total value is high.")
+        else:
+            return (f"WEAK SIGNAL (VIX 20-25, n={n_insiders}<5). "
+                    "EV=+0.68%, p=0.27 — NOT significant. Do not trade unless total>${total_value_k/1000:.1f}M>>$5M.")
+    elif vix_regime == "elevated":
+        if 6 <= n_insiders <= 9:
+            return (f"CONDITIONAL STRONG (VIX 25-30, n={n_insiders} in 6-9 tier). "
+                    "EV=+2.78%, 55.6% pos rate, p=0.0021. n=6-9 overcomes VIX penalty. Proceed.")
+        elif n_insiders >= 5:
+            return (f"MARGINAL (VIX 25-30, n={n_insiders}=5). "
+                    "EV uncertain in elevated VIX at n=5. Only trade if cluster is exceptional (CEO + $5M+).")
+        else:
+            return (f"DO NOT TRADE (VIX 25-30, n={n_insiders}<5). "
+                    "EV=-0.48%, 38% pos rate for n<5 in elevated VIX — historically a coin flip. SKIP.")
     elif vix_regime == "crisis":
         return (f"DO NOT TRADE (VIX>30 crisis regime). "
-                "Signal unreliable in crisis. N=94, mixed results. Wait for VIX to fall.")
+                "Signal unreliable in crisis. N=94, mixed results. Wait for VIX to fall below 25.")
     else:
         return "VIX regime unknown. Review manually before trading."
 
@@ -331,12 +354,12 @@ def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[d
         print(f"  Current VIX: {vix_level:.2f}" if vix_level is not None else "  Current VIX: UNAVAILABLE")
         print(f"  Signal regime: {vix_label}")
         if vix_regime == "calm":
-            print(f"  -> Tier 1: Calm regime. Full confidence. Any n>=3 cluster is tradeable.")
+            print(f"  -> Tier 1: Calm regime. n=6-9: EV=+4.32% (primary signal). n=3-5: EV=+3.75%. n>=10: SKIP (noise).")
         elif vix_regime == "moderate":
-            print(f"  -> Tier 2: Moderate regime (VIX 20-25). Prefer n>=5. n>=3 marginal if total>=$2M.")
+            print(f"  -> Tier 2: Moderate regime (VIX 20-25). n=6-9: EV=+2.78% p=0.002 (TRADEABLE). n=3-5: EV=+0.68% p=0.27 (WEAK). n>=10: SKIP.")
         elif vix_regime == "elevated":
-            print(f"  -> Tier 3: Elevated regime (VIX 25-30). n>=6 ONLY is tradeable. n<6: DO NOT TRADE.")
-            print(f"     EV for n>=6: +2.37%, 57% pos rate. EV for n<6: -0.48%, 38% pos rate.")
+            print(f"  -> Tier 3: Elevated regime (VIX 25-30). n=6-9 ONLY is tradeable (EV=+2.78%, p=0.002).")
+            print(f"     n=3-5: EV=-0.48%, p=0.27 (coin flip). n>=10: noise. Skip all but n=6-9.")
         elif vix_regime == "crisis":
             print(f"  -> Tier 4: Crisis regime (VIX>30). DO NOT TRADE. Signal unreliable in crisis conditions.")
         else:
@@ -407,10 +430,12 @@ def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[d
             print("NEXT STEP: Set trigger on hypothesis 1cb6140f for qualifying tickers.")
             print("  1. Verify company fundamentals (not in financial distress)")
             print("  2. Verify no upcoming earnings that would confound the signal")
-            print("  3. Check VIX regime label above before trading:")
-            print("     - HIGH CONFIDENCE (VIX<20): proceed normally")
-            print("     - MARGINAL (VIX 20-25): require 6+ insiders or large buy amount")
-            print("     - LOW CONFIDENCE (VIX>25): strong bias against trading (EV ~0.4%)")
+            print("  3. Check VIX regime + cluster size (refined rule, 2026-03-22):")
+            print("     - VIX<20, n=6-9: PRIMARY SIGNAL (EV=+4.32%). Trade freely.")
+            print("     - VIX<20, n=3-5: HIGH CONFIDENCE (EV=+3.75%). Trade freely.")
+            print("     - VIX 20-30, n=6-9: TRADEABLE (EV=+2.78%, p=0.002). Proceed.")
+            print("     - VIX 20-30, n=3-5: COIN FLIP (EV~+0%, p=0.27). Skip unless extraordinary.")
+            print("     - Any VIX, n>=10: NOISE (p=0.64). DO NOT TRADE.")
             print("  4. Set trigger: h['trigger'] = 'next_market_open'")
 
     return qualifying

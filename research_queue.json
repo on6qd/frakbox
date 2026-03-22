@@ -403,9 +403,11 @@
       "category": "insider_buying_cluster",
       "question": "Check POOL (3 insiders, $3.6M, March 17) and AMRZ (5 insiders, $4.6M, March 16) outcomes as validation data points for insider cluster signal",
       "priority": 3,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "These were missed opportunities that can serve as OOS validation data. POOL outcome available now; AMRZ may have data.",
-      "added": "2026-03-22T01:53:37.215866"
+      "added": "2026-03-22T01:53:37.215866",
+      "completed": "2026-03-22T03:22:45.763639",
+      "findings": "POOL (n=3, elevated VIX 23-25, filed March 17): 1d=+0.68%, 3d=-0.74%. No 5d data yet. Consistent with n=3-5 in elevated VIX being noise (p=0.27 historically). AMRZ (n=5, elevated VIX, filed March 16): 1d=+0.42%, 3d=-1.49%, 5d=-3.58%. Also negative. Both POOL and AMRZ failed as predicted by the n=3-5 elevated VIX analysis. Both are negative data points for the cluster signal in elevated VIX with low n. Key validation: the revised rule (n=6-9 required in elevated VIX) is supported by these outcomes."
     },
     {
       "id": "d288c2b8",

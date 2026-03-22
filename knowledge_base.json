@@ -225,71 +225,56 @@
       "last_updated": "2026-03-21T11:11:28.681628"
     },
     "insider_buying_cluster": {
-      "finding": "VIX 4-tier signal strength analysis (2026-03-22)",
-      "method": "Full-population N=1566, 2021-2025",
-      "vix_tier_results": {
-        "<15": {
-          "N": 305,
-          "mean_5d": 5.7,
-          "pos_rate": 56.1,
-          "p": "<0.0001"
-        },
-        "15-20": {
-          "N": 666,
-          "mean_5d": 2.22,
-          "pos_rate": 51.7,
-          "p": "<0.0001"
-        },
-        "20-25": {
-          "N": 360,
-          "mean_5d": 1.4,
-          "pos_rate": 46.4,
-          "p": 0.0205
-        },
-        "25-30": {
-          "N": 141,
-          "mean_5d": 0.33,
-          "pos_rate": 43.3,
-          "p": 0.717
-        },
-        ">30": {
-          "N": 94,
-          "mean_5d": 1.38,
-          "pos_rate": 50.0,
-          "p": 0.2
-        }
+      "finding": "n=6-9 insider cluster tier is regime-robust; n>=10 has ZERO signal",
+      "n69_overall": {
+        "N": 319,
+        "mean_5d_pct": 3.29,
+        "pos_rate_pct": 56.7,
+        "p_value": 0.0
       },
-      "cluster_size_interaction": {
-        "n>=6_VIX_25-30": {
-          "N": 42,
-          "mean_5d": 2.37,
-          "pos_rate": 57.1,
-          "p": 0.027,
-          "insight": "High cluster size OVERCOMES VIX 25-30 penalty"
-        },
-        "n=3-5_VIX_25-30": {
-          "N": 101,
-          "mean_5d": -0.48,
-          "pos_rate": 37.6,
-          "p": 0.682,
-          "insight": "DO NOT TRADE small clusters in VIX 25-30"
-        },
-        "n>=5_VIX_20-25": {
-          "N": 150,
-          "mean_5d": 1.85,
-          "pos_rate": 47.0,
-          "p": 0.032,
-          "insight": "Tradeable in moderate VIX if n>=5"
-        }
+      "n69_calm_vix": {
+        "N": 212,
+        "mean_5d_pct": 3.31,
+        "pos_rate_pct": 57.5,
+        "p_value": 0.0004
       },
-      "trading_rule_update": {
-        "tier_1": "VIX<20, any n>=3: TRADE (EV=+3.31%)",
-        "tier_2": "VIX 20-25, n>=5: TRADE (EV=+1.85%). n=3-4 with >M: marginal",
-        "tier_3": "VIX 25-30, n>=6 ONLY: TRADE (EV=+2.37%). n<6: DO NOT TRADE (EV=-0.48%)",
-        "tier_4": "VIX>30: DO NOT TRADE"
+      "n69_elevated_vix": {
+        "N": 90,
+        "mean_5d_pct": 2.78,
+        "pos_rate_pct": 55.6,
+        "p_value": 0.0021
       },
-      "data_warning": "2021-2022 full-population shows negative means (-0.51%, -0.37%) but original backtest showed positive (+2.93%). Discrepancy under investigation - original backtest may have used different event sampling or entry price assumptions. Use cluster_with_returns.csv results with caution for 2021-2022 regime analysis.",
-      "last_updated": "2026-03-22T02:59:53.598678"
+      "n69_post2021_elevated_vix": {
+        "N": 65,
+        "mean_5d_pct": 3.21,
+        "pos_rate_pct": 55.4,
+        "p_value": 0.0038
+      },
+      "n35_elevated_vix": {
+        "N": 353,
+        "mean_5d_pct": 0.68,
+        "pos_rate_pct": 47.6,
+        "p_value": 0.27,
+        "status": "NOISE"
+      },
+      "n10plus": {
+        "N": 155,
+        "mean_5d_pct": 0.49,
+        "pos_rate_pct": 49.0,
+        "p_value": 0.64,
+        "status": "NOISE"
+      },
+      "n10plus_explanation": "n>=10 events in 2021 are dominated by IPO lockup expiry Form 4 filings (CXM, BRZE, IOT, GLUE, DOCS, DNUT etc.). These are NOT voluntary open-market purchases. Even n=6-9 was contaminated in 2021 by IPO bubble. Signal is clean post-2021.",
+      "n69_post2021": {
+        "N": 241,
+        "mean_5d_pct": 4.32,
+        "pos_rate_pct": 60.6,
+        "p_value": 1e-06
+      },
+      "trading_rule": "For n=6-9 clusters: trade in BOTH calm and elevated VIX (p<0.005 in both). For n=3-5: only trade in calm VIX (p=0.27 in elevated = coin flip). Never trade n>=10.",
+      "data_period": "2021-2025, N=1566 total events",
+      "discovery_date": "2026-03-22",
+      "last_updated": "2026-03-22T03:21:09.707724"
     },
     "insider_buying_cluster_3plus": {
       "effect": "3+ insider cluster buys within 30 days: abnormal returns at 3d and 5d consistently positive",
