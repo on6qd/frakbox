@@ -559,6 +559,22 @@
       "hypothesis_template": "5f805860",
       "added": "2026-03-22T01:22:01.005021",
       "status": "watching"
+    },
+    {
+      "event": "DNLI BLA PDUFA for tividenofusp alfa (MPS II / Hunter syndrome). Clean first submission. Breakthrough Therapy + Priority Review + Fast Track. NEJM Phase 1/2 published. 8/8 analyst Buy, avg target $29.38. Company guided for commercial launch in 2026. FDA extended to April 5 (pharmacology data request - process, not substantive). Risk: single-arm Phase 1/2 only, small N=47, surrogate endpoint (CSF HS). PDUFA April 5, 2026. NO validated approval hypothesis - monitor for CRL. If rejected: short candidate for 5f805860.",
+      "expected_date": "2026-04-05",
+      "symbol": "DNLI",
+      "hypothesis_template": "fda_clinical_rejection_short (5f805860) if CRL issued. No validated long hypothesis for approval.",
+      "added": "2026-03-22T05:05:53.069513",
+      "status": "watching"
+    },
+    {
+      "event": "REPL BLA resubmission PDUFA for RP1+nivolumab in PD-1-refractory advanced melanoma. PRIOR CRL July 2025 (population heterogeneity, contribution of components). Resubmission accepted Oct 2025 as Class II. 60% PoS (Leerink). Stock at $6.98 (up from $2.68 CRL low). IF REJECTED: enter short per hypothesis 5f805860 (fda_clinical_rejection_short, N=6, 100% consistency, avg -20% 3d). Risk for rejection: structural objections unresolved without new randomized data.",
+      "expected_date": "2026-04-10",
+      "symbol": "REPL",
+      "hypothesis_template": "5f805860 (short entry if second CRL issued). Watch for FDA announcement AH on April 10.",
+      "added": "2026-03-22T05:05:53.070469",
+      "status": "watching"
     }
   ],
   "next_session_priorities": [
