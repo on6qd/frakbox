@@ -130,6 +130,146 @@ def get_ticker_for_cik(cik: str) -> str | None:
     return None
 
 
+def fetch_8k_text(cik: str, accession: str) -> str | None:
+    """
+    Fetch the text content of an 8-K filing from EDGAR.
+    Returns the plain text content, or None if unavailable.
+    """
+    try:
+        cik_clean = str(cik).lstrip("0")
+        acc_nodash = accession.replace("-", "")
+        index_url = f"https://www.sec.gov/Archives/edgar/data/{cik_clean}/{acc_nodash}/{accession}-index.htm"
+        resp = requests.get(index_url, headers=HEADERS, timeout=15)
+        if resp.status_code != 200:
+            return None
+
+        # Find 8-K document link
+        import re
+        # Look for links that contain the filing document (not exhibits)
+        links = re.findall(r'href="(/Archives/edgar/data/[^"]+\.htm)"', resp.text, re.I)
+        # Prioritize the main 8-K document (not ex10, ex99)
+        main_links = [l for l in links if not any(ex in l.lower() for ex in ['ex10', 'ex99', 'ex-10', 'ex-99'])]
+        doc_link = main_links[0] if main_links else (links[0] if links else None)
+        if not doc_link:
+            return None
+
+        doc_url = "https://www.sec.gov" + doc_link
+        doc_resp = requests.get(doc_url, headers=HEADERS, timeout=15)
+        if doc_resp.status_code != 200:
+            return None
+
+        # Strip HTML tags
+        text = re.sub(r'<[^>]+>', ' ', doc_resp.text)
+        text = re.sub(r'&[a-z#0-9]+;', ' ', text)  # Remove HTML entities
+        text = re.sub(r'\s+', ' ', text).strip()
+        return text[:10000]  # Limit to first 10k chars
+    except Exception:
+        return None
+
+
+def classify_departure_type(filing_text: str) -> str:
+    """
+    Classify CEO departure as 'planned', 'performance_failure', or 'unknown'
+    based on 8-K text analysis.
+
+    Returns:
+        'planned' - retirement, voluntary transition, succession planning
+        'performance_failure' - terminated for cause, mutual agreement, abrupt/unexplained
+        'unknown' - insufficient text to classify
+    """
+    if not filing_text:
+        return "unknown"
+
+    text_lower = filing_text.lower()
+
+    # Planned departure signals (EXCLUDE from trading signal)
+    planned_signals = [
+        "retire", "retirement", "transition", "succession",
+        "planned", "effective september", "effective october", "effective november",
+        "effective december", "effective january", "effective february",
+        "step down and transition", "end of the year", "end of his tenure",
+        "after serving", "years of service", "years of leadership",
+        "to pursue other opportunities",  # could be either
+    ]
+
+    # Performance failure signals (INCLUDE for trading signal)
+    performance_signals = [
+        "effective immediately", "immediately",
+        "mutual agreement", "separation agreement",
+        "transition agreement",  # sometimes used for polite firings
+        "resigned effective",  # not announced in advance
+        "notified the company of his resignation",
+        "notified the company of her resignation",
+        "unexpectedly",
+    ]
+
+    # Relief rally exclusions (from known hypothesis exclusion list)
+    relief_exclusions = [
+        # Companies where CEO departure caused relief rally - don't short these
+    ]
+
+    planned_score = sum(1 for sig in planned_signals if sig in text_lower)
+    performance_score = sum(1 for sig in performance_signals if sig in text_lower)
+
+    # Strong planned signals override
+    if any(sig in text_lower for sig in ["retire", "retirement", "years of service", "planned succession"]):
+        return "planned"
+
+    # "Effective immediately" with no retirement language = performance
+    if "effective immediately" in text_lower and "retire" not in text_lower:
+        return "performance_failure"
+
+    if performance_score > planned_score:
+        return "performance_failure"
+    elif planned_score > performance_score:
+        return "planned"
+    else:
+        return "unknown"
+
+
+def filter_by_departure_type(events: list, cik_map: dict = None) -> list:
+    """
+    Filter events to only include performance failure departures
+    (not planned retirements or succession transitions).
+
+    Fetches 8-K text for each event and classifies departure type.
+    """
+    print("Classifying departure types from 8-K text...")
+    qualified = []
+
+    for ev in events:
+        cik = ev.get("cik")
+        accession = ev.get("accession", "")
+        ticker = ev.get("ticker", "?")
+
+        if not cik or not accession:
+            ev["departure_type"] = "unknown"
+            qualified.append(ev)
+            continue
+
+        # Extract accession from compound ID (e.g., "0001234567-26-000001:filename.htm")
+        pure_accession = accession.split(":")[0] if ":" in accession else accession
+
+        text = fetch_8k_text(cik, pure_accession)
+        departure_type = classify_departure_type(text)
+        ev["departure_type"] = departure_type
+
+        if departure_type == "planned":
+            print(f"  {ticker}: SKIP (planned retirement/succession)")
+        elif departure_type == "performance_failure":
+            print(f"  {ticker}: KEEP (performance failure)")
+            qualified.append(ev)
+        else:
+            print(f"  {ticker}: KEEP (unknown — manual review needed)")
+            qualified.append(ev)  # Keep unknowns for manual review
+
+        time.sleep(0.3)  # Rate limiting
+
+    filtered_out = len(events) - len(qualified)
+    print(f"  Removed {filtered_out} planned departures, kept {len(qualified)} for further review")
+    return qualified
+
+
 def filter_by_market_cap(events: list, min_cap_m: float = 2000) -> list:
     """Filter events to large-cap companies only."""
     print(f"Filtering to market cap >= ${min_cap_m:.0f}M...")
@@ -187,9 +327,16 @@ def check_stock_direction(events: list) -> list:
             if next_days.empty or prev_close.empty:
                 continue
 
-            day_after_open = float(next_days.iloc[0]["Open"])
-            day_after_close = float(next_days.iloc[0]["Close"])
-            prev_close_price = float(prev_close.iloc[-1]["Close"])
+            # Handle multi-level column index from newer yfinance versions
+            def _scalar(series_or_val):
+                import pandas as pd
+                if isinstance(series_or_val, pd.Series):
+                    return float(series_or_val.iloc[0])
+                return float(series_or_val)
+
+            day_after_open = _scalar(next_days.iloc[0]["Open"])
+            day_after_close = _scalar(next_days.iloc[0]["Close"])
+            prev_close_price = _scalar(prev_close.iloc[-1]["Close"])
 
             # 1-day return from open to close (intraday)
             intraday_return = (day_after_close - day_after_open) / day_after_open
@@ -225,6 +372,7 @@ def scan_ceo_departures(
     end_date: str = "2024-12-31",
     min_cap_m: float = 2000,
     check_direction: bool = False,
+    filter_departure_type: bool = True,
     output_file: str = None
 ) -> list:
     """
@@ -234,7 +382,12 @@ def scan_ceo_departures(
     1. Search EDGAR for 8-K Item 5.02 filings
     2. Get ticker for each CIK
     3. Filter to large-cap companies
-    4. Optionally check if stock fell on announcement
+    4. Filter out planned retirements (fetch 8-K text and classify)
+    5. Optionally check if stock fell on announcement
+
+    Args:
+        filter_departure_type: If True (default), fetch 8-K text and remove planned
+            retirements/succession events. Only keeps performance failures and unknowns.
     """
 
     # Step 1: Search EDGAR
@@ -258,6 +411,10 @@ def scan_ceo_departures(
         large_cap_events = filter_by_market_cap(ticker_events, min_cap_m)
     else:
         large_cap_events = []
+
+    # Step 3b: Filter out planned retirements by fetching 8-K text
+    if filter_departure_type and large_cap_events:
+        large_cap_events = filter_by_departure_type(large_cap_events)
 
     # Step 4: Check stock direction (optional)
     if check_direction and large_cap_events:
