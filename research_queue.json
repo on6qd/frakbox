@@ -587,39 +587,40 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. MONITOR GO trade outcome (enters Monday March 23 open ~$5.79, exits Wednesday March 26 close). VIX=26.78 Tier 3, n=6. Expected +2.78% abnormal return.",
-      "set_by_session": "2026-03-22T05:07:26.495897"
+      "task": "1. CHECK TRADE OUTCOMES: GO (1cb6140f) exits Thursday March 26 close. WD (76678219) NOT entered (n=3 fails DO_NOT_TRADE at VIX 26.8). Record GO outcome in hypothesis.",
+      "set_by_session": "2026-03-22T05:51:52.978878"
     },
     {
-      "task": "2. PDUFA WATCH: DNLI April 5 \u2014 if FDA issues CRL, immediately short (set trigger on 5f805860 with symbol=DNLI, after_hours_immediate). If approved, no trade (no validated approval hypothesis).",
-      "set_by_session": "2026-03-22T05:07:26.495902"
+      "task": "2. MONITOR CEO DEPARTURE: ceo_departure_daily_scan.py runs at 7:30am weekdays. Check logs/ceo_departure_alerts.jsonl for qualifying events. If found: verify manually, set trigger='after_hours_immediate' on hypothesis 5dbcfb37.",
+      "set_by_session": "2026-03-22T05:51:52.978882"
     },
     {
-      "task": "3. PDUFA WATCH: REPL April 10 \u2014 if FDA issues second CRL, short via 5f805860 (symbol=REPL, after_hours_immediate). PoS=60% so ~40% rejection probability. Watch AH announcement.",
-      "set_by_session": "2026-03-22T05:07:26.495903"
+      "task": "3. MONITOR CLINICAL FAILURE: edgar_clinical_failure_scanner.py runs at session start. Check for new d302c84b-qualifying events (>55% crash, single-pipeline biotech, no path forward).",
+      "set_by_session": "2026-03-22T05:51:52.978883"
     },
     {
-      "task": "4. Cluster scan: Run openinsider_scraper for fresh n=6-9 clusters. VIX likely still elevated (26-28 range). Only n=6-9 qualifies in Tier 3. Next fresh cluster window: watch for clusters filed after March 22.",
-      "set_by_session": "2026-03-22T05:07:26.495904"
+      "task": "4. N=6-9 CLUSTER NEXT TRADE: cluster_auto_scanner.py runs nightly. Check logs/cluster_scanner.log. If 6-9 insiders >$500M mcap detected, set trigger on hypothesis 416556df. Note: signal only statistically validated in 2023-2025 (discovery 2021-2022 failed multiple testing).",
+      "set_by_session": "2026-03-22T05:51:52.978884"
     },
     {
-      "task": "5. S&P 500 Q2 rebalance: Announcement expected ~April 20 - May 1 for June 7 effective date. Check S&P press releases weekly. Hypothesis 061ae3a8 (symbol=TBD, long) ready to activate when announcement comes.",
-      "set_by_session": "2026-03-22T05:07:26.495905"
+      "task": "5. NEW RESEARCH: Consider testing mid-cap REIT CEO departures specifically (CPT was a false positive but the pattern is interesting). Or explore whether insider cluster signal is stronger in specific sectors (energy, real estate vs tech).",
+      "set_by_session": "2026-03-22T05:51:52.978885"
     }
   ],
   "session_handoff": {
-    "investigated": "GO/WD trigger review + DNLI/REPL PDUFA research + cluster scan + S&P500 scan",
+    "session_date": "2026-03-22",
+    "session_theme": "n=6-9 cluster validation, CEO scanner improvement, clinical failure monitoring",
     "key_findings": [
-      "CRITICAL: WD trigger REMOVED. WD has n=3 insiders, VIX=26.78 (Tier 3). Rule: n<6 in Tier 3 = DO NOT TRADE (EV=-0.48%). Prevents likely losing trade.",
-      "GO trigger KEPT: n=6 insiders (.3M), VIX Tier 3 qualifies for n=6-9 tier (EV=+2.78%). Enters Monday March 23 open. No earnings until May 5.",
-      "DNLI April 5: Clean first BLA, BTD+PRV, analyst consensus 8/8 Buy, price $20.17 (analyst target ~$29). Main risk: small single-arm Phase 1/2 dataset. No validated approval long hypothesis.",
-      "REPL April 10: Second-attempt BLA after July 2025 CRL. 60% PoS (Leerink). Price $6.98. If rejected: short via 5f805860 (AH trigger on April 10).",
-      "No new n=6-9 clusters: Only GO (n=6, too recent to rescan) and SSP (n=16, noise) and BLCO (n=9, filed March 10 = 12 days stale) in last 30 days.",
-      "After-hours order support CONFIRMED working in trade_loop.py (after_hours_immediate trigger type). CEO departure signal (5dbcfb37) is now operationally executable."
+      "n=6-9 cluster signal is concentrated in 2023-2025 (p<0.0001) NOT 2021-2022 (p=0.23). Full 2021-2025 aggregate passes MT. Hypothesis 416556df marked as exploratory-grade due to OOS split weakness.",
+      "GO trade (1cb6140f): trigger='next_market_open' set, executes Monday March 23 9:30 AM. n=6 insiders, elevated VIX 26.8 (borderline), all pre-trade checks passed.",
+      "WD trade: deliberately NOT entered (n=3 in VIX 26.8 fails DO_NOT_TRADE rule per git commit 324b6d8).",
+      "CEO departure scanner: improved with retirement filter + yfinance fix. New tool: ceo_departure_daily_scan.py (runs daily 7:30 AM weekdays). No current qualifying events.",
+      "Clinical failure: IMMP (March 13 crash) continuing to decline as predicted. No new qualifying events in last 14 days.",
+      "S&P 500 scanner: no new additions announced. Next expected: June 2026 quarterly rebalance."
     ],
-    "blocked_by": "Nothing currently blocked. GO trade executes autonomously Monday.",
-    "next_exact_step": "On April 5 (DNLI PDUFA): check FDA announcement. On April 10 (REPL PDUFA): if CRL, set trigger on 5f805860 with symbol=REPL, trigger=after_hours_immediate, direction=short.",
-    "written_at": "2026-03-22T05:07:26.495908"
+    "blocking_issue": "None. All scanners running. GO trade pending Monday execution.",
+    "specific_next_step": "At next session start: (1) check GO outcome if Monday has passed, (2) check ceo_departure_alerts.jsonl, (3) run edgar_clinical_failure_scanner.py for last 7 days",
+    "written_at": "2026-03-22T05:51:52.978886"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
