@@ -649,6 +649,11 @@
       "event_type": "vwap_breakout_momentum",
       "reason": "VWAP_252 breakout signal (Close/VWAP >= 1.15): tested N=489 events across 20 large-cap stocks (2018-2023) with OOS 2024 confirmation. Best abnormal return was +1.19% at 20d, which is below the min_abnormal_return_pct threshold of 1.5%. Signal direction is correct (momentum, not mean-reversion as hypothesized) but magnitude is too small to trade. Regime filtering (calm VIX) and high-volume filter both tested; neither brings any horizon above 1.5% abnormal. Conclusion: signal is real but not large enough to be tradeable within current methodology constraints. No hypothesis formed.",
       "recorded": "2026-03-22T03:43:14.678380"
+    },
+    {
+      "event_type": "ceo_performance_failure_departure_smci_2026",
+      "reason": "SMCI 2026-03-20 was a FALSE POSITIVE for hypothesis 5dbcfb37 (CEO departure short). The -27% overnight + -8.6% intraday crash was caused by a federal criminal indictment (Operation Gatekeeper) against co-founder/board-member Wally Liaw for smuggling $2.5B in Nvidia chips to China. The CEO (Charles Liang) did NOT depart. The EDGAR scanner flagged it because Item 5.02 8-K mentioned board member resignation which contains boilerplate CEO language. This is a board-member departure, not a CEO performance failure. Do NOT use as evidence for hypothesis 5dbcfb37. Criminal-indictment-driven crashes may represent a different, separate hypothesis. Scanner improvement needed: verify departing officer role is specifically CEO/President, not just any officer or director.",
+      "recorded": "2026-03-22T06:00:33.181368"
     }
   ]
 }

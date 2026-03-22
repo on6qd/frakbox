@@ -89,7 +89,7 @@ def main():
         if ticker in RELIEF_RALLY_EXCLUSIONS:
             print(f"EXCLUDED {ticker} (known relief-rally pattern)")
             continue
-        if r.get("departure_type") == "planned":
+        if r.get("departure_type") in ("planned", "not_ceo"):
             continue
 
         overnight = r.get("overnight_return_pct", 0)

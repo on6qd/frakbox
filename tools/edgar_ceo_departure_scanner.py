@@ -167,18 +167,87 @@ def fetch_8k_text(cik: str, accession: str) -> str | None:
         return None
 
 
+def is_ceo_departure(filing_text: str) -> bool:
+    """
+    Check if the 8-K actually describes a CEO/President departure (not just any officer).
+    Returns False for board-member-only departures, CFO-only departures, etc.
+
+    Key insight: SMCI-style false positives occur when a board member or non-CEO
+    officer departs and the 8-K mentions 'Chief Executive Officer' in a context
+    like 'the CEO continues in their role' rather than 'the CEO resigned'.
+
+    Strategy: scan a sliding window of ~200 characters around each CEO-role mention
+    and check if a departure verb is nearby. Exclude windows that contain
+    'remains', 'continues', 'will continue' (CEO staying, not leaving).
+    """
+    if not filing_text:
+        return False  # Can't verify without text
+
+    text_lower = filing_text.lower()
+
+    ceo_phrases = [
+        "chief executive officer",
+        "president and chief executive",
+        "chief executive and president",
+    ]
+    departure_verbs = [
+        "resign", "stepped down", "step down", "departed", "depart",
+        "terminat", "separat", "notified the company of his",
+        "notified the company of her", "will leave", "has left",
+        "effective immediately", "mutual agreement"
+    ]
+    # Context that means CEO is STAYING (not departing) — suppress if found near CEO phrase
+    staying_phrases = [
+        "remains in", "continues to", "will continue", "is serving",
+        "remains as", "continues as", "remain as chief"
+    ]
+
+    window = 200  # characters around each CEO-phrase hit
+
+    for phrase in ceo_phrases:
+        idx = 0
+        while True:
+            pos = text_lower.find(phrase, idx)
+            if pos == -1:
+                break
+            # Extract context window around this occurrence
+            ctx_start = max(0, pos - window)
+            ctx_end = min(len(text_lower), pos + len(phrase) + window)
+            ctx = text_lower[ctx_start:ctx_end]
+
+            # Check if CEO phrase is in a "staying" context (CEO is NOT departing)
+            is_staying = any(s in ctx for s in staying_phrases)
+            if is_staying:
+                idx = pos + 1
+                continue
+
+            # Check if a departure verb is nearby
+            has_departure = any(v in ctx for v in departure_verbs)
+            if has_departure:
+                return True
+
+            idx = pos + 1
+
+    return False
+
+
 def classify_departure_type(filing_text: str) -> str:
     """
     Classify CEO departure as 'planned', 'performance_failure', or 'unknown'
     based on 8-K text analysis.
 
     Returns:
+        'not_ceo' - departing officer is not the CEO/President (board member, CFO, etc.)
         'planned' - retirement, voluntary transition, succession planning
         'performance_failure' - terminated for cause, mutual agreement, abrupt/unexplained
         'unknown' - insufficient text to classify
     """
     if not filing_text:
         return "unknown"
+
+    # First check: is this actually a CEO departure?
+    if not is_ceo_departure(filing_text):
+        return "not_ceo"
 
     text_lower = filing_text.lower()
 
@@ -254,7 +323,9 @@ def filter_by_departure_type(events: list, cik_map: dict = None) -> list:
         departure_type = classify_departure_type(text)
         ev["departure_type"] = departure_type
 
-        if departure_type == "planned":
+        if departure_type == "not_ceo":
+            print(f"  {ticker}: SKIP (not a CEO departure — board member/director/CFO only)")
+        elif departure_type == "planned":
             print(f"  {ticker}: SKIP (planned retirement/succession)")
         elif departure_type == "performance_failure":
             print(f"  {ticker}: KEEP (performance failure)")
