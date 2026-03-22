@@ -544,12 +544,13 @@
       "status": "watching"
     },
     {
-      "event": "DNLI (Denali Therapeutics) PDUFA date for DNL310 (tividenofusp alfa) \u2014 Hunter syndrome (MPS II). First NDA, priority review. If CRL: enter short per hypothesis 5f805860.",
+      "event": "DNLI (Denali Therapeutics) PDUFA date for DNL310 (tividenofusp alfa) \u2014 Hunter syndrome (MPS II). BLA PDUFA \u2014 not tradeable under existing hypotheses (hypothesis 5f805860 requires CRL event, not a PDUFA). Monitor for outcome data to potentially build new hypothesis around BLA PDUFA outcomes.",
       "expected_date": "2026-04-05",
       "symbol": "DNLI",
-      "hypothesis_template": "5f805860",
+      "hypothesis_template": null,
       "added": "2026-03-22T01:22:01.004443",
-      "status": "watching"
+      "status": "monitor_only",
+      "note": "BLA PDUFA - not tradeable under existing hypotheses. Monitor for outcome data to potentially build new hypothesis."
     },
     {
       "event": "ARVN (Arvinas) PDUFA date for vepdegestrant (ARV-471) \u2014 breast cancer. First NDA for a PROTAC degrader. High-profile. If CRL: enter short per hypothesis 5f805860.",
