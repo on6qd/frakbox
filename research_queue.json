@@ -732,42 +732,45 @@
   ],
   "next_session_priorities": [
     {
-      "task": "CRITICAL: Monday March 23 confirm GO trade executed at open (check Alpaca dashboard or trade_loop logs)",
-      "set_by_session": "2026-03-22T13:40:54.016018"
+      "task": "1. CRITICAL (Mon March 23): Confirm GO trade (1cb6140f) executed at open via 'python run.py --status'",
+      "set_by_session": "2026-03-22T14:20:48.777267"
     },
     {
-      "task": "Thursday March 26: Close GO trade using tools/close_go_trade.py (3d hold from Monday open)",
-      "set_by_session": "2026-03-22T13:40:54.016024"
+      "task": "2. CRITICAL (Thu March 26): Close GO trade via 'python tools/close_go_trade.py'; record actual P&L to complete hypothesis 1cb6140f",
+      "set_by_session": "2026-03-22T14:20:48.777273"
     },
     {
-      "task": "After close GO: Record actual P&L to complete hypothesis 1cb6140f",
-      "set_by_session": "2026-03-22T13:40:54.016025"
+      "task": "3. Research: Short-interest spike signal - when stock's short interest as % of float rises >20pp in 1 month, test subsequent 10-20d returns. Use FINRA bimonthly short sale data or yfinance shortPercentOfFloat snapshots. Key question: do stocks with rapidly rising short interest underperform (EV=bearish) or squeeze (EV=bullish)?",
+      "set_by_session": "2026-03-22T14:20:48.777274"
     },
     {
-      "task": "Monitor REPL PDUFA April 10: confirmed DISQUALIFIED (RP2 multi-pipeline). No action needed.",
-      "set_by_session": "2026-03-22T13:40:54.016026"
+      "task": "4. Research: Insider selling cluster (mirror of buying signal) - use existing EDGAR Form 4 infrastructure but filter for open-market SELLS by 3+ insiders within 30 days. Expected: weaker signal than buying (insiders sell for many reasons). Test in 2023+ regime.",
+      "set_by_session": "2026-03-22T14:20:48.777275"
     },
     {
-      "task": "Clinical failure scanner: run at session start, already skips ALDX automatically",
-      "set_by_session": "2026-03-22T13:40:54.016027"
+      "task": "5. Research: S&P 500 52-week low contrarian bounce - when S&P 500 large-cap hits 52-week low, is there a mean-reversion bounce? Pure yfinance signal, no external data needed.",
+      "set_by_session": "2026-03-22T14:20:48.777276"
     },
     {
-      "task": "Fresh cluster scan: run cluster_auto_scanner.py --dry-run at session start",
-      "set_by_session": "2026-03-22T13:40:54.016027"
+      "task": "6. WD hypothesis (76678219): Monitor VIX. If VIX drops below 25 (Tier 1/2) AND WD cluster still fresh, activate with 'next_market_open' trigger.",
+      "set_by_session": "2026-03-22T14:20:48.777276"
     },
     {
-      "task": "Next new signal research: consider (1) short-interest spike signal - when weekly short interest rises >20%, continuation or squeeze? (2) analyst initiation of coverage LONG signal, (3) look into DNTH Phase 3 CAPTIVATE interim readout for d302c84b (watchlist already set for June 2026)",
-      "set_by_session": "2026-03-22T13:40:54.016028"
+      "task": "7. Fix CEO departure scanner (3+ friction entries): edgar_ceo_departure_scanner.py generates false positives. Fix: (a) add Item 5.02 text verification, (b) require >5% underperformance in prior 12 months (Bloomberg/yfinance), (c) exclude 'transition/succession' keyword in 8-K. But note: ceo_performance_failure_departure_short is already marked as dead end - so scanner fix is low priority.",
+      "set_by_session": "2026-03-22T14:20:48.777277"
     }
   ],
   "session_handoff": {
-    "current_state": "GO trade queued for Monday March 23 open. VIX=26.78, n=6 insiders (qualifies Tier 3). All other triggers removed (VIX gate).",
-    "active_experiments": 0,
-    "pending_trades": "GO (1cb6140f) at next_market_open Monday March 23",
-    "ongoing_research": "All 3-way interaction / conviction-tier analysis complete and recorded as dead ends. Buyback signal dead end recorded. Scanner memory fix deployed.",
-    "blocking_issues": "None. Clinical scanner now has persistent disqualification memory. REPL confirmed disqualified for April 10.",
-    "next_specific_action": "Monday: verify GO executed. Thursday: run close_go_trade.py. New signal research after GO closes.",
-    "written_at": "2026-03-22T13:40:54.016031"
+    "current_state": "GO trade (1cb6140f) has trigger=next_market_open, n=6 insiders including CEO, VIX=26.78 passes Tier 3 gate (n>=6 required). Will execute Monday March 23 at 9:30 ET.",
+    "completed_this_session": [
+      "Verified GO cluster: n=6 insiders (passes VIX Tier 3 gate). Trade executing Monday.",
+      "Confirmed WD (n=3) and AMRZ (n=4) are VIX-gated - DO NOT TRADE at current VIX=26.78",
+      "Tested analyst initiation signal (BUY from major banks): DEAD END. N=177 events, all p>0.45, coin flip at every horizon. Signal priced in before open.",
+      "Tested analyst downgrade signal (Buy->Hold/Sell): DEAD END. N=425 events, statistically significant (3d p<0.0001, avg_abnormal=-0.640%) but net return after costs only 0.273% - below 1.0% minimum threshold."
+    ],
+    "blocked_on": "Nothing blocking. Waiting for Monday market open for GO execution.",
+    "next_step": "Monday: confirm GO executed. Thursday: close GO at open using close_go_trade.py. Then research short-interest spike signal.",
+    "written_at": "2026-03-22T14:20:48.777279"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
