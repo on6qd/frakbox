@@ -33,6 +33,45 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 EDGAR_SEARCH_URL = "https://efts.sec.gov/LATEST/search-index"
 HEADERS = {"User-Agent": "financial-researcher-bot contact@example.com"}
 
+# Persistent disqualification memory — events we've already evaluated and rejected
+DISQUALIFIED_EVENTS_FILE = Path(__file__).parent.parent / "logs" / "clinical_disqualified_events.json"
+
+
+def load_disqualified_events() -> dict:
+    """Load previously evaluated and disqualified events from persistent file.
+
+    Returns dict keyed by 'TICKER:YYYY-MM-DD' -> {reason, disqualified_date}
+    """
+    if DISQUALIFIED_EVENTS_FILE.exists():
+        try:
+            with open(DISQUALIFIED_EVENTS_FILE) as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+
+def save_disqualified_event(ticker: str, filing_date: str, reason: str):
+    """Persist a disqualified event so it is skipped in future scans."""
+    events = load_disqualified_events()
+    key = f"{ticker}:{filing_date}"
+    events[key] = {
+        "ticker": ticker,
+        "filing_date": filing_date,
+        "reason": reason,
+        "disqualified_date": datetime.today().strftime("%Y-%m-%d"),
+    }
+    DISQUALIFIED_EVENTS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(DISQUALIFIED_EVENTS_FILE, "w") as f:
+        json.dump(events, f, indent=2)
+
+
+def add_manual_disqualification(ticker: str, filing_date: str, reason: str):
+    """CLI helper: manually add a known-bad event to the disqualification list."""
+    save_disqualified_event(ticker, filing_date, reason)
+    print(f"Added {ticker} ({filing_date}) to disqualified events: {reason}")
+
+
 # Keywords that suggest primary endpoint failure
 FAILURE_QUERIES = [
     '"did not meet" "primary endpoint"',
@@ -245,7 +284,28 @@ def main():
     parser.add_argument("--days", type=int, default=14, help="Look back N days (default: 14)")
     parser.add_argument("--auto-qualify", action="store_true",
                         help="Auto-check each candidate for crash >55%, market cap, etc.")
+    parser.add_argument("--disqualify", nargs=3, metavar=("TICKER", "DATE", "REASON"),
+                        help="Manually add a disqualification: --disqualify ALDX 2026-03-17 'multi-pipeline+bounce'")
+    parser.add_argument("--list-disqualified", action="store_true",
+                        help="Show all previously disqualified events and exit")
     args = parser.parse_args()
+
+    # Handle manual disqualification
+    if args.disqualify:
+        ticker, date, reason = args.disqualify
+        add_manual_disqualification(ticker, date, reason)
+        return
+
+    # Handle list disqualified
+    if args.list_disqualified:
+        events = load_disqualified_events()
+        if not events:
+            print("No disqualified events on record.")
+        else:
+            print(f"=== Previously Disqualified Events ({len(events)}) ===")
+            for key, ev in sorted(events.items()):
+                print(f"  {ev['ticker']:8} {ev['filing_date']}  (disqualified {ev['disqualified_date']}): {ev['reason']}")
+        return
 
     end_date = datetime.today().strftime("%Y-%m-%d")
     start_date = (datetime.today() - timedelta(days=args.days)).strftime("%Y-%m-%d")
@@ -253,6 +313,9 @@ def main():
     print(f"=== EDGAR Clinical Failure Scanner ===")
     print(f"Search window: {start_date} to {end_date}")
     print()
+
+    # Load disqualified events cache
+    disqualified = load_disqualified_events()
 
     all_hits = {}
     for query in FAILURE_QUERIES:
@@ -275,6 +338,23 @@ def main():
     # Sort by filing date descending
     results.sort(key=lambda x: x["filing_date"], reverse=True)
 
+    # Filter out previously disqualified events
+    n_before = len(results)
+    results_filtered = []
+    skipped_known = []
+    for r in results:
+        key = f"{r['ticker']}:{r['filing_date']}"
+        if key in disqualified:
+            skipped_known.append((r['ticker'], r['filing_date'], disqualified[key]['reason']))
+        else:
+            results_filtered.append(r)
+    if skipped_known:
+        print(f"Skipping {len(skipped_known)} previously disqualified events:")
+        for t, d, reason in skipped_known:
+            print(f"  {t} ({d}): {reason}")
+        print()
+    results = results_filtered
+
     if args.auto_qualify:
         print(f"Auto-qualifying {len(results)} candidates...")
         print()
@@ -291,7 +371,9 @@ def main():
                       f"price=${q.get('post_crash_price', 0):.3f}, "
                       f"pre-drift={q.get('pre_crash_drift', 0):.1f}%")
             else:
-                print(f"    SKIP: {q['reason']}")
+                # Persist the auto-disqualification so future runs skip it
+                save_disqualified_event(ticker, filing_date, q["reason"])
+                print(f"    SKIP: {q['reason']} (saved to disqualified list)")
 
         print()
         if qualifying:
