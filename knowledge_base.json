@@ -348,12 +348,8 @@
       "last_updated": "2026-03-21T15:30:03.781291"
     },
     "clinical_efficacy_failure_short": {
-      "finding": "Extreme micro-cap overnight gappers (>50% gap) are NOT reliable for open-entry short",
-      "evidence": "GOSS (Feb 23 2026): -72% overnight gap from $2.13 to $0.596; open-entry abnormal 1d = +4.40% (bounce from lows). ALDX (3rd CRL) also bounced. IMMP (-5.10% abnormal at 1d) had a moderate gap and confirmed the signal.",
-      "rule": "Only enter short at open if: (1) first-time clinical failure, (2) overnight gap is <40% (room for continuation drift). Large gappers have already seen the full move; open entry is entering a bounce.",
-      "recommended_screen": "Filter to events where gap-down from prior close to next-day open is <40%. Extreme gappers should be excluded or use delayed entry (day 2-3).",
-      "date_verified": "2026-03-22",
-      "last_updated": "2026-03-22T01:25:43.718787"
+      "goss_reversal_case": "GOSS Feb 23 2026 (PROSERA Phase 3 miss): REVERSAL EXCEPTION. Entry at open Feb 24 (0.388): 1d=+4.40%, 3d=+1.55%, 5d=+9.67%. Bounce mechanism: company simultaneously announced strong subgroup data (intermediate/high-risk PAH p=0.021) and FDA Type C meeting plans. Market priced ongoing regulatory path. Stock: 0.388->0.58 by March 4 (+49%). Disqualifying factor: stated FDA path forward (analogous to AVIR/Roche). Criterion 6 added to hypothesis: company must have NO stated regulatory path forward.",
+      "last_updated": "2026-03-22T01:48:26.796692"
     },
     "sp500_index_addition": {
       "finding": "March 2026 Q1 rebalance live validation (4 new events post-hypothesis creation)",

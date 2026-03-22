@@ -133,9 +133,11 @@
       "category": "validation",
       "question": "Verify GOSS (Gossamer Bio) Feb 23 2026 clinical failure event. What happened? Was there a concurrent positive catalyst? Was the stock already beaten down 90%+ (priced in)? Should GOSS be removed from d302c84b hypothesis backtest events?",
       "priority": 1,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "GOSS showed +4.40% abnormal 1d after a supposed clinical failure \u2014 wrong direction. Either the event date is wrong, the event classification is wrong, or it's a beaten-down-stock exception. Affects consistency_pct of d302c84b.",
-      "added": "2026-03-22T01:22:25.655010"
+      "added": "2026-03-22T01:22:25.655010",
+      "completed": "2026-03-22T00:00:00.000000",
+      "findings": "GOSS classification confirmed as REVERSAL, not continuation. Actual measurement (entry=open Feb 24, 0.388): 1d abnormal=+4.40%, 3d=+1.55%, 5d=+9.67% -- ALL WRONG DIRECTION for the short hypothesis. ROOT CAUSE: Feb 23 announcement simultaneously included strong subgroup data (intermediate/high-risk PAH p=0.021) AND explicit FDA Type C meeting plans. Market priced an ongoing regulatory path; stock bounced +49% (0.388 -> 0.58) by March 4. Structurally identical to AVIR reversal (Roche partnership kept regulatory path open). CORRECTION APPLIED to d302c84b: GOSS abnormal_3d corrected from -37.21 (recording error) to +1.55. New hypothesis stats: N=11, consistency_pct=90.9%, avg_3d=-23.93%, stdev=11.72%, confidence 8->7. Validation period: 4/5 continuation (80%), not 5/5. NEW QUALIFYING CRITERION RECOMMENDED: hypothesis event_description needs criterion 6 -- company must NOT have stated FDA path forward or subgroup NDA plans at time of event. GOSS remains in backtest as documented reversal exception (like AVIR), not excluded."
     },
     {
       "id": "seed-002",

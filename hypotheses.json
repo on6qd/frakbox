@@ -3331,7 +3331,7 @@
     "idempotency_key": "2fbc1bece6437e75",
     "status": "pending",
     "event_type": "clinical_efficacy_failure_short",
-    "event_description": "Short single-pipeline small biotech stock at open the trading day after a >55% crash caused by Phase 2/3 clinical trial failure OR FDA Complete Response Letter (CRL) with clinical/efficacy deficiency. Hold 3 days. Qualifying criteria: (1) initial crash >55% on day of announcement, (2) single primary drug/program \u2014 company has no other active clinical programs, (3) market cap <$500M at time of event, (4) NOT pre-anticipated \u2014 stock not down >20% in prior 10 trading days, (5) clinical/efficacy deficiency (NOT CMC/manufacturing only).",
+    "event_description": "Short single-pipeline small biotech stock at open the trading day after a >55% crash caused by Phase 2/3 clinical trial failure OR FDA Complete Response Letter (CRL) with clinical/efficacy deficiency. Hold 3 days. Qualifying criteria: (1) initial crash >55% on day of announcement, (2) single primary drug/program \u2014 company has no other active clinical programs, (3) market cap <$500M at time of event, (4) NOT pre-anticipated \u2014 stock not down >20% in prior 10 trading days, (5) clinical/efficacy deficiency (NOT CMC/manufacturing only), (6) company has NO stated regulatory path forward for the failed drug \u2014 no announced FDA meeting plans or subgroup-based NDA submissions at time of event (companies with announced path forward bounce instead of continuing lower).",
     "causal_mechanism": "When a single-pipeline small biotech's only drug fails Phase 2/3 or receives a clinical CRL, all projected revenue evaporates overnight. The crash is immediate but continuation occurs over 3-5 days because: (1) Institutional portfolio managers require 1-3 days to process and execute forced exits from biotech holdings that violate their 'viable revenue path' mandate; (2) The initial gap-down to market open typically underestimates ultimate fundamental value \u2014 the stock's only value was the pipeline drug, so intrinsic value approaches the cash balance, and the market takes 2-3 days to price this in; (3) Retail momentum traders (who see the crash and sell) add downward pressure over days 1-3.",
     "causal_mechanism_criteria": [
       "actors_incentives",
@@ -3470,7 +3470,7 @@
         "date": "2026-02-23",
         "symbol": "GOSS",
         "event": "Phase 3 failure GB002 PAH",
-        "abnormal_3d": -37.21,
+        "abnormal_3d": 1.55,
         "crash_1d": -80.1
       },
       {
@@ -3482,7 +3482,7 @@
       }
     ],
     "sample_size": 11,
-    "consistency_pct": 100.0,
+    "consistency_pct": 90.9090909090909,
     "out_of_sample_split": {
       "discovery_indices": [
         0,
@@ -3500,12 +3500,12 @@
         10
       ],
       "discovery_consistency_pct": 100.0,
-      "validation_consistency_pct": 100.0,
+      "validation_consistency_pct": 80.0,
       "split_type": "temporal",
       "discovery_period": "2019-2022",
       "validation_period": "2023-2026",
       "discovery_avg_abnormal_3d": -28.45,
-      "validation_avg_abnormal_3d": -26.26,
+      "validation_avg_abnormal_3d": -18.51,
       "discovery_n": 6,
       "validation_n": 5
     },
@@ -3520,7 +3520,7 @@
     },
     "market_regime_note": "Signal is regime-robust. Events span 2019-2026 covering multiple regimes. No regime filter applied. Risk: high VIX may amplify initial crash reducing continuation, but this has not been observed in data.",
     "regime_note": "Regime-robust \u2014 tested across 2019-2026 multiple market conditions",
-    "confidence": 8,
+    "confidence": 7,
     "literature_reference": "Bhattacharya et al. (2009): Phase 2/3 failures cause -8 to -11% 3-day CAR for small biotech. Hwang (2013): FDA CRL rejections cause persistent post-announcement drift. Our finding (-27.45% avg 3d abnormal) is larger than literature because: (1) we subset to single-pipeline, (2) we enter at open (not close) after the crash, (3) we measure from the gap-down open, not close.",
     "survivorship_bias_note": "Actively searched for delisted tickers. ACER (Acer Therapeutics, delisted) accessed via Tiingo. ATHX (Athersys, delisted) accessed via Tiingo. ARDX (Ardelyx) was acquired but had data. Many more qualifying events (SESN, TCDA, YMAB) cannot be measured due to data unavailability \u2014 these likely show the same pattern, so survivorship bias understates the effect. The reversal case (AVIR) is present in the dataset and explicitly classified as non-qualifying due to Roche partnership \u2014 not excluded to make results look better.",
     "selection_bias_note": "Events selected by: >55% crash, single-pipeline company, clinical/efficacy deficiency. This selection is applied PROSPECTIVELY (can be determined before observing continuation). Threshold validation: tested 5 events below threshold (PTCT -9.9%, IRON -21.9%, SRRK +12.4%, CAPR -33%, AQST +39%) \u2014 none show the continuation pattern, confirming threshold is causal not cherry-picked. Reversal case (AVIR) included in analysis and explicitly classified as excluded by single-pipeline filter.",
@@ -3540,6 +3540,11 @@
         "date": "2026-03-21",
         "type": "correction",
         "text": "Corrected validation_consistency_pct from 80% to 100%. Original 80% was based on stale GOSS measurement (+1.55%) which was due to wrong date. Corrected date (Feb 23, 2026) shows GOSS -37.21% continuation. All 5/5 validation events now confirm continuation pattern."
+      },
+      {
+        "date": "2026-03-22",
+        "type": "data_correction",
+        "text": "GOSS abnormal_3d corrected from -37.21 to +1.55 (the correct measured value). The -37.21 figure in historical_evidence was a recording error from session 2026-03-21. Actual measurement: GOSS Feb 23 2026 Phase 3 PROSERA failure, entry at open Feb 24 (0.388), 1d abnormal=+4.40%, 3d abnormal=+1.55%, 5d abnormal=+9.67%. GOSS is a REVERSAL case, not a continuation case. ROOT CAUSE of reversal: Gossamer Bio simultaneously announced FDA Type C meeting plans and strong subgroup results (intermediate/high-risk PAH p=0.021), giving market a stated regulatory path forward. Same mechanism as AVIR reversal (Roche partnership kept path open). GOSS stock bounced +49% from entry by March 4 as market priced subgroup FDA path. RECOMMENDATION: Add qualifying criterion 6 to event_description: company must have NO stated regulatory path forward (no announced FDA meeting / no subgroup NDA plan). With GOSS as reversal: N=11, consistency_pct=90.9% (10/11), avg_3d=-23.93%, stdev=11.72%. Validation period consistency: 80% (4/5). Signal still passes multiple testing. Confidence reduced from 8 to 7 to reflect one known reversal exception."
       }
     ]
   },
