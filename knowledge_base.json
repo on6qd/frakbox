@@ -614,6 +614,17 @@
       "literature_support": "Cohen, Malloy & Pomorski (2012): CEO/CFO purchases 12x more predictive",
       "data_source": "SEC EDGAR Form 4 bulk data, RPTOWNER_TITLE field, 2020-2024",
       "last_updated": "2026-03-22T11:11:34.360056"
+    },
+    "insider_buying_cluster_regime_change": {
+      "summary": "CRITICAL REGIME CHANGE: Insider cluster signal (n>=3) was ABSENT in 2021-2022 and SWITCHED ON in 2023+. Year-by-year means: 2021=-0.51% (p=0.37), 2022=-0.37% (p=0.52), 2023=+3.59% (p<0.001), 2024=+6.33% (p<0.001), 2025=+3.96% (p<0.001). Quarterly data confirms switch happened in 2023Q1.",
+      "magnitude_2023_plus": "+4.58% mean 5d abnormal (N=914, p<0.0001)",
+      "magnitude_2021_2022": "-0.44% mean 5d abnormal (N=652, p=0.40) -- not significant",
+      "n_6to9_current_regime": "+4.96% mean 5d (N=183, p<0.0001) in 2023+",
+      "vix_regime_current": "VIX<20: +4.76% (N=736, p<0.001); VIX 20-25: +3.86% (N=155, p<0.001); VIX 25-30: +3.58% (N=12, p=0.578, too small to confirm/deny)",
+      "trading_implication": "Trade the signal. Current 2023+ regime is clearly active. VIX 25-30 has too few 2023+ observations to set a hard cutoff -- may be overly conservative. The VIX gate was calibrated on 2021-2025 pooled data which included the dead signal years.",
+      "hypothesis_impact": "All insider cluster hypotheses (0a093c90, 1cb6140f, 416556df, 2bbe0f04) used discovery period 2021-2022. These years showed no signal. The true discovery of the live signal starts from 2023. The pattern of 100% OOS replication (2022) in original backtest was artificially driven by the 2022Q4 partial recovery.",
+      "recorded": "2026-03-22",
+      "last_updated": "2026-03-22T11:52:08.520890"
     }
   },
   "dead_ends": [
@@ -789,6 +800,11 @@
       "event_type": "reverse_stock_split_short",
       "reason": "Tested 10 reverse split events (AMC/BBBY/CLOV/KPLT/WKHS/GOEV/RIDE/MVST/TTCF/BBIG 2022-2023). 1d avg=-2.88% p=0.119, 3d avg=-2.18% p=0.572. Direction inconsistent (50% positive at 3d). High variance driven by meme stock dynamics. RIDE, GOEV reverse after split due to retail buying. Reverse splits signal distress but many are in heavily-retail-influenced stocks where dynamics are unpredictable. Not statistically significant.",
       "recorded": "2026-03-22T10:31:02.344812"
+    },
+    {
+      "event_type": "dividend_initiation",
+      "reason": "First-ever dividend initiation signal tested (N=14, 2020-2024). Discovery period (2020-2021, N=7): 3d avg=+5.78%, 100% positive rate, p=0.025 -- STRONG. Validation period (2022-2024, N=7): 3d avg=+1.15%, pos_rate=71.4%, p=0.26 -- WEAK. Fails multiple testing. Root cause: (1) Discovery period confounded by concurrent earnings -- MTDR Feb 22, 2021 was day before Q4 earnings (Feb 23); AA Oct 14, 2021 may also have had guidance with dividend. (2) Small N (7 per period) means 1-2 outliers drive statistical test. (3) Literature signal (Asquith & Mullins 1983) was for broader market; in 2022-2024 era, large-cap dividend initiations are fully anticipated (TMUS, ATKR, HUBG all near-zero 1d reactions). Conclusion: Dividend initiation signal has DECAYED for large-cap stocks. Remaining edge may be for small-cap surprise initiations but sample too small and liquidity concerns make it untradeable at our K scale.",
+      "recorded": "2026-03-22T11:50:52.339867"
     }
   ]
 }
