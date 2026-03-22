@@ -210,6 +210,18 @@
       ],
       "gaps": "Post-pricing drift (after 424B4 filing) is NOT the primary signal. Requires exact announcement dates from commercial data (CRSP) or real-time press release monitoring to trade. 424B4 lag (0-7 days) makes EDGAR-only approach unreliable for backtesting the primary signal.",
       "recorded": "2026-03-22T08:03:45.830449"
+    },
+    "insider_buying_cluster_ceo_cfo": {
+      "summary": "CEO/CFO-inclusive insider cluster buying events (3+ insiders, CEO or CFO among buyers) show higher abnormal returns than director-only clusters. Own analysis 2020-2024 (N=440 CEO/CFO-inclusive, N=489 non-CEO/CFO): CEO/CFO clusters: +7.01% avg abnormal 5d, 64% positive rate. Non-CEO/CFO clusters: +4.56% avg abnormal 5d, 62% positive rate. Differential: ~2.45% incremental alpha from CEO/CFO requirement. Signal holds in both discovery (2020-2021) and validation (2022-2024) periods. Validation period is STRONGER: CEO/CFO = +7.68% (n=301), non-CEO/CFO = +4.93% (n=320). Cohen, Malloy & Pomorski (2012) 'Decoding Inside Information': CEO/CFO purchases 12x more predictive than directors/VPs because they have full-company information access.",
+      "known_magnitude": "CEO/CFO clusters: +7.01% 5d abnormal (stdev 17.68%, pos_rate=64%, n=440). Non-CEO/CFO clusters: +4.56% 5d abnormal (stdev 14.67%, pos_rate=62%, n=489). Calm VIX: CEO/CFO = +7.51% (n=238). Elevated VIX 20-30: CEO/CFO = +4.94% (n=135). All horizons pass multiple testing (p<0.001 at 3d,5d,10d,20d Wilcoxon). Skewness is high (2.38 at 5d) \u2014 mean inflated by right-tail outliers. Bootstrap CI 5d: [5.41%, 8.68%]. Net after costs: +6.60%. Title coverage: 60.5% of clusters have any title info; 39.5% with no title default to non-CEO/CFO, likely undercounting CEO/CFO clusters and narrowing the measured differential.",
+      "known_timeframe": "5 trading days from cluster detection date (entry at next open)",
+      "sources": [
+        "Own analysis 2026-03-22: clusters_with_roles.csv N=1912 clusters 2020-2024",
+        "Cohen, Malloy & Pomorski (2012) 'Decoding Inside Information', Journal of Finance",
+        "SEC EDGAR Form 4 REPORTINGOWNER.RPTOWNER_TITLE field for role classification"
+      ],
+      "gaps": "Title coverage is only 60.5% \u2014 39.5% of clusters have no title in EDGAR bulk data. These default to non-CEO/CFO, creating contamination that NARROWS the measured gap. True differential may be larger. Need to extend cluster_auto_scanner to extract titles from Form 4 XML for live signals. High skewness (2.38-3.45 across horizons) suggests a small number of extreme events drive the mean; median analysis needed. Interaction with cluster SIZE (n=3-5 vs n=6-9) and CEO/CFO presence not yet tested \u2014 this 3-way interaction may reveal the optimal filter combination.",
+      "recorded": "2026-03-22T11:11:34.358564"
     }
   },
   "known_effects": {
@@ -561,6 +573,47 @@
       "mechanism": "The market distinguishes management spin ('we still believe in this') from concrete evidence (positive subgroup data meeting FDA threshold, partnership announcement, alternative path with actual data). Vague optimism does not prevent institutional selling pressure over 3d.",
       "revised_exclusion_criterion": "EXCLUDE if: (A) same 8-K announces positive subgroup data that meets FDA threshold OR (B) company announces partnership/licensing deal OR (C) FDA confirms alternative path with documented precedent. DO NOT EXCLUDE based solely on management commentary about future development.",
       "last_updated": "2026-03-22T06:38:45.426701"
+    },
+    "insider_buying_cluster_ceo_cfo": {
+      "effect": "3+ insider clusters including CEO or CFO outperform director-only clusters by ~2.45% at 5d",
+      "full_sample": {
+        "N": 440,
+        "mean_5d_pct": 7.01,
+        "pos_rate_pct": 64.0,
+        "stdev": 17.68,
+        "p_value": "<0.0001"
+      },
+      "vs_no_csuite": {
+        "N": 489,
+        "mean_5d_pct": 4.56,
+        "pos_rate_pct": 62.0,
+        "stdev": 14.67
+      },
+      "discovery_2020_2021": {
+        "N": 139,
+        "mean_5d_pct": 5.54,
+        "pos_rate_pct": 52.0
+      },
+      "validation_2022_2024": {
+        "N": 301,
+        "mean_5d_pct": 7.68,
+        "pos_rate_pct": 69.0
+      },
+      "calm_vix_lt20": {
+        "N": 238,
+        "mean_5d_pct": 7.51,
+        "pos_rate_pct": 62.0
+      },
+      "elevated_vix_2030": {
+        "N": 135,
+        "mean_5d_pct": 4.94,
+        "pos_rate_pct": 64.0
+      },
+      "cost_estimate_pct": 0.405,
+      "net_after_costs_5d_pct": 6.6,
+      "literature_support": "Cohen, Malloy & Pomorski (2012): CEO/CFO purchases 12x more predictive",
+      "data_source": "SEC EDGAR Form 4 bulk data, RPTOWNER_TITLE field, 2020-2024",
+      "last_updated": "2026-03-22T11:11:34.360056"
     }
   },
   "dead_ends": [

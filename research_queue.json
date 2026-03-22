@@ -171,6 +171,15 @@
       "added": "2026-03-22T06:39:24.225489"
     },
     {
+      "id": "14b9bd9c",
+      "category": "insider_buying",
+      "question": "Extend cluster_auto_scanner.py to extract CEO/CFO title from Form 4 XML <officerTitle> field and tag clusters with has_ceo/has_cfo flags. Update scanner to also check hypothesis 2bbe0f04 when a CEO/CFO cluster is detected.",
+      "priority": 1,
+      "status": "pending",
+      "reasoning": "CEO/CFO clusters show +7.01% abnormal 5d (n=440) vs +4.56% non-CEO/CFO. Hypothesis 2bbe0f04 pre-registered. To activate live trades, auto-scanner must detect CEO/CFO status in real-time from Form 4 XML. The officerTitle field exists in the XML \u2014 just needs extraction.",
+      "added": "2026-03-22T11:17:38.704505"
+    },
+    {
       "id": "seed-002",
       "category": "index_rebalancing",
       "question": "When a stock is announced for S&P 500 addition, what is the abnormal return between announcement and effective date, and does it reverse after inclusion? How does this compare to Russell 2000 rebalancing?",
@@ -400,6 +409,24 @@
       "added": "2026-03-22T08:04:24.655356"
     },
     {
+      "id": "a7bc4d12",
+      "category": "insider_buying_cluster",
+      "question": "Test whether CEO being one of the cluster buyers amplifies the insider cluster signal. Filter existing cluster dataset (cluster_with_returns.csv) to keep only clusters where CEO is one of the buyers. Compare CEO-inclusive cluster returns vs non-CEO cluster returns. Literature: Cohen et al (2012) found CEO/CFO purchases are 12x more predictive than other insiders.",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "Cohen et al (2012) JF: Decoding Inside Information found CEO/CFO purchases are the most predictive class of insider trades. If CEO presence strongly amplifies the signal, this could be a filtering criterion that boosts signal-to-noise. Data may exist in cluster_with_returns.csv or can be built from EDGAR bulk data.",
+      "added": "2026-03-22T10:30:51.444772"
+    },
+    {
+      "id": "55e28998",
+      "category": "insider_buying",
+      "question": "Test 3-way interaction: CEO/CFO presence x cluster size (n=3-5 vs n=6-9) x VIX regime. Use clusters_with_roles.csv. Does CEO/CFO in n=6-9 cluster during calm VIX materially outperform CEO/CFO in n=3-5 cluster?",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "Current analysis conflates all cluster sizes. VIX+cluster_size research showed n=6-9 is the optimal tier for the base signal. CEO/CFO may provide greater uplift in the n=6-9 regime. Optimal rule may be: trade n=6-9 CEO/CFO clusters, skip n=3-5 CEO/CFO in elevated VIX.",
+      "added": "2026-03-22T11:17:38.705790"
+    },
+    {
       "id": "seed-003",
       "category": "fda_decision",
       "question": "For Phase 3 FDA approvals/rejections of novel drugs (not generics, not supplements), what is the typical abnormal return at 1d and 5d horizons? Does the effect differ between first-time submissions and resubmissions after a Complete Response Letter?",
@@ -476,6 +503,15 @@
       "findings": "POOL (n=3, elevated VIX 23-25, filed March 17): 1d=+0.68%, 3d=-0.74%. No 5d data yet. Consistent with n=3-5 in elevated VIX being noise (p=0.27 historically). AMRZ (n=5, elevated VIX, filed March 16): 1d=+0.42%, 3d=-1.49%, 5d=-3.58%. Also negative. Both POOL and AMRZ failed as predicted by the n=3-5 elevated VIX analysis. Both are negative data points for the cluster signal in elevated VIX with low n. Key validation: the revised rule (n=6-9 required in elevated VIX) is supported by these outcomes."
     },
     {
+      "id": "126fa978",
+      "category": "insider_buying",
+      "question": "Compute median abnormal returns (not just mean) for CEO/CFO vs non-CEO/CFO clusters. Winsorize at 99th percentile. Skewness is 2.38 at 5d \u2014 mean may be inflated by outliers.",
+      "priority": 3,
+      "status": "pending",
+      "reasoning": "High skewness (2.38-3.45) means mean is driven by extreme events. Wilcoxon confirms median is positive (p<0.0001) but median magnitude unknown. This affects position sizing and stop-loss decisions.",
+      "added": "2026-03-22T11:17:38.706856"
+    },
+    {
       "id": "d288c2b8",
       "category": "sec_wells_notice",
       "question": "Wells Notice sub-hypothesis: Are financial fraud Wells Notices different from procedural ones? If yes, test 10+ fraud-specific Wells Notices (like BEN -13%, NRDS -7%) vs procedural (NDAQ +1.5%, XYL -2.5%). Need manual classification or a legal database. Likely requires Bloomberg Law or SEC enforcement actions database. LOW PRIORITY: would need external data source.",
@@ -525,15 +561,6 @@
       "added": "2026-03-22T10:30:51.444767",
       "completed": "2026-03-22T10:30:51.444771",
       "findings": "DEAD END. N=13 high-profile IPOs (LYFT/UBER/ABNB/DASH/SNOW/PLTR/U/COIN/RIVN/HOOD/BROS/PINS/ZM): 3d avg=-1.87% pos_rate=46.2% p=0.385. RIVN (-23.93%) is extreme outlier (EV sector May 2022 crash). Without RIVN: avg_3d=-0.66%. Direction inconsistent. Recorded in knowledge_base as ipo_lockup_expiration_short dead end."
-    },
-    {
-      "id": "a7bc4d12",
-      "category": "insider_buying_cluster",
-      "question": "Test whether CEO being one of the cluster buyers amplifies the insider cluster signal. Filter existing cluster dataset (cluster_with_returns.csv) to keep only clusters where CEO is one of the buyers. Compare CEO-inclusive cluster returns vs non-CEO cluster returns. Literature: Cohen et al (2012) found CEO/CFO purchases are 12x more predictive than other insiders.",
-      "priority": 2,
-      "status": "pending",
-      "reasoning": "Cohen et al (2012) JF: Decoding Inside Information found CEO/CFO purchases are the most predictive class of insider trades. If CEO presence strongly amplifies the signal, this could be a filtering criterion that boosts signal-to-noise. Data may exist in cluster_with_returns.csv or can be built from EDGAR bulk data.",
-      "added": "2026-03-22T10:30:51.444772"
     }
   ],
   "event_watchlist": [
@@ -675,45 +702,38 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. Monday: Verify GO trade executed at Alpaca open (9:30 ET). Check Alpaca paper account.",
-      "set_by_session": "2026-03-22T10:31:20.899352"
+      "task": "1. HIGHEST: Extend cluster_auto_scanner to extract CEO/CFO officerTitle from Form 4 XML and check hypothesis 2bbe0f04",
+      "set_by_session": "2026-03-22T11:17:38.708105"
     },
     {
-      "task": "2. Investigate CEO-inclusive insider cluster hypothesis (task a7bc4d12): does CEO being one of the buyers significantly amplify the 3d abnormal return? Use EDGAR bulk Form 4 data to tag which clusters had CEO buyers. Compare CEO vs non-CEO cluster returns.",
-      "set_by_session": "2026-03-22T10:31:20.899359"
+      "task": "2. HIGH: 3-way interaction (CEO/CFO x cluster size x VIX) using clusters_with_roles.csv",
+      "set_by_session": "2026-03-22T11:17:38.708108"
     },
     {
-      "task": "3. Thursday March 26: Close GO trade (3d hold). Run python tools/close_go_trade.py",
-      "set_by_session": "2026-03-22T10:31:20.899360"
+      "task": "3. MEDIUM: Median/winsorized analysis for hypothesis 2bbe0f04 to validate EV estimate",
+      "set_by_session": "2026-03-22T11:17:38.708109"
     },
     {
-      "task": "4. April 10: REPL PDUFA monitoring. Multi-pipeline = likely not tradeable for d302c84b.",
-      "set_by_session": "2026-03-22T10:31:20.899360"
-    },
-    {
-      "task": "5. June 5: S&P 500 Q2 2026 rebalance announcement. Check sp500_announcement_scanner.py results.",
-      "set_by_session": "2026-03-22T10:31:20.899361"
-    },
-    {
-      "task": "6. Consider testing dividend initiation signal (first-ever dividend payment) - measurable from EDGAR 8-K, has academic support (Michaely et al 1995: +3-4%), and different from buybacks.",
-      "set_by_session": "2026-03-22T10:31:20.899362"
+      "task": "4. LOW: Check if WD and AMRZ watchlist events have CEO/CFO among buyers",
+      "set_by_session": "2026-03-22T11:17:38.708109"
     }
   ],
   "session_handoff": {
-    "current_state": "GO trade scheduled for Monday March 23 open. EDGAR Form 4 verification added to cluster_auto_scanner.py to prevent OpenInsider RSU inflation (POOL/WD false positive fix).",
-    "active_hypotheses": {
-      "GO (1cb6140f)": "3d hold, triggers Monday March 23. 6 confirmed EDGAR open-market buyers including CEO Lindberg.",
-      "d302c84b": "Clinical efficacy failure short - waiting for next qualifying event. RCKT (April 10 PDUFA) pre-disqualified (multi-pipeline).",
-      "061ae3a8": "S&P 500 addition - June 5 is next opportunity."
+    "hypothesis_created": "2bbe0f04 (insider_buying_cluster_ceo_cfo)",
+    "data_file": "data/clusters_with_roles.csv",
+    "key_findings": {
+      "ceo_cfo_5d_abnormal": 7.01,
+      "no_csuite_5d_abnormal": 4.56,
+      "differential": 2.45,
+      "sample_n": 440,
+      "validation_2022_2024": 7.68,
+      "title_coverage_pct": 60.5,
+      "skewness_5d": 2.38,
+      "confidence_score": 7
     },
-    "key_finding_this_session": "EDGAR Form 4 verification reveals WD had only 2 confirmed open-market buyers (not 3 as OpenInsider reported). WD trigger was correctly removed. Scanner now auto-verifies via EDGAR for all future clusters.",
-    "dead_ends_this_session": [
-      "ipo_lockup_expiration_short: N=13, p=0.385, direction inconsistent",
-      "reverse_stock_split_short: N=10, p=0.572, meme stock dynamics prevent signal",
-      "vwap_momentum_breakout: confirmed dead end from prior session (N=14,412)"
-    ],
-    "next_trade_opportunity": "GO closes March 26. Next cluster scan: cluster_auto_scanner runs nightly at 9:15 PM ET. CEO cluster filter (task a7bc4d12) would be a signal improvement if Cohen et al 2012 finding replicates.",
-    "written_at": "2026-03-22T10:31:20.899366"
+    "critical_limitation": "39.5% of clusters lack RPTOWNER_TITLE in EDGAR bulk data defaulting to non-CEO/CFO. For live signal, must use Form 4 XML officerTitle field in real-time EDGAR calls.",
+    "scanner_extension_plan": "In verify_edgar_open_market_purchases(), add extraction of officerTitle from <reportingOwner><reportingOwnerRelationship><officerTitle> XML field. Return (n_insiders, names, has_ceo, has_cfo). Then check hypothesis 2bbe0f04 when has_ceo or has_cfo is True.",
+    "written_at": "2026-03-22T11:17:38.708110"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

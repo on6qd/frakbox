@@ -4915,5 +4915,3428 @@
     "result": null,
     "vix_gate_note": "VIX=26.78 (Tier 3, 25-30). n=4 cluster falls in n=3-5 tier. VIX gate: DO NOT TRADE at VIX>25 for n<6. AMRZ entry window closes March 23 so will not trade this instance. Hypothesis remains for future AMRZ signals.",
     "trigger_blocked_reason": "VIX gate: n=4 in VIX>25 regime + entry window will expire"
+  },
+  {
+    "id": "2bbe0f04",
+    "created": "2026-03-22T11:16:43.849337",
+    "prediction_hash": "8bf1a4495170b54e",
+    "idempotency_key": "439dbb582258c373",
+    "status": "pending",
+    "event_type": "insider_buying_cluster_ceo_cfo",
+    "event_description": "Insider buying cluster (3+ insiders) where CEO or CFO is one of the buyers. Minimum 3 insiders with open-market Form 4 purchases >=$ 50K each within 30 days. CEO or CFO confirmed via SEC RPTOWNER_TITLE field. Market cap >=$ 500M.",
+    "causal_mechanism": "CEO and CFO have privileged access to company-wide material information including forward revenue, contract pipeline, cost structure, and strategic plans. Unlike directors who attend quarterly board meetings, CEO/CFO live in the business daily. When they personally commit capital via open-market purchases (not option grants or 10b5-1 plans), they signal undervaluation with the highest-quality information available to any insider. When 3+ insiders cluster-buy AND the CEO/CFO is among them, this is a double confirmation: CEO/CFO superior information plus multi-insider coordination signaling broad agreement. The market takes 3-5 trading days to fully incorporate this signal as information diffuses gradually through Form 4 filing distribution, media coverage, and institutional model updates \u2014 consistent with post-earnings announcement drift dynamics.",
+    "causal_mechanism_criteria": {
+      "actors_and_incentives": "CEO/CFO are rational economic actors risking personal capital. Open-market code-P purchases require affirmative decision under strict pre-clearance and short-swing profit rules. They have information on the full P&L, not just their committee domain. Purchases are costly commitments unlike sales which have many liquidity motivations.",
+      "transmission_channel": "Form 4 appears on EDGAR within 2 business days of trade. Financial media and institutional investors parse SEC data and update models. Retail attention increases. Price discovery occurs over 3-5 days, not instantly, because not all participants process the signal simultaneously \u2014 creating the abnormal return window.",
+      "academic_reference": "Cohen, Malloy & Pomorski (2012) 'Decoding Inside Information', Journal of Finance 67(5): CEO/CFO purchases are 12x more predictive than other insider purchases. Separating routine from opportunistic trades and focusing on C-suite officers dramatically improves predictive power."
+    },
+    "expected_symbol": "TBD",
+    "expected_direction": "long",
+    "expected_magnitude_pct": 5.0,
+    "expected_timeframe_days": 5,
+    "event_timing": "unknown",
+    "backtest_symbols": null,
+    "backtest_events": null,
+    "historical_evidence": [
+      {
+        "symbol": "VCNX",
+        "date": "2020-01-23",
+        "abnormal_1d": -4.09,
+        "abnormal_5d": 41.69,
+        "abnormal_10d": 17.12
+      },
+      {
+        "symbol": "DCOM",
+        "date": "2020-02-05",
+        "abnormal_1d": -0.75,
+        "abnormal_5d": -1.76,
+        "abnormal_10d": -3.06
+      },
+      {
+        "symbol": "ADMA",
+        "date": "2020-02-11",
+        "abnormal_1d": 0.95,
+        "abnormal_5d": 3.89,
+        "abnormal_10d": 0.38
+      },
+      {
+        "symbol": "ONEW",
+        "date": "2020-02-11",
+        "abnormal_1d": 2.47,
+        "abnormal_5d": 17.91,
+        "abnormal_10d": 17.03
+      },
+      {
+        "symbol": "APPS",
+        "date": "2020-02-20",
+        "abnormal_1d": 1.29,
+        "abnormal_5d": -2.29,
+        "abnormal_10d": 8.55
+      },
+      {
+        "symbol": "MTDR",
+        "date": "2020-02-28",
+        "abnormal_1d": 7.21,
+        "abnormal_5d": -0.95,
+        "abnormal_10d": -60.99
+      },
+      {
+        "symbol": "CWH",
+        "date": "2020-03-05",
+        "abnormal_1d": -9.05,
+        "abnormal_5d": -24.47,
+        "abnormal_10d": -43.84
+      },
+      {
+        "symbol": "ET",
+        "date": "2020-03-09",
+        "abnormal_1d": 13.14,
+        "abnormal_5d": 5.59,
+        "abnormal_10d": -2.31
+      },
+      {
+        "symbol": "TEX",
+        "date": "2020-03-10",
+        "abnormal_1d": -0.96,
+        "abnormal_5d": -1.76,
+        "abnormal_10d": -7.24
+      },
+      {
+        "symbol": "RILY",
+        "date": "2020-03-11",
+        "abnormal_1d": 1.72,
+        "abnormal_5d": 4.35,
+        "abnormal_10d": -5.03
+      },
+      {
+        "symbol": "IHRT",
+        "date": "2020-03-12",
+        "abnormal_1d": -6.44,
+        "abnormal_5d": -22.84,
+        "abnormal_10d": -10.14
+      },
+      {
+        "symbol": "SWX",
+        "date": "2020-03-12",
+        "abnormal_1d": 3.76,
+        "abnormal_5d": 18.9,
+        "abnormal_10d": 18.71
+      },
+      {
+        "symbol": "MGPI",
+        "date": "2020-03-13",
+        "abnormal_1d": 1.2,
+        "abnormal_5d": -1.77,
+        "abnormal_10d": 4.79
+      },
+      {
+        "symbol": "GTE",
+        "date": "2020-03-13",
+        "abnormal_1d": -15.95,
+        "abnormal_5d": -19.16,
+        "abnormal_10d": -28.12
+      },
+      {
+        "symbol": "FCNCA",
+        "date": "2020-03-13",
+        "abnormal_1d": -9.5,
+        "abnormal_5d": -7.49,
+        "abnormal_10d": -9.92
+      },
+      {
+        "symbol": "AMCR",
+        "date": "2020-03-16",
+        "abnormal_1d": 8.33,
+        "abnormal_5d": 34.06,
+        "abnormal_10d": 33.02
+      },
+      {
+        "symbol": "OFIX",
+        "date": "2020-03-16",
+        "abnormal_1d": 10.86,
+        "abnormal_5d": 11.63,
+        "abnormal_10d": 13.39
+      },
+      {
+        "symbol": "SUN",
+        "date": "2020-03-17",
+        "abnormal_1d": -7.77,
+        "abnormal_5d": -9.34,
+        "abnormal_10d": -15.49
+      },
+      {
+        "symbol": "AHH",
+        "date": "2020-03-17",
+        "abnormal_1d": 0.63,
+        "abnormal_5d": 7.0,
+        "abnormal_10d": 10.7
+      },
+      {
+        "symbol": "DBI",
+        "date": "2020-03-18",
+        "abnormal_1d": -11.65,
+        "abnormal_5d": 82.06,
+        "abnormal_10d": 30.28
+      },
+      {
+        "symbol": "SPG",
+        "date": "2020-03-18",
+        "abnormal_1d": -12.52,
+        "abnormal_5d": 3.66,
+        "abnormal_10d": -1.91
+      },
+      {
+        "symbol": "HASI",
+        "date": "2020-03-19",
+        "abnormal_1d": 7.33,
+        "abnormal_5d": 16.43,
+        "abnormal_10d": 3.66
+      },
+      {
+        "symbol": "FTAI",
+        "date": "2020-03-20",
+        "abnormal_1d": 3.91,
+        "abnormal_5d": 12.0,
+        "abnormal_10d": -10.73
+      },
+      {
+        "symbol": "SLRC",
+        "date": "2020-03-20",
+        "abnormal_1d": -5.64,
+        "abnormal_5d": -2.33,
+        "abnormal_10d": -0.6
+      },
+      {
+        "symbol": "KODK",
+        "date": "2020-03-23",
+        "abnormal_1d": -1.17,
+        "abnormal_5d": -5.17,
+        "abnormal_10d": -9.1
+      },
+      {
+        "symbol": "REVG",
+        "date": "2020-03-27",
+        "abnormal_1d": -2.68,
+        "abnormal_5d": -3.78,
+        "abnormal_10d": -7.64
+      },
+      {
+        "symbol": "MGM",
+        "date": "2020-03-30",
+        "abnormal_1d": -3.42,
+        "abnormal_5d": -6.35,
+        "abnormal_10d": 11.67
+      },
+      {
+        "symbol": "KROS",
+        "date": "2020-04-13",
+        "abnormal_1d": 6.41,
+        "abnormal_5d": 18.22,
+        "abnormal_10d": 37.2
+      },
+      {
+        "symbol": "FBK",
+        "date": "2020-05-06",
+        "abnormal_1d": -1.46,
+        "abnormal_5d": -6.34,
+        "abnormal_10d": -4.01
+      },
+      {
+        "symbol": "RM",
+        "date": "2020-05-13",
+        "abnormal_1d": -4.08,
+        "abnormal_5d": 31.52,
+        "abnormal_10d": 34.94
+      },
+      {
+        "symbol": "CRK",
+        "date": "2020-05-14",
+        "abnormal_1d": 1.49,
+        "abnormal_5d": 12.85,
+        "abnormal_10d": 13.39
+      },
+      {
+        "symbol": "WHLR",
+        "date": "2020-06-02",
+        "abnormal_1d": 2.03,
+        "abnormal_5d": 46.36,
+        "abnormal_10d": 21.65
+      },
+      {
+        "symbol": "BW",
+        "date": "2020-06-05",
+        "abnormal_1d": 3.21,
+        "abnormal_5d": -7.31,
+        "abnormal_10d": -9.36
+      },
+      {
+        "symbol": "CWH",
+        "date": "2020-06-11",
+        "abnormal_1d": -0.16,
+        "abnormal_5d": 15.77,
+        "abnormal_10d": 18.02
+      },
+      {
+        "symbol": "WHLR",
+        "date": "2020-06-19",
+        "abnormal_1d": 7.31,
+        "abnormal_5d": -2.38,
+        "abnormal_10d": 6.16
+      },
+      {
+        "symbol": "RPTX",
+        "date": "2020-06-23",
+        "abnormal_1d": -0.61,
+        "abnormal_5d": -3.32,
+        "abnormal_10d": -17.68
+      },
+      {
+        "symbol": "WSBC",
+        "date": "2020-08-04",
+        "abnormal_1d": -0.45,
+        "abnormal_5d": 11.41,
+        "abnormal_10d": 10.69
+      },
+      {
+        "symbol": "EHTH",
+        "date": "2020-08-07",
+        "abnormal_1d": 1.67,
+        "abnormal_5d": -3.58,
+        "abnormal_10d": -11.76
+      },
+      {
+        "symbol": "AVDL",
+        "date": "2020-08-12",
+        "abnormal_1d": -2.67,
+        "abnormal_5d": 7.04,
+        "abnormal_10d": -2.64
+      },
+      {
+        "symbol": "VRCA",
+        "date": "2020-08-13",
+        "abnormal_1d": 0.18,
+        "abnormal_5d": 60.51,
+        "abnormal_10d": 38.3
+      },
+      {
+        "symbol": "CWH",
+        "date": "2020-08-13",
+        "abnormal_1d": 1.85,
+        "abnormal_5d": 10.7,
+        "abnormal_10d": -10.05
+      },
+      {
+        "symbol": "BW",
+        "date": "2020-08-25",
+        "abnormal_1d": 0.46,
+        "abnormal_5d": -4.69,
+        "abnormal_10d": -1.2
+      },
+      {
+        "symbol": "AVDL",
+        "date": "2020-09-17",
+        "abnormal_1d": 1.39,
+        "abnormal_5d": -6.66,
+        "abnormal_10d": -13.52
+      },
+      {
+        "symbol": "BNL",
+        "date": "2020-09-21",
+        "abnormal_1d": -0.15,
+        "abnormal_5d": 0.16,
+        "abnormal_10d": 1.05
+      },
+      {
+        "symbol": "LMB",
+        "date": "2020-09-24",
+        "abnormal_1d": -5.88,
+        "abnormal_5d": 23.89,
+        "abnormal_10d": 8.94
+      },
+      {
+        "symbol": "VST",
+        "date": "2020-09-30",
+        "abnormal_1d": 0.26,
+        "abnormal_5d": -4.62,
+        "abnormal_10d": -8.77
+      },
+      {
+        "symbol": "LOOP",
+        "date": "2020-10-14",
+        "abnormal_1d": 0.89,
+        "abnormal_5d": -8.03,
+        "abnormal_10d": -7.36
+      },
+      {
+        "symbol": "BH",
+        "date": "2020-12-08",
+        "abnormal_1d": -1.05,
+        "abnormal_5d": -0.88,
+        "abnormal_10d": 2.92
+      },
+      {
+        "symbol": "CGEM",
+        "date": "2021-01-12",
+        "abnormal_1d": 5.66,
+        "abnormal_5d": 21.01,
+        "abnormal_10d": 35.44
+      },
+      {
+        "symbol": "RILY",
+        "date": "2021-01-13",
+        "abnormal_1d": 1.12,
+        "abnormal_5d": -7.2,
+        "abnormal_10d": -2.19
+      },
+      {
+        "symbol": "DFH",
+        "date": "2021-01-25",
+        "abnormal_1d": -3.76,
+        "abnormal_5d": 7.39,
+        "abnormal_10d": 33.17
+      },
+      {
+        "symbol": "SOWG",
+        "date": "2021-02-05",
+        "abnormal_1d": 3.73,
+        "abnormal_5d": 22.54,
+        "abnormal_10d": 22.72
+      },
+      {
+        "symbol": "CRVS",
+        "date": "2021-02-17",
+        "abnormal_1d": -0.85,
+        "abnormal_5d": 12.52,
+        "abnormal_10d": -9.27
+      },
+      {
+        "symbol": "ADC",
+        "date": "2021-03-02",
+        "abnormal_1d": -0.62,
+        "abnormal_5d": 2.73,
+        "abnormal_10d": 6.08
+      },
+      {
+        "symbol": "VST",
+        "date": "2021-03-04",
+        "abnormal_1d": 6.32,
+        "abnormal_5d": 15.12,
+        "abnormal_10d": 0.53
+      },
+      {
+        "symbol": "TDY",
+        "date": "2021-03-04",
+        "abnormal_1d": 0.79,
+        "abnormal_5d": 3.51,
+        "abnormal_10d": 2.2
+      },
+      {
+        "symbol": "MRKR",
+        "date": "2021-03-16",
+        "abnormal_1d": -2.49,
+        "abnormal_5d": 50.38,
+        "abnormal_10d": 18.68
+      },
+      {
+        "symbol": "GOCO",
+        "date": "2021-03-16",
+        "abnormal_1d": -2.61,
+        "abnormal_5d": 0.04,
+        "abnormal_10d": -4.19
+      },
+      {
+        "symbol": "ADV",
+        "date": "2021-03-23",
+        "abnormal_1d": 1.56,
+        "abnormal_5d": 0.31,
+        "abnormal_10d": 3.95
+      },
+      {
+        "symbol": "TIL",
+        "date": "2021-03-23",
+        "abnormal_1d": -2.11,
+        "abnormal_5d": -2.7,
+        "abnormal_10d": -13.16
+      },
+      {
+        "symbol": "CTOS",
+        "date": "2021-04-01",
+        "abnormal_1d": -2.24,
+        "abnormal_5d": -0.75,
+        "abnormal_10d": -1.44
+      },
+      {
+        "symbol": "BMEA",
+        "date": "2021-04-20",
+        "abnormal_1d": -0.5,
+        "abnormal_5d": 2.3,
+        "abnormal_10d": -0.72
+      },
+      {
+        "symbol": "SWIM",
+        "date": "2021-04-27",
+        "abnormal_1d": 2.52,
+        "abnormal_5d": -3.2,
+        "abnormal_10d": 10.32
+      },
+      {
+        "symbol": "VST",
+        "date": "2021-05-06",
+        "abnormal_1d": -1.89,
+        "abnormal_5d": 1.06,
+        "abnormal_10d": 3.01
+      },
+      {
+        "symbol": "APP",
+        "date": "2021-05-17",
+        "abnormal_1d": 11.42,
+        "abnormal_5d": 22.08,
+        "abnormal_10d": 31.46
+      },
+      {
+        "symbol": "OPK",
+        "date": "2021-05-25",
+        "abnormal_1d": -3.99,
+        "abnormal_5d": -5.12,
+        "abnormal_10d": -0.74
+      },
+      {
+        "symbol": "BH",
+        "date": "2021-05-28",
+        "abnormal_1d": -0.03,
+        "abnormal_5d": 2.86,
+        "abnormal_10d": 11.49
+      },
+      {
+        "symbol": "PAY",
+        "date": "2021-05-28",
+        "abnormal_1d": 6.88,
+        "abnormal_5d": 7.95,
+        "abnormal_10d": 4.49
+      },
+      {
+        "symbol": "CNTA",
+        "date": "2021-06-02",
+        "abnormal_1d": 7.8,
+        "abnormal_5d": -3.03,
+        "abnormal_10d": 2.16
+      },
+      {
+        "symbol": "CYCN",
+        "date": "2021-06-03",
+        "abnormal_1d": -1.75,
+        "abnormal_5d": 23.32,
+        "abnormal_10d": 14.43
+      },
+      {
+        "symbol": "REVG",
+        "date": "2021-06-11",
+        "abnormal_1d": 1.67,
+        "abnormal_5d": -1.94,
+        "abnormal_10d": 2.28
+      },
+      {
+        "symbol": "VERO",
+        "date": "2021-06-15",
+        "abnormal_1d": 5.38,
+        "abnormal_5d": 17.6,
+        "abnormal_10d": 29.45
+      },
+      {
+        "symbol": "JANX",
+        "date": "2021-06-15",
+        "abnormal_1d": -11.0,
+        "abnormal_5d": 0.47,
+        "abnormal_10d": 16.84
+      },
+      {
+        "symbol": "ATAI",
+        "date": "2021-06-22",
+        "abnormal_1d": -6.53,
+        "abnormal_5d": -10.01,
+        "abnormal_10d": -13.66
+      },
+      {
+        "symbol": "CXM",
+        "date": "2021-06-25",
+        "abnormal_1d": 7.24,
+        "abnormal_5d": 2.78,
+        "abnormal_10d": 14.73
+      },
+      {
+        "symbol": "DCTH",
+        "date": "2021-06-28",
+        "abnormal_1d": -1.4,
+        "abnormal_5d": 6.73,
+        "abnormal_10d": -7.42
+      },
+      {
+        "symbol": "VINC",
+        "date": "2021-06-29",
+        "abnormal_1d": 4.78,
+        "abnormal_5d": 17.29,
+        "abnormal_10d": 19.0
+      },
+      {
+        "symbol": "ECOR",
+        "date": "2021-07-02",
+        "abnormal_1d": -5.0,
+        "abnormal_5d": -5.42,
+        "abnormal_10d": -13.77
+      },
+      {
+        "symbol": "NECB",
+        "date": "2021-07-12",
+        "abnormal_1d": -2.94,
+        "abnormal_5d": -7.7,
+        "abnormal_10d": -11.66
+      },
+      {
+        "symbol": "BYRN",
+        "date": "2021-07-20",
+        "abnormal_1d": -0.27,
+        "abnormal_5d": -7.82,
+        "abnormal_10d": -1.3
+      },
+      {
+        "symbol": "HCWB",
+        "date": "2021-07-22",
+        "abnormal_1d": -10.04,
+        "abnormal_5d": -2.14,
+        "abnormal_10d": -6.31
+      },
+      {
+        "symbol": "SSB",
+        "date": "2021-07-26",
+        "abnormal_1d": 1.79,
+        "abnormal_5d": -1.05,
+        "abnormal_10d": 3.5
+      },
+      {
+        "symbol": "PHGE",
+        "date": "2021-07-28",
+        "abnormal_1d": -0.81,
+        "abnormal_5d": -7.07,
+        "abnormal_10d": -14.17
+      },
+      {
+        "symbol": "CADL",
+        "date": "2021-07-29",
+        "abnormal_1d": 6.15,
+        "abnormal_5d": 9.46,
+        "abnormal_10d": 22.23
+      },
+      {
+        "symbol": "IMRX",
+        "date": "2021-08-03",
+        "abnormal_1d": 11.95,
+        "abnormal_5d": 73.32,
+        "abnormal_10d": 74.03
+      },
+      {
+        "symbol": "OBT",
+        "date": "2021-08-05",
+        "abnormal_1d": 0.21,
+        "abnormal_5d": -0.31,
+        "abnormal_10d": 0.54
+      },
+      {
+        "symbol": "KPLT",
+        "date": "2021-08-11",
+        "abnormal_1d": -11.81,
+        "abnormal_5d": -23.21,
+        "abnormal_10d": -20.7
+      },
+      {
+        "symbol": "ENVX",
+        "date": "2021-08-12",
+        "abnormal_1d": 1.23,
+        "abnormal_5d": -3.9,
+        "abnormal_10d": 3.5
+      },
+      {
+        "symbol": "CTO",
+        "date": "2021-08-12",
+        "abnormal_1d": 0.51,
+        "abnormal_5d": -0.42,
+        "abnormal_10d": -1.81
+      },
+      {
+        "symbol": "ELAN",
+        "date": "2021-08-13",
+        "abnormal_1d": 2.64,
+        "abnormal_5d": 5.66,
+        "abnormal_10d": 8.43
+      },
+      {
+        "symbol": "GOCO",
+        "date": "2021-08-16",
+        "abnormal_1d": 15.47,
+        "abnormal_5d": 6.97,
+        "abnormal_10d": 9.85
+      },
+      {
+        "symbol": "BRSP",
+        "date": "2021-08-16",
+        "abnormal_1d": 1.36,
+        "abnormal_5d": 3.42,
+        "abnormal_10d": 7.39
+      },
+      {
+        "symbol": "RILY",
+        "date": "2021-08-19",
+        "abnormal_1d": -3.09,
+        "abnormal_5d": 3.88,
+        "abnormal_10d": 2.07
+      },
+      {
+        "symbol": "DNUT",
+        "date": "2021-08-19",
+        "abnormal_1d": 14.59,
+        "abnormal_5d": 25.02,
+        "abnormal_10d": 26.78
+      },
+      {
+        "symbol": "ET",
+        "date": "2021-08-19",
+        "abnormal_1d": -0.63,
+        "abnormal_5d": 3.21,
+        "abnormal_10d": 2.07
+      },
+      {
+        "symbol": "HIPO",
+        "date": "2021-08-19",
+        "abnormal_1d": -5.49,
+        "abnormal_5d": -2.88,
+        "abnormal_10d": 11.57
+      },
+      {
+        "symbol": "ONTF",
+        "date": "2021-08-24",
+        "abnormal_1d": 0.53,
+        "abnormal_5d": 5.99,
+        "abnormal_10d": -0.52
+      },
+      {
+        "symbol": "AUID",
+        "date": "2021-08-26",
+        "abnormal_1d": 15.42,
+        "abnormal_5d": 46.08,
+        "abnormal_10d": 46.05
+      },
+      {
+        "symbol": "HUMA",
+        "date": "2021-08-26",
+        "abnormal_1d": 8.04,
+        "abnormal_5d": 65.93,
+        "abnormal_10d": 34.79
+      },
+      {
+        "symbol": "SLQT",
+        "date": "2021-08-30",
+        "abnormal_1d": 6.41,
+        "abnormal_5d": 44.44,
+        "abnormal_10d": 61.39
+      },
+      {
+        "symbol": "FOA",
+        "date": "2021-09-01",
+        "abnormal_1d": -0.78,
+        "abnormal_5d": 0.14,
+        "abnormal_10d": -4.67
+      },
+      {
+        "symbol": "ET",
+        "date": "2021-09-15",
+        "abnormal_1d": -1.61,
+        "abnormal_5d": -2.87,
+        "abnormal_10d": 4.2
+      },
+      {
+        "symbol": "BMEA",
+        "date": "2021-09-17",
+        "abnormal_1d": -5.74,
+        "abnormal_5d": -11.66,
+        "abnormal_10d": 5.42
+      },
+      {
+        "symbol": "ACT",
+        "date": "2021-09-20",
+        "abnormal_1d": 3.51,
+        "abnormal_5d": 11.6,
+        "abnormal_10d": 13.34
+      },
+      {
+        "symbol": "ADC",
+        "date": "2021-09-28",
+        "abnormal_1d": 1.8,
+        "abnormal_5d": 3.24,
+        "abnormal_10d": 2.88
+      },
+      {
+        "symbol": "CGTX",
+        "date": "2021-10-13",
+        "abnormal_1d": -1.17,
+        "abnormal_5d": -6.36,
+        "abnormal_10d": -7.02
+      },
+      {
+        "symbol": "TCBI",
+        "date": "2021-10-25",
+        "abnormal_1d": -2.03,
+        "abnormal_5d": -1.15,
+        "abnormal_10d": 0.55
+      },
+      {
+        "symbol": "ADMA",
+        "date": "2021-10-25",
+        "abnormal_1d": -0.54,
+        "abnormal_5d": 3.53,
+        "abnormal_10d": 7.17
+      },
+      {
+        "symbol": "INTC",
+        "date": "2021-10-25",
+        "abnormal_1d": -1.39,
+        "abnormal_5d": -3.03,
+        "abnormal_10d": -0.5
+      },
+      {
+        "symbol": "ARIS",
+        "date": "2021-10-26",
+        "abnormal_1d": 6.08,
+        "abnormal_5d": 4.67,
+        "abnormal_10d": 1.69
+      },
+      {
+        "symbol": "RNR",
+        "date": "2021-10-29",
+        "abnormal_1d": -2.91,
+        "abnormal_5d": -0.66,
+        "abnormal_10d": 5.85
+      },
+      {
+        "symbol": "BBBY",
+        "date": "2021-11-04",
+        "abnormal_1d": 0.62,
+        "abnormal_5d": -7.02,
+        "abnormal_10d": -0.07
+      },
+      {
+        "symbol": "CMTG",
+        "date": "2021-11-05",
+        "abnormal_1d": 0.21,
+        "abnormal_5d": -1.15,
+        "abnormal_10d": 4.77
+      },
+      {
+        "symbol": "CALA",
+        "date": "2021-11-10",
+        "abnormal_1d": 1.05,
+        "abnormal_5d": 21.28,
+        "abnormal_10d": 5.43
+      },
+      {
+        "symbol": "EHTH",
+        "date": "2021-11-11",
+        "abnormal_1d": -3.97,
+        "abnormal_5d": -15.26,
+        "abnormal_10d": -23.39
+      },
+      {
+        "symbol": "DNUT",
+        "date": "2021-11-11",
+        "abnormal_1d": 6.42,
+        "abnormal_5d": 10.53,
+        "abnormal_10d": 14.37
+      },
+      {
+        "symbol": "ATEC",
+        "date": "2021-11-12",
+        "abnormal_1d": -1.86,
+        "abnormal_5d": -4.53,
+        "abnormal_10d": -8.85
+      },
+      {
+        "symbol": "TCBX",
+        "date": "2021-11-12",
+        "abnormal_1d": -0.55,
+        "abnormal_5d": 10.15,
+        "abnormal_10d": 9.31
+      },
+      {
+        "symbol": "RIVN",
+        "date": "2021-11-15",
+        "abnormal_1d": 14.16,
+        "abnormal_5d": -2.03,
+        "abnormal_10d": -7.86
+      },
+      {
+        "symbol": "CNTA",
+        "date": "2021-11-18",
+        "abnormal_1d": -10.58,
+        "abnormal_5d": -14.0,
+        "abnormal_10d": -1.04
+      },
+      {
+        "symbol": "WHG",
+        "date": "2021-11-22",
+        "abnormal_1d": 0.28,
+        "abnormal_5d": 0.84,
+        "abnormal_10d": 5.42
+      },
+      {
+        "symbol": "OFIX",
+        "date": "2021-11-22",
+        "abnormal_1d": 2.99,
+        "abnormal_5d": -0.36,
+        "abnormal_10d": 1.1
+      },
+      {
+        "symbol": "GOCO",
+        "date": "2021-11-22",
+        "abnormal_1d": -1.89,
+        "abnormal_5d": -5.88,
+        "abnormal_10d": -2.46
+      },
+      {
+        "symbol": "FISV",
+        "date": "2021-11-26",
+        "abnormal_1d": 3.3,
+        "abnormal_5d": 5.29,
+        "abnormal_10d": 7.16
+      },
+      {
+        "symbol": "KD",
+        "date": "2021-11-29",
+        "abnormal_1d": -2.74,
+        "abnormal_5d": 13.78,
+        "abnormal_10d": 7.23
+      },
+      {
+        "symbol": "FRPT",
+        "date": "2021-11-29",
+        "abnormal_1d": -0.45,
+        "abnormal_5d": -3.93,
+        "abnormal_10d": -5.77
+      },
+      {
+        "symbol": "IONM",
+        "date": "2021-11-29",
+        "abnormal_1d": -2.23,
+        "abnormal_5d": 4.07,
+        "abnormal_10d": -12.69
+      },
+      {
+        "symbol": "FXLV",
+        "date": "2021-11-29",
+        "abnormal_1d": 4.43,
+        "abnormal_5d": 1.01,
+        "abnormal_10d": 10.25
+      },
+      {
+        "symbol": "NAUT",
+        "date": "2021-11-30",
+        "abnormal_1d": 8.07,
+        "abnormal_5d": 9.57,
+        "abnormal_10d": 15.99
+      },
+      {
+        "symbol": "CHGG",
+        "date": "2021-12-02",
+        "abnormal_1d": 1.53,
+        "abnormal_5d": -2.01,
+        "abnormal_10d": -5.17
+      },
+      {
+        "symbol": "LOCL",
+        "date": "2021-12-02",
+        "abnormal_1d": 13.01,
+        "abnormal_5d": -6.51,
+        "abnormal_10d": -21.62
+      },
+      {
+        "symbol": "PRGO",
+        "date": "2021-12-06",
+        "abnormal_1d": 1.17,
+        "abnormal_5d": -2.85,
+        "abnormal_10d": 2.48
+      },
+      {
+        "symbol": "ET",
+        "date": "2021-12-10",
+        "abnormal_1d": -3.06,
+        "abnormal_5d": -1.98,
+        "abnormal_10d": -6.32
+      },
+      {
+        "symbol": "VAXX",
+        "date": "2021-12-10",
+        "abnormal_1d": -0.2,
+        "abnormal_5d": -19.16,
+        "abnormal_10d": -22.37
+      },
+      {
+        "symbol": "RWAY",
+        "date": "2021-12-10",
+        "abnormal_1d": -0.41,
+        "abnormal_5d": -2.68,
+        "abnormal_10d": -0.6
+      },
+      {
+        "symbol": "GIC",
+        "date": "2021-12-14",
+        "abnormal_1d": -0.98,
+        "abnormal_5d": 3.58,
+        "abnormal_10d": 1.48
+      },
+      {
+        "symbol": "LILA",
+        "date": "2021-12-14",
+        "abnormal_1d": -1.68,
+        "abnormal_5d": -2.06,
+        "abnormal_10d": -0.29
+      },
+      {
+        "symbol": "ARHS",
+        "date": "2021-12-14",
+        "abnormal_1d": 0.88,
+        "abnormal_5d": -0.12,
+        "abnormal_10d": 4.9
+      },
+      {
+        "symbol": "BBBY",
+        "date": "2022-01-07",
+        "abnormal_1d": -0.18,
+        "abnormal_5d": -3.55,
+        "abnormal_10d": -17.52
+      },
+      {
+        "symbol": "VCNX",
+        "date": "2022-01-27",
+        "abnormal_1d": -14.32,
+        "abnormal_5d": 50.03,
+        "abnormal_10d": 38.87
+      },
+      {
+        "symbol": "NEE",
+        "date": "2022-01-28",
+        "abnormal_1d": -2.23,
+        "abnormal_5d": 1.22,
+        "abnormal_10d": 0.14
+      },
+      {
+        "symbol": "CBAN",
+        "date": "2022-02-08",
+        "abnormal_1d": 5.34,
+        "abnormal_5d": 8.54,
+        "abnormal_10d": 13.13
+      },
+      {
+        "symbol": "FLNC",
+        "date": "2022-02-15",
+        "abnormal_1d": -0.26,
+        "abnormal_5d": -13.72,
+        "abnormal_10d": -6.29
+      },
+      {
+        "symbol": "NOTV",
+        "date": "2022-02-17",
+        "abnormal_1d": -10.97,
+        "abnormal_5d": 6.88,
+        "abnormal_10d": 12.08
+      },
+      {
+        "symbol": "FCNCA",
+        "date": "2022-02-24",
+        "abnormal_1d": 2.2,
+        "abnormal_5d": 4.96,
+        "abnormal_10d": -4.74
+      },
+      {
+        "symbol": "RILY",
+        "date": "2022-02-28",
+        "abnormal_1d": 0.49,
+        "abnormal_5d": 9.54,
+        "abnormal_10d": 12.49
+      },
+      {
+        "symbol": "MNKD",
+        "date": "2022-02-28",
+        "abnormal_1d": -0.88,
+        "abnormal_5d": 14.48,
+        "abnormal_10d": 27.06
+      },
+      {
+        "symbol": "EOSE",
+        "date": "2022-03-01",
+        "abnormal_1d": -5.33,
+        "abnormal_5d": 5.65,
+        "abnormal_10d": 2.44
+      },
+      {
+        "symbol": "AMWD",
+        "date": "2022-03-01",
+        "abnormal_1d": 4.32,
+        "abnormal_5d": 13.71,
+        "abnormal_10d": 10.19
+      },
+      {
+        "symbol": "JRVR",
+        "date": "2022-03-03",
+        "abnormal_1d": 0.55,
+        "abnormal_5d": 9.35,
+        "abnormal_10d": 5.19
+      },
+      {
+        "symbol": "DOUG",
+        "date": "2022-03-04",
+        "abnormal_1d": -5.68,
+        "abnormal_5d": -0.98,
+        "abnormal_10d": 12.36
+      },
+      {
+        "symbol": "HLMN",
+        "date": "2022-03-07",
+        "abnormal_1d": 5.49,
+        "abnormal_5d": 9.86,
+        "abnormal_10d": 3.19
+      },
+      {
+        "symbol": "UTZ",
+        "date": "2022-03-07",
+        "abnormal_1d": 2.79,
+        "abnormal_5d": 11.95,
+        "abnormal_10d": 7.05
+      },
+      {
+        "symbol": "FRST",
+        "date": "2022-03-08",
+        "abnormal_1d": 0.17,
+        "abnormal_5d": 3.16,
+        "abnormal_10d": -3.86
+      },
+      {
+        "symbol": "COTY",
+        "date": "2022-03-10",
+        "abnormal_1d": 3.37,
+        "abnormal_5d": 11.55,
+        "abnormal_10d": 7.02
+      },
+      {
+        "symbol": "AHCO",
+        "date": "2022-03-11",
+        "abnormal_1d": -3.28,
+        "abnormal_5d": 4.03,
+        "abnormal_10d": -4.12
+      },
+      {
+        "symbol": "PCT",
+        "date": "2022-03-17",
+        "abnormal_1d": 0.26,
+        "abnormal_5d": -24.22,
+        "abnormal_10d": -21.18
+      },
+      {
+        "symbol": "ANIP",
+        "date": "2022-03-21",
+        "abnormal_1d": -1.51,
+        "abnormal_5d": 0.47,
+        "abnormal_10d": 3.01
+      },
+      {
+        "symbol": "TMC",
+        "date": "2022-03-30",
+        "abnormal_1d": 23.91,
+        "abnormal_5d": 35.23,
+        "abnormal_10d": 18.68
+      },
+      {
+        "symbol": "LCII",
+        "date": "2022-03-31",
+        "abnormal_1d": -0.99,
+        "abnormal_5d": -1.43,
+        "abnormal_10d": 3.19
+      },
+      {
+        "symbol": "WULF",
+        "date": "2022-04-11",
+        "abnormal_1d": 2.86,
+        "abnormal_5d": -21.09,
+        "abnormal_10d": -44.65
+      },
+      {
+        "symbol": "EE",
+        "date": "2022-04-18",
+        "abnormal_1d": -4.45,
+        "abnormal_5d": -12.86,
+        "abnormal_10d": 0.16
+      },
+      {
+        "symbol": "VAXX",
+        "date": "2022-04-26",
+        "abnormal_1d": -0.32,
+        "abnormal_5d": 86.65,
+        "abnormal_10d": 56.41
+      },
+      {
+        "symbol": "WBD",
+        "date": "2022-04-27",
+        "abnormal_1d": -5.47,
+        "abnormal_5d": -3.04,
+        "abnormal_10d": -8.55
+      },
+      {
+        "symbol": "RILY",
+        "date": "2022-05-02",
+        "abnormal_1d": 5.39,
+        "abnormal_5d": 12.19,
+        "abnormal_10d": 10.83
+      },
+      {
+        "symbol": "GE",
+        "date": "2022-05-02",
+        "abnormal_1d": 1.36,
+        "abnormal_5d": 5.75,
+        "abnormal_10d": 3.8
+      },
+      {
+        "symbol": "SFNC",
+        "date": "2022-05-03",
+        "abnormal_1d": 0.22,
+        "abnormal_5d": 6.08,
+        "abnormal_10d": 3.28
+      },
+      {
+        "symbol": "CNDT",
+        "date": "2022-05-05",
+        "abnormal_1d": 5.31,
+        "abnormal_5d": 6.71,
+        "abnormal_10d": 15.47
+      },
+      {
+        "symbol": "BRSP",
+        "date": "2022-05-06",
+        "abnormal_1d": 1.58,
+        "abnormal_5d": 8.52,
+        "abnormal_10d": 6.28
+      },
+      {
+        "symbol": "RAPT",
+        "date": "2022-05-10",
+        "abnormal_1d": 0.68,
+        "abnormal_5d": 24.75,
+        "abnormal_10d": 14.71
+      },
+      {
+        "symbol": "MKL",
+        "date": "2022-05-10",
+        "abnormal_1d": -1.42,
+        "abnormal_5d": 1.22,
+        "abnormal_10d": 4.03
+      },
+      {
+        "symbol": "CMPX",
+        "date": "2022-05-10",
+        "abnormal_1d": 5.58,
+        "abnormal_5d": 71.78,
+        "abnormal_10d": 78.38
+      },
+      {
+        "symbol": "HLF",
+        "date": "2022-05-11",
+        "abnormal_1d": -5.06,
+        "abnormal_5d": -5.49,
+        "abnormal_10d": -9.65
+      },
+      {
+        "symbol": "CMP",
+        "date": "2022-05-11",
+        "abnormal_1d": -0.14,
+        "abnormal_5d": 4.15,
+        "abnormal_10d": 3.46
+      },
+      {
+        "symbol": "OPK",
+        "date": "2022-05-11",
+        "abnormal_1d": -5.33,
+        "abnormal_5d": 4.95,
+        "abnormal_10d": 6.15
+      },
+      {
+        "symbol": "AFCG",
+        "date": "2022-05-11",
+        "abnormal_1d": 9.48,
+        "abnormal_5d": 12.34,
+        "abnormal_10d": 14.99
+      },
+      {
+        "symbol": "BRT",
+        "date": "2022-05-12",
+        "abnormal_1d": 1.54,
+        "abnormal_5d": 1.84,
+        "abnormal_10d": 8.97
+      },
+      {
+        "symbol": "BW",
+        "date": "2022-05-12",
+        "abnormal_1d": 6.39,
+        "abnormal_5d": 17.6,
+        "abnormal_10d": 18.05
+      },
+      {
+        "symbol": "FLL",
+        "date": "2022-05-12",
+        "abnormal_1d": 5.15,
+        "abnormal_5d": 19.51,
+        "abnormal_10d": 13.6
+      },
+      {
+        "symbol": "EYE",
+        "date": "2022-05-12",
+        "abnormal_1d": 12.31,
+        "abnormal_5d": 22.18,
+        "abnormal_10d": 17.26
+      },
+      {
+        "symbol": "EOSE",
+        "date": "2022-05-12",
+        "abnormal_1d": -1.33,
+        "abnormal_5d": 2.38,
+        "abnormal_10d": -11.97
+      },
+      {
+        "symbol": "NNBR",
+        "date": "2022-05-13",
+        "abnormal_1d": -1.97,
+        "abnormal_5d": 21.5,
+        "abnormal_10d": 12.8
+      },
+      {
+        "symbol": "ALTG",
+        "date": "2022-05-13",
+        "abnormal_1d": 0.94,
+        "abnormal_5d": 6.0,
+        "abnormal_10d": 0.57
+      },
+      {
+        "symbol": "JXN",
+        "date": "2022-05-13",
+        "abnormal_1d": 5.28,
+        "abnormal_5d": 15.39,
+        "abnormal_10d": 14.01
+      },
+      {
+        "symbol": "KD",
+        "date": "2022-05-13",
+        "abnormal_1d": 3.87,
+        "abnormal_5d": 31.11,
+        "abnormal_10d": 12.4
+      },
+      {
+        "symbol": "PHAT",
+        "date": "2022-05-16",
+        "abnormal_1d": 2.53,
+        "abnormal_5d": 11.11,
+        "abnormal_10d": -10.6
+      },
+      {
+        "symbol": "ARHS",
+        "date": "2022-05-17",
+        "abnormal_1d": 0.15,
+        "abnormal_5d": -6.0,
+        "abnormal_10d": -12.72
+      },
+      {
+        "symbol": "SONX",
+        "date": "2022-05-17",
+        "abnormal_1d": -9.1,
+        "abnormal_5d": -4.49,
+        "abnormal_10d": -4.97
+      },
+      {
+        "symbol": "LIQT",
+        "date": "2022-05-17",
+        "abnormal_1d": -2.06,
+        "abnormal_5d": 14.52,
+        "abnormal_10d": 6.59
+      },
+      {
+        "symbol": "RPAY",
+        "date": "2022-05-18",
+        "abnormal_1d": 10.59,
+        "abnormal_5d": 22.0,
+        "abnormal_10d": 20.96
+      },
+      {
+        "symbol": "AVAH",
+        "date": "2022-05-19",
+        "abnormal_1d": 9.13,
+        "abnormal_5d": 11.93,
+        "abnormal_10d": 7.93
+      },
+      {
+        "symbol": "LQDA",
+        "date": "2022-05-24",
+        "abnormal_1d": -25.34,
+        "abnormal_5d": -15.0,
+        "abnormal_10d": -6.72
+      },
+      {
+        "symbol": "AVDL",
+        "date": "2022-05-27",
+        "abnormal_1d": 53.79,
+        "abnormal_5d": 53.08,
+        "abnormal_10d": 55.7
+      },
+      {
+        "symbol": "CGEM",
+        "date": "2022-06-06",
+        "abnormal_1d": 1.35,
+        "abnormal_5d": 5.05,
+        "abnormal_10d": 11.49
+      },
+      {
+        "symbol": "FSK",
+        "date": "2022-06-09",
+        "abnormal_1d": -0.74,
+        "abnormal_5d": 0.87,
+        "abnormal_10d": -2.62
+      },
+      {
+        "symbol": "MMS",
+        "date": "2022-06-15",
+        "abnormal_1d": 2.08,
+        "abnormal_5d": 3.12,
+        "abnormal_10d": 4.13
+      },
+      {
+        "symbol": "VST",
+        "date": "2022-06-16",
+        "abnormal_1d": -0.13,
+        "abnormal_5d": 1.07,
+        "abnormal_10d": -1.15
+      },
+      {
+        "symbol": "VAXX",
+        "date": "2022-06-16",
+        "abnormal_1d": -3.96,
+        "abnormal_5d": -16.95,
+        "abnormal_10d": -28.55
+      },
+      {
+        "symbol": "OPK",
+        "date": "2022-06-22",
+        "abnormal_1d": 5.69,
+        "abnormal_5d": 7.41,
+        "abnormal_10d": 13.92
+      },
+      {
+        "symbol": "ACXP",
+        "date": "2022-07-27",
+        "abnormal_1d": 4.96,
+        "abnormal_5d": 5.78,
+        "abnormal_10d": 26.16
+      },
+      {
+        "symbol": "MAIA",
+        "date": "2022-08-01",
+        "abnormal_1d": 11.72,
+        "abnormal_5d": -31.79,
+        "abnormal_10d": -32.67
+      },
+      {
+        "symbol": "PACK",
+        "date": "2022-08-05",
+        "abnormal_1d": -1.17,
+        "abnormal_5d": 16.69,
+        "abnormal_10d": 14.78
+      },
+      {
+        "symbol": "BFH",
+        "date": "2022-08-08",
+        "abnormal_1d": 0.98,
+        "abnormal_5d": 11.92,
+        "abnormal_10d": 9.21
+      },
+      {
+        "symbol": "WBD",
+        "date": "2022-08-08",
+        "abnormal_1d": -4.51,
+        "abnormal_5d": -10.23,
+        "abnormal_10d": -8.7
+      },
+      {
+        "symbol": "CRGY",
+        "date": "2022-08-12",
+        "abnormal_1d": 0.37,
+        "abnormal_5d": 8.58,
+        "abnormal_10d": 8.0
+      },
+      {
+        "symbol": "ENDI",
+        "date": "2022-08-18",
+        "abnormal_1d": -0.11,
+        "abnormal_5d": 3.22,
+        "abnormal_10d": 2.09
+      },
+      {
+        "symbol": "OPRX",
+        "date": "2022-08-19",
+        "abnormal_1d": -1.66,
+        "abnormal_5d": 1.42,
+        "abnormal_10d": 1.41
+      },
+      {
+        "symbol": "TLSS",
+        "date": "2022-09-02",
+        "abnormal_1d": 1.05,
+        "abnormal_5d": -2.57,
+        "abnormal_10d": 2.34
+      },
+      {
+        "symbol": "PVH",
+        "date": "2022-09-06",
+        "abnormal_1d": -1.99,
+        "abnormal_5d": 6.39,
+        "abnormal_10d": 0.24
+      },
+      {
+        "symbol": "RILY",
+        "date": "2022-09-07",
+        "abnormal_1d": -1.0,
+        "abnormal_5d": 0.22,
+        "abnormal_10d": 7.86
+      },
+      {
+        "symbol": "ELAN",
+        "date": "2022-09-09",
+        "abnormal_1d": 3.78,
+        "abnormal_5d": 8.53,
+        "abnormal_10d": 0.25
+      },
+      {
+        "symbol": "CMRA",
+        "date": "2022-09-12",
+        "abnormal_1d": -8.29,
+        "abnormal_5d": 24.02,
+        "abnormal_10d": -4.33
+      },
+      {
+        "symbol": "CRK",
+        "date": "2022-09-16",
+        "abnormal_1d": -3.04,
+        "abnormal_5d": -4.35,
+        "abnormal_10d": -8.0
+      },
+      {
+        "symbol": "BRT",
+        "date": "2022-09-16",
+        "abnormal_1d": -0.23,
+        "abnormal_5d": 1.47,
+        "abnormal_10d": -1.23
+      },
+      {
+        "symbol": "LRMR",
+        "date": "2022-09-16",
+        "abnormal_1d": -5.12,
+        "abnormal_5d": -0.44,
+        "abnormal_10d": 1.92
+      },
+      {
+        "symbol": "MBIN",
+        "date": "2022-09-22",
+        "abnormal_1d": -2.53,
+        "abnormal_5d": -5.04,
+        "abnormal_10d": -4.15
+      },
+      {
+        "symbol": "MAC",
+        "date": "2022-09-26",
+        "abnormal_1d": 0.38,
+        "abnormal_5d": 5.05,
+        "abnormal_10d": 9.89
+      },
+      {
+        "symbol": "PLAY",
+        "date": "2022-10-11",
+        "abnormal_1d": 2.11,
+        "abnormal_5d": 7.53,
+        "abnormal_10d": 10.35
+      },
+      {
+        "symbol": "AZZ",
+        "date": "2022-10-17",
+        "abnormal_1d": 0.78,
+        "abnormal_5d": 2.47,
+        "abnormal_10d": 8.86
+      },
+      {
+        "symbol": "BHVN",
+        "date": "2022-10-25",
+        "abnormal_1d": 0.46,
+        "abnormal_5d": 15.41,
+        "abnormal_10d": 10.76
+      },
+      {
+        "symbol": "ALGN",
+        "date": "2022-11-02",
+        "abnormal_1d": -4.44,
+        "abnormal_5d": -5.6,
+        "abnormal_10d": 7.01
+      },
+      {
+        "symbol": "NSA",
+        "date": "2022-11-04",
+        "abnormal_1d": -1.34,
+        "abnormal_5d": 1.85,
+        "abnormal_10d": -4.26
+      },
+      {
+        "symbol": "B",
+        "date": "2022-11-07",
+        "abnormal_1d": 0.95,
+        "abnormal_5d": 9.14,
+        "abnormal_10d": 4.08
+      },
+      {
+        "symbol": "VRNS",
+        "date": "2022-11-07",
+        "abnormal_1d": 2.35,
+        "abnormal_5d": 23.57,
+        "abnormal_10d": 23.66
+      },
+      {
+        "symbol": "HASI",
+        "date": "2022-11-09",
+        "abnormal_1d": 4.63,
+        "abnormal_5d": 7.21,
+        "abnormal_10d": 8.6
+      },
+      {
+        "symbol": "KD",
+        "date": "2022-11-09",
+        "abnormal_1d": -1.28,
+        "abnormal_5d": 10.45,
+        "abnormal_10d": 9.11
+      },
+      {
+        "symbol": "RPAY",
+        "date": "2022-11-11",
+        "abnormal_1d": 10.37,
+        "abnormal_5d": 20.63,
+        "abnormal_10d": 25.02
+      },
+      {
+        "symbol": "CRVW",
+        "date": "2022-11-14",
+        "abnormal_1d": 0.85,
+        "abnormal_5d": 0.62,
+        "abnormal_10d": 0.65
+      },
+      {
+        "symbol": "AIRS",
+        "date": "2022-11-15",
+        "abnormal_1d": 11.1,
+        "abnormal_5d": 13.9,
+        "abnormal_10d": 22.8
+      },
+      {
+        "symbol": "BRT",
+        "date": "2022-11-17",
+        "abnormal_1d": 1.27,
+        "abnormal_5d": 0.94,
+        "abnormal_10d": -0.74
+      },
+      {
+        "symbol": "SST",
+        "date": "2022-11-21",
+        "abnormal_1d": -0.43,
+        "abnormal_5d": -1.96,
+        "abnormal_10d": 10.43
+      },
+      {
+        "symbol": "CTM",
+        "date": "2022-11-28",
+        "abnormal_1d": 7.57,
+        "abnormal_5d": 42.15,
+        "abnormal_10d": 99.27
+      },
+      {
+        "symbol": "BW",
+        "date": "2022-11-29",
+        "abnormal_1d": 0.63,
+        "abnormal_5d": 13.88,
+        "abnormal_10d": 14.27
+      },
+      {
+        "symbol": "USCB",
+        "date": "2022-11-29",
+        "abnormal_1d": 0.25,
+        "abnormal_5d": -2.02,
+        "abnormal_10d": -5.29
+      },
+      {
+        "symbol": "HLMN",
+        "date": "2022-11-30",
+        "abnormal_1d": 3.41,
+        "abnormal_5d": 7.58,
+        "abnormal_10d": 2.98
+      },
+      {
+        "symbol": "PLAY",
+        "date": "2022-12-08",
+        "abnormal_1d": 2.89,
+        "abnormal_5d": 3.48,
+        "abnormal_10d": 1.13
+      },
+      {
+        "symbol": "TRIN",
+        "date": "2022-12-08",
+        "abnormal_1d": 0.02,
+        "abnormal_5d": 2.76,
+        "abnormal_10d": 10.17
+      },
+      {
+        "symbol": "HLF",
+        "date": "2022-12-09",
+        "abnormal_1d": 1.3,
+        "abnormal_5d": 7.7,
+        "abnormal_10d": 18.07
+      },
+      {
+        "symbol": "REFI",
+        "date": "2022-12-12",
+        "abnormal_1d": -2.13,
+        "abnormal_5d": -1.07,
+        "abnormal_10d": 1.2
+      },
+      {
+        "symbol": "VFC",
+        "date": "2022-12-13",
+        "abnormal_1d": -3.44,
+        "abnormal_5d": -6.46,
+        "abnormal_10d": -3.03
+      },
+      {
+        "symbol": "NXPL",
+        "date": "2022-12-14",
+        "abnormal_1d": -1.43,
+        "abnormal_5d": 25.59,
+        "abnormal_10d": 2.42
+      },
+      {
+        "symbol": "DCTH",
+        "date": "2022-12-14",
+        "abnormal_1d": 1.46,
+        "abnormal_5d": 1.9,
+        "abnormal_10d": -6.67
+      },
+      {
+        "symbol": "ET",
+        "date": "2022-12-15",
+        "abnormal_1d": 2.11,
+        "abnormal_5d": 5.09,
+        "abnormal_10d": 5.01
+      },
+      {
+        "symbol": "NRG",
+        "date": "2022-12-15",
+        "abnormal_1d": 1.07,
+        "abnormal_5d": 3.26,
+        "abnormal_10d": 3.89
+      },
+      {
+        "symbol": "RILY",
+        "date": "2022-12-16",
+        "abnormal_1d": -0.97,
+        "abnormal_5d": -16.65,
+        "abnormal_10d": -14.8
+      },
+      {
+        "symbol": "SKIL",
+        "date": "2022-12-19",
+        "abnormal_1d": -3.7,
+        "abnormal_5d": 31.91,
+        "abnormal_10d": 29.73
+      },
+      {
+        "symbol": "HROW",
+        "date": "2022-12-22",
+        "abnormal_1d": 1.13,
+        "abnormal_5d": 9.96,
+        "abnormal_10d": 4.84
+      },
+      {
+        "symbol": "RILY",
+        "date": "2023-01-09",
+        "abnormal_1d": 2.94,
+        "abnormal_5d": 8.22,
+        "abnormal_10d": 14.51
+      },
+      {
+        "symbol": "ACHR",
+        "date": "2023-01-13",
+        "abnormal_1d": -1.9,
+        "abnormal_5d": 6.71,
+        "abnormal_10d": 3.48
+      },
+      {
+        "symbol": "NEE",
+        "date": "2023-02-06",
+        "abnormal_1d": 1.83,
+        "abnormal_5d": 1.24,
+        "abnormal_10d": 3.21
+      },
+      {
+        "symbol": "VERA",
+        "date": "2023-02-06",
+        "abnormal_1d": -2.58,
+        "abnormal_5d": 4.79,
+        "abnormal_10d": 17.62
+      },
+      {
+        "symbol": "RILY",
+        "date": "2023-02-08",
+        "abnormal_1d": -8.24,
+        "abnormal_5d": 0.18,
+        "abnormal_10d": -0.9
+      },
+      {
+        "symbol": "CNC",
+        "date": "2023-02-09",
+        "abnormal_1d": -1.23,
+        "abnormal_5d": -0.8,
+        "abnormal_10d": 0.49
+      },
+      {
+        "symbol": "RILY",
+        "date": "2023-02-09",
+        "abnormal_1d": -0.74,
+        "abnormal_5d": 11.53,
+        "abnormal_10d": -2.03
+      },
+      {
+        "symbol": "FBIO",
+        "date": "2023-02-10",
+        "abnormal_1d": 2.47,
+        "abnormal_5d": 5.11,
+        "abnormal_10d": -8.18
+      },
+      {
+        "symbol": "MLYS",
+        "date": "2023-02-14",
+        "abnormal_1d": -1.49,
+        "abnormal_5d": 2.02,
+        "abnormal_10d": 1.23
+      },
+      {
+        "symbol": "ASPS",
+        "date": "2023-02-14",
+        "abnormal_1d": -4.14,
+        "abnormal_5d": -0.67,
+        "abnormal_10d": 14.3
+      },
+      {
+        "symbol": "KDP",
+        "date": "2023-03-03",
+        "abnormal_1d": -1.64,
+        "abnormal_5d": 1.57,
+        "abnormal_10d": 1.97
+      },
+      {
+        "symbol": "IHRT",
+        "date": "2023-03-07",
+        "abnormal_1d": -2.86,
+        "abnormal_5d": -12.15,
+        "abnormal_10d": -22.68
+      },
+      {
+        "symbol": "SMMT",
+        "date": "2023-03-08",
+        "abnormal_1d": 14.99,
+        "abnormal_5d": 33.46,
+        "abnormal_10d": 24.46
+      },
+      {
+        "symbol": "TTI",
+        "date": "2023-03-08",
+        "abnormal_1d": -1.33,
+        "abnormal_5d": -11.44,
+        "abnormal_10d": -22.64
+      },
+      {
+        "symbol": "CFR",
+        "date": "2023-03-13",
+        "abnormal_1d": -3.58,
+        "abnormal_5d": -4.16,
+        "abnormal_10d": -10.07
+      },
+      {
+        "symbol": "FFIN",
+        "date": "2023-03-14",
+        "abnormal_1d": -3.36,
+        "abnormal_5d": -5.46,
+        "abnormal_10d": -4.99
+      },
+      {
+        "symbol": "SCHW",
+        "date": "2023-03-14",
+        "abnormal_1d": -6.06,
+        "abnormal_5d": -7.92,
+        "abnormal_10d": -10.75
+      },
+      {
+        "symbol": "HASI",
+        "date": "2023-03-16",
+        "abnormal_1d": -7.99,
+        "abnormal_5d": -0.22,
+        "abnormal_10d": 5.17
+      },
+      {
+        "symbol": "WEST",
+        "date": "2023-03-17",
+        "abnormal_1d": 5.01,
+        "abnormal_5d": 5.17,
+        "abnormal_10d": 3.55
+      },
+      {
+        "symbol": "BNL",
+        "date": "2023-03-17",
+        "abnormal_1d": 0.29,
+        "abnormal_5d": -2.72,
+        "abnormal_10d": -0.98
+      },
+      {
+        "symbol": "BRT",
+        "date": "2023-03-21",
+        "abnormal_1d": -1.94,
+        "abnormal_5d": 0.43,
+        "abnormal_10d": 1.88
+      },
+      {
+        "symbol": "CRK",
+        "date": "2023-03-23",
+        "abnormal_1d": -5.13,
+        "abnormal_5d": -1.86,
+        "abnormal_10d": -1.08
+      },
+      {
+        "symbol": "UEC",
+        "date": "2023-03-24",
+        "abnormal_1d": 8.11,
+        "abnormal_5d": 12.86,
+        "abnormal_10d": 3.1
+      },
+      {
+        "symbol": "DOMO",
+        "date": "2023-04-13",
+        "abnormal_1d": 1.96,
+        "abnormal_5d": 20.49,
+        "abnormal_10d": 12.68
+      },
+      {
+        "symbol": "SFNC",
+        "date": "2023-05-01",
+        "abnormal_1d": -1.54,
+        "abnormal_5d": -3.24,
+        "abnormal_10d": -8.25
+      },
+      {
+        "symbol": "FFIN",
+        "date": "2023-05-01",
+        "abnormal_1d": -1.44,
+        "abnormal_5d": -4.0,
+        "abnormal_10d": -10.86
+      },
+      {
+        "symbol": "FSBC",
+        "date": "2023-05-02",
+        "abnormal_1d": -1.23,
+        "abnormal_5d": -6.62,
+        "abnormal_10d": -11.45
+      },
+      {
+        "symbol": "ADT",
+        "date": "2023-05-04",
+        "abnormal_1d": -1.57,
+        "abnormal_5d": 15.17,
+        "abnormal_10d": 12.52
+      },
+      {
+        "symbol": "KDP",
+        "date": "2023-05-04",
+        "abnormal_1d": 0.05,
+        "abnormal_5d": -1.51,
+        "abnormal_10d": -3.55
+      },
+      {
+        "symbol": "EWBC",
+        "date": "2023-05-04",
+        "abnormal_1d": -3.44,
+        "abnormal_5d": 1.56,
+        "abnormal_10d": 11.34
+      },
+      {
+        "symbol": "INBK",
+        "date": "2023-05-12",
+        "abnormal_1d": 5.45,
+        "abnormal_5d": 18.92,
+        "abnormal_10d": 22.64
+      },
+      {
+        "symbol": "KREF",
+        "date": "2023-05-12",
+        "abnormal_1d": -0.8,
+        "abnormal_5d": 5.23,
+        "abnormal_10d": 6.21
+      },
+      {
+        "symbol": "PIII",
+        "date": "2023-05-15",
+        "abnormal_1d": 9.44,
+        "abnormal_5d": 37.79,
+        "abnormal_10d": 23.68
+      },
+      {
+        "symbol": "OUST",
+        "date": "2023-05-16",
+        "abnormal_1d": 0.15,
+        "abnormal_5d": 6.45,
+        "abnormal_10d": 22.15
+      },
+      {
+        "symbol": "SLQT",
+        "date": "2023-05-16",
+        "abnormal_1d": 7.98,
+        "abnormal_5d": 53.07,
+        "abnormal_10d": 27.53
+      },
+      {
+        "symbol": "ADC",
+        "date": "2023-05-17",
+        "abnormal_1d": -0.8,
+        "abnormal_5d": -1.14,
+        "abnormal_10d": -2.94
+      },
+      {
+        "symbol": "ADV",
+        "date": "2023-05-18",
+        "abnormal_1d": -0.42,
+        "abnormal_5d": -1.73,
+        "abnormal_10d": 0.05
+      },
+      {
+        "symbol": "LAB",
+        "date": "2023-05-18",
+        "abnormal_1d": 10.77,
+        "abnormal_5d": 29.06,
+        "abnormal_10d": 16.78
+      },
+      {
+        "symbol": "ACDC",
+        "date": "2023-05-22",
+        "abnormal_1d": 0.97,
+        "abnormal_5d": -1.93,
+        "abnormal_10d": -3.62
+      },
+      {
+        "symbol": "PRLD",
+        "date": "2023-05-23",
+        "abnormal_1d": 1.12,
+        "abnormal_5d": 5.91,
+        "abnormal_10d": 2.56
+      },
+      {
+        "symbol": "BVS",
+        "date": "2023-05-24",
+        "abnormal_1d": 6.95,
+        "abnormal_5d": 11.12,
+        "abnormal_10d": 14.0
+      },
+      {
+        "symbol": "MKL",
+        "date": "2023-05-24",
+        "abnormal_1d": -0.6,
+        "abnormal_5d": -2.52,
+        "abnormal_10d": -1.15
+      },
+      {
+        "symbol": "AUID",
+        "date": "2023-05-26",
+        "abnormal_1d": 11.74,
+        "abnormal_5d": 19.88,
+        "abnormal_10d": 19.4
+      },
+      {
+        "symbol": "PRPL",
+        "date": "2023-05-26",
+        "abnormal_1d": 4.44,
+        "abnormal_5d": -14.08,
+        "abnormal_10d": -13.35
+      },
+      {
+        "symbol": "SBIG",
+        "date": "2023-05-31",
+        "abnormal_1d": 0.55,
+        "abnormal_5d": 46.52,
+        "abnormal_10d": 57.37
+      },
+      {
+        "symbol": "ZD",
+        "date": "2023-05-31",
+        "abnormal_1d": 1.25,
+        "abnormal_5d": 10.97,
+        "abnormal_10d": 10.15
+      },
+      {
+        "symbol": "LFMD",
+        "date": "2023-06-05",
+        "abnormal_1d": 2.06,
+        "abnormal_5d": 15.89,
+        "abnormal_10d": 54.4
+      },
+      {
+        "symbol": "GCO",
+        "date": "2023-06-05",
+        "abnormal_1d": 1.75,
+        "abnormal_5d": 16.08,
+        "abnormal_10d": 26.13
+      },
+      {
+        "symbol": "CAPIX",
+        "date": "2023-06-22",
+        "abnormal_1d": -0.36,
+        "abnormal_5d": -0.21,
+        "abnormal_10d": -0.83
+      },
+      {
+        "symbol": "AENT",
+        "date": "2023-06-30",
+        "abnormal_1d": -1.18,
+        "abnormal_5d": -29.8,
+        "abnormal_10d": -21.34
+      },
+      {
+        "symbol": "EPSN",
+        "date": "2023-07-06",
+        "abnormal_1d": -1.31,
+        "abnormal_5d": 7.94,
+        "abnormal_10d": 8.39
+      },
+      {
+        "symbol": "HPK",
+        "date": "2023-07-19",
+        "abnormal_1d": 6.55,
+        "abnormal_5d": 18.66,
+        "abnormal_10d": 19.89
+      },
+      {
+        "symbol": "RILY",
+        "date": "2023-07-25",
+        "abnormal_1d": -1.53,
+        "abnormal_5d": -5.78,
+        "abnormal_10d": -4.53
+      },
+      {
+        "symbol": "BTTX",
+        "date": "2023-07-27",
+        "abnormal_1d": -3.95,
+        "abnormal_5d": 11.95,
+        "abnormal_10d": 15.99
+      },
+      {
+        "symbol": "ADC",
+        "date": "2023-08-02",
+        "abnormal_1d": -0.85,
+        "abnormal_5d": 0.58,
+        "abnormal_10d": -1.55
+      },
+      {
+        "symbol": "ZBRA",
+        "date": "2023-08-07",
+        "abnormal_1d": -2.0,
+        "abnormal_5d": 4.6,
+        "abnormal_10d": 10.64
+      },
+      {
+        "symbol": "SABR",
+        "date": "2023-08-09",
+        "abnormal_1d": -4.9,
+        "abnormal_5d": -0.18,
+        "abnormal_10d": 0.14
+      },
+      {
+        "symbol": "EMBC",
+        "date": "2023-08-10",
+        "abnormal_1d": -3.94,
+        "abnormal_5d": -11.47,
+        "abnormal_10d": -17.95
+      },
+      {
+        "symbol": "XPOF",
+        "date": "2023-08-11",
+        "abnormal_1d": -2.51,
+        "abnormal_5d": 2.71,
+        "abnormal_10d": -5.52
+      },
+      {
+        "symbol": "HQI",
+        "date": "2023-08-16",
+        "abnormal_1d": -4.76,
+        "abnormal_5d": -0.86,
+        "abnormal_10d": 4.08
+      },
+      {
+        "symbol": "TSHA",
+        "date": "2023-08-16",
+        "abnormal_1d": -0.29,
+        "abnormal_5d": 3.12,
+        "abnormal_10d": 71.92
+      },
+      {
+        "symbol": "FWRD",
+        "date": "2023-08-17",
+        "abnormal_1d": -0.61,
+        "abnormal_5d": -0.07,
+        "abnormal_10d": 9.4
+      },
+      {
+        "symbol": "MRCY",
+        "date": "2023-08-18",
+        "abnormal_1d": 2.38,
+        "abnormal_5d": 5.4,
+        "abnormal_10d": 3.9
+      },
+      {
+        "symbol": "BVS",
+        "date": "2023-08-18",
+        "abnormal_1d": 16.44,
+        "abnormal_5d": 6.25,
+        "abnormal_10d": -7.48
+      },
+      {
+        "symbol": "FNKO",
+        "date": "2023-08-22",
+        "abnormal_1d": -0.52,
+        "abnormal_5d": 1.76,
+        "abnormal_10d": 6.32
+      },
+      {
+        "symbol": "HTLD",
+        "date": "2023-08-22",
+        "abnormal_1d": 0.0,
+        "abnormal_5d": -1.32,
+        "abnormal_10d": -3.67
+      },
+      {
+        "symbol": "SOWG",
+        "date": "2023-08-25",
+        "abnormal_1d": -0.71,
+        "abnormal_5d": -3.08,
+        "abnormal_10d": 14.69
+      },
+      {
+        "symbol": "DOUG",
+        "date": "2023-08-31",
+        "abnormal_1d": 1.77,
+        "abnormal_5d": 0.96,
+        "abnormal_10d": -5.52
+      },
+      {
+        "symbol": "ET",
+        "date": "2023-09-01",
+        "abnormal_1d": -0.01,
+        "abnormal_5d": 2.24,
+        "abnormal_10d": 1.11
+      },
+      {
+        "symbol": "KGS",
+        "date": "2023-09-01",
+        "abnormal_1d": 0.56,
+        "abnormal_5d": -2.0,
+        "abnormal_10d": -1.68
+      },
+      {
+        "symbol": "RRGB",
+        "date": "2023-09-06",
+        "abnormal_1d": 0.47,
+        "abnormal_5d": 1.6,
+        "abnormal_10d": -16.51
+      },
+      {
+        "symbol": "ASPS",
+        "date": "2023-09-08",
+        "abnormal_1d": -0.9,
+        "abnormal_5d": 12.51,
+        "abnormal_10d": 12.43
+      },
+      {
+        "symbol": "RBA",
+        "date": "2023-09-14",
+        "abnormal_1d": -0.39,
+        "abnormal_5d": 0.97,
+        "abnormal_10d": -0.12
+      },
+      {
+        "symbol": "TKNO",
+        "date": "2023-09-19",
+        "abnormal_1d": -0.35,
+        "abnormal_5d": 30.9,
+        "abnormal_10d": 43.12
+      },
+      {
+        "symbol": "NMRA",
+        "date": "2023-09-19",
+        "abnormal_1d": -17.96,
+        "abnormal_5d": -19.56,
+        "abnormal_10d": -21.12
+      },
+      {
+        "symbol": "CODA",
+        "date": "2023-09-28",
+        "abnormal_1d": -2.05,
+        "abnormal_5d": -1.48,
+        "abnormal_10d": 0.7
+      },
+      {
+        "symbol": "ADC",
+        "date": "2023-09-28",
+        "abnormal_1d": -0.62,
+        "abnormal_5d": -0.82,
+        "abnormal_10d": -2.82
+      },
+      {
+        "symbol": "BHVN",
+        "date": "2023-10-05",
+        "abnormal_1d": 5.91,
+        "abnormal_5d": 18.69,
+        "abnormal_10d": 19.3
+      },
+      {
+        "symbol": "NTRS",
+        "date": "2023-10-24",
+        "abnormal_1d": -1.69,
+        "abnormal_5d": 2.65,
+        "abnormal_10d": 5.98
+      },
+      {
+        "symbol": "LC",
+        "date": "2023-10-31",
+        "abnormal_1d": 1.14,
+        "abnormal_5d": 7.52,
+        "abnormal_10d": -4.15
+      },
+      {
+        "symbol": "TEX",
+        "date": "2023-10-31",
+        "abnormal_1d": 0.33,
+        "abnormal_5d": 0.84,
+        "abnormal_10d": 2.17
+      },
+      {
+        "symbol": "MKL",
+        "date": "2023-11-03",
+        "abnormal_1d": 0.01,
+        "abnormal_5d": 0.67,
+        "abnormal_10d": -0.27
+      },
+      {
+        "symbol": "B",
+        "date": "2023-11-07",
+        "abnormal_1d": -1.87,
+        "abnormal_5d": -6.59,
+        "abnormal_10d": -5.72
+      },
+      {
+        "symbol": "INTZ",
+        "date": "2023-11-08",
+        "abnormal_1d": 31.18,
+        "abnormal_5d": 62.92,
+        "abnormal_10d": 5.63
+      },
+      {
+        "symbol": "ADV",
+        "date": "2023-11-09",
+        "abnormal_1d": 0.27,
+        "abnormal_5d": 19.1,
+        "abnormal_10d": 28.08
+      },
+      {
+        "symbol": "PETS",
+        "date": "2023-11-09",
+        "abnormal_1d": 1.6,
+        "abnormal_5d": 7.05,
+        "abnormal_10d": -0.49
+      },
+      {
+        "symbol": "ET",
+        "date": "2023-11-09",
+        "abnormal_1d": 0.14,
+        "abnormal_5d": -0.94,
+        "abnormal_10d": 0.74
+      },
+      {
+        "symbol": "SNCR",
+        "date": "2023-11-10",
+        "abnormal_1d": 22.46,
+        "abnormal_5d": 51.48,
+        "abnormal_10d": 44.9
+      },
+      {
+        "symbol": "CTOS",
+        "date": "2023-11-13",
+        "abnormal_1d": -0.52,
+        "abnormal_5d": 14.46,
+        "abnormal_10d": 14.85
+      },
+      {
+        "symbol": "JANX",
+        "date": "2023-11-13",
+        "abnormal_1d": 17.48,
+        "abnormal_5d": 41.4,
+        "abnormal_10d": 63.08
+      },
+      {
+        "symbol": "TKO",
+        "date": "2023-11-14",
+        "abnormal_1d": -3.3,
+        "abnormal_5d": -7.08,
+        "abnormal_10d": -6.83
+      },
+      {
+        "symbol": "PCT",
+        "date": "2023-11-14",
+        "abnormal_1d": 11.47,
+        "abnormal_5d": 19.54,
+        "abnormal_10d": 8.31
+      },
+      {
+        "symbol": "HAIN",
+        "date": "2023-11-15",
+        "abnormal_1d": -4.38,
+        "abnormal_5d": -9.34,
+        "abnormal_10d": -12.45
+      },
+      {
+        "symbol": "RXO",
+        "date": "2023-11-16",
+        "abnormal_1d": -0.42,
+        "abnormal_5d": 0.37,
+        "abnormal_10d": 3.89
+      },
+      {
+        "symbol": "PRGO",
+        "date": "2023-11-16",
+        "abnormal_1d": -3.64,
+        "abnormal_5d": -0.6,
+        "abnormal_10d": 0.01
+      },
+      {
+        "symbol": "SGN",
+        "date": "2023-11-16",
+        "abnormal_1d": 9.1,
+        "abnormal_5d": 58.39,
+        "abnormal_10d": -14.26
+      },
+      {
+        "symbol": "RILY",
+        "date": "2023-11-17",
+        "abnormal_1d": 6.67,
+        "abnormal_5d": 1.16,
+        "abnormal_10d": -3.59
+      },
+      {
+        "symbol": "ATNI",
+        "date": "2023-11-20",
+        "abnormal_1d": 0.78,
+        "abnormal_5d": -0.64,
+        "abnormal_10d": 3.32
+      },
+      {
+        "symbol": "SOWG",
+        "date": "2023-11-20",
+        "abnormal_1d": 0.67,
+        "abnormal_5d": -2.91,
+        "abnormal_10d": 21.41
+      },
+      {
+        "symbol": "CTSO",
+        "date": "2023-12-13",
+        "abnormal_1d": 22.74,
+        "abnormal_5d": 22.8,
+        "abnormal_10d": 12.51
+      },
+      {
+        "symbol": "LQDA",
+        "date": "2023-12-14",
+        "abnormal_1d": 0.93,
+        "abnormal_5d": 48.68,
+        "abnormal_10d": 65.91
+      },
+      {
+        "symbol": "HRTG",
+        "date": "2023-12-19",
+        "abnormal_1d": -0.9,
+        "abnormal_5d": -5.38,
+        "abnormal_10d": -4.81
+      },
+      {
+        "symbol": "ADC",
+        "date": "2023-12-20",
+        "abnormal_1d": 1.33,
+        "abnormal_5d": 1.34,
+        "abnormal_10d": 3.64
+      },
+      {
+        "symbol": "RLMD",
+        "date": "2024-01-29",
+        "abnormal_1d": 1.69,
+        "abnormal_5d": 25.3,
+        "abnormal_10d": 47.31
+      },
+      {
+        "symbol": "COLB",
+        "date": "2024-01-29",
+        "abnormal_1d": 1.9,
+        "abnormal_5d": -5.58,
+        "abnormal_10d": -10.24
+      },
+      {
+        "symbol": "ANRO",
+        "date": "2024-02-06",
+        "abnormal_1d": -7.51,
+        "abnormal_5d": -35.06,
+        "abnormal_10d": -36.02
+      },
+      {
+        "symbol": "MRCY",
+        "date": "2024-02-09",
+        "abnormal_1d": 10.15,
+        "abnormal_5d": 14.3,
+        "abnormal_10d": 5.15
+      },
+      {
+        "symbol": "EG",
+        "date": "2024-02-09",
+        "abnormal_1d": -0.01,
+        "abnormal_5d": 5.7,
+        "abnormal_10d": 3.53
+      },
+      {
+        "symbol": "PMNT",
+        "date": "2024-02-12",
+        "abnormal_1d": 6.84,
+        "abnormal_5d": 4.42,
+        "abnormal_10d": -6.78
+      },
+      {
+        "symbol": "GTES",
+        "date": "2024-02-16",
+        "abnormal_1d": -0.62,
+        "abnormal_5d": 7.68,
+        "abnormal_10d": 8.1
+      },
+      {
+        "symbol": "FCNCA",
+        "date": "2024-02-20",
+        "abnormal_1d": 2.24,
+        "abnormal_5d": 4.36,
+        "abnormal_10d": 2.73
+      },
+      {
+        "symbol": "GSHD",
+        "date": "2024-02-26",
+        "abnormal_1d": 0.1,
+        "abnormal_5d": -1.08,
+        "abnormal_10d": 5.06
+      },
+      {
+        "symbol": "BNL",
+        "date": "2024-02-26",
+        "abnormal_1d": -0.96,
+        "abnormal_5d": 1.2,
+        "abnormal_10d": -0.37
+      },
+      {
+        "symbol": "AMN",
+        "date": "2024-02-28",
+        "abnormal_1d": -3.56,
+        "abnormal_5d": -2.14,
+        "abnormal_10d": -0.06
+      },
+      {
+        "symbol": "ADC",
+        "date": "2024-02-29",
+        "abnormal_1d": -1.65,
+        "abnormal_5d": 2.19,
+        "abnormal_10d": -0.88
+      },
+      {
+        "symbol": "PRGO",
+        "date": "2024-03-05",
+        "abnormal_1d": 3.86,
+        "abnormal_5d": 16.79,
+        "abnormal_10d": 13.97
+      },
+      {
+        "symbol": "KDP",
+        "date": "2024-03-05",
+        "abnormal_1d": 0.71,
+        "abnormal_5d": 0.63,
+        "abnormal_10d": 0.74
+      },
+      {
+        "symbol": "GENK",
+        "date": "2024-03-11",
+        "abnormal_1d": -0.08,
+        "abnormal_5d": 33.95,
+        "abnormal_10d": 76.9
+      },
+      {
+        "symbol": "CORZ",
+        "date": "2024-03-15",
+        "abnormal_1d": 9.95,
+        "abnormal_5d": 9.14,
+        "abnormal_10d": 11.21
+      },
+      {
+        "symbol": "AAOI",
+        "date": "2024-03-18",
+        "abnormal_1d": 1.45,
+        "abnormal_5d": 13.18,
+        "abnormal_10d": 7.02
+      },
+      {
+        "symbol": "IMRX",
+        "date": "2024-03-19",
+        "abnormal_1d": -0.16,
+        "abnormal_5d": -2.52,
+        "abnormal_10d": -3.51
+      },
+      {
+        "symbol": "LILA",
+        "date": "2024-03-20",
+        "abnormal_1d": 4.53,
+        "abnormal_5d": 9.99,
+        "abnormal_10d": 17.9
+      },
+      {
+        "symbol": "BRT",
+        "date": "2024-03-21",
+        "abnormal_1d": 1.17,
+        "abnormal_5d": 0.71,
+        "abnormal_10d": 3.75
+      },
+      {
+        "symbol": "SOWG",
+        "date": "2024-03-28",
+        "abnormal_1d": 4.5,
+        "abnormal_5d": 81.04,
+        "abnormal_10d": 107.46
+      },
+      {
+        "symbol": "PGY",
+        "date": "2024-04-04",
+        "abnormal_1d": 2.69,
+        "abnormal_5d": 8.97,
+        "abnormal_10d": 5.2
+      },
+      {
+        "symbol": "TKO",
+        "date": "2024-04-09",
+        "abnormal_1d": 1.13,
+        "abnormal_5d": 4.1,
+        "abnormal_10d": 2.83
+      },
+      {
+        "symbol": "CRMT",
+        "date": "2024-04-11",
+        "abnormal_1d": -3.1,
+        "abnormal_5d": -4.29,
+        "abnormal_10d": -1.65
+      },
+      {
+        "symbol": "ULS",
+        "date": "2024-04-16",
+        "abnormal_1d": 0.65,
+        "abnormal_5d": -2.12,
+        "abnormal_10d": -0.38
+      },
+      {
+        "symbol": "SNDA",
+        "date": "2024-04-18",
+        "abnormal_1d": 3.85,
+        "abnormal_5d": 11.21,
+        "abnormal_10d": 13.1
+      },
+      {
+        "symbol": "INMB",
+        "date": "2024-04-19",
+        "abnormal_1d": -3.58,
+        "abnormal_5d": 22.95,
+        "abnormal_10d": 25.95
+      },
+      {
+        "symbol": "BHVN",
+        "date": "2024-04-22",
+        "abnormal_1d": -4.37,
+        "abnormal_5d": -4.48,
+        "abnormal_10d": -0.76
+      },
+      {
+        "symbol": "CTRI",
+        "date": "2024-04-22",
+        "abnormal_1d": 0.08,
+        "abnormal_5d": 1.51,
+        "abnormal_10d": -3.51
+      },
+      {
+        "symbol": "HXL",
+        "date": "2024-04-26",
+        "abnormal_1d": -0.8,
+        "abnormal_5d": 5.88,
+        "abnormal_10d": 11.33
+      },
+      {
+        "symbol": "HTLD",
+        "date": "2024-05-03",
+        "abnormal_1d": -1.05,
+        "abnormal_5d": 2.66,
+        "abnormal_10d": 2.58
+      },
+      {
+        "symbol": "MAC",
+        "date": "2024-05-08",
+        "abnormal_1d": 4.78,
+        "abnormal_5d": 7.96,
+        "abnormal_10d": 1.83
+      },
+      {
+        "symbol": "SABR",
+        "date": "2024-05-08",
+        "abnormal_1d": -1.13,
+        "abnormal_5d": 15.29,
+        "abnormal_10d": 10.36
+      },
+      {
+        "symbol": "TMCI",
+        "date": "2024-05-10",
+        "abnormal_1d": -1.03,
+        "abnormal_5d": 25.74,
+        "abnormal_10d": 12.91
+      },
+      {
+        "symbol": "PAL",
+        "date": "2024-05-13",
+        "abnormal_1d": -1.45,
+        "abnormal_5d": -4.73,
+        "abnormal_10d": -3.42
+      },
+      {
+        "symbol": "BCRX",
+        "date": "2024-05-13",
+        "abnormal_1d": 2.91,
+        "abnormal_5d": 13.16,
+        "abnormal_10d": 10.42
+      },
+      {
+        "symbol": "OUST",
+        "date": "2024-05-15",
+        "abnormal_1d": -2.06,
+        "abnormal_5d": -0.07,
+        "abnormal_10d": -0.62
+      },
+      {
+        "symbol": "LUXH",
+        "date": "2024-05-23",
+        "abnormal_1d": 12.21,
+        "abnormal_5d": 18.1,
+        "abnormal_10d": -4.58
+      },
+      {
+        "symbol": "SUN",
+        "date": "2024-05-24",
+        "abnormal_1d": -0.84,
+        "abnormal_5d": 1.59,
+        "abnormal_10d": 5.4
+      },
+      {
+        "symbol": "BOW",
+        "date": "2024-05-28",
+        "abnormal_1d": 2.37,
+        "abnormal_5d": 3.37,
+        "abnormal_10d": 1.07
+      },
+      {
+        "symbol": "CMTG",
+        "date": "2024-05-28",
+        "abnormal_1d": -5.03,
+        "abnormal_5d": 12.49,
+        "abnormal_10d": 10.3
+      },
+      {
+        "symbol": "GL",
+        "date": "2024-05-28",
+        "abnormal_1d": 3.15,
+        "abnormal_5d": 1.71,
+        "abnormal_10d": -0.84
+      },
+      {
+        "symbol": "ALTI",
+        "date": "2024-06-04",
+        "abnormal_1d": -4.77,
+        "abnormal_5d": -3.51,
+        "abnormal_10d": -2.24
+      },
+      {
+        "symbol": "RGEN",
+        "date": "2024-06-14",
+        "abnormal_1d": 0.08,
+        "abnormal_5d": -0.81,
+        "abnormal_10d": -0.16
+      },
+      {
+        "symbol": "SPMC",
+        "date": "2024-06-17",
+        "abnormal_1d": 0.08,
+        "abnormal_5d": -0.18,
+        "abnormal_10d": -0.05
+      },
+      {
+        "symbol": "ATLN",
+        "date": "2024-06-18",
+        "abnormal_1d": -0.25,
+        "abnormal_5d": 147.97,
+        "abnormal_10d": 153.14
+      },
+      {
+        "symbol": "TBN",
+        "date": "2024-06-28",
+        "abnormal_1d": 2.2,
+        "abnormal_5d": 6.54,
+        "abnormal_10d": 6.33
+      },
+      {
+        "symbol": "PFBX",
+        "date": "2024-07-01",
+        "abnormal_1d": -0.21,
+        "abnormal_5d": -0.74,
+        "abnormal_10d": 1.53
+      },
+      {
+        "symbol": "DOUG",
+        "date": "2024-07-08",
+        "abnormal_1d": 7.5,
+        "abnormal_5d": 18.08,
+        "abnormal_10d": 27.68
+      },
+      {
+        "symbol": "SSKN",
+        "date": "2024-07-15",
+        "abnormal_1d": -1.53,
+        "abnormal_5d": 16.11,
+        "abnormal_10d": 7.81
+      },
+      {
+        "symbol": "COFS",
+        "date": "2024-07-25",
+        "abnormal_1d": -8.13,
+        "abnormal_5d": -3.56,
+        "abnormal_10d": -0.97
+      },
+      {
+        "symbol": "LINE",
+        "date": "2024-07-26",
+        "abnormal_1d": 2.27,
+        "abnormal_5d": 6.63,
+        "abnormal_10d": 11.93
+      },
+      {
+        "symbol": "MGM",
+        "date": "2024-08-05",
+        "abnormal_1d": 3.74,
+        "abnormal_5d": 9.87,
+        "abnormal_10d": 11.1
+      },
+      {
+        "symbol": "GT",
+        "date": "2024-08-09",
+        "abnormal_1d": -2.97,
+        "abnormal_5d": 2.74,
+        "abnormal_10d": 2.65
+      },
+      {
+        "symbol": "POCI",
+        "date": "2024-08-15",
+        "abnormal_1d": -2.66,
+        "abnormal_5d": -4.24,
+        "abnormal_10d": -3.43
+      },
+      {
+        "symbol": "GBDC",
+        "date": "2024-08-16",
+        "abnormal_1d": 0.69,
+        "abnormal_5d": 3.02,
+        "abnormal_10d": 3.14
+      },
+      {
+        "symbol": "ET",
+        "date": "2024-08-23",
+        "abnormal_1d": -0.22,
+        "abnormal_5d": -0.73,
+        "abnormal_10d": 2.09
+      },
+      {
+        "symbol": "INBX",
+        "date": "2024-08-28",
+        "abnormal_1d": -1.18,
+        "abnormal_5d": 14.77,
+        "abnormal_10d": 6.83
+      },
+      {
+        "symbol": "LESL",
+        "date": "2024-08-29",
+        "abnormal_1d": 2.03,
+        "abnormal_5d": 34.21,
+        "abnormal_10d": 21.08
+      },
+      {
+        "symbol": "MTDR",
+        "date": "2024-09-06",
+        "abnormal_1d": 0.16,
+        "abnormal_5d": -5.19,
+        "abnormal_10d": -2.41
+      },
+      {
+        "symbol": "RLMD",
+        "date": "2024-09-09",
+        "abnormal_1d": 7.86,
+        "abnormal_5d": 16.7,
+        "abnormal_10d": 31.62
+      },
+      {
+        "symbol": "PENN",
+        "date": "2024-09-10",
+        "abnormal_1d": -2.79,
+        "abnormal_5d": 9.21,
+        "abnormal_10d": 4.78
+      },
+      {
+        "symbol": "AMLX",
+        "date": "2024-09-12",
+        "abnormal_1d": -3.58,
+        "abnormal_5d": 11.24,
+        "abnormal_10d": 18.74
+      },
+      {
+        "symbol": "HCWC",
+        "date": "2024-09-17",
+        "abnormal_1d": -22.43,
+        "abnormal_5d": -52.64,
+        "abnormal_10d": -55.8
+      },
+      {
+        "symbol": "AHH",
+        "date": "2024-09-26",
+        "abnormal_1d": -1.91,
+        "abnormal_5d": -1.1,
+        "abnormal_10d": -2.86
+      },
+      {
+        "symbol": "VRDN",
+        "date": "2024-09-27",
+        "abnormal_1d": 0.27,
+        "abnormal_5d": 3.27,
+        "abnormal_10d": -6.25
+      },
+      {
+        "symbol": "MOFG",
+        "date": "2024-09-30",
+        "abnormal_1d": 3.44,
+        "abnormal_5d": -0.53,
+        "abnormal_10d": 1.58
+      },
+      {
+        "symbol": "BHVN",
+        "date": "2024-10-02",
+        "abnormal_1d": 0.12,
+        "abnormal_5d": 10.97,
+        "abnormal_10d": 3.88
+      },
+      {
+        "symbol": "RMCF",
+        "date": "2024-10-22",
+        "abnormal_1d": 1.73,
+        "abnormal_5d": 35.78,
+        "abnormal_10d": 11.19
+      },
+      {
+        "symbol": "UMAC",
+        "date": "2024-10-30",
+        "abnormal_1d": 6.04,
+        "abnormal_5d": 25.71,
+        "abnormal_10d": 77.02
+      },
+      {
+        "symbol": "CALC",
+        "date": "2024-11-01",
+        "abnormal_1d": -6.82,
+        "abnormal_5d": -11.41,
+        "abnormal_10d": -14.48
+      },
+      {
+        "symbol": "AIN",
+        "date": "2024-11-05",
+        "abnormal_1d": 3.72,
+        "abnormal_5d": 13.99,
+        "abnormal_10d": 13.82
+      },
+      {
+        "symbol": "SNDA",
+        "date": "2024-11-15",
+        "abnormal_1d": -4.41,
+        "abnormal_5d": 7.12,
+        "abnormal_10d": 12.45
+      },
+      {
+        "symbol": "WSC",
+        "date": "2024-11-15",
+        "abnormal_1d": -1.36,
+        "abnormal_5d": 0.29,
+        "abnormal_10d": 6.72
+      },
+      {
+        "symbol": "ZETA",
+        "date": "2024-11-18",
+        "abnormal_1d": 4.86,
+        "abnormal_5d": 18.66,
+        "abnormal_10d": 26.03
+      },
+      {
+        "symbol": "BH",
+        "date": "2024-11-20",
+        "abnormal_1d": 0.26,
+        "abnormal_5d": -3.25,
+        "abnormal_10d": 3.81
+      },
+      {
+        "symbol": "IMNM",
+        "date": "2024-11-21",
+        "abnormal_1d": -0.64,
+        "abnormal_5d": 41.43,
+        "abnormal_10d": 31.94
+      },
+      {
+        "symbol": "MBIN",
+        "date": "2024-11-21",
+        "abnormal_1d": 3.15,
+        "abnormal_5d": 7.37,
+        "abnormal_10d": 1.7
+      },
+      {
+        "symbol": "CTGO",
+        "date": "2024-12-10",
+        "abnormal_1d": 0.89,
+        "abnormal_5d": -4.02,
+        "abnormal_10d": -12.85
+      },
+      {
+        "symbol": "DMLP",
+        "date": "2024-12-11",
+        "abnormal_1d": 0.07,
+        "abnormal_5d": -0.11,
+        "abnormal_10d": -0.3
+      },
+      {
+        "symbol": "TKO",
+        "date": "2024-12-11",
+        "abnormal_1d": -1.16,
+        "abnormal_5d": 3.54,
+        "abnormal_10d": 2.01
+      },
+      {
+        "symbol": "AVDL",
+        "date": "2024-12-11",
+        "abnormal_1d": -5.31,
+        "abnormal_5d": -0.99,
+        "abnormal_10d": -5.45
+      },
+      {
+        "symbol": "FISI",
+        "date": "2024-12-13",
+        "abnormal_1d": 1.92,
+        "abnormal_5d": -2.88,
+        "abnormal_10d": -3.42
+      },
+      {
+        "symbol": "MDRR",
+        "date": "2024-12-13",
+        "abnormal_1d": 1.02,
+        "abnormal_5d": 16.06,
+        "abnormal_10d": 10.02
+      },
+      {
+        "symbol": "PLAY",
+        "date": "2024-12-13",
+        "abnormal_1d": 4.43,
+        "abnormal_5d": 2.56,
+        "abnormal_10d": 11.93
+      },
+      {
+        "symbol": "MMS",
+        "date": "2024-12-17",
+        "abnormal_1d": -0.35,
+        "abnormal_5d": 4.61,
+        "abnormal_10d": 8.61
+      },
+      {
+        "symbol": "ONEW",
+        "date": "2024-12-19",
+        "abnormal_1d": -5.46,
+        "abnormal_5d": -7.58,
+        "abnormal_10d": -13.87
+      },
+      {
+        "symbol": "QNRX",
+        "date": "2024-12-23",
+        "abnormal_1d": -5.84,
+        "abnormal_5d": 27.05,
+        "abnormal_10d": 20.24
+      }
+    ],
+    "sample_size": 438,
+    "consistency_pct": 64.0,
+    "out_of_sample_split": {
+      "discovery_period": "2020-2021",
+      "validation_period": "2022-2024",
+      "validation_indices": [
+        138,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        179,
+        180,
+        181,
+        182,
+        183,
+        184,
+        185,
+        186,
+        187,
+        188,
+        189,
+        190,
+        191,
+        192,
+        193,
+        194,
+        195,
+        196,
+        197,
+        198,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209,
+        210,
+        211,
+        212,
+        213,
+        214,
+        215,
+        216,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259,
+        260,
+        261,
+        262,
+        263,
+        264,
+        265,
+        266,
+        267,
+        268,
+        269,
+        270,
+        271,
+        272,
+        273,
+        274,
+        275,
+        276,
+        277,
+        278,
+        279,
+        280,
+        281,
+        282,
+        283,
+        284,
+        285,
+        286,
+        287,
+        288,
+        289,
+        290,
+        291,
+        292,
+        293,
+        294,
+        295,
+        296,
+        297,
+        298,
+        299,
+        300,
+        301,
+        302,
+        303,
+        304,
+        305,
+        306,
+        307,
+        308,
+        309,
+        310,
+        311,
+        312,
+        313,
+        314,
+        315,
+        316,
+        317,
+        318,
+        319,
+        320,
+        321,
+        322,
+        323,
+        324,
+        325,
+        326,
+        327,
+        328,
+        329,
+        330,
+        331,
+        332,
+        333,
+        334,
+        335,
+        336,
+        337,
+        338,
+        339,
+        340,
+        341,
+        342,
+        343,
+        344,
+        345,
+        346,
+        347,
+        348,
+        349,
+        350,
+        351,
+        352,
+        353,
+        354,
+        355,
+        356,
+        357,
+        358,
+        359,
+        360,
+        361,
+        362,
+        363,
+        364,
+        365,
+        366,
+        367,
+        368,
+        369,
+        370,
+        371,
+        372,
+        373,
+        374,
+        375,
+        376,
+        377,
+        378,
+        379,
+        380,
+        381,
+        382,
+        383,
+        384,
+        385,
+        386,
+        387,
+        388,
+        389,
+        390,
+        391,
+        392,
+        393,
+        394,
+        395,
+        396,
+        397,
+        398,
+        399,
+        400,
+        401,
+        402,
+        403,
+        404,
+        405,
+        406,
+        407,
+        408,
+        409,
+        410,
+        411,
+        412,
+        413,
+        414,
+        415,
+        416,
+        417,
+        418,
+        419,
+        420,
+        421,
+        422,
+        423,
+        424,
+        425,
+        426,
+        427,
+        428,
+        429,
+        430,
+        431,
+        432,
+        433,
+        434,
+        435,
+        436,
+        437
+      ],
+      "validation_consistency_pct": 69.0
+    },
+    "confounders": {
+      "broad_market_direction": "SPY benchmark subtracted throughout \u2014 raw market direction controlled. Signal persists in both bull (2021) and bear (2022) markets.",
+      "vix_level": "Calm VIX<20: +7.51% 5d abnormal (n=238). Elevated VIX 20-30: +4.94% (n=135). Both exceed minimum threshold. Apply VIX gate: trade only when VIX < 30.",
+      "sector_trend": "No sector ETF benchmark used \u2014 sector trend not explicitly controlled. CEO/CFO filter naturally excludes lockup-expiry mass filings that contaminated n>=10 cluster analysis. Sector concentration not tested.",
+      "survivorship_bias": "4.8% event drop rate (well within 30% threshold). 39.5% of clusters lack RPTOWNER_TITLE in EDGAR bulk data and default to non-CEO/CFO, narrowing the measured gap. True CEO/CFO advantage likely larger than observed.",
+      "selection_bias": "Sample is all qualifying EDGAR Form 4 clusters \u2014 no outcome selection. Section 16 reporting requirement excludes sub-10% non-officer/director holders. Market cap >= $500M applied for live trading. Potential sector concentration untested.",
+      "event_timing": "Entry at next-day open (entry_price='open') used throughout. Form 4s appear 1-2 business days after trade date. Cluster detection date = filing date when threshold was first crossed. Actual trade dates 1-5 days earlier.",
+      "market_regime": "Tested 2020-2024 across COVID recovery, bull run, bear market, normalization. Validation period 2022-2024 shows STRONGER signal (+7.68%) than discovery 2020-2021 (+5.54%), suggesting a fundamentally-driven signal not regime-dependent."
+    },
+    "market_regime_note": "Tested across 5 years including bear and bull markets. VIX gate: trade when VIX < 30. Prefer calm VIX (<20) for highest EV.",
+    "regime_note": null,
+    "confidence": 7,
+    "literature_reference": "Cohen, Malloy & Pomorski (2012) 'Decoding Inside Information', Journal of Finance 67(5). CEO/CFO purchases 12x more predictive than other insiders.",
+    "survivorship_bias_note": "4.8% event drop rate within acceptable threshold. Main bias: 39.5% of clusters lack RPTOWNER_TITLE in EDGAR bulk data, defaulting to non-CEO/CFO \u2014 this narrows the measured differential, meaning true advantage is likely larger than observed.",
+    "selection_bias_note": "All qualifying EDGAR Form 4 clusters \u2014 no outcome selection. Section 16 excludes sub-10% non-officer holders. Market cap >= $500M for live trading. Possible sector concentration bias not tested.",
+    "passes_multiple_testing": true,
+    "multiple_testing_warning": null,
+    "confounder_warnings": null,
+    "symbol_warnings": [
+      "Symbol is TBD \u2014 must be resolved to a real ticker before activation."
+    ],
+    "dead_end_warnings": null,
+    "trade": null,
+    "result": null
   }
 ]
