@@ -511,6 +511,27 @@
       "hypothesis_id": "5dbcfb37",
       "status": "borderline_unverified_window_closed",
       "last_updated": "2026-03-22T06:06:22.003166"
+    },
+    "insider_buying_cluster_n6_9": {
+      "event": "BLCO Bausch & Lomb n=9 cluster 2026-03-10",
+      "ticker": "BLCO",
+      "n_insiders": 9,
+      "filed": "2026-03-10",
+      "trade_date": "2026-03-06",
+      "entry_date": "2026-03-11",
+      "entry_price": 17.28,
+      "exit_3d": 16.2,
+      "exit_5d": 16.71,
+      "raw_3d": -6.25,
+      "abnormal_3d": -4.17,
+      "raw_5d": -3.3,
+      "abnormal_5d": -2.48,
+      "vix_regime": "elevated",
+      "direction": "negative",
+      "note": "MISSED TRADE (window closed before detection). NEGATIVE outcome for 416556df. n=9 insiders bought but stock fell -4.17% abnormal at 3d under elevated VIX. Market was broadly falling (SPY -2.08% same period). BLCO is ex-IPO from Bausch Health, at  near post-IPO lows. Does not invalidate hypothesis (backtest N=179 for 2023-2025 showing avg +4.53%) but adds one negative data point. Elevated VIX regime is already flagged as higher risk.",
+      "hypothesis_id": "416556df",
+      "status": "missed_window_negative_outcome",
+      "last_updated": "2026-03-22T06:08:01.389373"
     }
   },
   "dead_ends": [
