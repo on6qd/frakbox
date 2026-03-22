@@ -437,9 +437,11 @@
       "category": "new_signal",
       "question": "VWAP breakout momentum: does expanding to 100+ stock universe and filtering for calm VIX regime validate a hypothesis-quality signal? Test thresholds 20% and 25% above VWAP. Net return after costs needs to clear 1% minimum.",
       "priority": 3,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Discovered as opposite of tested disposition effect. 489 events over 20 stocks shows +0.64-1.19% abnormal returns, all horizons, OOS confirmed. High-volume variant is strongest. But economic edge after costs is thin (~0.42-0.82% net). Need larger universe, tighter threshold, and regime filter before a hypothesis can be formed. Tools exist: tools/vwap_deviation_signal.py",
-      "added": "2026-03-21T21:33:45.176032"
+      "added": "2026-03-21T21:33:45.176032",
+      "completed": "2026-03-22T10:30:05.029408",
+      "findings": "DEAD END. 100-stock universe test (N=14,412) ran in prior session and confirmed no signal. The small-universe finding (+0.64-1.19%) was noise that did not replicate. Calm VIX filter made results WORSE. Details in knowledge_base.json vwap_breakout_momentum and vwap_momentum_breakout entries. No hypothesis formable. See steer.md for full 4-approach test summary."
     },
     {
       "id": "de9e7aaf",
@@ -512,6 +514,26 @@
       "added": "2026-03-21T21:14:05.919073",
       "completed": "2026-03-22T03:56:37.687675",
       "findings": "VWAP_252 breakout (Close/VWAP >= 1.15) fails minimum thresholds. Best return = +1.19% at 20d, below min_abnormal_return_pct=1.5%. Net return after 0.10% costs = +1.09% at best, failing min_net_return=1.0% at shorter horizons. Dead end recorded. The signal direction is correct (momentum, not mean-reversion) but magnitude is too small."
+    },
+    {
+      "id": "lockup_expiration_ded",
+      "category": "ipo_lockup_expiration",
+      "question": "IPO lockup expiration SHORT signal tested and dead-ended.",
+      "priority": 99,
+      "status": "completed",
+      "reasoning": "High-profile IPO lockup expirations show inconsistent direction and high variance.",
+      "added": "2026-03-22T10:30:51.444767",
+      "completed": "2026-03-22T10:30:51.444771",
+      "findings": "DEAD END. N=13 high-profile IPOs (LYFT/UBER/ABNB/DASH/SNOW/PLTR/U/COIN/RIVN/HOOD/BROS/PINS/ZM): 3d avg=-1.87% pos_rate=46.2% p=0.385. RIVN (-23.93%) is extreme outlier (EV sector May 2022 crash). Without RIVN: avg_3d=-0.66%. Direction inconsistent. Recorded in knowledge_base as ipo_lockup_expiration_short dead end."
+    },
+    {
+      "id": "a7bc4d12",
+      "category": "insider_buying_cluster",
+      "question": "Test whether CEO being one of the cluster buyers amplifies the insider cluster signal. Filter existing cluster dataset (cluster_with_returns.csv) to keep only clusters where CEO is one of the buyers. Compare CEO-inclusive cluster returns vs non-CEO cluster returns. Literature: Cohen et al (2012) found CEO/CFO purchases are 12x more predictive than other insiders.",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "Cohen et al (2012) JF: Decoding Inside Information found CEO/CFO purchases are the most predictive class of insider trades. If CEO presence strongly amplifies the signal, this could be a filtering criterion that boosts signal-to-noise. Data may exist in cluster_with_returns.csv or can be built from EDGAR bulk data.",
+      "added": "2026-03-22T10:30:51.444772"
     }
   ],
   "event_watchlist": [
@@ -653,36 +675,45 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. GO trade: verify execution at Monday March 23 open (hypothesis 1cb6140f). Close at 3d hold = March 26 open. Run close_go_trade.py after 3 trading days.",
-      "set_by_session": "2026-03-22T10:02:28.847744"
+      "task": "1. Monday: Verify GO trade executed at Alpaca open (9:30 ET). Check Alpaca paper account.",
+      "set_by_session": "2026-03-22T10:31:20.899352"
     },
     {
-      "task": "2. RCKT PDUFA March 28: DISQUALIFIED (multi-pipeline). Do NOT trade even if CRL issued. Remove from watch.",
-      "set_by_session": "2026-03-22T10:02:28.847747"
+      "task": "2. Investigate CEO-inclusive insider cluster hypothesis (task a7bc4d12): does CEO being one of the buyers significantly amplify the 3d abnormal return? Use EDGAR bulk Form 4 data to tag which clusters had CEO buyers. Compare CEO vs non-CEO cluster returns.",
+      "set_by_session": "2026-03-22T10:31:20.899359"
     },
     {
-      "task": "3. WD (76678219): VIX gate blocks entry at VIX=26.78. Wait for VIX to drop below 25, then re-evaluate. If VIX<25 on Monday morning before market open, can restore trigger.",
-      "set_by_session": "2026-03-22T10:02:28.847748"
+      "task": "3. Thursday March 26: Close GO trade (3d hold). Run python tools/close_go_trade.py",
+      "set_by_session": "2026-03-22T10:31:20.899360"
     },
     {
-      "task": "4. AMRZ (1f3ac0ec): Entry window expires March 23. VIX gate blocks entry. AMRZ hypothesis remains for any future AMRZ clusters that appear when VIX<25.",
-      "set_by_session": "2026-03-22T10:02:28.847749"
+      "task": "4. April 10: REPL PDUFA monitoring. Multi-pipeline = likely not tradeable for d302c84b.",
+      "set_by_session": "2026-03-22T10:31:20.899360"
     },
     {
-      "task": "5. New signal investigation: Consider testing dividend initiation/increase announcements via EDGAR 8-K Item 8.01. Literature: 3-5% abnormal return on initiation (signals financial confidence). Can be sourced from free EDGAR 8-K search.",
-      "set_by_session": "2026-03-22T10:02:28.847749"
+      "task": "5. June 5: S&P 500 Q2 2026 rebalance announcement. Check sp500_announcement_scanner.py results.",
+      "set_by_session": "2026-03-22T10:31:20.899361"
     },
     {
-      "task": "6. Clinical failure signal: scan EDGAR weekly for new qualifying events. Current qualifying pipeline: none active. Next PDUFA to watch: check for Q2 2026 PDUFA dates for single-pipeline small biotechs.",
-      "set_by_session": "2026-03-22T10:02:28.847750"
+      "task": "6. Consider testing dividend initiation signal (first-ever dividend payment) - measurable from EDGAR 8-K, has academic support (Michaely et al 1995: +3-4%), and different from buybacks.",
+      "set_by_session": "2026-03-22T10:31:20.899362"
     }
   ],
   "session_handoff": {
-    "investigation": "SEO bought-deal scanner built and initial dataset ready (258 events 2022-2024). Insider clusters: SSP disqualified (small cap), BLCO window closed, POOL pending n count verification.",
-    "intermediate_findings": "EDGAR form.idx requires regex parsing (not pipe-split or fixed-offset). Regex pattern: r\"^(\\S+)\\s+(.*?)\\s{2,}(\\d+)\\s+(\\d{4}-\\d{2}-\\d{2})\\s+(edgar/\\S+)\". Of 258 candidates: 62% same-day gap, 17% 1-day. Next gate: ticker resolution + market-cap filter + backtest.",
-    "blocked_by": "Ticker resolution requires ~258 EDGAR API calls (0.15s each = ~40s). No blockers, just time. Run with --resolve-tickers --filter-market-cap.",
-    "next_step": "python tools/seo_bought_deal_scanner.py --years 2022 2023 2024 --resolve-tickers --filter-market-cap > data/seo_bought_deals_qualified.txt, then load JSON, extract (ticker, date) pairs, run measure_event_impact with entry_price=open, benchmark=SPY.",
-    "written_at": "2026-03-22T08:19:14.515931"
+    "current_state": "GO trade scheduled for Monday March 23 open. EDGAR Form 4 verification added to cluster_auto_scanner.py to prevent OpenInsider RSU inflation (POOL/WD false positive fix).",
+    "active_hypotheses": {
+      "GO (1cb6140f)": "3d hold, triggers Monday March 23. 6 confirmed EDGAR open-market buyers including CEO Lindberg.",
+      "d302c84b": "Clinical efficacy failure short - waiting for next qualifying event. RCKT (April 10 PDUFA) pre-disqualified (multi-pipeline).",
+      "061ae3a8": "S&P 500 addition - June 5 is next opportunity."
+    },
+    "key_finding_this_session": "EDGAR Form 4 verification reveals WD had only 2 confirmed open-market buyers (not 3 as OpenInsider reported). WD trigger was correctly removed. Scanner now auto-verifies via EDGAR for all future clusters.",
+    "dead_ends_this_session": [
+      "ipo_lockup_expiration_short: N=13, p=0.385, direction inconsistent",
+      "reverse_stock_split_short: N=10, p=0.572, meme stock dynamics prevent signal",
+      "vwap_momentum_breakout: confirmed dead end from prior session (N=14,412)"
+    ],
+    "next_trade_opportunity": "GO closes March 26. Next cluster scan: cluster_auto_scanner runs nightly at 9:15 PM ET. CEO cluster filter (task a7bc4d12) would be a signal improvement if Cohen et al 2012 finding replicates.",
+    "written_at": "2026-03-22T10:31:20.899366"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
