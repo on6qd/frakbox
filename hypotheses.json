@@ -4224,7 +4224,8 @@
     ],
     "dead_end_warnings": null,
     "trade": null,
-    "result": null
+    "result": null,
+    "notes": " [SUPERSEDED by 9f8a4c61: more comprehensive backtest (N=132 disc, N=178 val), confidence=7 vs 4, 3d hold preferred over 5d based on skewness analysis]"
   },
   {
     "id": "9f8a4c61",

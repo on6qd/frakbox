@@ -151,6 +151,15 @@
       "added": "2026-03-22T01:53:37.216707"
     },
     {
+      "id": "7b8afceb",
+      "category": "insider_buying_cluster",
+      "question": "Record GO and WD trade outcomes when they close. GO: entered Monday March 23, exits Thursday March 26 close (3d hold). WD: entered Monday March 23, exits Monday-Tuesday March 28-29 (5d hold). Record P&L in hypotheses 1cb6140f and 76678219. Also note: GO is n=6 which counts as a live test for hypothesis 9f8a4c61 even though it was entered under 1cb6140f.",
+      "priority": 1,
+      "status": "pending",
+      "reasoning": "Critical for learning: these are the first live paper trades. Even though WD (n=3, elevated VIX 26.78) is below the current regime threshold, GO (n=6, elevated VIX) is directly within the n=6-9 hypothesis. Recording outcomes tests predictions.",
+      "added": "2026-03-22T03:58:03.832693"
+    },
+    {
       "id": "seed-002",
       "category": "index_rebalancing",
       "question": "When a stock is announced for S&P 500 addition, what is the abnormal return between announcement and effective date, and does it reverse after inclusion? How does this compare to Russell 2000 rebalancing?",
@@ -343,6 +352,15 @@
       "status": "pending",
       "reasoning": "n=6-9 tier is regime-robust (works in elevated VIX, p=0.002). n>=10 is noise. A formal hypothesis would allow GO/WD-like trades specifically when VIX is elevated AND n=6-9, which current hypotheses don't cleanly cover.",
       "added": "2026-03-22T03:24:10.678857"
+    },
+    {
+      "id": "47f09fd5",
+      "category": "insider_buying_cluster",
+      "question": "Find next n=6-9 insider cluster trade opportunity. After GO closes (March 26, 3d hold), scan OpenInsider for any 6-9 insider clusters filed in last 7 days. If found: (1) verify market cap >500M, (2) check VIX regime -- n=6-9 is tradeable in ANY VIX regime, (3) verify no concurrent news, (4) set trigger on hypothesis 9f8a4c61 with expected_symbol updated to ticker. Next scan should detect this automatically via cluster_auto_scanner.py (runs daily at 9:15 PM ET).",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "Hypothesis 9f8a4c61 (n=6-9, 3d hold) is pre-registered and ready to trade. GO is already a live test under 1cb6140f. The next qualifying n=6-9 cluster should be entered under 9f8a4c61 to validate this more specific hypothesis.",
+      "added": "2026-03-22T03:58:03.831790"
     },
     {
       "id": "seed-003",
@@ -544,20 +562,39 @@
   ],
   "next_session_priorities": [
     {
-      "task": "Activate n=6-9 hypothesis (id=7b5d0120): find fresh n=6-9 cluster from openinsider_scraper, resolve TBD symbol, set trigger",
-      "set_by_session": "2026-03-22T03:51:08.861166"
+      "task": {
+        "task": "1. CRITICAL: Check GO and WD trade outcomes. GO exit March 26 (3d). WD exit March 27-28 (5d). Record actual P&L in hypotheses 1cb6140f (GO) and 76678219 (WD). Use research.complete_hypothesis() after closing. GO is also a live test of n=6-9 hypothesis (9f8a4c61).",
+        "set_by_session": "2026-03-22"
+      },
+      "set_by_session": "2026-03-22T03:58:20.256958"
     },
     {
-      "task": "Check cluster_auto_scanner output for any recent n=6-9 clusters to deploy",
-      "set_by_session": "2026-03-22T03:51:08.861171"
+      "task": {
+        "task": "2. Run cluster_auto_scanner.py after GO/WD close to check for fresh n=6-9 clusters. VIX was 26.78 last check (Tier 3) -- n=6-9 ONLY. If VIX drops to <20, ALSO trade n=3-5. Scanner runs automatically at 9:15PM ET daily.",
+        "set_by_session": "2026-03-22"
+      },
+      "set_by_session": "2026-03-22T03:58:20.256963"
     },
     {
-      "task": "Consider sector-adjusted analysis for n=6-9 to address the sector_trend confounder",
-      "set_by_session": "2026-03-22T03:51:08.861172"
+      "task": {
+        "task": "3. DNLI PDUFA April 5, 2026. Verify: (a) Is DNLI single-pipeline? Check SEC filings for pipeline summary. Current price .17, mkt cap .2B. If multi-pipeline or too large, skip. The CRL short hypothesis requires single-pipeline small biotech. REPL (M, also has PDUFA near April) is closer to target size.",
+        "set_by_session": "2026-03-22"
+      },
+      "set_by_session": "2026-03-22T03:58:20.256964"
     },
     {
-      "task": "Run VIX-filtered backtest: measure n=6-9 in calm VIX only vs full population to quantify regime sensitivity",
-      "set_by_session": "2026-03-22T03:51:08.861173"
+      "task": {
+        "task": "4. Consider CEO departure signal research (hypothesis 5dbcfb37, TBD symbol). Watch for forced CEO departures via edgar_ceo_departure_scanner.py. Last session showed signal is validated but high false-positive rate for scanner. Consider using news search instead of EDGAR scanner.",
+        "set_by_session": "2026-03-22"
+      },
+      "set_by_session": "2026-03-22T03:58:20.256965"
+    },
+    {
+      "task": {
+        "task": "5. Methodology review: The discovery set for n=6-9 had 39% failure rate (above 30% threshold). Consider whether to add a data quality gate warning in the hypothesis. Also: validate that 9f8a4c61 OOS split with only 2 validation_indices passes the minimum-3 check.",
+        "set_by_session": "2026-03-22"
+      },
+      "set_by_session": "2026-03-22T03:58:20.256966"
     }
   ],
   "session_handoff": {
