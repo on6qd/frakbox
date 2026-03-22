@@ -541,40 +541,14 @@
       "last_updated": "2026-03-22T06:38:45.426701"
     },
     "insider_buying_cluster_ceo_cfo": {
-      "finding": "Full-population CEO/CFO analysis with 98.3% data coverage (N=1566 events, 2021-2025)",
-      "previous_coverage": "18.5% (290 events matched via flawed join)",
-      "new_coverage": "98.3% (1539 matched from bulk EDGAR Form 4 data)",
-      "overall": {
-        "ceo_cfo_clusters_n": 545,
-        "avg_5d_abnormal": "+3.31%",
-        "pos_rate": "53.8%",
-        "p_value": "<0.0001",
-        "non_ceo_cfo_n": 1021,
-        "non_ceo_cfo_avg": "+2.05%",
-        "differential_p": "0.092 (not significant overall)"
-      },
-      "by_year": {
-        "2021": "CEO/CFO -0.51%, Non -0.51% (both flat - SPAC/noise era)",
-        "2022": "CEO/CFO -0.03%, Non -0.56% (both flat - bear market)",
-        "2023": "CEO/CFO +4.50% p=0.001, Non +3.13% p=0.001",
-        "2024": "CEO/CFO +7.98% p=0.020, Non +5.52% p<0.001",
-        "2025": "CEO/CFO +5.46% p=0.001, Non +3.09% p<0.001"
-      },
-      "by_vix": {
-        "calm_vix_lt20": "CEO/CFO +4.62% (n=340), Non +2.61% (n=631)",
-        "moderate_vix_20_25": "CEO/CFO +1.41% p=0.21 (n=116), Non +1.40% p=0.05 (n=244)",
-        "elevated_vix_25_30": "CEO/CFO -0.00% p=1.00 (n=55), Non +0.54% p=0.57 (n=86)"
-      },
-      "current_regime_2023plus": {
-        "ceo_cfo": "+5.90% n=316 p<0.001",
-        "non_ceo_cfo": "+3.88% n=598 p<0.001",
-        "differential": "+2.02% p=0.069 (trending, not significant)",
-        "calm_vix_only": "CEO/CFO +6.42% n=252, Non +3.89% n=484, differential +2.54% p=0.051"
-      },
-      "vix_gate_validated": "Elevated VIX (25-30) shows ZERO signal for both CEO/CFO and non-CEO/CFO groups. VIX gate is correct.",
-      "key_implication": "CEO/CFO distinction adds ~+2% in 2023+ but differential not significant at p<0.05. Both groups show strong signal independently. Use CEO/CFO as a confirmatory filter but not as the sole trade criterion.",
-      "methodology_note": "build_roles_from_bulk.py matches cluster events to EDGAR bulk Form 4 data using 45-day window. Title coverage 40.3% (38.5% NULL = classified as non-CEO/CFO, causing downward bias in has_ceo_cfo rate).",
-      "last_updated": "2026-03-22T12:59:22.130026"
+      "finding": "GO (Grocery Outlet) cluster March 2026 qualifies for 2bbe0f04",
+      "n_insiders": 6,
+      "has_ceo_cfo": true,
+      "ceo_buyer": "Jason J. N. Potter (President and CEO), purchased $1,687,972",
+      "total_value": "$6.3M",
+      "vix_at_time": 26.78,
+      "note": "Could not activate 2bbe0f04 for GO because 1cb6140f already triggered. Operational rule: when a CEO/CFO cluster matches, check if existing hypothesis already covers that stock before activating 2bbe0f04.",
+      "last_updated": "2026-03-22T13:00:41.299726"
     },
     "insider_buying_cluster_regime_change": {
       "summary": "CRITICAL REGIME CHANGE: Insider cluster signal (n>=3) was ABSENT in 2021-2022 and SWITCHED ON in 2023+. Year-by-year means: 2021=-0.51% (p=0.37), 2022=-0.37% (p=0.52), 2023=+3.59% (p<0.001), 2024=+6.33% (p<0.001), 2025=+3.96% (p<0.001). Quarterly data confirms switch happened in 2023Q1.",
