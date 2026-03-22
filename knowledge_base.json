@@ -228,29 +228,13 @@
       "last_updated": "2026-03-21T11:11:28.681628"
     },
     "insider_buying_cluster": {
-      "regime_analysis_date": "2026-03-22",
-      "finding": "Regime analysis on 117 WD hypothesis events (2021-2022): signal is STRONGEST in ELEVATED VIX (20-30) at mean_1d=+2.57% and 63.6% positive rate. CALM regime (VIX<20) is weakest at +0.39% and 46.7% pos rate. CRISIS (VIX>30) intermediate at +1.89% and 47.1% pos rate. Counter-intuitive: elevated VIX may amplify contrarian value of insider signal.",
-      "recommended_filter": "Do NOT add VIX<20 gate -- elevated VIX is historically the BEST regime for this signal. Only consider pausing at true CRISIS (VIX>30).",
-      "current_regime_note": "As of March 22 2026: VIX=26.78 (elevated, not crisis). SPY -1.80% past 5 days. This is the historically strongest regime for insider clusters.",
-      "pool_amrz_note": "POOL and AMRZ both failed (VIX 22-25 range). n=2 misses has p=13.3% chance under 63.6% success rate. Not statistically meaningful as regime breakdown evidence.",
-      "regime_breakdown": {
-        "CALM_lt20": {
-          "n": 45,
-          "mean_1d": 0.39,
-          "pos_rate": 46.7
-        },
-        "ELEVATED_20to30": {
-          "n": 55,
-          "mean_1d": 2.57,
-          "pos_rate": 63.6
-        },
-        "CRISIS_gt30": {
-          "n": 17,
-          "mean_1d": 1.89,
-          "pos_rate": 47.1
-        }
-      },
-      "last_updated": "2026-03-22T01:59:29.960610"
+      "effect": "full_population_regime_analysis_1566_events",
+      "details": "N=1566 insider cluster events (3+ insiders, 2021-2025). Signal performance by VIX regime: Calm VIX<20: mean abnormal 5d=+3.31%, consistency=55.7%, N=971; Elevated VIX 20-30: mean=+1.10%, consistency=49.1%, N=501; Crisis VIX>30: mean=+1.38%, consistency=55.3%, N=94. Bootstrap CIs: calm excludes zero (CI [2.36%, 4.33%]), elevated barely excludes zero (CI [0.17%, 2.14%]). Year breakdown: 2021=-0.51%, 2022=-0.37%, 2023=+3.59%, 2024=+6.33%, 2025=+3.96% -- signal essentially only works in calm VIX environments of 2023-2025. SPY 5d prior trend is NOT a meaningful predictor (r=0.030, p=0.23, no significance in any VIX regime). The 3 recent failures (POOL, AMRZ, BLCO) in elevated VIX are consistent with historical: 49% consistency = near coin flip. VIX 25-30 + SPY<-3% shows negative EV (-3.12%, N=24) but 75% from 2022 bear market.",
+      "implication": "Trade insider clusters ONLY when VIX < 20 for high-confidence EV (+3.31%). VIX 20-25 = marginal positive (EV +1.1-1.5%, barely above 1.0% minimum). VIX 25-30 = near-zero EV (~0.36%), may be below minimum net return threshold. Consider adding VIX < 20 gate to auto-scanner to avoid marginal trades.",
+      "analysis_date": "2026-03-22",
+      "dataset_size": 1566,
+      "dataset_period": "2021-2025",
+      "last_updated": "2026-03-22T02:34:25.089319"
     },
     "insider_buying_cluster_3plus": {
       "effect": "3+ insider cluster buys within 30 days: abnormal returns at 3d and 5d consistently positive",

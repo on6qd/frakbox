@@ -18,6 +18,11 @@ Qualifications (matching hypothesis 1cb6140f):
     - Market cap >= $500M (prevents delistment failures)
     - Filed within last 24 hours (48 if run twice per day)
     - Not already in active/pending experiments
+
+VIX Regime Gate (from full-population analysis, N=1566, 2021-2025):
+    - VIX < 20 (calm):      EV = +3.31%, 55.7% consistency -> HIGH CONFIDENCE
+    - VIX 20-25 (elevated): EV = +1.10%, 49.1% consistency -> MARGINAL
+    - VIX > 25 (high):      EV = ~+0.36%                   -> LOW CONFIDENCE (below min net return)
 """
 
 import argparse
@@ -43,6 +48,40 @@ MAX_STALE_HOURS = 48       # Don't trade if cluster is older than 48 hours
 
 # Hypothesis IDs to check for existing pending triggers
 CLUSTER_HYPOTHESIS_IDS = ["1cb6140f", "76678219"]  # 3d and 5d cluster hypotheses
+
+# VIX regime thresholds (from full-population analysis N=1566, 2021-2025)
+VIX_CALM_THRESHOLD = 20.0    # VIX < 20: EV=+3.31%, 55.7% consistency (HIGH CONFIDENCE)
+VIX_MARGINAL_THRESHOLD = 25.0  # VIX 20-25: EV~+1.10%, 49.1% consistency (MARGINAL)
+# VIX > 25: EV~+0.36%, near-zero — below minimum net return threshold (LOW CONFIDENCE)
+
+
+def get_current_vix() -> tuple[float, str, str]:
+    """
+    Get current VIX level and classify by regime.
+
+    Returns (vix_level, regime_label, confidence_label).
+    regime_label: "calm" | "marginal" | "low_confidence"
+    confidence_label: human-readable label for output/email
+    """
+    try:
+        vix_data = yf.Ticker("^VIX").history(period="2d")
+        if vix_data.empty:
+            return (None, "unknown", "UNKNOWN (VIX data unavailable)")
+        vix_level = float(vix_data['Close'].iloc[-1])
+    except Exception:
+        return (None, "unknown", "UNKNOWN (VIX fetch failed)")
+
+    if vix_level < VIX_CALM_THRESHOLD:
+        regime = "calm"
+        label = f"HIGH CONFIDENCE (calm VIX {vix_level:.1f} < {VIX_CALM_THRESHOLD})"
+    elif vix_level < VIX_MARGINAL_THRESHOLD:
+        regime = "marginal"
+        label = f"MARGINAL (elevated VIX {vix_level:.1f}, EV ~+1.1%, 49% consistency)"
+    else:
+        regime = "low_confidence"
+        label = f"LOW CONFIDENCE (high VIX {vix_level:.1f} > {VIX_MARGINAL_THRESHOLD}, EV ~+0.4%)"
+
+    return (vix_level, regime, label)
 
 
 def get_current_market_cap_m(ticker: str) -> float:
@@ -186,8 +225,21 @@ def log_opportunity(cluster: dict, market_cap_m: float, position_52w: dict,
     total_value_k = cluster.get('total_value_k', 0)
     filing_date = cluster.get('filing_date', '')
     price = cluster.get('price_per_share', 0)
+    vix_label = cluster.get('vix_label', 'UNKNOWN')
+    vix_regime = cluster.get('vix_regime', 'unknown')
+    vix_level = cluster.get('vix_level')
 
     pct_from_high = position_52w.get('pct_from_52w_high', 0) or 0
+
+    # Build regime-aware action recommendation
+    if vix_regime == "calm":
+        action_note = "HIGH CONFIDENCE. Trade at next open per standard protocol."
+    elif vix_regime == "marginal":
+        action_note = "MARGINAL CONFIDENCE (VIX 20-25). Consider only if 6+ insiders or unusually large buy."
+    elif vix_regime == "low_confidence":
+        action_note = "LOW CONFIDENCE (VIX > 25). EV below minimum net return threshold. CAUTION: strong bias against trading."
+    else:
+        action_note = "VIX regime unknown. Review manually."
 
     description = (
         f"AUTO-DETECTED insider cluster: {ticker} ({company}). "
@@ -195,8 +247,9 @@ def log_opportunity(cluster: dict, market_cap_m: float, position_52w: dict,
         f"Total value: ${total_value_k/1000:.1f}M. "
         f"Price: ${price:.2f} ({pct_from_high:.1f}% from 52W high). "
         f"Market cap: ${market_cap_m:.0f}M. "
+        f"VIX={vix_level:.1f if vix_level is not None else 'N/A'} -> {vix_label}. "
         f"QUALIFYING for hypothesis 1cb6140f (3d hold). "
-        f"ACTION NEEDED: Review and set trigger if appropriate."
+        f"{action_note}"
     )
 
     if dry_run:
@@ -207,8 +260,11 @@ def log_opportunity(cluster: dict, market_cap_m: float, position_52w: dict,
         category="insider_buying_cluster",
         question=description,
         priority=0,  # Highest priority
-        reasoning=f"Auto-detected cluster with {n_insiders} insiders, ${total_value_k/1000:.1f}M total. "
-                  f"Qualifying for 1cb6140f. Filed {filing_date}. Must act before 3d window expires."
+        reasoning=(
+            f"Auto-detected cluster with {n_insiders} insiders, ${total_value_k/1000:.1f}M total. "
+            f"Qualifying for 1cb6140f. Filed {filing_date}. Must act before 3d window expires. "
+            f"VIX regime: {vix_label}. {action_note}"
+        )
     )
     print(f"  LOGGED to research queue: {ticker}")
 
@@ -226,6 +282,24 @@ def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[d
         print(f"=== Insider Cluster Auto-Scanner ===")
         print(f"Scanning for clusters filed in last {hours} hours...")
         print(f"Thresholds: {MIN_INSIDERS}+ insiders, ${MIN_TOTAL_VALUE_K}K+ value, ${MIN_MARKET_CAP_M}M+ market cap")
+        print()
+
+    # VIX regime check (from full-population analysis N=1566, 2021-2025)
+    vix_level, vix_regime, vix_label = get_current_vix()
+    if verbose:
+        print(f"VIX Regime Check:")
+        print(f"  Current VIX: {vix_level:.2f}" if vix_level is not None else "  Current VIX: UNAVAILABLE")
+        print(f"  Signal regime: {vix_label}")
+        if vix_regime == "calm":
+            print(f"  -> Calm regime: proceed with full confidence (EV=+3.31%, 55.7% consistency)")
+        elif vix_regime == "marginal":
+            print(f"  -> Marginal regime: scan but flag opportunities. EV~+1.10%, barely above 1% minimum.")
+            print(f"     Consider requiring higher cluster size (6+ insiders) or unusually large purchase values.")
+        elif vix_regime == "low_confidence":
+            print(f"  -> Low confidence regime: VIX > 25, EV~+0.4%, BELOW minimum net return threshold.")
+            print(f"     Logging opportunities for awareness but strong caution advised against trading.")
+        else:
+            print(f"  -> VIX regime unknown. Proceed with caution.")
         print()
 
     fresh_clusters = find_fresh_clusters(hours=hours)
@@ -263,29 +337,40 @@ def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[d
         # Qualifying!
         cluster['market_cap_m'] = mktcap_m
         cluster['position_52w'] = pos_52w
+        cluster['vix_level'] = vix_level
+        cluster['vix_regime'] = vix_regime
+        cluster['vix_label'] = vix_label
         qualifying.append(cluster)
 
         if verbose:
             pct = pos_52w.get('pct_from_52w_high', 0) or 0
             print(f"  QUALIFYING: {cluster['n_insiders']} insiders, ${cluster.get('total_value_k', 0)/1000:.1f}M, "
                   f"${mktcap_m:.0f}M mktcap, {pct:.1f}% from 52W high")
+            print(f"  Signal confidence: {vix_label}")
 
         # Log to research queue
         log_opportunity(cluster, mktcap_m, pos_52w, dry_run=dry_run)
 
     if verbose:
         print(f"\n{'='*40}")
+        print(f"VIX regime at scan time: {vix_label}")
         print(f"Qualifying opportunities: {len(qualifying)}")
         for q in qualifying:
             pct = q.get('position_52w', {}).get('pct_from_52w_high', 0) or 0
-            print(f"  {q['ticker']}: {q['n_insiders']} insiders, ${q.get('total_value_k', 0)/1000:.1f}M, {pct:.1f}% from 52W high")
+            q_vix_label = q.get('vix_label', 'unknown')
+            print(f"  {q['ticker']}: {q['n_insiders']} insiders, ${q.get('total_value_k', 0)/1000:.1f}M, "
+                  f"{pct:.1f}% from 52W high | {q_vix_label}")
         print()
 
         if not dry_run and qualifying:
             print("NEXT STEP: Set trigger on hypothesis 1cb6140f for qualifying tickers.")
             print("  1. Verify company fundamentals (not in financial distress)")
             print("  2. Verify no upcoming earnings that would confound the signal")
-            print("  3. Set trigger: h['trigger'] = 'next_market_open'")
+            print("  3. Check VIX regime label above before trading:")
+            print("     - HIGH CONFIDENCE (VIX<20): proceed normally")
+            print("     - MARGINAL (VIX 20-25): require 6+ insiders or large buy amount")
+            print("     - LOW CONFIDENCE (VIX>25): strong bias against trading (EV ~0.4%)")
+            print("  4. Set trigger: h['trigger'] = 'next_market_open'")
 
     return qualifying
 

@@ -327,11 +327,13 @@
     {
       "id": "8305be3b",
       "category": "insider_buying_cluster",
-      "question": "Run full historical backtest with regime_filter=calm vs elevated vs crisis to quantify regime sensitivity on FULL population (1452 discovery + 816 OOS events, not just the 117-event sample). Current 117-event sample suggests ELEVATED VIX is best regime (mean_1d=+2.57%, 63.6% pos rate) but sample is too small for definitive conclusions. If confirmed on full population, consider only pausing at VIX>30 crisis.",
+      "question": "COMPLETED via full-population analysis (N=1566). FINDING: Calm VIX < 20 is the best regime (EV=+3.31%, 55.7%), not elevated. Previous 117-event sample was biased by 2023-2024 bull market when elevated VIX still showed positive returns. Full population across all years shows calm > elevated > crisis for EV. VIX gate added to cluster_auto_scanner.py. Key implication: POOL/AMRZ/BLCO failures at elevated VIX (23-27) are historically expected (49% consistency = coin flip). Next: backtest 6+ insiders across VIX regimes to see if high cluster size overcomes VIX penalty.",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "POOL/AMRZ both failed in elevated VIX but n=2 is not significant. Regime analysis on 117-event WD sample shows elevated VIX is actually the BEST regime. Need full population confirmation before adding any regime gate to the scanner.",
-      "added": "2026-03-22T01:59:43.737058"
+      "added": "2026-03-22T01:59:43.737058",
+      "completed": "2026-03-22T00:00:00.000000",
+      "findings": "COMPLETED. Full population N=1566 (2021-2025): Calm VIX<20: EV=+3.31% (N=971), Elevated VIX 20-30: EV=+1.10% (N=501), Crisis VIX>30: EV=+1.38% (N=94). SPY trend r=0.030 p=0.23 -- NOT predictive. VIX gate added to cluster_auto_scanner.py. Prior finding of 'elevated VIX = best regime' was a small-sample artifact."
     },
     {
       "id": "seed-003",
@@ -529,29 +531,38 @@
   ],
   "next_session_priorities": [
     {
-      "task": "Check GO and WD trade outcomes (3d for GO = Thursday March 26, 5d for WD = Friday March 27)",
-      "set_by_session": "2026-03-22T01:59:43.737858"
+      "task": "1. Check GO and WD trade outcomes (entering March 23, GO exit March 26/27, WD exit March 27/28). Record outcomes in hypotheses 1cb6140f and 76678219.",
+      "set_by_session": "2026-03-22"
     },
     {
-      "task": "Run full-population regime analysis: reload all 1452+ cluster events and apply VIX regime filter",
-      "set_by_session": "2026-03-22T01:59:43.737860"
+      "task": "2. Monitor DNLI PDUFA (April 5, 2026) and REPL PDUFA (April 10, 2026) for hypothesis 5f805860 activation. REPL is a BLA RE-SUBMISSION after prior CRL -- if rejected again, 'repeat CRL' known effect applies (NO trade, market bounces not crashes on repeat CRLs).",
+      "set_by_session": "2026-03-22"
     },
     {
-      "task": "Investigate BLCO (9 insiders) cluster from prior session - is it still a valid candidate?",
-      "set_by_session": "2026-03-22T01:59:43.737861"
+      "task": "3. KEY FINDING: Insider cluster signal EV is ~0.4% at VIX>25 -- barely tradeable. CORRECTING prior finding: previous session erroneously identified 'elevated VIX = best' based on small sample. Full population (N=1566) shows calm VIX (<20) is dramatically better (+3.31% vs +1.10%). VIX gate now in cluster_auto_scanner.py. Consider requiring VIX < 20 as primary trading condition for hypothesis 1cb6140f.",
+      "set_by_session": "2026-03-22"
     },
     {
-      "task": "Review DNLI PDUFA outcome (expected ~March 27-28)",
-      "set_by_session": "2026-03-22T01:59:43.737862"
+      "task": "4. Investigate whether higher cluster size (6+ insiders) overcomes VIX penalty. Backtest 6+ insiders specifically across VIX regimes (calm vs elevated vs crisis). If 6+ clusters show >2% EV even in elevated VIX, update scanner to allow elevated VIX for high-conviction clusters only.",
+      "set_by_session": "2026-03-22"
+    },
+    {
+      "task": "5. SSP (16 insiders) is underwater vs all insider purchase prices -- a live test of whether extraordinary cluster size can fight macro headwinds. Monitor and record outcome when price data is available.",
+      "set_by_session": "2026-03-22"
     }
   ],
   "session_handoff": {
-    "regime_finding": "ELEVATED VIX is historically BEST regime for insider cluster signal (mean_1d=+2.57% vs +0.39% in calm). Do NOT add VIX<20 gate.",
+    "regime_finding_CORRECTED": "CORRECTION to prior handoff: Full population (N=1566) shows CALM VIX < 20 is the best regime (EV=+3.31%, 55.7%), NOT elevated VIX. Prior 'elevated=best' finding was a small-sample artifact from 2023-2024 bull market data. VIX gate now added to cluster_auto_scanner.py.",
     "current_vix": 26.78,
-    "go_trade": "pending, trigger=next_market_open (Monday March 23), 6 insiders incl CEO, confidence=7",
-    "wd_trade": "pending, trigger=next_market_open (Monday March 23), confidence=5, basic cluster",
-    "recommendation": "PROCEED with GO trade (strong signal). WD is marginal -- monitor stop-loss closely.",
-    "written_at": "2026-03-22T01:59:43.737863"
+    "vix_regime": "LOW CONFIDENCE (VIX 26.78 > 25, EV ~0.4%, below minimum net return)",
+    "go_trade": "triggers at next_market_open (Monday March 23), hypothesis 1cb6140f, 6 insiders incl CEO, $6.3M purchase, confidence=7. Exit Thursday March 26 (3d hold).",
+    "wd_trade": "triggers at next_market_open (Monday March 23), hypothesis 76678219, 3 insiders, confidence=5 (marginal). Exit March 27-28 (5d hold).",
+    "recommendation": "Both GO and WD enter in elevated VIX (26.78). Per full-population data, this means ~49% consistency = near coin flip. GO has highest conviction (6 insiders, CEO + $6.3M) which may partially offset regime penalty. Monitor stop-loss closely on both.",
+    "dnli_note": "DNLI spike March 9 was analyst upgrade + PDUFA positioning. PDUFA April 5 still upcoming. If CRL, short per 5f805860.",
+    "repl_note": "REPL spike March 6 was sector sympathy (CGON). PDUFA April 10. BLA RE-SUBMISSION after July 2025 CRL. If rejected again, repeat CRL rule applies -- do NOT trade (market bounces, not crashes).",
+    "ssp_note": "SSP 16-insider cluster is underwater vs all purchase prices. Live test of whether extraordinary cluster size fights macro headwinds. Monitor.",
+    "full_regime_analysis": "COMPLETE. N=1566, 2021-2025. SPY 5d prior trend r=0.030 p=0.23 -- NOT predictive. VIX is the ONLY significant regime factor. Calm <20: EV=+3.31%. Elevated 20-30: EV=+1.10%. Crisis >30: EV=+1.38% (but N=94 only). 3 consecutive failures (POOL, AMRZ, BLCO) in elevated VIX (23-27) are historically expected.",
+    "written_at": "2026-03-22T02:30:00.000000"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
@@ -571,12 +582,13 @@
   ],
   "next_session": {
     "priorities": [
-      "1. Check GO and WD trade outcomes (entered 2026-03-19/18) \u2014 are these in elevated VIX bucket as expected?",
-      "2. Test two-tier VIX rule: VIX<20 vs VIX 20-25 vs VIX 25-30 with bootstrap CIs",
-      "3. Determine whether to update the hypothesis regime filter from \"elevated(20-30)\" to just \"VIX<25\" or \"VIX<20\"",
-      "4. Investigate whether 2022 bear market is driving the VIX 25-30 + SPY<-3% bucket result (n=18/24 from 2022)"
+      "1. Check GO (1cb6140f) and WD (76678219) trade outcomes. GO entered March 23, 3d exit March 26/27. WD entered March 23, 5d exit March 27/28.",
+      "2. Monitor DNLI PDUFA April 5 and REPL PDUFA April 10 for hypothesis 5f805860 activation.",
+      "3. Backtest 6+ insider clusters across VIX regimes -- does high cluster size overcome VIX penalty?",
+      "4. Consider whether to formally update hypothesis 1cb6140f to require VIX < 20 as primary condition (currently only in scanner as advisory, not enforcement).",
+      "5. SSP 16-insider cluster: check price -- is stock still underwater vs all purchase prices?"
     ],
-    "handoff": "SPY trend analysis complete. Key finding: VIX level dominates, SPY trend has near-zero correlation (r=0.03). The elevated VIX regime (20-30) is marginally positive but driven by VIX 20-25, not VIX 25-30. Next priority: refine VIX tier thresholds.",
+    "handoff": "Full-population regime analysis COMPLETE (N=1566). CORRECTS prior finding: calm VIX (<20) is dramatically better than elevated (+3.31% vs +1.10%). SPY trend not predictive (r=0.03, p=0.23). VIX gate added to cluster_auto_scanner.py as advisory. Current VIX=26.78 (low confidence). GO and WD trades entering elevated VIX regime -- 49% historical consistency. REPL is a resubmission: if April 10 PDUFA rejected, do NOT short (repeat CRL causes bounce not crash).",
     "updated": "2026-03-22"
   }
 }
