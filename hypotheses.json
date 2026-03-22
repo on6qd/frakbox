@@ -3800,7 +3800,7 @@
     "created": "2026-03-22T03:50:47.584170",
     "prediction_hash": "14459fae86460b7f",
     "idempotency_key": "1090ce0eb5e237ac",
-    "status": "pending",
+    "status": "superseded",
     "event_type": "insider_buying_cluster_n6to9",
     "event_description": "When 6-9 corporate insiders at the same company buy shares within a short window, the stock outperforms the market over the next 5 trading days. Discovery (2021-2022, n=173): avg 5d abnormal return +3.57%, pos_rate=59.0%, p=0.0001. Validation (2023-2025, n=178): avg 5d abnormal return +7.80%, pos_rate=62.9%, p<0.0001. Both periods pass multiple testing correction.",
     "causal_mechanism": "Multiple insiders at the same firm each independently filing Form 4 purchases signals broad internal conviction. At 6-9 insiders, the cluster exceeds random coincidence but remains below the n>=10 level where reporting artifacts and lock-up expirations inflate counts. Market participants take 3-10 days to aggregate Form 4 data across filings, so the signal is slow to be arbitraged. Price drifts upward as the aggregated signal propagates through data vendors and quant fund scanners.",
@@ -4225,7 +4225,8 @@
     "dead_end_warnings": null,
     "trade": null,
     "result": null,
-    "notes": " [SUPERSEDED by 9f8a4c61: more comprehensive backtest (N=132 disc, N=178 val), confidence=7 vs 4, 3d hold preferred over 5d based on skewness analysis]"
+    "notes": " [SUPERSEDED by 9f8a4c61: more comprehensive backtest (N=132 disc, N=178 val), confidence=7 vs 4, 3d hold preferred over 5d based on skewness analysis]",
+    "superseded_reason": "Superseded by 9f8a4c61 (more comprehensive backtest, N=132 disc vs 173, confidence=7 vs 4, 3d hold preferred over 5d based on skewness analysis). 9f8a4c61 was itself superseded by 416556df (the current active version with corrected validation_indices and validation_consistency_pct). validation_indices in this record (173-350) are phantom indices beyond the 28-item evidence array and do not resolve to real events."
   },
   {
     "id": "9f8a4c61",
