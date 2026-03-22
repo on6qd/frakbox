@@ -64,6 +64,20 @@ SEC_HEADERS = {"User-Agent": "research_bot cluster_scanner@research.com"}
 # Cache for CIK lookups to avoid repeated HTTP requests
 _cik_cache: dict[str, str] = {}
 
+# CEO/CFO hypothesis ID (insider_buying_cluster_ceo_cfo, registered 2026-03-22)
+CEO_CFO_HYPOTHESIS_ID = "2bbe0f04"
+
+
+def is_ceo_or_cfo(title: str) -> bool:
+    """Check if an insider title indicates CEO or CFO role."""
+    if not title:
+        return False
+    t = title.upper()
+    return any(kw in t for kw in [
+        'CHIEF EXECUTIVE', 'CEO', 'CHIEF FINANCIAL', 'CFO',
+        'CHIEF OPERATING', 'COO', 'PRESIDENT AND', 'PRESIDENT &',
+    ])
+
 
 def _load_cik_lookup() -> dict[str, str]:
     """Load EDGAR company_tickers.json and build ticker->CIK mapping."""
@@ -98,7 +112,7 @@ def verify_edgar_open_market_purchases(
     days_back: int = 35,
     min_value_usd: float = 50_000,
     verbose: bool = True,
-) -> tuple[int, list[str]]:
+) -> tuple[int, list[str], bool, list[str]]:
     """
     Verify a cluster candidate actually has open-market purchases (Form 4 code P)
     by fetching EDGAR Form 4 XMLs directly.
@@ -108,6 +122,9 @@ def verify_edgar_open_market_purchases(
     data and returns only insiders with confirmed open-market purchases above
     the minimum value threshold.
 
+    Also extracts <officerTitle> from Form 4 XML for each buyer to determine
+    whether a CEO or CFO is among the cluster buyers (hypothesis 2bbe0f04).
+
     Args:
         ticker: Stock ticker (e.g. 'POOL')
         days_back: Look-back window in calendar days (default 35 to cover 1-month clusters)
@@ -115,14 +132,14 @@ def verify_edgar_open_market_purchases(
         verbose: If True, print progress
 
     Returns:
-        (verified_n_insiders, list_of_insider_names)
-        Returns (0, []) on failure or if no qualifying purchases found.
+        (verified_n_insiders, list_of_insider_names, has_ceo_cfo, list_of_titles)
+        Returns (0, [], False, []) on failure or if no qualifying purchases found.
     """
     cik = get_cik_for_ticker(ticker)
     if not cik:
         if verbose:
             print(f"  EDGAR VERIFY: No CIK found for {ticker} — skipping verification")
-        return 0, []
+        return 0, [], False, []
 
     try:
         resp = requests.get(
@@ -138,7 +155,7 @@ def verify_edgar_open_market_purchases(
     except Exception as e:
         if verbose:
             print(f"  EDGAR VERIFY: Request failed for {ticker}: {e}")
-        return 0, []
+        return 0, [], False, []
 
     filings = data.get("filings", {}).get("recent", {})
     forms = filings.get("form", [])
@@ -156,8 +173,9 @@ def verify_edgar_open_market_purchases(
         print(f"  EDGAR VERIFY: {len(form4_list)} Form 4 filings for {ticker} in last {days_back} days")
 
     # Parse each Form 4 XML — collect insiders with confirmed code-P purchases
-    # above the minimum value threshold
+    # above the minimum value threshold. Also extract officerTitle for CEO/CFO detection.
     buyers: dict[str, float] = {}  # name -> total purchase value
+    buyer_titles: dict[str, str] = {}  # name -> officerTitle (if present)
     cik_int = str(int(cik))  # EDGAR folder uses non-zero-padded CIK
 
     for _filing_date, acc in form4_list:
@@ -200,6 +218,11 @@ def verify_edgar_open_market_purchases(
             continue
         name = name_match.group(1).strip()
 
+        # Extract officer title from reportingOwnerRelationship block
+        # This is present for officer-filers; absent for director-only filers.
+        title_match = re.search(r"<officerTitle>(.*?)</officerTitle>", xml, re.DOTALL)
+        title = title_match.group(1).strip() if title_match else ""
+
         # Extract all non-derivative transactions (table 1)
         # Iterate over transaction blocks: look for P-code entries with shares/price
         # Pattern: find each <nonDerivativeTransaction> block
@@ -234,16 +257,26 @@ def verify_edgar_open_market_purchases(
 
         if total_value >= min_value_usd:
             buyers[name] = buyers.get(name, 0.0) + total_value
+            if title and name not in buyer_titles:
+                buyer_titles[name] = title
 
     verified = [(name, val) for name, val in buyers.items()]
     verified.sort(key=lambda x: -x[1])
 
+    # Determine if any confirmed buyer has a CEO/CFO title
+    titles_found = [buyer_titles.get(name, "") for name, _ in verified]
+    has_ceo_cfo = any(is_ceo_or_cfo(t) for t in titles_found)
+
     if verbose:
         print(f"  EDGAR VERIFY: {len(verified)} unique insiders with open-market purchases >= ${min_value_usd:,.0f}")
         for name, val in verified:
-            print(f"    {name}: ${val:,.0f}")
+            title_str = f" [{buyer_titles[name]}]" if name in buyer_titles else ""
+            ceo_flag = " *** CEO/CFO ***" if is_ceo_or_cfo(buyer_titles.get(name, "")) else ""
+            print(f"    {name}{title_str}{ceo_flag}: ${val:,.0f}")
+        if has_ceo_cfo:
+            print(f"  EDGAR VERIFY: CEO/CFO detected — qualifies for hypothesis {CEO_CFO_HYPOTHESIS_ID}")
 
-    return len(verified), [name for name, _ in verified]
+    return len(verified), [name for name, _ in verified], has_ceo_cfo, titles_found
 
 ET = ZoneInfo("America/New_York")
 
@@ -488,19 +521,32 @@ def log_opportunity(cluster: dict, market_cap_m: float, position_52w: dict,
     vix_regime = cluster.get('vix_regime', 'unknown')
     vix_level = cluster.get('vix_level')
 
+    has_ceo_cfo = cluster.get('has_ceo_cfo', False)
+    buyer_titles = cluster.get('buyer_titles', [])
     pct_from_high = position_52w.get('pct_from_52w_high', 0) or 0
 
     # Build regime-aware action recommendation (n_insiders-aware)
     action_note = get_vix_action_recommendation(vix_regime, n_insiders, total_value_k)
 
+    # CEO/CFO presence note for hypothesis 2bbe0f04
+    ceo_cfo_note = ""
+    if has_ceo_cfo:
+        ceo_cfo_titles = [t for t in buyer_titles if is_ceo_or_cfo(t)]
+        ceo_cfo_note = (
+            f" CEO/CFO PRESENT ({', '.join(ceo_cfo_titles)}): "
+            f"also qualifies for hypothesis {CEO_CFO_HYPOTHESIS_ID} "
+            f"(insider_buying_cluster_ceo_cfo, EV=+7.01% vs +4.56% baseline)."
+        )
+
+    vix_str = f"{vix_level:.1f}" if vix_level is not None else "N/A"
     description = (
         f"AUTO-DETECTED insider cluster: {ticker} ({company}). "
         f"{n_insiders} insiders filed {filing_date}. "
         f"Total value: ${total_value_k/1000:.1f}M. "
         f"Price: ${price:.2f} ({pct_from_high:.1f}% from 52W high). "
         f"Market cap: ${market_cap_m:.0f}M. "
-        f"VIX={vix_level:.1f if vix_level is not None else 'N/A'} -> {vix_label}. "
-        f"QUALIFYING for hypothesis 1cb6140f (3d hold). "
+        f"VIX={vix_str} -> {vix_label}. "
+        f"QUALIFYING for hypothesis 1cb6140f (3d hold).{ceo_cfo_note} "
         f"{action_note}"
     )
 
@@ -516,9 +562,10 @@ def log_opportunity(cluster: dict, market_cap_m: float, position_52w: dict,
             f"Auto-detected cluster with {n_insiders} insiders, ${total_value_k/1000:.1f}M total. "
             f"Qualifying for 1cb6140f. Filed {filing_date}. Must act before 3d window expires. "
             f"VIX regime: {vix_label}. {action_note}"
+            + (f" CEO/CFO present: also tag hypothesis {CEO_CFO_HYPOTHESIS_ID}." if has_ceo_cfo else "")
         )
     )
-    print(f"  LOGGED to research queue: {ticker}")
+    print(f"  LOGGED to research queue: {ticker}" + (" [CEO/CFO cluster]" if has_ceo_cfo else ""))
 
 
 def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[dict]:
@@ -582,7 +629,7 @@ def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[d
         # purchases and not RSU award grants (code A). OpenInsider can inflate counts
         # by including non-purchase transactions (discovered 2026-03-22, POOL case).
         openinsider_n = cluster.get('n_insiders', 0)
-        verified_n, verified_names = verify_edgar_open_market_purchases(
+        verified_n, verified_names, has_ceo_cfo, buyer_titles = verify_edgar_open_market_purchases(
             ticker, days_back=35, min_value_usd=50_000, verbose=verbose
         )
         if verified_n < MIN_INSIDERS:
@@ -598,10 +645,12 @@ def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[d
                 f"  NOTE: OpenInsider reported {openinsider_n} insiders; "
                 f"EDGAR confirms {verified_n} open-market buyers."
             )
-        # Update cluster with verified count
+        # Update cluster with verified count and CEO/CFO flag
         cluster['n_insiders_verified'] = verified_n
         cluster['n_insiders_openinsider'] = openinsider_n
         cluster['n_insiders'] = verified_n  # Use verified count going forward
+        cluster['has_ceo_cfo'] = has_ceo_cfo
+        cluster['buyer_titles'] = buyer_titles
 
         # Get 52W position
         pos_52w = get_52w_position(ticker)
@@ -622,11 +671,12 @@ def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[d
 
         if verbose:
             pct = pos_52w.get('pct_from_52w_high', 0) or 0
+            ceo_flag = " [CEO/CFO PRESENT -> hypothesis 2bbe0f04]" if cluster.get('has_ceo_cfo') else ""
             print(f"  QUALIFYING: {cluster['n_insiders']} insiders, ${cluster.get('total_value_k', 0)/1000:.1f}M, "
-                  f"${mktcap_m:.0f}M mktcap, {pct:.1f}% from 52W high")
+                  f"${mktcap_m:.0f}M mktcap, {pct:.1f}% from 52W high{ceo_flag}")
             print(f"  Signal confidence: {vix_label}")
 
-        # Log to research queue
+        # Log to research queue (includes CEO/CFO flag)
         log_opportunity(cluster, mktcap_m, pos_52w, dry_run=dry_run)
 
     if verbose:
