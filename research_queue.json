@@ -162,6 +162,15 @@
       "added": "2026-03-22T03:58:03.832693"
     },
     {
+      "id": "740f4fec",
+      "category": "clinical_efficacy_failure_short",
+      "question": "Monitor REPL (Replimune) PDUFA April 10 2026: second BLA for RP1 melanoma. If CRL issued: (1) Check if clinical efficacy deficiency (not CMC), (2) Check if crash >55% (from $6.98, need crash to <$3.14), (3) Note that REPL is already known to have had first CRL -- this is a REPEAT CRL. Per knowledge base, repeat CRLs often behave differently. LIKELY WILL NOT QUALIFY for d302c84b unless crash is >55% AND no stated path forward. If approved: do not trade. Update watchlist entry after decision.",
+      "priority": 1,
+      "status": "pending",
+      "reasoning": "REPL PDUFA April 10 is the only near-term catalyst that might trigger d302c84b. However, repeat CRL is a different pattern. Need explicit monitoring decision.",
+      "added": "2026-03-22T06:39:24.225489"
+    },
+    {
       "id": "seed-002",
       "category": "index_rebalancing",
       "question": "When a stock is announced for S&P 500 addition, what is the abnormal return between announcement and effective date, and does it reverse after inclusion? How does this compare to Russell 2000 rebalancing?",
@@ -369,6 +378,15 @@
       "added": "2026-03-22T03:58:03.831790",
       "completed": "2026-03-22T05:38:10.089937",
       "findings": "CHECKED 2026-03-22. No new qualifying n=6-9 clusters within entry window. From OpenInsider last 7 days: AVBC (4x, March 19, 349M market cap - BELOW 500M), GCBC (3x, March 18, 390M - BELOW 500M). GRNT (5x, March 16) window expired. GO (6x, March 20) is already queued under 1cb6140f. cluster_auto_scanner.py runs nightly at 9:15 PM ET -- will catch next qualifying event."
+    },
+    {
+      "id": "e779875d",
+      "category": "clinical_efficacy_failure_short",
+      "question": "Test whether the 3d SHORT hypothesis outperforms 5d or 10d holds. The new N=14 data shows 3d avg=-18.76%, 5d avg=-19.36% (similar), but CRVO shows 10d reversal (+3.2%). Is the 3d hold reliably BETTER than 5d or 10d for continuation events? Compare per-event 3d vs 5d vs 10d abnormal returns. If 3d is optimal: update d302c84b expected_timeframe_days from 3 to confirm = 3.",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "With N=14, we can now check optimal hold period. Current hypothesis says 3d hold. CRVO reverses at 10d. If 3d is systematically better than 10d, this validates the 3-day hold design.",
+      "added": "2026-03-22T06:39:24.226366"
     },
     {
       "id": "seed-003",
@@ -587,52 +605,35 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. MONDAY OPEN (March 23): GO (1cb6140f) triggers at next_market_open \u2014 verify trade executed, check entry price. Expected exit Thursday March 26 close (3 trading days).",
-      "set_by_session": "2026-03-22T06:05:00.343539"
+      "task": "1. URGENT March 26: Close GO trade (1cb6140f). Run close_go_trade.py to exit position.",
+      "set_by_session": "2026-03-22T06:39:24.227043"
     },
     {
-      "task": "2. THURSDAY MARCH 26: Close GO trade. Record outcome in hypothesis via research.complete_hypothesis(). Check abnormal return vs SPY.",
-      "set_by_session": "2026-03-22T06:05:00.343541"
+      "task": "2. Check WD (Walker & Dunlop): WD trigger was NOT set. But WD 5d hold would have expired March 28. Check what price WD is at for reference (was n=3 elevated VIX, correctly skipped).",
+      "set_by_session": "2026-03-22T06:39:24.227045"
     },
     {
-      "task": "3. CEO DEPARTURE SCANNER: Fixed yfinance MultiIndex bug + deduplication + 2-day window + CEO-vs-board-member filter. FBIN (March 16) and ATR (March 17) windows closed. Check alerts for any new events in logs/ceo_departure_alerts.jsonl.",
-      "set_by_session": "2026-03-22T06:05:00.343542"
+      "task": "3. Run edgar_clinical_failure_scanner.py --auto-qualify for past 7 days to catch any new qualifying events.",
+      "set_by_session": "2026-03-22T06:39:24.227046"
     },
     {
-      "task": "4. S&P 500 ADDITIONS: VRT/LITE/COHR/SATS effective March 23 \u2014 window closed (16 days late). Monitor sp500_announcement_scanner.py for next batch. Next quarterly: announced ~June 5 for June 19 effective date.",
-      "set_by_session": "2026-03-22T06:05:00.343542"
+      "task": "4. Monitor REPL PDUFA April 10 - decision expected April 10 after-hours.",
+      "set_by_session": "2026-03-22T06:39:24.227047"
     },
     {
-      "task": "5. INSIDER CLUSTER WATCH: n=6-9 hypothesis (416556df) signal concentrated post-2023. Under elevated VIX (~27), only n>=6 qualifies. Next cluster scan runs nightly 9:15 PM via cluster_auto_scanner.py.",
-      "set_by_session": "2026-03-22T06:05:00.343543"
-    },
-    {
-      "task": "6. RESEARCH: Consider building missed-opportunity outcome checker \u2014 nightly script to measure abnormal returns for clusters/events that were in-window but not traded.",
-      "set_by_session": "2026-03-22T06:05:00.343544"
+      "task": "5. Run cluster_auto_scanner.py to check for n=6-9 clusters qualifying under 416556df hypothesis.",
+      "set_by_session": "2026-03-22T06:39:24.227047"
     }
   ],
   "session_handoff": {
-    "as_of": "2026-03-22T06:05:00.343380",
-    "current_state": {
-      "active_trades": 0,
-      "pending_trigger": "GO (1cb6140f) next_market_open Monday March 23",
-      "expected_exit": "2026-03-26 Thursday close 3d hold",
-      "vix_regime": "elevated ~27"
-    },
-    "session_work_done": [
-      "Fixed yfinance MultiIndex bug in edgar_ceo_departure_scanner.py",
-      "Added ticker+date deduplication in EDGAR scanner",
-      "Added 2-day trading-window check in ceo_departure_daily_scan.py",
-      "Added is_ceo_departure() role check \u2014 SMCI board-member-only departure correctly filtered",
-      "Screened 7 EDGAR clinical failure candidates \u2014 none qualified",
-      "Screened 28 insider clusters \u2014 GO already staged, all other windows closed"
-    ],
-    "key_findings": [
-      "FBIN CEO performance failure March 16: -2.6% overnight, -2.0% abnormal intraday \u2014 missed due to bug",
-      "SMCI March 20 crash was criminal indictment NOT CEO departure \u2014 false positive now filtered",
-      "ATR March 17: all move in gap, no intraday continuation \u2014 correctly excluded"
-    ],
-    "written_at": "2026-03-22T06:05:00.343545"
+    "active_trades": "GO (1cb6140f) entered Monday March 23 at market open. Exit: Thursday March 26 close (3d hold). Use tools/close_go_trade.py.",
+    "d302c84b_expansion": "COMPLETED this session. N expanded from 11 to 14. Confidence raised 7->9. New events: ORMP (2023-01-12), CRVO (2024-12-10), NEUP (2025-10-20). Key insight: 'stated path forward for alternative indication' does NOT prevent 3d continuation. Only concrete positive regulatory evidence (subgroup data p<0.05, partnership) causes reversal.",
+    "ipo_lockup_dead_end": "RECORDED as dead end. N=23, p=0.18, bootstrap CI includes zero. Market pre-prices lockup dates.",
+    "new_tool": "edgar_clinical_failure_scanner.py now has --auto-qualify flag that auto-checks crash >55%, market cap <$500M, pre-anticipation. Eliminates ~3 turns of manual review per session.",
+    "vix_current": "26.78 (Tier 3 elevated). Only n=6-9 clusters tradeable.",
+    "next_event": "REPL PDUFA April 10 2026. Second BLA submission. Monitor.",
+    "ceo_departure_alerts": "Previous ceo_departure_alerts.jsonl had stale entries (BG, RIVN, SMA, CPT - March 19, all false positives, scanner correctly filtered them). No new qualifying CEO departures in March 19-22 window.",
+    "written_at": "2026-03-22T06:39:24.227049"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
