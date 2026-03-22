@@ -562,117 +562,47 @@
   ],
   "next_session_priorities": [
     {
-      "task": {
-        "task": "1. CRITICAL: Check GO and WD trade outcomes. GO exit March 26 (3d). WD exit March 27-28 (5d). Record actual P&L in hypotheses 1cb6140f (GO) and 76678219 (WD). Use research.complete_hypothesis() after closing. GO is also a live test of n=6-9 hypothesis (9f8a4c61).",
-        "set_by_session": "2026-03-22"
-      },
-      "set_by_session": "2026-03-22T03:58:20.256958"
+      "task": "1. CHECK GO and WD trade outcomes (GO exits ~March 26 at 3d close, WD exits ~March 27-28 at 5d close)",
+      "set_by_session": "2026-03-22T04:30:15.832314"
     },
     {
-      "task": {
-        "task": "2. Run cluster_auto_scanner.py after GO/WD close to check for fresh n=6-9 clusters. VIX was 26.78 last check (Tier 3) -- n=6-9 ONLY. If VIX drops to <20, ALSO trade n=3-5. Scanner runs automatically at 9:15PM ET daily.",
-        "set_by_session": "2026-03-22"
-      },
-      "set_by_session": "2026-03-22T03:58:20.256963"
+      "task": "2. Run cluster_auto_scanner for new n=6-9 opportunities after GO/WD close",
+      "set_by_session": "2026-03-22T04:30:15.832320"
     },
     {
-      "task": {
-        "task": "3. DNLI PDUFA April 5, 2026. Verify: (a) Is DNLI single-pipeline? Check SEC filings for pipeline summary. Current price .17, mkt cap .2B. If multi-pipeline or too large, skip. The CRL short hypothesis requires single-pipeline small biotech. REPL (M, also has PDUFA near April) is closer to target size.",
-        "set_by_session": "2026-03-22"
-      },
-      "set_by_session": "2026-03-22T03:58:20.256964"
+      "task": "3. DNLI BLA PDUFA April 5 \u2014 not tradeable under existing hypotheses. If you want to research BLA rejection patterns as a new hypothesis, begin with historical BLA PDUFA outcomes for Accelerated Approval rare diseases (2018-2024)",
+      "set_by_session": "2026-03-22T04:30:15.832321"
     },
     {
-      "task": {
-        "task": "4. Consider CEO departure signal research (hypothesis 5dbcfb37, TBD symbol). Watch for forced CEO departures via edgar_ceo_departure_scanner.py. Last session showed signal is validated but high false-positive rate for scanner. Consider using news search instead of EDGAR scanner.",
-        "set_by_session": "2026-03-22"
-      },
-      "set_by_session": "2026-03-22T03:58:20.256965"
+      "task": "4. S&P 500 Q2 rebalance June 7 \u2014 monitor for announcement (~4-6 weeks before effective date). Check news weekly. March 2026 additions (VRT, LITE, COHR, SATS) took effect March 23 \u2014 window already closed.",
+      "set_by_session": "2026-03-22T04:30:15.832322"
     },
     {
-      "task": {
-        "task": "5. Methodology review: The discovery set for n=6-9 had 39% failure rate (above 30% threshold). Consider whether to add a data quality gate warning in the hypothesis. Also: validate that 9f8a4c61 OOS split with only 2 validation_indices passes the minimum-3 check.",
-        "set_by_session": "2026-03-22"
-      },
-      "set_by_session": "2026-03-22T03:58:20.256966"
+      "task": "5. CEO departure signal (5dbcfb37) remains unexecutable without after-hours order support. Engineering task ad6b0f64 (build AH support in trader.py) has highest leverage \u2014 one-time build unlocks validated signal permanently.",
+      "set_by_session": "2026-03-22T04:30:15.832322"
     }
   ],
   "session_handoff": {
-    "last_action": "Pre-registered hypothesis insider_buying_cluster_n6to9 (id=7b5d0120)",
-    "backtest_numbers": {
-      "discovery_2021_2022": {
-        "n": 173,
-        "1d": {
-          "avg": 0.46,
-          "pos_rate": 50.3,
-          "p": 0.4725
-        },
-        "3d": {
-          "avg": 3.3,
-          "pos_rate": 67.6,
-          "p": 0.0
-        },
-        "5d": {
-          "avg": 3.57,
-          "pos_rate": 59.0,
-          "p": 0.0001
-        },
-        "10d": {
-          "avg": 3.59,
-          "pos_rate": 56.1,
-          "p": 0.0052
-        },
-        "20d": {
-          "avg": 0.88,
-          "pos_rate": 51.2,
-          "p": 0.8458
-        },
-        "passes_multiple_testing": true,
-        "bootstrap_ci_5d": {
-          "lower": 1.959,
-          "upper": 5.271,
-          "excludes_zero": true
-        }
-      },
-      "validation_2023_2025": {
-        "n": 178,
-        "1d": {
-          "avg": 1.19,
-          "pos_rate": 52.8,
-          "p": 0.0685
-        },
-        "3d": {
-          "avg": 4.13,
-          "pos_rate": 64.6,
-          "p": 0.0
-        },
-        "5d": {
-          "avg": 7.8,
-          "pos_rate": 62.9,
-          "p": 0.0
-        },
-        "10d": {
-          "avg": 8.4,
-          "pos_rate": 60.7,
-          "p": 0.0
-        },
-        "20d": {
-          "avg": 8.02,
-          "pos_rate": 52.3,
-          "p": 0.0281
-        },
-        "passes_multiple_testing": true,
-        "bootstrap_ci_5d": {
-          "lower": 4.592,
-          "upper": 11.68,
-          "excludes_zero": true
-        }
-      }
+    "completed_this_session": [
+      "CRITICAL compliance fix: superseded 9f8a4c61 (only 2 validation indices) and 7b5d0120 (phantom indices). New hypothesis 416556df is the active n=6-9 cluster template with 4 real named validation events (CODI, NSIT, IRON, CRM) and validation_consistency_pct=64.6%.",
+      "Deprecated realtime_insider_scanner.py with warnings.warn() at import time",
+      "DNLI PDUFA April 5 verified: BLA on Accelerated Approval basis (Phase 1/2 biomarker data). NOT a clinical failure \u2014 not tradeable under d302c84b. FDA extension was for clinical pharmacology data, explicitly not efficacy/safety concerns.",
+      "Cluster scanner: 0 new clusters. GO and WD are the only active signals. VIX=26.78, Tier 3, n=6-9 only rule applies.",
+      "Data integrity: clean (verify_data_integrity returned ok=True, no issues)",
+      "S&P 500 March 2026 rebalance: VRT, LITE, COHR, SATS added effective March 23 (tomorrow). Announcement was March 6 \u2014 window already closed. No actionable trade under 061ae3a8."
+    ],
+    "active_trades_to_monitor": {
+      "GO_1cb6140f": "3d hold, trigger Monday 9:30 ET, exit ~March 26. n=6 cluster (Tier 3 VIX). Expected +3.46% at 3d.",
+      "WD_76678219": "5d hold, trigger Monday 9:30 ET, exit ~March 27-28. n=3 cluster (below Tier 3 threshold \u2014 NOTE: this was set before 4-tier rule was finalized). Monitor closely."
     },
-    "hypothesis_id": "7b5d0120",
-    "status": "pending \u2014 needs symbol resolution to activate",
-    "next_step": "Run openinsider_scraper.py or cluster_auto_scanner.py to find a fresh n=6-9 cluster. Resolve expected_symbol from TBD to a real ticker, then set trigger=next_market_open to activate.",
-    "written_at": "2026-03-22T03:51:08.861175"
+    "hypothesis_state": {
+      "416556df": "Active n=6-9 template (3d hold). 4 validation events, 64.6% consistency. TBD symbol \u2014 will be resolved when next cluster is found.",
+      "061ae3a8": "S&P 500 addition template. TBD \u2014 waiting for announcement. Next window: Q2 rebalance ~June 7 (announcement expected ~late April).",
+      "5dbcfb37": "CEO departure template. VALIDATED but unexecutable without AH order support.",
+      "d302c84b": "Clinical efficacy failure short. Ready to use when Phase 2/3 failure occurs."
+    },
+    "warning": "WD (76678219) was pre-registered under n=2+ rule, not the refined Tier 3 n=6-9 rule. n=3 at VIX=26.78 Tier 3 had expected_value=-0.48% (noise). Trade is already triggered \u2014 let it run but document this as a learning case for the outcome review.",
+    "written_at": "2026-03-22T04:30:15.832324"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

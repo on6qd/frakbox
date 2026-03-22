@@ -1,3 +1,13 @@
+# DEPRECATED: This scanner times out repeatedly due to SEC EDGAR API changes.
+# Use tools/openinsider_scraper.py instead for fresh insider cluster signals.
+# See friction_log.jsonl for details (3+ timeout occurrences logged).
+import warnings
+warnings.warn(
+    "realtime_insider_scanner.py is deprecated. Use openinsider_scraper.py instead.",
+    DeprecationWarning,
+    stacklevel=1
+)
+
 """
 Real-Time Insider Cluster Scanner
 
