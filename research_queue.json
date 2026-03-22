@@ -587,40 +587,52 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. CHECK TRADE OUTCOMES: GO (1cb6140f) exits Thursday March 26 close. WD (76678219) NOT entered (n=3 fails DO_NOT_TRADE at VIX 26.8). Record GO outcome in hypothesis.",
-      "set_by_session": "2026-03-22T05:51:52.978878"
+      "task": "1. MONDAY OPEN (March 23): GO (1cb6140f) triggers at next_market_open \u2014 verify trade executed, check entry price. Expected exit Thursday March 26 close (3 trading days).",
+      "set_by_session": "2026-03-22T06:05:00.343539"
     },
     {
-      "task": "2. MONITOR CEO DEPARTURE: ceo_departure_daily_scan.py runs at 7:30am weekdays. Check logs/ceo_departure_alerts.jsonl for qualifying events. If found: verify manually, set trigger='after_hours_immediate' on hypothesis 5dbcfb37.",
-      "set_by_session": "2026-03-22T05:51:52.978882"
+      "task": "2. THURSDAY MARCH 26: Close GO trade. Record outcome in hypothesis via research.complete_hypothesis(). Check abnormal return vs SPY.",
+      "set_by_session": "2026-03-22T06:05:00.343541"
     },
     {
-      "task": "3. MONITOR CLINICAL FAILURE: edgar_clinical_failure_scanner.py runs at session start. Check for new d302c84b-qualifying events (>55% crash, single-pipeline biotech, no path forward).",
-      "set_by_session": "2026-03-22T05:51:52.978883"
+      "task": "3. CEO DEPARTURE SCANNER: Fixed yfinance MultiIndex bug + deduplication + 2-day window + CEO-vs-board-member filter. FBIN (March 16) and ATR (March 17) windows closed. Check alerts for any new events in logs/ceo_departure_alerts.jsonl.",
+      "set_by_session": "2026-03-22T06:05:00.343542"
     },
     {
-      "task": "4. N=6-9 CLUSTER NEXT TRADE: cluster_auto_scanner.py runs nightly. Check logs/cluster_scanner.log. If 6-9 insiders >$500M mcap detected, set trigger on hypothesis 416556df. Note: signal only statistically validated in 2023-2025 (discovery 2021-2022 failed multiple testing).",
-      "set_by_session": "2026-03-22T05:51:52.978884"
+      "task": "4. S&P 500 ADDITIONS: VRT/LITE/COHR/SATS effective March 23 \u2014 window closed (16 days late). Monitor sp500_announcement_scanner.py for next batch. Next quarterly: announced ~June 5 for June 19 effective date.",
+      "set_by_session": "2026-03-22T06:05:00.343542"
     },
     {
-      "task": "5. NEW RESEARCH: Consider testing mid-cap REIT CEO departures specifically (CPT was a false positive but the pattern is interesting). Or explore whether insider cluster signal is stronger in specific sectors (energy, real estate vs tech).",
-      "set_by_session": "2026-03-22T05:51:52.978885"
+      "task": "5. INSIDER CLUSTER WATCH: n=6-9 hypothesis (416556df) signal concentrated post-2023. Under elevated VIX (~27), only n>=6 qualifies. Next cluster scan runs nightly 9:15 PM via cluster_auto_scanner.py.",
+      "set_by_session": "2026-03-22T06:05:00.343543"
+    },
+    {
+      "task": "6. RESEARCH: Consider building missed-opportunity outcome checker \u2014 nightly script to measure abnormal returns for clusters/events that were in-window but not traded.",
+      "set_by_session": "2026-03-22T06:05:00.343544"
     }
   ],
   "session_handoff": {
-    "session_date": "2026-03-22",
-    "session_theme": "n=6-9 cluster validation, CEO scanner improvement, clinical failure monitoring",
-    "key_findings": [
-      "n=6-9 cluster signal is concentrated in 2023-2025 (p<0.0001) NOT 2021-2022 (p=0.23). Full 2021-2025 aggregate passes MT. Hypothesis 416556df marked as exploratory-grade due to OOS split weakness.",
-      "GO trade (1cb6140f): trigger='next_market_open' set, executes Monday March 23 9:30 AM. n=6 insiders, elevated VIX 26.8 (borderline), all pre-trade checks passed.",
-      "WD trade: deliberately NOT entered (n=3 in VIX 26.8 fails DO_NOT_TRADE rule per git commit 324b6d8).",
-      "CEO departure scanner: improved with retirement filter + yfinance fix. New tool: ceo_departure_daily_scan.py (runs daily 7:30 AM weekdays). No current qualifying events.",
-      "Clinical failure: IMMP (March 13 crash) continuing to decline as predicted. No new qualifying events in last 14 days.",
-      "S&P 500 scanner: no new additions announced. Next expected: June 2026 quarterly rebalance."
+    "as_of": "2026-03-22T06:05:00.343380",
+    "current_state": {
+      "active_trades": 0,
+      "pending_trigger": "GO (1cb6140f) next_market_open Monday March 23",
+      "expected_exit": "2026-03-26 Thursday close 3d hold",
+      "vix_regime": "elevated ~27"
+    },
+    "session_work_done": [
+      "Fixed yfinance MultiIndex bug in edgar_ceo_departure_scanner.py",
+      "Added ticker+date deduplication in EDGAR scanner",
+      "Added 2-day trading-window check in ceo_departure_daily_scan.py",
+      "Added is_ceo_departure() role check \u2014 SMCI board-member-only departure correctly filtered",
+      "Screened 7 EDGAR clinical failure candidates \u2014 none qualified",
+      "Screened 28 insider clusters \u2014 GO already staged, all other windows closed"
     ],
-    "blocking_issue": "None. All scanners running. GO trade pending Monday execution.",
-    "specific_next_step": "At next session start: (1) check GO outcome if Monday has passed, (2) check ceo_departure_alerts.jsonl, (3) run edgar_clinical_failure_scanner.py for last 7 days",
-    "written_at": "2026-03-22T05:51:52.978886"
+    "key_findings": [
+      "FBIN CEO performance failure March 16: -2.6% overnight, -2.0% abnormal intraday \u2014 missed due to bug",
+      "SMCI March 20 crash was criminal indictment NOT CEO departure \u2014 false positive now filtered",
+      "ATR March 17: all move in gap, no intraday continuation \u2014 correctly excluded"
+    ],
+    "written_at": "2026-03-22T06:05:00.343545"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
