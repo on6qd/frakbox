@@ -262,56 +262,22 @@
       "last_updated": "2026-03-21T11:11:28.681628"
     },
     "insider_buying_cluster": {
-      "finding": "n=6-9 insider cluster tier is regime-robust; n>=10 has ZERO signal",
-      "n69_overall": {
-        "N": 319,
-        "mean_5d_pct": 3.29,
-        "pos_rate_pct": 56.7,
-        "p_value": 0.0
+      "finding": "VIX gate fully validated with 98.3% coverage (N=1566). Elevated VIX (25-30) shows ZERO signal.",
+      "vix_regime_performance": {
+        "calm_lt20": "ALL clusters: +3.43% avg (CEO/CFO +4.62%, Non +2.61%), p<0.0001",
+        "moderate_20_25": "ALL clusters: +1.41%, p=0.05 (marginal)",
+        "elevated_25_30": "ALL clusters: +0.35%, p=0.57 (NO SIGNAL)"
       },
-      "n69_calm_vix": {
-        "N": 212,
-        "mean_5d_pct": 3.31,
-        "pos_rate_pct": 57.5,
-        "p_value": 0.0004
+      "cluster_size_performance": {
+        "n3_5": "CEO/CFO +3.37% p=0.001, Non +2.02% p<0.001",
+        "n6_9": "CEO/CFO +3.95% p=0.001, Non +3.03% p=0.001",
+        "n10_plus": "CEO/CFO +0.94% p=0.65, Non +0.37% p=0.76 (DO NOT TRADE)"
       },
-      "n69_elevated_vix": {
-        "N": 90,
-        "mean_5d_pct": 2.78,
-        "pos_rate_pct": 55.6,
-        "p_value": 0.0021
+      "current_regime_2023_to_2025": {
+        "all_clusters": "+4.57% avg, 58.9% positive, p<0.0001",
+        "n6_9_clusters": "+3.25% avg, 56.7% positive, p<0.0001"
       },
-      "n69_post2021_elevated_vix": {
-        "N": 65,
-        "mean_5d_pct": 3.21,
-        "pos_rate_pct": 55.4,
-        "p_value": 0.0038
-      },
-      "n35_elevated_vix": {
-        "N": 353,
-        "mean_5d_pct": 0.68,
-        "pos_rate_pct": 47.6,
-        "p_value": 0.27,
-        "status": "NOISE"
-      },
-      "n10plus": {
-        "N": 155,
-        "mean_5d_pct": 0.49,
-        "pos_rate_pct": 49.0,
-        "p_value": 0.64,
-        "status": "NOISE"
-      },
-      "n10plus_explanation": "n>=10 events in 2021 are dominated by IPO lockup expiry Form 4 filings (CXM, BRZE, IOT, GLUE, DOCS, DNUT etc.). These are NOT voluntary open-market purchases. Even n=6-9 was contaminated in 2021 by IPO bubble. Signal is clean post-2021.",
-      "n69_post2021": {
-        "N": 241,
-        "mean_5d_pct": 4.32,
-        "pos_rate_pct": 60.6,
-        "p_value": 1e-06
-      },
-      "trading_rule": "For n=6-9 clusters: trade in BOTH calm and elevated VIX (p<0.005 in both). For n=3-5: only trade in calm VIX (p=0.27 in elevated = coin flip). Never trade n>=10.",
-      "data_period": "2021-2025, N=1566 total events",
-      "discovery_date": "2026-03-22",
-      "last_updated": "2026-03-22T03:21:09.707724"
+      "last_updated": "2026-03-22T12:59:31.953967"
     },
     "insider_buying_cluster_3plus": {
       "effect": "3+ insider cluster buys within 30 days: abnormal returns at 3d and 5d consistently positive",
@@ -575,45 +541,40 @@
       "last_updated": "2026-03-22T06:38:45.426701"
     },
     "insider_buying_cluster_ceo_cfo": {
-      "effect": "3+ insider clusters including CEO or CFO outperform director-only clusters by ~2.45% at 5d",
-      "full_sample": {
-        "N": 440,
-        "mean_5d_pct": 7.01,
-        "pos_rate_pct": 64.0,
-        "stdev": 17.68,
-        "p_value": "<0.0001"
+      "finding": "Full-population CEO/CFO analysis with 98.3% data coverage (N=1566 events, 2021-2025)",
+      "previous_coverage": "18.5% (290 events matched via flawed join)",
+      "new_coverage": "98.3% (1539 matched from bulk EDGAR Form 4 data)",
+      "overall": {
+        "ceo_cfo_clusters_n": 545,
+        "avg_5d_abnormal": "+3.31%",
+        "pos_rate": "53.8%",
+        "p_value": "<0.0001",
+        "non_ceo_cfo_n": 1021,
+        "non_ceo_cfo_avg": "+2.05%",
+        "differential_p": "0.092 (not significant overall)"
       },
-      "vs_no_csuite": {
-        "N": 489,
-        "mean_5d_pct": 4.56,
-        "pos_rate_pct": 62.0,
-        "stdev": 14.67
+      "by_year": {
+        "2021": "CEO/CFO -0.51%, Non -0.51% (both flat - SPAC/noise era)",
+        "2022": "CEO/CFO -0.03%, Non -0.56% (both flat - bear market)",
+        "2023": "CEO/CFO +4.50% p=0.001, Non +3.13% p=0.001",
+        "2024": "CEO/CFO +7.98% p=0.020, Non +5.52% p<0.001",
+        "2025": "CEO/CFO +5.46% p=0.001, Non +3.09% p<0.001"
       },
-      "discovery_2020_2021": {
-        "N": 139,
-        "mean_5d_pct": 5.54,
-        "pos_rate_pct": 52.0
+      "by_vix": {
+        "calm_vix_lt20": "CEO/CFO +4.62% (n=340), Non +2.61% (n=631)",
+        "moderate_vix_20_25": "CEO/CFO +1.41% p=0.21 (n=116), Non +1.40% p=0.05 (n=244)",
+        "elevated_vix_25_30": "CEO/CFO -0.00% p=1.00 (n=55), Non +0.54% p=0.57 (n=86)"
       },
-      "validation_2022_2024": {
-        "N": 301,
-        "mean_5d_pct": 7.68,
-        "pos_rate_pct": 69.0
+      "current_regime_2023plus": {
+        "ceo_cfo": "+5.90% n=316 p<0.001",
+        "non_ceo_cfo": "+3.88% n=598 p<0.001",
+        "differential": "+2.02% p=0.069 (trending, not significant)",
+        "calm_vix_only": "CEO/CFO +6.42% n=252, Non +3.89% n=484, differential +2.54% p=0.051"
       },
-      "calm_vix_lt20": {
-        "N": 238,
-        "mean_5d_pct": 7.51,
-        "pos_rate_pct": 62.0
-      },
-      "elevated_vix_2030": {
-        "N": 135,
-        "mean_5d_pct": 4.94,
-        "pos_rate_pct": 64.0
-      },
-      "cost_estimate_pct": 0.405,
-      "net_after_costs_5d_pct": 6.6,
-      "literature_support": "Cohen, Malloy & Pomorski (2012): CEO/CFO purchases 12x more predictive",
-      "data_source": "SEC EDGAR Form 4 bulk data, RPTOWNER_TITLE field, 2020-2024",
-      "last_updated": "2026-03-22T11:11:34.360056"
+      "vix_gate_validated": "Elevated VIX (25-30) shows ZERO signal for both CEO/CFO and non-CEO/CFO groups. VIX gate is correct.",
+      "key_implication": "CEO/CFO distinction adds ~+2% in 2023+ but differential not significant at p<0.05. Both groups show strong signal independently. Use CEO/CFO as a confirmatory filter but not as the sole trade criterion.",
+      "methodology_note": "build_roles_from_bulk.py matches cluster events to EDGAR bulk Form 4 data using 45-day window. Title coverage 40.3% (38.5% NULL = classified as non-CEO/CFO, causing downward bias in has_ceo_cfo rate).",
+      "last_updated": "2026-03-22T12:59:22.130026"
     },
     "insider_buying_cluster_regime_change": {
       "summary": "CRITICAL REGIME CHANGE: Insider cluster signal (n>=3) was ABSENT in 2021-2022 and SWITCHED ON in 2023+. Year-by-year means: 2021=-0.51% (p=0.37), 2022=-0.37% (p=0.52), 2023=+3.59% (p<0.001), 2024=+6.33% (p<0.001), 2025=+3.96% (p<0.001). Quarterly data confirms switch happened in 2023Q1.",
