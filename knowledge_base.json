@@ -500,17 +500,17 @@
       "last_updated": "2026-03-22T05:35:56.829072"
     },
     "ceo_performance_failure_departure": {
-      "event": "ATR CEO departure 2026-03-17 - EXCLUSION",
-      "ticker": "ATR",
-      "market_cap_m": "unknown",
-      "overnight_return_pct": -3.95,
-      "intraday_return_pct": -0.13,
-      "abnormal_intraday_pct": 0.91,
-      "departure_type": "planned_retirement",
-      "note": "Classified as planned retirement by 8-K text. Despite -4% overnight gap, intraday return was +0.91% abnormal (ATR outperformed SPY intraday on a day SPY fell -1.04%). Gap was priced in by market open \u2014 no intraday continuation. NOT a valid signal for hypothesis 5dbcfb37 (entry at open).",
+      "event": "CPT Camden Property Trust CEO departure 2026-03-19",
+      "ticker": "CPT",
+      "market_cap_m": 10359,
+      "overnight_return_pct": -0.44,
+      "intraday_return_pct": -1.89,
+      "abnormal_intraday_pct": -0.68,
+      "departure_type": "unknown",
+      "note": "BORDERLINE CASE. Departure type unverified (unknown). Overnight gap only -0.44%, intraday abnormal -0.68% (barely above 0.5% threshold). Window closed March 20. REIT sector context: CPT is a residential REIT, departure signal may differ from operating companies. Alert was stale when detected \u2014 2-day window fix would have filtered this correctly. Do NOT count as formal evidence for 5dbcfb37 without manual verification of departure reason.",
       "hypothesis_id": "5dbcfb37",
-      "status": "excluded_planned_retirement_correctly",
-      "last_updated": "2026-03-22T05:58:02.131600"
+      "status": "borderline_unverified_window_closed",
+      "last_updated": "2026-03-22T06:06:22.003166"
     }
   },
   "dead_ends": [
