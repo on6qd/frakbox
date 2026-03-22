@@ -726,34 +726,37 @@
   ],
   "next_session_priorities": [
     {
-      "task": "MONDAY MARCH 23 - CONFIRM GO TRADE EXECUTED at open. Check Alpaca API or run: python trade_loop.py --dry-run",
-      "set_by_session": "2026-03-22T11:55:59.365756"
+      "task": "MONDAY MARCH 23 - Confirm GO trade executed at open. Check Alpaca: python trade_loop.py --dry-run",
+      "set_by_session": "2026-03-22T12:27:18.372608"
     },
     {
-      "task": "THURSDAY MARCH 26 - Close GO trade and record outcome via tools/close_go_trade.py. This is the first live test of 1cb6140f.",
-      "set_by_session": "2026-03-22T11:55:59.365761"
+      "task": "THURSDAY MARCH 26 - Close GO trade and record outcome via tools/close_go_trade.py (first live test of 1cb6140f)",
+      "set_by_session": "2026-03-22T12:27:18.372613"
     },
     {
-      "task": "MARCH 28 - RCKT PDUFA (disqualified, multi-pipeline). Do not trade. But check if any other clinical failure fires.",
-      "set_by_session": "2026-03-22T11:55:59.365762"
+      "task": "HIGH PRIORITY: Re-run CEO/CFO role classifier on ALL 1566 events in cluster_with_returns.csv to get proper 3-way coverage. Current coverage is only 18.5% (290/1566). Script: load cluster_with_returns.csv, for each ticker+date look up the cluster_auto_scanner.verify_edgar_open_market_purchases() function, extract CEO/CFO flag. This will take ~2-3 hours to run. Save merged file as data/clusters_with_roles_full.csv.",
+      "set_by_session": "2026-03-22T12:27:18.372614"
     },
     {
-      "task": "New research: test pre-earnings run-up signal (do stocks systematically outperform SPY in the 2-3 days before earnings announcement?). EDGAR Whisper database or Yahoo Finance earnings calendar as data source.",
-      "set_by_session": "2026-03-22T11:55:59.365763"
+      "task": "Mid-cap pre-earnings run-up: test on B-B market cap universe (large-cap dead-ended). Use Russell 2000 or screen for mid-cap tickers with 12+ quarters earnings history.",
+      "set_by_session": "2026-03-22T12:27:18.372615"
     },
     {
-      "task": "Update hypothesis 416556df data_quality_note with regime change finding: signal is concentrated in 2023+, not 2021-2022.",
-      "set_by_session": "2026-03-22T11:55:59.365763"
+      "task": "Check WD trade status (Walker & Dunlop, 5d hold). Should close around Tuesday March 30.",
+      "set_by_session": "2026-03-22T12:27:18.372616"
     }
   ],
   "session_handoff": {
-    "current_state": "Two pending trades: GO (trigger set, entry Monday March 23 open) and WD (NOT trading -- VIX gate: n=3 at VIX=26.78). Dividend initiation signal investigated and recorded as dead end. Insider cluster regime change documented in knowledge base.",
-    "critical_finding": "Insider cluster signal WAS ABSENT in 2021-2022 (means near-zero, p>0.37). SWITCHED ON in 2023+ (mean=+4.58%, p<0.0001). The regime change coincides with end of Fed rate hike cycle. All our backtests using 2021-2022 as discovery understate the true current signal strength.",
-    "regime_vix_risk": "VIX=26.78 at time of GO/WD decisions. For 2023+, VIX>25 has only 23 observations (mean=+3.70%, p=0.28). Statistical uncertainty but directionally positive.",
-    "no_new_hypotheses_needed": "CEO departure scanner: 0 qualifying events this week. Clinical failure scanner: ALDX was disqualified (already documented). No new clinical failures.",
-    "next_research": "Pre-earnings run-up signal OR earnings gap and fill (do large overnight earnings gaps fill within 5 days?). Both are systematic and can be backtested with EDGAR earnings calendar data.",
-    "amrz_window_expired": "AMRZ entry window closes March 23. VIX gate blocks it anyway (n=4, VIX>25). Hypothesis 1f3ac0ec remains pending for future signals on same ticker or same pattern.",
-    "written_at": "2026-03-22T11:55:59.365764"
+    "investigation_state": "Pre-earnings run-up DEAD END recorded. GO trade triggered for Monday open. 3-way interaction analysis done but limited by data coverage.",
+    "intermediate_findings": {
+      "pre_earnings_runup": "Dead end: large-cap S&P 500 (N=874 events, 44 stocks, 2021-2025). 5d abnormal +0.23%, fails multiple testing, fails direction threshold. Beater classification adds nothing. 2021 reversed.",
+      "3way_interaction": "n3_5 + CEO/CFO + calm VIX: +7.87% (n=96, p=0.019) but only 18.5% data coverage. Need full-population role classification before this can be acted on.",
+      "regime_note_416556df": "Added: n=6-9 signal concentrated in 2023+, 2021-2022 was weak/null.",
+      "go_trigger": "Confirmed: trigger=next_market_open, K position, stop_loss=10%"
+    },
+    "blockers": "CEO/CFO role data only covers 18.5% of returns events. Need full-coverage role classification to test n=6-9 + CEO/CFO interaction properly.",
+    "next_exact_step": "After GO trade executes Monday: run tools/close_go_trade.py on Thursday March 26. For research: write script to merge cluster_with_returns.csv with EDGAR XML role data for all 1566 events (expensive: ~3h network IO). Alternative: focus on mid-cap pre-earnings as completely new signal direction.",
+    "written_at": "2026-03-22T12:27:18.372617"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
