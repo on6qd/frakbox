@@ -641,35 +641,41 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. URGENT March 26: Close GO trade (1cb6140f). Run close_go_trade.py to exit position.",
-      "set_by_session": "2026-03-22T06:39:24.227043"
+      "task": "URGENT (March 26): Close GO trade (hypothesis 1cb6140f) \u2014 run `python tools/close_go_trade.py` or check if trade_loop auto-closes. Verify via Alpaca positions first.",
+      "set_by_session": "2026-03-22T07:19:06.267929"
     },
     {
-      "task": "2. Check WD (Walker & Dunlop): WD trigger was NOT set. But WD 5d hold would have expired March 28. Check what price WD is at for reference (was n=3 elevated VIX, correctly skipped).",
-      "set_by_session": "2026-03-22T06:39:24.227045"
+      "task": "URGENT (March 28): Monitor RCKT PDUFA decision. If CRL issued with clinical/efficacy deficiency AND crash >55% at open, evaluate d302c84b criteria (single-pipeline?, market cap <$500M?, no stated path forward?) and enter short at next-day open if all pass.",
+      "set_by_session": "2026-03-22T07:19:06.267933"
     },
     {
-      "task": "3. Run edgar_clinical_failure_scanner.py --auto-qualify for past 7 days to catch any new qualifying events.",
-      "set_by_session": "2026-03-22T06:39:24.227046"
+      "task": "Monitor REPL PDUFA April 10. If approved: no trade. If CRL (second): check if RP2/RP3 provide valuation floor \u2014 if negligible, may qualify for 5f805860 IF crash >55%. Do not pre-position.",
+      "set_by_session": "2026-03-22T07:19:06.267934"
     },
     {
-      "task": "4. Monitor REPL PDUFA April 10 - decision expected April 10 after-hours.",
-      "set_by_session": "2026-03-22T06:39:24.227047"
+      "task": "Run edgar_clinical_failure_scanner.py --auto-qualify for past 7 days at each session start.",
+      "set_by_session": "2026-03-22T07:19:06.267935"
     },
     {
-      "task": "5. Run cluster_auto_scanner.py to check for n=6-9 clusters qualifying under 416556df hypothesis.",
-      "set_by_session": "2026-03-22T06:39:24.227047"
+      "task": "Research NEW SIGNAL: Secondary Equity Offerings (SEO dilution short). Literature: -2 to -3% abnormal on announcement day (well-documented). Research question: does the abnormal return continue for 3-5 days? Data source: SEC EDGAR 424B4 filings (actual pricing date) or S-3 filing date. Next step: collect 50+ events from 2020-2024, filter to large-cap only, run backtest with measure_event_impact.",
+      "set_by_session": "2026-03-22T07:19:06.267936"
+    },
+    {
+      "task": "S&P 500 Q2 rebalance: Watch June 5, 2026 after 5:15 PM ET at spglobal.com/press-releases for announcement. Entry Monday June 8 open, 5-day hold.",
+      "set_by_session": "2026-03-22T07:19:06.267937"
     }
   ],
   "session_handoff": {
-    "active_trades": "GO (1cb6140f) entered Monday March 23 at market open. Exit: Thursday March 26 close (3d hold). Use tools/close_go_trade.py.",
-    "d302c84b_expansion": "COMPLETED this session. N expanded from 11 to 14. Confidence raised 7->9. New events: ORMP (2023-01-12), CRVO (2024-12-10), NEUP (2025-10-20). Key insight: 'stated path forward for alternative indication' does NOT prevent 3d continuation. Only concrete positive regulatory evidence (subgroup data p<0.05, partnership) causes reversal.",
-    "ipo_lockup_dead_end": "RECORDED as dead end. N=23, p=0.18, bootstrap CI includes zero. Market pre-prices lockup dates.",
-    "new_tool": "edgar_clinical_failure_scanner.py now has --auto-qualify flag that auto-checks crash >55%, market cap <$500M, pre-anticipation. Eliminates ~3 turns of manual review per session.",
-    "vix_current": "26.78 (Tier 3 elevated). Only n=6-9 clusters tradeable.",
-    "next_event": "REPL PDUFA April 10 2026. Second BLA submission. Monitor.",
-    "ceo_departure_alerts": "Previous ceo_departure_alerts.jsonl had stale entries (BG, RIVN, SMA, CPT - March 19, all false positives, scanner correctly filtered them). No new qualifying CEO departures in March 19-22 window.",
-    "written_at": "2026-03-22T06:39:24.227049"
+    "current_state": "No active experiments. GO trade fires Monday March 23 automatically. WD correctly skipped (VIX elevated). All scanners operational.",
+    "key_findings_not_in_knowledge_base": [
+      "ALDX March 17 CRL: +50.8% bounce in 3 days post-crash. Confirms d302c84b exclusion criteria (multi-pipeline + stated path forward = bounce, not continuation). Second case after GOSS. Criteria are working.",
+      "March 2026 S&P 500 additions (VRT/LITE/COHR/SATS): 4/4 positive, avg +5.20% 1d abnormal. Pure out-of-sample validation for 061ae3a8. Trade missed due to watchlist gap \u2014 now fixed.",
+      "DNLI April 5 PDUFA: disqualified ($3.2B cap + multi-pipeline). Do not trade.",
+      "REPL April 10 PDUFA: disqualified as d302c84b (multi-pipeline RP1/RP2/RP3). Only 5f805860 possible IF crash >55% on second CRL \u2014 monitor only."
+    ],
+    "what_blocked_or_unclear": "GO trade has not fired yet (market closed Sunday). Cannot verify execution until Monday. Need to confirm by Tuesday March 24 that the Alpaca position is open.",
+    "exact_next_step": "Monday March 24: Check Alpaca positions to confirm GO trade executed at open. If it did not execute, diagnose trade_loop.py. If it did, set close deadline for March 26 close.",
+    "written_at": "2026-03-22T07:19:06.267938"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
