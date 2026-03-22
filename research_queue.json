@@ -675,12 +675,13 @@
       "status": "watching"
     },
     {
-      "event": "Pool Corporation (POOL) insider cluster monitoring - 3 insiders bought March 13, $3M. Entry window passed. Monitor for next cluster formation (pool season May-Aug)",
+      "event": "Pool Corporation (POOL) insider cluster monitoring - 3 insiders bought March 13, $3M. BLOCKED: n=3 at VIX=26.78 (need n>=6 OR VIX<25 with n>=3). Monitor for: (a) VIX drops below 25 while cluster still fresh, (b) additional insiders join to reach n>=6, (c) next pool season cluster May-Aug 2026.",
       "expected_date": "2026-07-01",
       "symbol": "POOL",
       "hypothesis_template": "insider_buying_cluster_3plus",
       "added": "2026-03-22T00:11:21.807759",
-      "status": "watching"
+      "status": "watching",
+      "vix_gate": "VIX must be < 25 for n=3 cluster to qualify. Current VIX=26.78 as of 2026-03-23."
     },
     {
       "event": "REPL (Replimune) PDUFA date for RP1 (BLA resubmission after Jul 2025 CRL) \u2014 melanoma indication. Monitor for rejection (2nd CRL). If CRL: wait 1-2 days for initial bounce to resolve before entering short. If approved: do not trade.",
@@ -790,37 +791,86 @@
   ],
   "next_session_priorities": [
     {
-      "task": "PRIORITY 1: Retrieve March 23 ABT open price and compute OOS return for 86d28864",
-      "set_by_session": "2026-03-23T00:22:17.595059"
+      "task": "1. POST-MARKET CHECK: Verify GO (1cb6140f) and HD (86d28864) executed via run.py --status",
+      "set_by_session": "2026-03-23T00:26:08.817203"
     },
     {
-      "task": "PRIORITY 2: Check GO (1cb6140f) and HD (86d28864) trade execution status after market open",
-      "set_by_session": "2026-03-23T00:22:17.595063"
+      "task": "2. ABT OOS: Get March 23 open price and compute abnormal return (entry at open, measure vs SPY). Record in hypothesis notes.",
+      "set_by_session": "2026-03-23T00:26:08.817208"
     },
     {
-      "task": "PRIORITY 3: Monitor NKE - it is 2.7% above its 52w low (51.00 from Apr 10, 2025); trigger SHORT if it touches",
-      "set_by_session": "2026-03-23T00:22:17.595065"
+      "task": "3. NKE WATCH: If NKE closes at or below $51.00, SHORT signal fires. Automated scanner should detect. Check logs/52w_low_signals.jsonl",
+      "set_by_session": "2026-03-23T00:26:08.817209"
     },
     {
-      "task": "PRIORITY 4: VIX watch - if VIX drops below 25, activate WD (76678219) and AMRZ (1f3ac0ec)",
-      "set_by_session": "2026-03-23T00:22:17.595065"
+      "task": "4. BAX CRITICAL: BAX is 0.4% above its 52w low ($16.08). If it breaches, SHORT signal fires immediately. Monitor daily.",
+      "set_by_session": "2026-03-23T00:26:08.817210"
     },
     {
-      "task": "PRIORITY 5: S&P 500 addition hypothesis 061ae3a8 - all 4 March 2026 additions confirmed positive (VRT +4.24%, LITE +9.97%, COHR +5.86%, SATS +0.73% at 1d). Next quarterly announcement expected late May 2026.",
-      "set_by_session": "2026-03-23T00:22:17.595066"
+      "task": "5. NEW 52W LOW CANDIDATES: SYK (2.7%, $128.5B), LULU (3.9%, $19.1B), ZBH (3.9%, $17.4B), PODD (4.9%, $16B) - all within 5% of 52w low. Scanner will catch if they breach.",
+      "set_by_session": "2026-03-23T00:26:08.817211"
+    },
+    {
+      "task": "6. VIX GATE: If VIX < 25, activate WD (76678219) and AMRZ (1f3ac0ec) triggers. Current VIX=26.78, trending up.",
+      "set_by_session": "2026-03-23T00:26:08.817211"
+    },
+    {
+      "task": "7. MARCH 26: Close GO trade via tools/close_go_trade.py",
+      "set_by_session": "2026-03-23T00:26:08.817212"
+    },
+    {
+      "task": "8. MARCH 27: Close HD trade via tools/close_hd_trade.py, compute ABT 5d OOS return (March 20 signal -> March 27 close). Record in knowledge base.",
+      "set_by_session": "2026-03-23T00:26:08.817213"
+    },
+    {
+      "task": "9. S&P 500 Q2 announcement: monitor spglobal.com weekly starting May 15, 2026. Next quarterly cycle expected ~May 29.",
+      "set_by_session": "2026-03-23T00:26:08.817213"
     }
   ],
   "session_handoff": {
-    "session_date": "2026-03-22",
-    "market_status": "Closed (Sunday 7:17 PM ET). Monday March 23 open is next.",
-    "go_hd_triggers": "Both GO (1cb6140f LONG) and HD (86d28864 SHORT) have trigger=next_market_open. Trade loop will execute at 9:30 AM ET.",
-    "abt_oos": "ABT touched 52w low (105.27) on March 20 close at 105.46. Entry at March 23 open is PENDING. No March 23 data available yet.",
-    "vix_regime": "VIX closed at 26.78 on March 20 -- elevated regime. Rising trend (22.37->26.78 over the week). WD and AMRZ gates are CLOSED.",
-    "sp500_additions": "March 2026: VRT, LITE, COHR, SATS added effective March 23. All showed positive abnormal returns (1d: +4.24%, +9.97%, +5.86%, +0.73%). These are included in hypothesis 061ae3a8 validation set (14 OOS events, 100% positive rate).",
-    "new_clusters": "OpenInsider shows POOL (7.4B, 3x, March 13) and GRNT (722M, 5x, March 12). POOL is viable size but VIX too high for new experiments. AVBC and GCBC below 500M filter.",
-    "nke_watch": "NKE at 52.37, 52w low is 51.00 (2.7% away). Not a signal yet but closest to breach. Fiftytwo_week_low_scanner will catch it.",
-    "commits": "Scanner fix already committed (62c216f). No new files to commit this session.",
-    "written_at": "2026-03-23T00:22:17.595068"
+    "current_investigation": "S&P 500 52w-low momentum short (86d28864) in live testing. HD executing Monday March 23. ABT passive OOS tracking.",
+    "scanner_fix": "Fixed fiftytwo_week_low_scanner.py to log all signals and prioritize by market cap. Committed.",
+    "vix_status": "VIX=26.78 (elevated). WD (n=3) and AMRZ (n=4) blocked. POOL (n=3, $7.4B) blocked.",
+    "new_52w_low_candidates": {
+      "BAX": {
+        "pct_above": 0.4,
+        "mcap_B": 8.3,
+        "note": "CRITICAL - essentially at 52w low now"
+      },
+      "SYK": {
+        "pct_above": 2.7,
+        "mcap_B": 128.5,
+        "note": "Large cap healthcare"
+      },
+      "NKE": {
+        "pct_above": 2.7,
+        "mcap_B": 77.5,
+        "note": "Already being watched"
+      },
+      "ZBH": {
+        "pct_above": 3.9,
+        "mcap_B": 17.4,
+        "note": "Zimmer Biomet - healthcare"
+      },
+      "LULU": {
+        "pct_above": 3.9,
+        "mcap_B": 19.1,
+        "note": "Lululemon - retail"
+      },
+      "RH": {
+        "pct_above": 3.8,
+        "mcap_B": 2.4,
+        "note": "RH Inc - retail (smaller cap)"
+      },
+      "PODD": {
+        "pct_above": 4.9,
+        "mcap_B": 16.0,
+        "note": "Insulet - healthcare"
+      }
+    },
+    "what_blocked": "VIX gate blocking multiple cluster trades. Market stress environment.",
+    "next_step": "Post-market March 23: verify trade execution. March 26: close GO. March 27: close HD, compute ABT OOS return. Watch BAX daily.",
+    "written_at": "2026-03-23T00:26:08.817215"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
