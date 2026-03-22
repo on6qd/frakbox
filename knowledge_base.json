@@ -625,6 +625,34 @@
       "hypothesis_impact": "All insider cluster hypotheses (0a093c90, 1cb6140f, 416556df, 2bbe0f04) used discovery period 2021-2022. These years showed no signal. The true discovery of the live signal starts from 2023. The pattern of 100% OOS replication (2022) in original backtest was artificially driven by the 2022Q4 partial recovery.",
       "recorded": "2026-03-22",
       "last_updated": "2026-03-22T11:52:08.520890"
+    },
+    "insider_buying_cluster_3way_interaction": {
+      "effect": "3-way analysis: CEO/CFO x cluster size x VIX regime",
+      "data_limitation": "Only 290/1566 (18.5%) of return events have role data. Severely underpowered for n=6-9 cells.",
+      "n3_5_ceo_calm": {
+        "n": 96,
+        "avg_5d_pct": 7.87,
+        "p": 0.019,
+        "pos_rate": 0.57
+      },
+      "n3_5_no_csuite_calm": {
+        "n": 68,
+        "avg_5d_pct": 4.67,
+        "p": 0.001,
+        "pos_rate": 0.56
+      },
+      "n3_5_ceo_elevated": {
+        "n": 31,
+        "avg_5d_pct": -1.04,
+        "p": 0.603,
+        "pos_rate": 0.45,
+        "note": "FAILS in elevated VIX"
+      },
+      "n6_9_cells": "n=15-17 per cell, underpowered, no significant results",
+      "n10plus_cells": "n=35, no significant results",
+      "actionable_finding": "CEO/CFO + n3_5 + calm VIX appears strongest (avg +7.87% vs +4.67% without CEO/CFO). But Bonferroni correction for 12 cells would require p<0.004 - FAILS.",
+      "next_step": "Re-run CEO/CFO role classifier on all 1566 return events to get proper coverage. Current 18.5% coverage is insufficient.",
+      "last_updated": "2026-03-22T12:26:24.206733"
     }
   },
   "dead_ends": [
@@ -805,6 +833,11 @@
       "event_type": "dividend_initiation",
       "reason": "First-ever dividend initiation signal tested (N=14, 2020-2024). Discovery period (2020-2021, N=7): 3d avg=+5.78%, 100% positive rate, p=0.025 -- STRONG. Validation period (2022-2024, N=7): 3d avg=+1.15%, pos_rate=71.4%, p=0.26 -- WEAK. Fails multiple testing. Root cause: (1) Discovery period confounded by concurrent earnings -- MTDR Feb 22, 2021 was day before Q4 earnings (Feb 23); AA Oct 14, 2021 may also have had guidance with dividend. (2) Small N (7 per period) means 1-2 outliers drive statistical test. (3) Literature signal (Asquith & Mullins 1983) was for broader market; in 2022-2024 era, large-cap dividend initiations are fully anticipated (TMUS, ATKR, HUBG all near-zero 1d reactions). Conclusion: Dividend initiation signal has DECAYED for large-cap stocks. Remaining edge may be for small-cap surprise initiations but sample too small and liquidity concerns make it untradeable at our K scale.",
       "recorded": "2026-03-22T11:50:52.339867"
+    },
+    {
+      "event_type": "pre_earnings_runup_beater",
+      "reason": "Pre-earnings run-up for consistent EPS beaters: DEAD END for large-cap S&P 500. Measured 44-stock universe 2021-2025 (874 events). 5d abnormal: avg=+0.23%, pos_rate=44.9%, Wilcoxon p=0.082. FAILS: (1) Below 0.5% direction threshold, (2) Bonferroni-corrected p threshold (tested 3 windows), (3) Beater classification adds zero value vs all-stocks baseline (p_diff=0.35), (4) 2021 shows OPPOSITE direction for beaters (-1.12%, p=0.005). The general 5d pre-earnings drift (all stocks) also fails: p=0.021, marginal, no direction signal. Conclusion: large-cap S&P 500 is too efficient for pre-earnings drift to be tradeable. Possible follow-up: test on mid-cap or small-cap universe (<B) where information diffusion is slower.",
+      "recorded": "2026-03-22T12:24:19.465112"
     }
   ]
 }

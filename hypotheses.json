@@ -4773,7 +4773,7 @@
       "market_regime": "Tested across 2021-2025 including bull (2021, 2023-2025), bear (2022), and elevated volatility (March 2020-type tariff shock). Signal persists across regimes for n=6-9 tier."
     },
     "market_regime_note": "Extensively tested across VIX regimes. n=6-9 is uniquely regime-robust vs all other cluster tiers. n=3-5 fails in elevated VIX (p=0.27). n>=10 is noise (p=0.64). n=6-9 maintains significance through VIX 25-30.",
-    "regime_note": null,
+    "regime_note": "IMPORTANT: Temporal analysis (N=353, 2021-2025) reveals the n=6-9 signal is NOT uniformly distributed across time. 2021-2022 shows NO signal (N=133, avg 3d=+0.77%, p=0.23 -- SPAC-era insider mechanics and micro-cap contamination). Signal EMERGES in 2023-2025 (N=179, avg 3d=+4.53%, 67% pos, p<0.0001). The hypothesis is supported by 2023+ data but the discovery period (2021-2022) is weak. This is a structural regime change: post-SPAC-era filings are cleaner, and 2023+ institutional attention to EDGAR Form 4 data is higher. Treat as 2023-vintage signal. The GO live trade (March 2026) is the first true prospective OOS test.",
     "confidence": 7,
     "literature_reference": "Kang, Kim & Wang (2018) \"Informed Trading before Corporate Events.\" Lakonishok & Lee (2001). Seyhun (1998).",
     "survivorship_bias_note": "Discovery (2021-2022): 39% measurement failure due to delisted tickers (SPAC-era companies, micro-cap acquisitions). Exceeds 30% threshold but failures are predominantly acquired companies (positive survivorship bias). Validation (2023-2025): <1% failure rate, clean data.",

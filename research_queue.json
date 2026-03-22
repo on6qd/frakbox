@@ -527,6 +527,15 @@
       "added": "2026-03-22T11:17:38.706856"
     },
     {
+      "id": "9549127c",
+      "category": "pre_earnings_runup",
+      "question": "Test pre-earnings run-up signal on mid-cap universe (B-B market cap). Large-cap S&P 500 shows dead end (avg +0.23%, fails multiple testing). Mid-cap hypothesis: information diffuses more slowly in mid-cap stocks, so consistent beaters may show larger pre-earnings drift as institutional analysts gradually build positions. Use Russell 2000 components or screener. Need at least 50 stocks with 12+ quarters of data (2021-2025). Target: avg abnormal > 0.5%, pos_rate > 50%, p < 0.05 (Wilcoxon).",
+      "priority": 3,
+      "status": "pending",
+      "reasoning": "Large-cap version dead-ended due to market efficiency. Mid-cap test is natural follow-up. Frazzini & Lamont (2007) documented drift in 1980s-90s data when market efficiency was lower for smaller stocks.",
+      "added": "2026-03-22T12:24:37.370198"
+    },
+    {
       "id": "d288c2b8",
       "category": "sec_wells_notice",
       "question": "Wells Notice sub-hypothesis: Are financial fraud Wells Notices different from procedural ones? If yes, test 10+ fraud-specific Wells Notices (like BEN -13%, NRDS -7%) vs procedural (NDAQ +1.5%, XYL -2.5%). Need manual classification or a legal database. Likely requires Bloomberg Law or SEC enforcement actions database. LOW PRIORITY: would need external data source.",
