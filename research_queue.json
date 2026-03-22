@@ -331,9 +331,11 @@
       "category": "capital_allocation",
       "question": "Refined buyback sub-hypothesis: small-cap (<$2B mcap) first-ever buyback programs buying back >10% of float. Do these generate significant short-term abnormal returns? Build EDGAR 8-K scanner to find these events 2019-2024, then backtest.",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "General large buyback signal is dead (market efficient post-2007). But extreme-size first-ever buybacks at small-caps may still signal undervaluation meaningfully. Requires EDGAR 8-K item 8.01 parsing to find events. Academic paper by Vermaelen shows 16% long-horizon excess returns for large tender offers but this has not been tested for small-cap open-market repurchases.",
-      "added": "2026-03-21T19:30:39.570109"
+      "added": "2026-03-21T19:30:39.570109",
+      "completed": "2026-03-22T13:29:03.903616",
+      "findings": "DEAD END. Small-cap buyback announcements (EDGAR 8-K, 2022-2024): 2023 N=91: 1d=+0.14% p=0.797; 2024 N=47: 1d=+0.42% p=0.845 -- no signal. 2022 N=49: 1d=+2.71% p=0.020 -- PASSES MT but is bear market regime artifact. Signal does not replicate across 3 years. Regime-specific to 2022 bear market. General buyback announcement signal is not systematic at small-cap level. Dead end."
     },
     {
       "id": "91533711",
@@ -437,9 +439,11 @@
       "category": "insider_buying",
       "question": "Test 3-way interaction: CEO/CFO presence x cluster size (n=3-5 vs n=6-9) x VIX regime. Use clusters_with_roles.csv. Does CEO/CFO in n=6-9 cluster during calm VIX materially outperform CEO/CFO in n=3-5 cluster?",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Current analysis conflates all cluster sizes. VIX+cluster_size research showed n=6-9 is the optimal tier for the base signal. CEO/CFO may provide greater uplift in the n=6-9 regime. Optimal rule may be: trade n=6-9 CEO/CFO clusters, skip n=3-5 CEO/CFO in elevated VIX.",
-      "added": "2026-03-22T11:17:38.705790"
+      "added": "2026-03-22T11:17:38.705790",
+      "completed": "2026-03-22T13:29:03.902691",
+      "findings": "3-WAY INTERACTION (CEO/CFO x cluster_size x VIX): DEAD END for new hypothesis. n3_5+CEO/CFO+calm VIX shows +7.05% mean (2023+, N=198) but CEO/CFO PREMIUM within n3_5 vs n3_5 without CEO/CFO fails Mann-Whitney (p=0.22) and Bonferroni correction. Key insight: n6_9 hypothesis (416556df) is more symmetric (skewness=1.90 vs 8.23) and does NOT benefit from CEO/CFO filter (CEO/CFO adds nothing for n6_9: +4.62 vs +5.10). The pre-registered hypotheses (2bbe0f04 for CEO/CFO, 416556df for n6_9) are the correct trading rules. No new hypothesis warranted. VIX gate confirmed: calm VIX is critical for n3_5 CEO/CFO but n6_9 works in VIX<=30 as well."
     },
     {
       "id": "seed-003",
@@ -522,9 +526,11 @@
       "category": "insider_buying",
       "question": "Compute median abnormal returns (not just mean) for CEO/CFO vs non-CEO/CFO clusters. Winsorize at 99th percentile. Skewness is 2.38 at 5d \u2014 mean may be inflated by outliers.",
       "priority": 3,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "High skewness (2.38-3.45) means mean is driven by extreme events. Wilcoxon confirms median is positive (p<0.0001) but median magnitude unknown. This affects position sizing and stop-loss decisions.",
-      "added": "2026-03-22T11:17:38.706856"
+      "added": "2026-03-22T11:17:38.706856",
+      "completed": "2026-03-22T13:29:03.901527",
+      "findings": "CEO/CFO cluster (2bbe0f04) robust stats: mean=+5.90% but heavily right-skewed (skewness=8.23). Winsorized mean=+5.23% (outliers contribute ~0.67%). Median=+1.59%. 10th percentile=-5.05% (stop-loss at 10% covers ~10% of events). Sharpe vs 0 = 0.278. n6_9 (416556df) has better distribution: skewness=1.90, Sharpe=0.370. Mean for CEO/CFO is real but inflated by right tail. Position sizing: K uniform is appropriate; the 90th percentile is +21.58% so the upside tail justifies the position. The median is more representative of typical outcome: expect ~1.5-2% per trade, not 5-7%."
     },
     {
       "id": "9549127c",

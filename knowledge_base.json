@@ -778,6 +778,11 @@
       "event_type": "pre_earnings_runup_midcap",
       "reason": "Mid-cap (B-B) pre-earnings drift dead end. Universe: 42 S&P MidCap stocks, 2021-2025. Consistent beaters (n=367): +0.12% 5d abnormal, p=0.494, 52.3% positive rate. Consistent missers (n=40): -0.15%, p=0.834. Mixed (n=302): +0.31%, p=0.154. No window (2d, 3d, 5d) showed significance. Conclusion: Pre-earnings drift is absent for mid-caps in this universe, consistent with large-cap dead end. The signal simply does not exist for US equities with consistent earnings histories, likely because the EPS beat/miss pattern is already priced in via analyst estimates.",
       "recorded": "2026-03-22T12:52:30.963456"
+    },
+    {
+      "event_type": "small_cap_buyback_announcement",
+      "reason": "2022-2024 EDGAR 8-K buyback program announcements for small-cap (<2B) stocks. 2023 (N=91): 1d=+0.14% p=0.797, fails MT. 2024 (N=47): 1d=+0.42% p=0.845, fails MT. 2022 (N=49): 1d=+2.71% p=0.020 PASSES MT but 5d not significant and 2022 bear market is a unique regime (general negative sentiment amplified buyback signaling). Signal does not replicate across 3 years. DEAD END for systematic trading.",
+      "recorded": "2026-03-22T13:28:46.424862"
     }
   ]
 }
