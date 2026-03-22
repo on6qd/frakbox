@@ -556,5 +556,27 @@
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
     "set_by_session": "2026-03-21T14:15:00.000000"
+  },
+  "tasks": [
+    {
+      "id": "spy_trend_filter_vix_tier",
+      "category": "regime_analysis",
+      "question": "Is VIX 20-25 vs VIX 25-30 a better split than 20-30 combined? Test two-tier VIX rule.",
+      "priority": "high",
+      "reasoning": "Full-population analysis shows VIX 25-30 barely positive (mean=0.36%) vs VIX 20-25 (mean~1.1%). A finer VIX split may improve trading selectivity. Also test whether the marginal VIX 25-30 + SPY<-3% filter is real or 2022-bear-market artifact.",
+      "depends_on": null,
+      "status": "pending",
+      "created": "2026-03-22"
+    }
+  ],
+  "next_session": {
+    "priorities": [
+      "1. Check GO and WD trade outcomes (entered 2026-03-19/18) \u2014 are these in elevated VIX bucket as expected?",
+      "2. Test two-tier VIX rule: VIX<20 vs VIX 20-25 vs VIX 25-30 with bootstrap CIs",
+      "3. Determine whether to update the hypothesis regime filter from \"elevated(20-30)\" to just \"VIX<25\" or \"VIX<20\"",
+      "4. Investigate whether 2022 bear market is driving the VIX 25-30 + SPY<-3% bucket result (n=18/24 from 2022)"
+    ],
+    "handoff": "SPY trend analysis complete. Key finding: VIX level dominates, SPY trend has near-zero correlation (r=0.03). The elevated VIX regime (20-30) is marginally positive but driven by VIX 20-25, not VIX 25-30. Next priority: refine VIX tier thresholds.",
+    "updated": "2026-03-22"
   }
 }
