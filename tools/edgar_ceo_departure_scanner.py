@@ -307,6 +307,7 @@ def check_stock_direction(events: list) -> list:
             continue
 
         try:
+            import pandas as pd
             date = datetime.strptime(date_str[:10], "%Y-%m-%d")
             # Get price data around the event
             start = (date - timedelta(days=5)).strftime("%Y-%m-%d")
@@ -315,6 +316,10 @@ def check_stock_direction(events: list) -> list:
             hist = yf.download(ticker, start=start, end=end, progress=False, auto_adjust=True)
             if hist.empty:
                 continue
+
+            # Flatten MultiIndex columns from newer yfinance (e.g. ('Open','AAPL') -> 'Open')
+            if isinstance(hist.columns, pd.MultiIndex):
+                hist.columns = hist.columns.get_level_values(0)
 
             hist.index = hist.index.tz_localize(None)
             hist.index = hist.index.normalize()
@@ -327,16 +332,9 @@ def check_stock_direction(events: list) -> list:
             if next_days.empty or prev_close.empty:
                 continue
 
-            # Handle multi-level column index from newer yfinance versions
-            def _scalar(series_or_val):
-                import pandas as pd
-                if isinstance(series_or_val, pd.Series):
-                    return float(series_or_val.iloc[0])
-                return float(series_or_val)
-
-            day_after_open = _scalar(next_days.iloc[0]["Open"])
-            day_after_close = _scalar(next_days.iloc[0]["Close"])
-            prev_close_price = _scalar(prev_close.iloc[-1]["Close"])
+            day_after_open = float(next_days["Open"].iloc[0])
+            day_after_close = float(next_days["Close"].iloc[0])
+            prev_close_price = float(prev_close["Close"].iloc[-1])
 
             # 1-day return from open to close (intraday)
             intraday_return = (day_after_close - day_after_open) / day_after_open
@@ -405,6 +403,19 @@ def scan_ceo_departures(
                 time.sleep(0.1)
 
     print(f"  Resolved {len(ticker_events)} tickers")
+
+    # Step 2b: Deduplicate by (ticker, filing_date[:10]) — EDGAR often returns
+    # multiple documents per event (main 8-K + amendment/exhibit)
+    seen_ticker_dates = set()
+    deduped = []
+    for ev in ticker_events:
+        key = (ev.get("ticker", ""), ev.get("filing_date", "")[:10])
+        if key not in seen_ticker_dates:
+            seen_ticker_dates.add(key)
+            deduped.append(ev)
+    if len(deduped) < len(ticker_events):
+        print(f"  Deduped {len(ticker_events)} -> {len(deduped)} events (same ticker+date)")
+    ticker_events = deduped
 
     # Step 3: Filter by market cap
     if ticker_events:

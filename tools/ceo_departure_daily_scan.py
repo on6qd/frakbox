@@ -67,9 +67,23 @@ def main():
     )
 
     # Filter for qualifying signals
+    today = datetime.date.today()
     qualifying = []
     for r in results:
         ticker = r.get("ticker", "")
+
+        # Check trading window: event must be within last 2 calendar days to be actionable
+        # (CEO departure signal requires entry at next-day open — stale events can't be traded)
+        filing_date_str = r.get("filing_date", "")[:10]
+        try:
+            filing_date = datetime.date.fromisoformat(filing_date_str)
+            days_old = (today - filing_date).days
+            if days_old > 2:
+                print(f"SKIP {ticker}: event {filing_date_str} is {days_old} days old (window closed)")
+                continue
+        except ValueError:
+            pass  # If date parse fails, continue checking
+
         if not r.get("stock_fell", False):
             continue
         if ticker in RELIEF_RALLY_EXCLUSIONS:

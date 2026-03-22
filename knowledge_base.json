@@ -498,6 +498,19 @@
       "discovery_backtest": "All 2021-2025: N=353, 3d avg=+2.39% p<0.0001, 5d avg=+3.72% p<0.0001, passes_multiple_testing=True",
       "by_period": "2021-2022: N=133, 3d avg=+0.77% p=0.23, NOT significant; 2022-only: N=56, p=0.16 NOT significant; 2023-2025: N=179, 3d avg=+4.53% p<0.0001, STRONG signal",
       "last_updated": "2026-03-22T05:35:56.829072"
+    },
+    "ceo_performance_failure_departure": {
+      "event": "ATR CEO departure 2026-03-17 - EXCLUSION",
+      "ticker": "ATR",
+      "market_cap_m": "unknown",
+      "overnight_return_pct": -3.95,
+      "intraday_return_pct": -0.13,
+      "abnormal_intraday_pct": 0.91,
+      "departure_type": "planned_retirement",
+      "note": "Classified as planned retirement by 8-K text. Despite -4% overnight gap, intraday return was +0.91% abnormal (ATR outperformed SPY intraday on a day SPY fell -1.04%). Gap was priced in by market open \u2014 no intraday continuation. NOT a valid signal for hypothesis 5dbcfb37 (entry at open).",
+      "hypothesis_id": "5dbcfb37",
+      "status": "excluded_planned_retirement_correctly",
+      "last_updated": "2026-03-22T05:58:02.131600"
     }
   },
   "dead_ends": [
