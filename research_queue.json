@@ -778,6 +778,14 @@
       "hypothesis_template": "061ae3a8",
       "added": "2026-03-22T16:12:20.888562",
       "status": "watching"
+    },
+    {
+      "event": "ABT 52-week low first touch on 2026-03-20 (105.46, fresh new 52w low after 35-day gap from Jan cluster). Track 5d outcome as OOS validation for hypothesis 86d28864. Signal criteria met: S&P 500 large-cap (market cap ~$183B), first touch by 30-day gap rule, entry at Monday March 23 open.",
+      "expected_date": "2026-03-27",
+      "symbol": "ABT",
+      "hypothesis_template": "86d28864",
+      "added": "2026-03-22T16:16:24.986164",
+      "status": "watching"
     }
   ],
   "next_session_priorities": [
