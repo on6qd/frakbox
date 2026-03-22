@@ -228,18 +228,20 @@
       "last_updated": "2026-03-21T11:11:28.681628"
     },
     "insider_buying_cluster": {
-      "finding": "Sector heterogeneity in 2023-24 largecap clusters",
-      "source": "Sector analysis of 233 largecap 2023-24 cluster events (session 11)",
-      "consumer_cyclical": "3d avg=+9.88%, pos_rate=90%, p=0.007 (N=10, strong but small N)",
-      "industrials": "3d avg=+4.47%, pos_rate=71%, p=0.014 (N=31)",
-      "energy": "3d avg=+3.11%, pos_rate=62.5%, p=0.009 (N=24)",
-      "technology": "3d avg=+3.41%, NOT significant p=0.20 (N=21)",
-      "financial_services": "3d avg=-0.26%, NOT significant p=0.76 (N=34) - WEAKEST",
-      "communication_services": "3d avg=-0.13%, NOT significant p=0.95 (N=8) - AVOID",
-      "healthcare": "MEAN skewed by outliers (DRUG +1369%), MEDIAN=0.24% - low predictability",
-      "caution": "2020-2022 validation of sector effect was inconclusive due to data quality; 2023-24 finding only",
-      "implication": "Prefer Energy/Industrials clusters; de-prioritize Financial Services and Healthcare clusters",
-      "last_updated": "2026-03-21T20:38:25.034986"
+      "observation": "AHCO cluster (Mar 12 2026): 3 insiders, 20M total, management flag (M). Abnormal: 1d=+3.98%, 3d=+1.24%, 5d=-0.72%. Strong 1d signal, faded by day 5.",
+      "observation_type": "observed_outcome_post_hoc",
+      "symbol": "AHCO",
+      "cluster_date": "2026-03-12",
+      "cluster_size": 3,
+      "cluster_value_usd": 20000000,
+      "flags": "M (management)",
+      "market_cap": 1346915840,
+      "sector": "Healthcare",
+      "abnormal_1d": 3.98,
+      "abnormal_3d": 1.24,
+      "abnormal_5d": -0.72,
+      "note": "Management flag (M) cluster with very large dollar value showed strong 1d abnormal return. By day 5 (March 19 close=10.08 vs entry ~10.25), returned to near flat vs benchmark. The fast mean-reversion suggests the 3d window may be optimal for M-flag clusters of this size.",
+      "last_updated": "2026-03-22T01:53:11.322932"
     },
     "insider_buying_cluster_3plus": {
       "effect": "3+ insider cluster buys within 30 days: abnormal returns at 3d and 5d consistently positive",

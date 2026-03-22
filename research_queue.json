@@ -16,9 +16,11 @@
       "category": "insider_buying_cluster",
       "question": "URGENT: Paper trade execution for TWO trades Monday March 23.\n\nTRADE 1 - GO (Grocery Outlet), hypothesis 1cb6140f (3d hold):\n  6 insiders incl CEO bought $6.3M at avg $6.02 (March 6-19). Current ~$5.79.\n  Entry: LONG GO at Monday open. Exit: Thursday March 26 close.\n  Run: python tools/activate_go_trade.py\n\nTRADE 2 - WD (Walker & Dunlop), hypothesis 76678219 (5d hold):\n  3 insiders filed March 20, last purchase March 18. Current ~$43.82.\n  Near 52W low ($42.12), down 51% from high. Mortgage Finance $1.49B.\n  Entry: LONG WD at Monday open. Exit: Tuesday March 30 close.\n  Run: python tools/activate_wd_trade.py\n\nBoth are $5,000 positions. Abort if either is down >10% from Friday close.",
       "priority": 0,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "GO cluster detected 2026-03-21, market closed (Saturday). Must enter Monday open to capture 1d signal window. 6 insiders including CEO = highest conviction cluster since backtest period.",
-      "added": "2026-03-21T11:56:17.468564"
+      "added": "2026-03-21T11:56:17.468564",
+      "completed": "2026-03-22T01:53:28.300689",
+      "findings": "GO and WD triggers set to next_market_open. Trade loop will execute both at Monday March 23 9:30 AM ET. No manual action needed."
     },
     {
       "id": "seed-001",
@@ -138,6 +140,15 @@
       "added": "2026-03-22T01:22:25.655010",
       "completed": "2026-03-22T00:00:00.000000",
       "findings": "GOSS classification confirmed as REVERSAL, not continuation. Actual measurement (entry=open Feb 24, 0.388): 1d abnormal=+4.40%, 3d=+1.55%, 5d=+9.67% -- ALL WRONG DIRECTION for the short hypothesis. ROOT CAUSE: Feb 23 announcement simultaneously included strong subgroup data (intermediate/high-risk PAH p=0.021) AND explicit FDA Type C meeting plans. Market priced an ongoing regulatory path; stock bounced +49% (0.388 -> 0.58) by March 4. Structurally identical to AVIR reversal (Roche partnership kept regulatory path open). CORRECTION APPLIED to d302c84b: GOSS abnormal_3d corrected from -37.21 (recording error) to +1.55. New hypothesis stats: N=11, consistency_pct=90.9%, avg_3d=-23.93%, stdev=11.72%, confidence 8->7. Validation period: 4/5 continuation (80%), not 5/5. NEW QUALIFYING CRITERION RECOMMENDED: hypothesis event_description needs criterion 6 -- company must NOT have stated FDA path forward or subgroup NDA plans at time of event. GOSS remains in backtest as documented reversal exception (like AVIR), not excluded."
+    },
+    {
+      "id": "f1ce4f4d",
+      "category": "ceo_sudden_departure_short",
+      "question": "When next qualifying CEO departure fires, set trigger to 'after_hours_immediate' and place short via extended hours limit order. After-hours support now in trader.py. Signal: p=0.0034, N=13, confidence 7.",
+      "priority": 1,
+      "status": "pending",
+      "reasoning": "After-hours order support is now built. The only barrier was technical \u2014 it is removed. First qualifying event should be traded.",
+      "added": "2026-03-22T01:53:37.216707"
     },
     {
       "id": "seed-002",
@@ -377,6 +388,15 @@
       "added": "2026-03-22T00:33:45.305908"
     },
     {
+      "id": "4c6dbfe1",
+      "category": "insider_buying_cluster",
+      "question": "Check POOL (3 insiders, $3.6M, March 17) and AMRZ (5 insiders, $4.6M, March 16) outcomes as validation data points for insider cluster signal",
+      "priority": 3,
+      "status": "pending",
+      "reasoning": "These were missed opportunities that can serve as OOS validation data. POOL outcome available now; AMRZ may have data.",
+      "added": "2026-03-22T01:53:37.215866"
+    },
+    {
       "id": "d288c2b8",
       "category": "sec_wells_notice",
       "question": "Wells Notice sub-hypothesis: Are financial fraud Wells Notices different from procedural ones? If yes, test 10+ fraud-specific Wells Notices (like BEN -13%, NRDS -7%) vs procedural (NDAQ +1.5%, XYL -2.5%). Need manual classification or a legal database. Likely requires Bloomberg Law or SEC enforcement actions database. LOW PRIORITY: would need external data source.",
@@ -500,42 +520,29 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. VERIFY GO (1cb6140f) and WD (76678219) trade execution \u2014 should have executed at 9:30 ET Monday March 23. Check Alpaca positions and run.py --status.",
-      "set_by_session": "2026-03-22T01:25:43.720555"
+      "task": "Regime-conditional insider cluster signal: POOL and AMRZ both went against the signal during SPY -3% drawdown (Mar 17-20). Need to test whether insider cluster signal should be gated by VIX/SPY trend filter.",
+      "set_by_session": "2026-03-22T01:53:24.673661"
     },
     {
-      "task": "2. MONITOR PDUFA dates: DNLI (Apr 5) and REPL (Apr 10). These are linked to hypothesis 5f805860. If FDA issues CRL for either: determine if first-time clinical efficacy failure, then set trigger next_market_open on 5f805860 with correct symbol.",
-      "set_by_session": "2026-03-22T01:25:43.720559"
+      "task": "Management-flag (M) insider clusters: AHCO showed strong 1d abnormal (+3.98%) but faded by day 5 (-0.72%). Test whether M-flag clusters systematically generate faster, stronger 1-3d returns compared to director-only clusters.",
+      "set_by_session": "2026-03-22T01:53:24.673670"
     },
     {
-      "task": "3. VERIFY GOSS classification for d302c84b (task 5568fdad). Check: was GOSS Feb 23 2026 actually a clinical failure (what trial failed)? Was this a first-time failure? Given the -72% overnight gap, should this event be excluded or classified as extreme-gapper exception?",
-      "set_by_session": "2026-03-22T01:25:43.720560"
+      "task": "WD and GO trades still pending with next_market_open triggers \u2014 verify they execute correctly on Monday March 23 open.",
+      "set_by_session": "2026-03-22T01:53:24.673672"
     },
     {
-      "task": "4. INVESTIGATE GPOR CEO departure more: search EDGAR for exact 8-K filing date. Determine if announcement was before or after market hours on March 9. Add as supporting evidence or new N=13 data point for CEO departure hypothesis if announcement was after-hours on March 8.",
-      "set_by_session": "2026-03-22T01:25:43.720560"
-    },
-    {
-      "task": "5. CONSIDER building after-hours EDGAR monitoring (task ad6b0f64): edgar_ceo_departure_scanner.py needs CEO-vs-CFO text parsing fix. Then add place_experiment() extended hours support in trader.py for short sells.",
-      "set_by_session": "2026-03-22T01:25:43.720561"
-    },
-    {
-      "task": "6. RESEARCH NEW SIGNAL: Look at S&P 500 earnings estimate revisions \u2014 when consensus EPS estimates are revised down significantly (>15%) for S&P 500 companies, is there a signal? Low priority but in queue.",
-      "set_by_session": "2026-03-22T01:25:43.720562"
+      "task": "AHCO is not actionable: 7+ trading days have passed, 1d signal already fired and faded. Use as validation data point only.",
+      "set_by_session": "2026-03-22T01:53:24.673673"
     }
   ],
   "session_handoff": {
-    "session_date": "2026-03-22",
-    "what_was_done": "Fresh insider scan (28 clusters, GO/WD are active), ADBE CEO departure measured (muted by market selloff), FDA data quality review (ALDX/ATRA repeat CRLs bounce not crash), GOSS revealed as extreme-gapper exception (-72% gap, open entry catches bounce), IMMP confirmed clinical failure signal (-18.6% at 5d), GPOR CEO departure measured (-3.11% open entry, -7.68% close entry), PDUFA watchlist added for DNLI/REPL/ARVN",
-    "key_findings": [
-      "Repeat CRLs (2nd, 3rd) DO NOT follow the first-time CRL short pattern \u2014 stocks bounce. Discriminating factor: must be FIRST clinical efficacy failure",
-      "Extreme micro-cap gappers (>50% overnight gap) also bounce from open entry. GOSS is example. Only moderate gappers (<40%) show continuation drift",
-      "GPOR CEO departure confirms gap mechanism: -7.68% close entry vs -3.11% open entry. Open entry DOES work for CEO departure better than hypothesized average (-0.14%)",
-      "ADBE CEO departure: muted abnormal returns due to broad market selloff in March 2026. Raw gap was -7.6% but benchmark-adjusted near zero during market correction"
-    ],
-    "what_is_blocked": "CEO departure signal (5dbcfb37) still needs after-hours infrastructure. GOSS needs manual verification. GO/WD trades executing Monday",
-    "specific_next_step": "First: run.py --status to verify GO/WD activated. Then check DNLI PDUFA (Apr 5) news as it approaches \u2014 search for FDA AdCom decisions or reviewer concerns.",
-    "written_at": "2026-03-22T01:25:43.720563"
+    "investigation": "Outcome check on missed clusters POOL/AMRZ and AHCO assessment",
+    "current_state": "All three measured. POOL and AMRZ missed (negative abnormal returns, market selloff overwhelmed signal). AHCO showed +3.98% abnormal on day 1 but is no longer tradeable \u2014 window has closed.",
+    "key_finding": "Market regime (SPY direction) appears to interact with insider cluster signal. Both POOL and AMRZ filed clusters at the start of a broad 3% SPY selloff and underperformed. This is consistent with the documented regime_note on hypothesis 0a093c90 that the 20d signal is regime-dependent.",
+    "blocked_by": "Need more regime-filtered backtest data to determine if a SPY trend gate would improve signal. Cannot conclude from 3 observations.",
+    "next_step": "Run the existing insider cluster backtest (hypothesis 32be9d90 or 0a093c90) with regime_filter=calm to quantify how much the calm-regime signal differs from the full-sample signal. This would support or refute a regime gate.",
+    "written_at": "2026-03-22T01:53:24.673675"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
