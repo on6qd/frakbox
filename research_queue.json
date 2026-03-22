@@ -452,9 +452,11 @@
       "category": "momentum",
       "question": "Is VWAP_252 breakout (Close/VWAP >= 1.15) a viable LONG momentum signal? Can it be traded profitably?",
       "priority": 7,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "VWAP deviation backtest revealed the OPPOSITE of the disposition effect: stocks extended above VWAP continue upward. Signal has n=489, passes_multiple_testing=True, +0.64% abnormal at 1d, all bootstrap CIs exclude zero, OOS 2024 confirms (+0.82% 1d). Need regime analysis, higher-threshold test, and transaction cost viability check before forming hypothesis.",
-      "added": "2026-03-21T21:14:05.919073"
+      "added": "2026-03-21T21:14:05.919073",
+      "completed": "2026-03-22T03:56:37.687675",
+      "findings": "VWAP_252 breakout (Close/VWAP >= 1.15) fails minimum thresholds. Best return = +1.19% at 20d, below min_abnormal_return_pct=1.5%. Net return after 0.10% costs = +1.09% at best, failing min_net_return=1.0% at shorter horizons. Dead end recorded. The signal direction is correct (momentum, not mean-reversion) but magnitude is too small."
     }
   ],
   "event_watchlist": [

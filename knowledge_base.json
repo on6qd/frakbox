@@ -465,6 +465,19 @@
       },
       "actionability_conclusion": "Signal requires after-hours entry (post-announcement, pre-gap) to capture. Intraday-only accounts cannot trade this signal.",
       "last_updated": "2026-03-22T00:11:19.333449"
+    },
+    "insider_cluster_6_to_9": {
+      "description": "OPTIMAL CLUSTER SIZE TIER: 6-9 insiders is the uniquely regime-robust tier",
+      "discovery_2021_2022": "3d avg=+3.48%, pos_rate=69.7%, p<0.000001, N=132 measured (216 attempted, 39% failure)",
+      "validation_2023_2025": "3d avg=+4.13%, pos_rate=64.6%, p<0.000001, N=178 measured (<1% failure)",
+      "bootstrap_ci_disc": "[+2.04%, +5.08%], excludes zero=True",
+      "bootstrap_ci_val": "[+2.48%, +5.98%], excludes zero=True",
+      "regime_robustness": "Works in BOTH calm VIX<20 (p=0.0004) AND elevated VIX 20-30 (p=0.027). EV ranges from +5.70% (VIX<15) to +2.37% (VIX 25-30). ONLY cluster tier significant across regimes.",
+      "comparison_to_other_tiers": "n=3-5: fails in elevated VIX (p=0.27). n>=10: noise (p=0.64, 49% pos_rate). n=6-9: optimal signal/noise ratio.",
+      "hypothesis_id": "9f8a4c61",
+      "confidence": 7,
+      "passes_multiple_testing": true,
+      "last_updated": "2026-03-22T03:56:37.686580"
     }
   },
   "dead_ends": [
