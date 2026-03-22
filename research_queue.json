@@ -129,6 +129,15 @@
       "added": "2026-03-21T20:45:49.626841"
     },
     {
+      "id": "5568fdad",
+      "category": "validation",
+      "question": "Verify GOSS (Gossamer Bio) Feb 23 2026 clinical failure event. What happened? Was there a concurrent positive catalyst? Was the stock already beaten down 90%+ (priced in)? Should GOSS be removed from d302c84b hypothesis backtest events?",
+      "priority": 1,
+      "status": "pending",
+      "reasoning": "GOSS showed +4.40% abnormal 1d after a supposed clinical failure \u2014 wrong direction. Either the event date is wrong, the event classification is wrong, or it's a beaten-down-stock exception. Affects consistency_pct of d302c84b.",
+      "added": "2026-03-22T01:22:25.655010"
+    },
+    {
       "id": "seed-002",
       "category": "index_rebalancing",
       "question": "When a stock is announced for S&P 500 addition, what is the abnormal return between announcement and effective date, and does it reverse after inclusion? How does this compare to Russell 2000 rebalancing?",
@@ -294,6 +303,15 @@
       "findings": "Earnings guidance cut SHORT signal: DEAD END for general large-cap. N=9 events (AAPL/FDX/TGT/WMT/MU/SNAP/NKE/INTC 2018-2024). Blue chips BOUNCE after cuts (WMT +5.6%, TGT +2.5%), only pure growth/weaker (SNAP -11%) decline. avg_1d=-0.71% pos_rate=56% p=0.91. Not statistically or economically significant. Potential subhypothesis: SHORT growth-heavy (P/E >30) guidance cuts, but sample too small to test. DEAD END."
     },
     {
+      "id": "ad6b0f64",
+      "category": "engineering",
+      "question": "Build after-hours order support in trader.py and real-time CEO departure detector. Required to trade hypothesis 5dbcfb37 (p=0.0034, -3.25% avg). Steps: (1) Add place_experiment_afterhours() using Alpaca extended_hours=True, limit orders at bid; (2) Improve edgar_ceo_departure_scanner.py with CEO-vs-CFO text parsing; (3) Build launchd job to scan EDGAR 8-K Item 5.02 filings every 30 min during market hours.",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "CEO departure signal (5dbcfb37) is validated but entirely fires in the overnight gap. Without AH short entry, the signal is untradeable. GPOR (Mar 9, 2026, -7.0%) is a missed trade that confirms the signal is still firing.",
+      "added": "2026-03-22T01:22:25.655736"
+    },
+    {
       "id": "seed-003",
       "category": "fda_decision",
       "question": "For Phase 3 FDA approvals/rejections of novel drugs (not generics, not supplements), what is the typical abnormal return at 1d and 5d horizons? Does the effect differ between first-time submissions and resubmissions after a Complete Response Letter?",
@@ -452,46 +470,70 @@
       "hypothesis_template": "insider_buying_cluster_3plus",
       "added": "2026-03-22T00:11:21.807759",
       "status": "watching"
+    },
+    {
+      "event": "REPL (Replimune) PDUFA date for RP1 (BLA resubmission after Jul 2025 CRL) \u2014 melanoma indication. Monitor for rejection (2nd CRL). If CRL: wait 1-2 days for initial bounce to resolve before entering short. If approved: do not trade.",
+      "expected_date": "2026-04-10",
+      "symbol": "REPL",
+      "hypothesis_template": "5f805860",
+      "added": "2026-03-22T01:22:01.003715",
+      "status": "watching"
+    },
+    {
+      "event": "DNLI (Denali Therapeutics) PDUFA date for DNL310 (tividenofusp alfa) \u2014 Hunter syndrome (MPS II). First NDA, priority review. If CRL: enter short per hypothesis 5f805860.",
+      "expected_date": "2026-04-05",
+      "symbol": "DNLI",
+      "hypothesis_template": "5f805860",
+      "added": "2026-03-22T01:22:01.004443",
+      "status": "watching"
+    },
+    {
+      "event": "ARVN (Arvinas) PDUFA date for vepdegestrant (ARV-471) \u2014 breast cancer. First NDA for a PROTAC degrader. High-profile. If CRL: enter short per hypothesis 5f805860.",
+      "expected_date": "2026-06-05",
+      "symbol": "ARVN",
+      "hypothesis_template": "5f805860",
+      "added": "2026-03-22T01:22:01.005021",
+      "status": "watching"
     }
   ],
   "next_session_priorities": [
     {
-      "task": "1. VERIFY GO and WD trade execution Monday March 23 (check Alpaca positions, confirm fills, log any slippage). Hypothesis IDs: 1cb6140f (GO) and 76678219 (WD).",
-      "set_by_session": "2026-03-22T00:33:45.306721"
+      "task": "1. VERIFY GO (1cb6140f) and WD (76678219) trade execution \u2014 should have executed at 9:30 ET Monday March 23. Check Alpaca positions and run.py --status.",
+      "set_by_session": "2026-03-22T01:25:43.720555"
     },
     {
-      "task": "2. CEO departure signal - explore after-hours entry: test whether Alpaca paper account allows after-hours short orders. If yes, add extended-hours support to trader.py. The signal fires in overnight gap (-3.11% avg) and is currently unexecutable.",
-      "set_by_session": "2026-03-22T00:33:45.306724"
+      "task": "2. MONITOR PDUFA dates: DNLI (Apr 5) and REPL (Apr 10). These are linked to hypothesis 5f805860. If FDA issues CRL for either: determine if first-time clinical efficacy failure, then set trigger next_market_open on 5f805860 with correct symbol.",
+      "set_by_session": "2026-03-22T01:25:43.720559"
     },
     {
-      "task": "3. Fresh insider cluster scan Monday/Tuesday - check OpenInsider for new filings. Next best candidates from this week's scan: AHCO (3 insiders, $20M purchases, $1.35B cap - entry window passed but monitor for continuation), BLCO (9 insiders), IP (3 insiders).",
-      "set_by_session": "2026-03-22T00:33:45.306725"
+      "task": "3. VERIFY GOSS classification for d302c84b (task 5568fdad). Check: was GOSS Feb 23 2026 actually a clinical failure (what trial failed)? Was this a first-time failure? Given the -72% overnight gap, should this event be excluded or classified as extreme-gapper exception?",
+      "set_by_session": "2026-03-22T01:25:43.720560"
     },
     {
-      "task": "4. ADBE validation for 5dbcfb37 - run 5d return measurement once March 19 close is available (need full 5 trading days post-event). This will be the 13th validation point.",
-      "set_by_session": "2026-03-22T00:33:45.306725"
+      "task": "4. INVESTIGATE GPOR CEO departure more: search EDGAR for exact 8-K filing date. Determine if announcement was before or after market hours on March 9. Add as supporting evidence or new N=13 data point for CEO departure hypothesis if announcement was after-hours on March 8.",
+      "set_by_session": "2026-03-22T01:25:43.720560"
     },
     {
-      "task": "5. S&P 500 Q2 2026 rebalance monitoring - expected ~June 5, 2026. Hypothesis 061ae3a8 needs a symbol once additions are announced (~May 2026).",
-      "set_by_session": "2026-03-22T00:33:45.306726"
+      "task": "5. CONSIDER building after-hours EDGAR monitoring (task ad6b0f64): edgar_ceo_departure_scanner.py needs CEO-vs-CFO text parsing fix. Then add place_experiment() extended hours support in trader.py for short sells.",
+      "set_by_session": "2026-03-22T01:25:43.720561"
     },
     {
-      "task": "6. Explore broader small-cap buyback signal (any open-market repurchase, not first-ever) - lower priority, needs N=50+ dataset.",
-      "set_by_session": "2026-03-22T00:33:45.306727"
+      "task": "6. RESEARCH NEW SIGNAL: Look at S&P 500 earnings estimate revisions \u2014 when consensus EPS estimates are revised down significantly (>15%) for S&P 500 companies, is there a signal? Low priority but in queue.",
+      "set_by_session": "2026-03-22T01:25:43.720562"
     }
   ],
   "session_handoff": {
-    "last_session": "2026-03-21",
-    "trades_staged": [
-      "GO (1cb6140f) triggers Monday March 23",
-      "WD (76678219) triggers Monday March 23"
+    "session_date": "2026-03-22",
+    "what_was_done": "Fresh insider scan (28 clusters, GO/WD are active), ADBE CEO departure measured (muted by market selloff), FDA data quality review (ALDX/ATRA repeat CRLs bounce not crash), GOSS revealed as extreme-gapper exception (-72% gap, open entry catches bounce), IMMP confirmed clinical failure signal (-18.6% at 5d), GPOR CEO departure measured (-3.11% open entry, -7.68% close entry), PDUFA watchlist added for DNLI/REPL/ARVN",
+    "key_findings": [
+      "Repeat CRLs (2nd, 3rd) DO NOT follow the first-time CRL short pattern \u2014 stocks bounce. Discriminating factor: must be FIRST clinical efficacy failure",
+      "Extreme micro-cap gappers (>50% overnight gap) also bounce from open entry. GOSS is example. Only moderate gappers (<40%) show continuation drift",
+      "GPOR CEO departure confirms gap mechanism: -7.68% close entry vs -3.11% open entry. Open entry DOES work for CEO departure better than hypothesized average (-0.14%)",
+      "ADBE CEO departure: muted abnormal returns due to broad market selloff in March 2026. Raw gap was -7.6% but benchmark-adjusted near zero during market correction"
     ],
-    "key_finding": "CEO departure signal fires entirely in overnight gap. Close-entry: avg -3.25% abnormal, 83% correct. Open-entry: avg -0.14%, p=1.0 \u2014 untradeable without after-hours infrastructure.",
-    "adbe_event": "CEO Narayen step-down March 12, 2026. Overnight abnormal: -8.18%. 13th data point for hypothesis 5dbcfb37. Validates pattern but entry window closed.",
-    "dead_end": "Small-cap first-ever buyback: N=8, fails all multiple testing, structurally limited by sample size and earnings contamination.",
-    "no_new_clusters": "All insider clusters from week of March 15-21 have passed entry windows (POOL, AMRZ, AHCO, BLCO, FFIN, IP). GO and WD from March 20 filings are the only fresh ones.",
-    "hypothesis_status": "5 pending, 0 active. GO and WD will become active Monday.",
-    "written_at": "2026-03-22T00:33:45.306729"
+    "what_is_blocked": "CEO departure signal (5dbcfb37) still needs after-hours infrastructure. GOSS needs manual verification. GO/WD trades executing Monday",
+    "specific_next_step": "First: run.py --status to verify GO/WD activated. Then check DNLI PDUFA (Apr 5) news as it approaches \u2014 search for FDA AdCom decisions or reviewer concerns.",
+    "written_at": "2026-03-22T01:25:43.720563"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

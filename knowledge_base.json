@@ -292,133 +292,32 @@
       "last_updated": "2026-03-21T21:39:26.008578"
     },
     "fda_crl_clinical_short": {
-      "description": "N=5 clinical CRL events ALL show SHORT continuation from crash-day open. 0% positive rate at all horizons. Avg 3d=-19.83%, avg 5d=-29.34%. Events: ARDX, GRTX, OTLK, NERV, APLT.",
-      "effect_sizes": {
-        "ardx": {
-          "gap": -73.6,
-          "1d": -2.4,
-          "3d": -15.3,
-          "5d": -28.9
-        },
-        "grtx": {
-          "gap": -82.8,
-          "1d": -5.3,
-          "3d": -21.6,
-          "5d": -32.8
-        },
-        "otlk": {
-          "gap": -80.9,
-          "1d": -4.0,
-          "3d": -19.4,
-          "5d": -19.8
-        },
-        "nerv": {
-          "gap": -58.8,
-          "1d": -15.3,
-          "3d": -19.5,
-          "5d": -23.1
-        },
-        "aplt": {
-          "gap": -74.6,
-          "1d": -7.5,
-          "3d": -23.3,
-          "5d": -42.1
-        }
-      },
-      "avg_1d_abnormal": -6.91,
-      "avg_3d_abnormal": -19.83,
-      "avg_5d_abnormal": -29.34,
-      "pos_rate_1d": 0.0,
-      "pos_rate_3d": 0.0,
-      "pos_rate_5d": 0.0,
-      "passes_multiple_testing": true,
-      "status": "promising_partial_n5",
-      "blocking_issue": "Need min 3 validation instances per methodology (currently 2 if split 3/2)",
-      "reversal_cases_documented": {
-        "REPL_2025": "diversified pipeline",
-        "ALDX_2026": "3rd CRL, pre-anticipated",
-        "SPRY_2023": "device/usability CRL not efficacy failure",
-        "OTLK_2025": "2nd CRL for same company, ultra-micro-cap short-squeeze"
-      },
-      "new_event_grtx": "GRTX (Galera Therapeutics) Aug 10 2023: avasopasem NDA, clinical endpoint failure, -82.8% gap, 3d=-21.6%, 5d=-32.8%, single-drug company",
-      "next_steps": "Need 2+ more qualifying events. Search: Phase 2/3 trial failure crashes as related category. Try Polygon.io for delisted tickers. Monitor upcoming PDUFA calendar for qualifying single-asset small biotech clinical CRL events.",
-      "last_updated": "2026-03-21T14:45:33.605587"
-    },
-    "fda_clinical_rejection_short": {
-      "n_events": 6,
-      "avg_abnormal_3d": -23.88,
-      "avg_abnormal_5d": -30.6,
-      "positive_rate": 0.0,
-      "wilcoxon_p": 0.0312,
-      "passes_multiple_testing": true,
-      "events": [
+      "finding": "Repeat CRL rejections are NOT tradeable with the standard first-time-CRL short hypothesis",
+      "counterexamples": [
         {
-          "symbol": "ACER",
-          "date": "2019-06-24",
-          "event_type": "CRL_clinical",
-          "crash_pct": -79.0,
-          "abn_3d": -34.7
+          "symbol": "ALDX",
+          "date": "2026-03-17",
+          "crl_number": 3,
+          "abnormal_1d": "+19.73%"
         },
         {
-          "symbol": "ARDX",
-          "date": "2021-07-19",
-          "event_type": "AdComm_negative",
-          "crash_pct": -73.9,
-          "abn_3d": -15.3
-        },
-        {
-          "symbol": "NERV",
-          "date": "2022-10-16",
-          "event_type": "RTF_clinical",
-          "crash_pct": -69.5,
-          "abn_3d": -29.0
-        },
-        {
-          "symbol": "GRTX",
-          "date": "2023-08-09",
-          "event_type": "CRL_clinical",
-          "crash_pct": -82.8,
-          "abn_3d": -21.6
-        },
-        {
-          "symbol": "OTLK",
-          "date": "2023-08-29",
-          "event_type": "CRL_mixed",
-          "crash_pct": -80.9,
-          "abn_3d": -19.4
-        },
-        {
-          "symbol": "APLT",
-          "date": "2024-11-27",
-          "event_type": "CRL_clinical",
-          "crash_pct": -76.3,
-          "abn_3d": -23.3
+          "symbol": "ATRA",
+          "date": "2026-01-10",
+          "crl_number": 2,
+          "abnormal_1d": "+4.47%"
         }
       ],
-      "reversal_case": {
-        "symbol": "ALDX",
-        "date": "2026-03-17",
-        "note": "Pre-anticipated CRL: stock declined ~70% pre-announcement. Opened -73% but RECOVERED +64% by day 3. Pre-anticipation = reversal, not continuation."
-      },
-      "discovery_oos_split": {
-        "discovery": [
-          "ACER-2019",
-          "ARDX-2021",
-          "NERV-2022"
-        ],
-        "oos": [
-          "GRTX-2023",
-          "OTLK-2023",
-          "APLT-2024"
-        ],
-        "discovery_avg_3d": -26.31,
-        "oos_avg_3d": -21.45,
-        "both_100pct_negative": true
-      },
-      "key_filter": "Exclude events where stock declined >20% in 10 days BEFORE announcement (pre-anticipated)",
-      "hypothesis_id": "5f805860",
-      "status": "pre_registered_pending_live_event",
-      "last_updated": "2026-03-21T15:22:50.112998"
+      "recommendation": "Add screening criterion: exclude repeat CRLs (CRL #2 or higher). Only first-time clinical efficacy failures qualify.",
+      "date_verified": "2026-03-22",
+      "last_updated": "2026-03-22T01:22:01.002942"
+    },
+    "fda_clinical_rejection_short": {
+      "finding": "Repeat CRL rejections (2nd or 3rd) behave differently from first-time CRLs",
+      "evidence": "ALDX (3rd CRL, Mar 17 2026): +19.73% abnormal 1d; ATRA (2nd CRL, Jan 10 2026): +4.47% day 1 then -19.93% by 3d",
+      "interpretation": "Repeat CRLs are already priced in \u2014 market may bounce on certainty reduction. First-time CRL from clinical efficacy failure is the reliable signal.",
+      "discriminating_factor": "Is this the FIRST clinical efficacy failure for this drug? If so, signal applies. If repeat rejection, do NOT trade.",
+      "date_verified": "2026-03-22",
+      "last_updated": "2026-03-22T01:22:00.999745"
     },
     "fda_crl_clinical_short_DEPRECATED": {
       "note": "DEPRECATED - event dates were wrong in previous sessions. Use fda_clinical_rejection_short instead.",
@@ -449,20 +348,12 @@
       "last_updated": "2026-03-21T15:30:03.781291"
     },
     "clinical_efficacy_failure_short": {
-      "goss_reversal_explanation": "GOSS seralutinib Phase 3 p=0.032 (threshold was 0.025) - near-miss, NOT definitive failure. Company explicitly stated they will still seek FDA approval via subgroup analysis meeting. This is an ambiguous result, not a definitive clinical failure. GOSS should be EXCLUDED from d302c84b backtest by proposed new criterion: Company must have NO stated path forward for the drug.",
-      "immp_note": "IMMP March 13 2026 Phase 3 TACTI-004 failure: eftilagimod in NSCLC. IMMP has other programs (IMP761, other efti indications). Borderline qualifying - failed program was LEAD but company has other pipeline. Still showed -14.2% 3d continuation (consistent with signal). Cash runway EXTENDED because stopped expensive trial (bullish signal for company solvency).",
-      "refined_qualifying_criteria": [
-        "1. Initial crash >55% (unchanged)",
-        "2. Single primary drug/program - no other active clinical programs (unchanged)",
-        "3. Market cap <500M at time of event (unchanged)",
-        "4. NOT pre-anticipated - stock not down >20% in prior 10 days (unchanged)",
-        "5. Clinical/efficacy deficiency - NOT CMC/manufacturing only (unchanged)",
-        "6. NEW: Post-crash stock price >0.50/share at entry (avoid liquidation-value floor)",
-        "7. NEW: Company has NO stated path forward for the failed drug (exclude near-miss p-values or subgroup-analysis FDA meeting plans)",
-        "8. NEW: Primary endpoint must be clearly failed (p>0.05, not p=0.03 vs 0.025 threshold)"
-      ],
-      "last_updated": "2026-03-21T19:35:56.635321",
-      "march_14_21_edgar_scan": "EDGAR scan March 14-21 2026: 7 8-K filers reviewed. NONE qualify for d302c84b. ALDX (Aldeyra): -70.7% crash but DISQUALIFIED - pre-anticipation -24.7% in prior 10 days AND repeat event (3rd CRL for same reproxalap NDA). TBPH (Theravance): -26% on Phase 3 CYPRESS MSA miss - below 55% threshold, DISQUALIFIED. RYTM (Rhythm): -6% on EMANATE miss - multi-product company, got FDA approval same week, DISQUALIFIED. ATRA (Atara): No new crash in scan period - Jan 2026 CRL follow-up meeting, not a new event. HUMA (Humacyte): Positive news week (Saudi Arabia deal, capital raise), no clinical failure. GOSS and IMMP: Already captured in d302c84b backtest."
+      "finding": "Extreme micro-cap overnight gappers (>50% gap) are NOT reliable for open-entry short",
+      "evidence": "GOSS (Feb 23 2026): -72% overnight gap from $2.13 to $0.596; open-entry abnormal 1d = +4.40% (bounce from lows). ALDX (3rd CRL) also bounced. IMMP (-5.10% abnormal at 1d) had a moderate gap and confirmed the signal.",
+      "rule": "Only enter short at open if: (1) first-time clinical failure, (2) overnight gap is <40% (room for continuation drift). Large gappers have already seen the full move; open entry is entering a bounce.",
+      "recommended_screen": "Filter to events where gap-down from prior close to next-day open is <40%. Extreme gappers should be excluded or use delayed entry (day 2-3).",
+      "date_verified": "2026-03-22",
+      "last_updated": "2026-03-22T01:25:43.718787"
     },
     "sp500_index_addition": {
       "finding": "March 2026 Q1 rebalance live validation (4 new events post-hypothesis creation)",
@@ -514,55 +405,11 @@
       "last_updated": "2026-03-21T21:33:45.174443"
     },
     "ceo_performance_failure_departure_short": {
-      "summary": "Large-cap CEO fired for performance failure \u2192 SHORT next-day open, hold 1d",
-      "signal": "SHORT",
-      "entry": "Next-day market open (announcement typically after-hours)",
-      "hold_period": "1 trading day ONLY (signal does NOT persist: 3d p=0.077)",
-      "avg_abnormal_1d": -3.25,
-      "median_abnormal_1d": -2.96,
-      "stdev_1d": 3.32,
-      "positive_rate_1d": 16.7,
-      "wilcoxon_p_1d": 0.0034,
-      "bootstrap_ci_1d": {
-        "lower": -5.155,
-        "upper": -1.518,
-        "excludes_zero": true
-      },
-      "passes_multiple_testing": true,
-      "sample_size": 12,
-      "discovery_period": "2019-2022",
-      "discovery_n": 4,
-      "discovery_consistency": "100%",
-      "validation_period": "2023-2024",
-      "validation_n": 8,
-      "validation_consistency": "75%",
-      "hypothesis_id": "5dbcfb37",
-      "qualifying_criteria": [
-        "CEO departure is abrupt/forced (not planned succession)",
-        "Market cap >\\B",
-        "Stock underperformed sector 20%+ in prior 12 months",
-        "Company had earnings misses or profit warnings in past year",
-        "EXCLUDE: relief-rally departures (new CEO welcomed positively)"
-      ],
-      "confirmed_events_n12": [
-        "MCD 2019-11-04 (Steve Easterbrook, -1.20%)",
-        "UAA 2022-05-19 (Patrik Frisk, -6.22%)",
-        "DOCU 2022-06-14 (Dan Springer, -4.20%)",
-        "VFC 2022-12-14 (Steve Rendle, -0.64%)",
-        "WBA 2023-09-01 (Rosalind Brewer, -7.09%)",
-        "AAP 2023-08-24 (Tom Greco, -0.98%)",
-        "PARA 2024-04-30 (Bob Bakish, -4.33%)",
-        "CVS 2024-10-18 (Karen Lynch, +0.95% - miss)",
-        "STLA 2024-12-02 (Carlos Tavares, +0.62% - miss)",
-        "INTC 2024-12-02 (Pat Gelsinger, -3.84%)",
-        "FIVE 2024-07-17 (Joel Anderson, -9.97%)",
-        "BA 2024-03-25 (Dave Calhoun, -2.07%)"
-      ],
-      "exclusions_documented": "PTON (relief rally +22%), VSCO (relief +3.2%), DIS/Iger (+relief), LYFT (relief), CHGG (+2.4%), NFLX (-1.4% - borderline), SNAP/UAL/F (wrong events)",
-      "net_expected_return": 2.95,
-      "estimated_cost_pct": 0.302,
-      "status": "FORMAL HYPOTHESIS 5dbcfb37",
-      "last_updated": "2026-03-21T23:37:53.994540"
+      "finding": "GPOR (Mar 9, 2026): CEO departure confirmed signal. Close-entry abnormal 1d = -7.68%. Open-entry abnormal 1d = -3.11% (better than average but gap was missed). 5d reversal to +3.03% (signal fades by day 5).",
+      "interpretation": "GPOR is a missed trade that supports the gap-entry mechanism. Open entry still shows -3.11% which is directionally correct and above the 0.5% threshold, unlike the average of -0.14% for the full N=12 sample.",
+      "note": "GPOR may be a special case \u2014 oil & gas CEO departure may have different dynamics than tech/retail. Do not add to formal hypothesis without checking sector-specific patterns.",
+      "date_verified": "2026-03-22",
+      "last_updated": "2026-03-22T01:25:43.719723"
     },
     "ceo_performance_departure": {
       "finding": "Signal fires entirely in overnight gap, not intraday",
