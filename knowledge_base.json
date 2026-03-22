@@ -637,6 +637,18 @@
       "regime": "all_vix_regimes",
       "note": "First touch of 52-week low predicts continued decline, not bounce. Signal is SHORT at next-day open. Hypothesis pre-registered as 86d28864.",
       "last_updated": "2026-03-22T14:55:22.573637"
+    },
+    "insider_selling_cluster": {
+      "summary": "When 3+ corporate insiders (officers/directors) make open-market sales within 30 days of each other (each >K), the stock shows negative abnormal returns at 10-20 day horizons. Discovery 2021 (N=420 measured): 10d=-0.95% p<0.0001, 20d=-2.86% p<0.0001. OOS 2022 (N=347 measured): 10d=-1.57% p=0.001, 20d=-2.30% p=0.002. passes_multiple_testing=True in both periods.",
+      "known_magnitude": "-0.95% to -2.86% at 10-20d horizon (abnormal return)",
+      "known_timeframe": "10-20 trading days",
+      "sources": [
+        "Seyhun (1986, JBF): insider selling predicts negative abnormal returns",
+        "Cohen, Malloy, Pomorski (2012, JF): strategic selling more predictive than routine sales",
+        "Jeng et al (2003): insider sales show 1.5-2% abnormal return effect"
+      ],
+      "gaps": "1d and 5d signals are below 1.5% threshold. 20d signal exceeds threshold but is slow-burn. Confounders: (1) sales at 52-week highs (momentum exhaustion), (2) pre-earnings window, (3) 10b5-1 planned sales not captured in cluster definition. Need causal mechanism testing: are these clusters pre-announcement or fundamental-information-driven?",
+      "last_updated": "2026-03-22T15:31:43.352320"
     }
   },
   "dead_ends": [
@@ -848,6 +860,11 @@
       "event_type": "sp500_52w_low_bounce",
       "reason": "52-week low first-touch for large-cap S&P 500 stocks does NOT generate positive returns (bounces). Tested 209 events 2021-2025. Results: 1d avg=-1.28% (76% negative), 5d avg=-1.68% (62% negative). The signal is REVERSED from hypothesis. Signal is a SHORT, not LONG. Momentum continuation dominates mean reversion for large-cap stocks. This is consistent with George & Hwang (2004): 52-week price levels act as momentum anchors, not mean-reversion triggers.",
       "recorded": "2026-03-22T14:55:22.572291"
+    },
+    {
+      "event_type": "short_interest_daily_spike",
+      "reason": "FINRA REGSHO daily short volume spike (>2-sigma in 20-day rolling window) shows no predictive signal for large-cap stocks. Discovery 2022 (N=310): avg_abnormal_5d=+0.05%, p=0.84; avg_abnormal_20d=+0.76%, p=0.13. OOS 2023 (N=355): avg_abnormal_5d=-0.21%, p=0.31; avg_abnormal_10d=-0.39%, p=0.17. Root cause: FINRA consolidated tape includes market-maker and ETF arbitrage shorts which dwarf informed short-selling volume for large-caps. Even high z-score events (>3.0 sigma, N=65) show only -0.40% at 5d (not statistically significant). ALTERNATIVE TESTED: consecutive spike days (gap<=3d) show +0.41% at 5d - wrong direction entirely. Dead end. FINRA REGSHO daily data not useful for predicting individual stock returns at 5-20d horizons for large-caps.",
+      "recorded": "2026-03-22T15:31:43.351142"
     }
   ]
 }
