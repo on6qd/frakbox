@@ -560,6 +560,15 @@
       "added": "2026-03-22T14:58:01.622998"
     },
     {
+      "id": "f5857b08",
+      "category": "insider_selling_cluster",
+      "question": "Re-test insider selling cluster with large-cap filter (market_cap >5B) using tools/largecap_filter.py. Hypothesis: smaller companies have noisier insider selling (routine diversification), while large-cap insider sells are more likely to be informative. Use same 2021 discovery / 2022-2024 OOS structure. Also: try to filter out 10b5-1 plans by excluding insiders who filed within 90 days of a new 10b5-1 Rule plan (Form 4 footnotes).",
+      "priority": 3,
+      "status": "pending",
+      "reasoning": "All-ticker selling cluster shows regime dependence and fails MT in 2023-24 bull market. Large-cap filter reduces micro-cap noise and may sharpen signal. 10b5-1 exclusion is the key to isolating strategic vs routine sells per Cohen et al (2012).",
+      "added": "2026-03-22T15:37:56.931766"
+    },
+    {
       "id": "d288c2b8",
       "category": "sec_wells_notice",
       "question": "Wells Notice sub-hypothesis: Are financial fraud Wells Notices different from procedural ones? If yes, test 10+ fraud-specific Wells Notices (like BEN -13%, NRDS -7%) vs procedural (NDAQ +1.5%, XYL -2.5%). Need manual classification or a legal database. Likely requires Bloomberg Law or SEC enforcement actions database. LOW PRIORITY: would need external data source.",

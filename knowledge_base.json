@@ -639,16 +639,16 @@
       "last_updated": "2026-03-22T14:55:22.573637"
     },
     "insider_selling_cluster": {
-      "summary": "When 3+ corporate insiders (officers/directors) make open-market sales within 30 days of each other (each >K), the stock shows negative abnormal returns at 10-20 day horizons. Discovery 2021 (N=420 measured): 10d=-0.95% p<0.0001, 20d=-2.86% p<0.0001. OOS 2022 (N=347 measured): 10d=-1.57% p=0.001, 20d=-2.30% p=0.002. passes_multiple_testing=True in both periods.",
-      "known_magnitude": "-0.95% to -2.86% at 10-20d horizon (abnormal return)",
+      "summary": "Insider selling clusters (3+ insiders, 30-day window, K+ each) show regime-dependent negative abnormal returns.\n    FULL RESULTS BY PERIOD:\n    - 2021 (bull peak): 10d=-0.95% p<0.0001, 20d=-2.86% p<0.0001; N=420\n    - 2022 (bear market): 10d=-1.57% p=0.001, 20d=-2.30% p=0.002; N=347, passes MT\n    - 2023-24 (bull market): 10d=-0.92% p=0.002, 20d=-1.11% p=0.03; N=361, FAILS MT\n    - n>=6 filter 2021: 10d=-1.80% p=0.002, 20d=-2.63% p=0.003\n    - n>=6 filter 2022: 10d=-0.20% p=0.44, FAILS OOS (regime confound)\n    \n    VERDICT: Signal is real but regime-dependent. 20d hold exceeds 1.5% threshold in 2021-2022 but not 2023-24.\n    The 2021 result may be confounded by insiders selling ahead of the 2022 crash (hindsight bias risk).\n    n>=6 does NOT improve OOS stability; failed in 2022 bear market.\n    NOT FORMABLE as hypothesis due to: (1) regime dependence, (2) 20d hold too long for clean causal testing,\n    (3) n>=6 OOS failure, (4) 5d magnitude below 1.5% threshold in all periods.\n    Potential follow-up: test with large-cap filter (>5B market cap) to reduce micro-cap noise.",
+      "known_magnitude": "10d: -0.95% to -1.80% (regime-dependent); 20d: -1.11% to -2.86%",
       "known_timeframe": "10-20 trading days",
       "sources": [
         "Seyhun (1986, JBF): insider selling predicts negative abnormal returns",
-        "Cohen, Malloy, Pomorski (2012, JF): strategic selling more predictive than routine sales",
-        "Jeng et al (2003): insider sales show 1.5-2% abnormal return effect"
+        "Cohen, Malloy, Pomorski (2012, JF): routine vs strategic selling distinction",
+        "Jeng, Metrick, Zeckhauser (2003): insider sales weaker than purchases"
       ],
-      "gaps": "1d and 5d signals are below 1.5% threshold. 20d signal exceeds threshold but is slow-burn. Confounders: (1) sales at 52-week highs (momentum exhaustion), (2) pre-earnings window, (3) 10b5-1 planned sales not captured in cluster definition. Need causal mechanism testing: are these clusters pre-announcement or fundamental-information-driven?",
-      "last_updated": "2026-03-22T15:31:43.352320"
+      "gaps": "Regime-dependent signal. n>=6 fails OOS in 2022. Large-cap filter not tested. Need 10b5-1 plan exclusion to isolate strategic sales.",
+      "last_updated": "2026-03-22T15:37:47.145672"
     }
   },
   "dead_ends": [
@@ -865,6 +865,11 @@
       "event_type": "short_interest_daily_spike",
       "reason": "FINRA REGSHO daily short volume spike (>2-sigma in 20-day rolling window) shows no predictive signal for large-cap stocks. Discovery 2022 (N=310): avg_abnormal_5d=+0.05%, p=0.84; avg_abnormal_20d=+0.76%, p=0.13. OOS 2023 (N=355): avg_abnormal_5d=-0.21%, p=0.31; avg_abnormal_10d=-0.39%, p=0.17. Root cause: FINRA consolidated tape includes market-maker and ETF arbitrage shorts which dwarf informed short-selling volume for large-caps. Even high z-score events (>3.0 sigma, N=65) show only -0.40% at 5d (not statistically significant). ALTERNATIVE TESTED: consecutive spike days (gap<=3d) show +0.41% at 5d - wrong direction entirely. Dead end. FINRA REGSHO daily data not useful for predicting individual stock returns at 5-20d horizons for large-caps.",
       "recorded": "2026-03-22T15:31:43.351142"
+    },
+    {
+      "event_type": "insider_selling_cluster_large_n",
+      "reason": "n>=6 insider selling cluster (30-day window, K+ each) failed OOS in 2022 bear market: 10d=-0.20% p=0.44, fails multiple testing. Discovery 2021 signal (10d=-1.80% p=0.002) did not replicate. Root cause: 2021 signal may be confounded by bull market peak insiders selling into strength before 2022 crash. Not a reliable short signal across regimes. All n>=3 selling cluster shows 10d=-1.57% in 2022 but this is also regime-dependent (weakens to 10d=-0.92% in 2023-24 bull market).",
+      "recorded": "2026-03-22T15:37:47.146811"
     }
   ]
 }
