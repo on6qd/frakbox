@@ -732,45 +732,46 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. CRITICAL (Mon March 23): Confirm GO trade (1cb6140f) executed at open via 'python run.py --status'",
-      "set_by_session": "2026-03-22T14:20:48.777267"
+      "task": "1. CRITICAL (Mon March 23): Confirm GO trade (1cb6140f) executed at open via 'python run.py --status'. Account should show active position in GO.",
+      "set_by_session": "2026-03-22T14:22:56.105539"
     },
     {
-      "task": "2. CRITICAL (Thu March 26): Close GO trade via 'python tools/close_go_trade.py'; record actual P&L to complete hypothesis 1cb6140f",
-      "set_by_session": "2026-03-22T14:20:48.777273"
+      "task": "2. CRITICAL (Thu March 26): Close GO trade via 'python tools/close_go_trade.py'; record actual P&L to complete hypothesis 1cb6140f with spy_return_pct and actual_return_pct.",
+      "set_by_session": "2026-03-22T14:22:56.105548"
     },
     {
-      "task": "3. Research: Short-interest spike signal - when stock's short interest as % of float rises >20pp in 1 month, test subsequent 10-20d returns. Use FINRA bimonthly short sale data or yfinance shortPercentOfFloat snapshots. Key question: do stocks with rapidly rising short interest underperform (EV=bearish) or squeeze (EV=bullish)?",
-      "set_by_session": "2026-03-22T14:20:48.777274"
+      "task": "3. Research: Short-interest spike signal. When a stock's short interest as % of float rises sharply (>5pp in 2 weeks), test 10-20d subsequent returns. Use FINRA bimonthly short sale reports (free at finra.org). Hypothesis: rising short interest predicts underperformance (not squeeze). Academic base: Asquith, Pathak & Ritter (2005).",
+      "set_by_session": "2026-03-22T14:22:56.105549"
     },
     {
-      "task": "4. Research: Insider selling cluster (mirror of buying signal) - use existing EDGAR Form 4 infrastructure but filter for open-market SELLS by 3+ insiders within 30 days. Expected: weaker signal than buying (insiders sell for many reasons). Test in 2023+ regime.",
-      "set_by_session": "2026-03-22T14:20:48.777275"
+      "task": "4. Research: Insider selling cluster (mirror of buying). Use EDGAR Form 4 bulk data (same infrastructure as insider_cluster_detector.py) but filter for open-market SELLS (transaction_type='S'). Test if 3+ insider sells within 30 days predicts underperformance in 2023+ regime. Caveat: insiders sell for many non-informative reasons (diversification, tax, exercise) so signal expected to be weaker than buying.",
+      "set_by_session": "2026-03-22T14:22:56.105549"
     },
     {
-      "task": "5. Research: S&P 500 52-week low contrarian bounce - when S&P 500 large-cap hits 52-week low, is there a mean-reversion bounce? Pure yfinance signal, no external data needed.",
-      "set_by_session": "2026-03-22T14:20:48.777276"
+      "task": "5. Research: 52-week low contrarian bounce for S&P 500 large-caps. Pure yfinance signal. Collect dates when each S&P 500 stock first touches 52-week low (i.e., new low not seen in prior 12 months), measure 5-20d abnormal returns. Hypothesis: mean reversion after capitulation.",
+      "set_by_session": "2026-03-22T14:22:56.105550"
     },
     {
-      "task": "6. WD hypothesis (76678219): Monitor VIX. If VIX drops below 25 (Tier 1/2) AND WD cluster still fresh, activate with 'next_market_open' trigger.",
-      "set_by_session": "2026-03-22T14:20:48.777276"
+      "task": "6. Monitor VIX for WD hypothesis (76678219): WD cluster has n=3 insiders - only tradeable when VIX<25. Check VIX at session start. Entry window likely closed if VIX stays elevated.",
+      "set_by_session": "2026-03-22T14:22:56.105551"
     },
     {
-      "task": "7. Fix CEO departure scanner (3+ friction entries): edgar_ceo_departure_scanner.py generates false positives. Fix: (a) add Item 5.02 text verification, (b) require >5% underperformance in prior 12 months (Bloomberg/yfinance), (c) exclude 'transition/succession' keyword in 8-K. But note: ceo_performance_failure_departure_short is already marked as dead end - so scanner fix is low priority.",
-      "set_by_session": "2026-03-22T14:20:48.777277"
+      "task": "7. Low priority: Fix edgar_ceo_departure_scanner.py false positives (3+ friction entries). Note: ceo_performance_failure_departure_short already dead-ended so scanner fix is informational only.",
+      "set_by_session": "2026-03-22T14:22:56.105551"
     }
   ],
   "session_handoff": {
-    "current_state": "GO trade (1cb6140f) has trigger=next_market_open, n=6 insiders including CEO, VIX=26.78 passes Tier 3 gate (n>=6 required). Will execute Monday March 23 at 9:30 ET.",
+    "current_state": "GO trade (1cb6140f) has trigger=next_market_open. Will execute Monday March 23 at 9:30 ET. n=6 insiders including CEO. VIX=26.78 (Tier 3) - n>=6 passes gate. No active positions as of session end.",
     "completed_this_session": [
-      "Verified GO cluster: n=6 insiders (passes VIX Tier 3 gate). Trade executing Monday.",
-      "Confirmed WD (n=3) and AMRZ (n=4) are VIX-gated - DO NOT TRADE at current VIX=26.78",
-      "Tested analyst initiation signal (BUY from major banks): DEAD END. N=177 events, all p>0.45, coin flip at every horizon. Signal priced in before open.",
-      "Tested analyst downgrade signal (Buy->Hold/Sell): DEAD END. N=425 events, statistically significant (3d p<0.0001, avg_abnormal=-0.640%) but net return after costs only 0.273% - below 1.0% minimum threshold."
+      "Verified GO cluster: n=6 insiders (passes VIX Tier 3 gate at VIX=26.78). Trade confirmed valid for Monday open.",
+      "WD (n=3) and AMRZ (n=4) confirmed VIX-gated \u2014 DO NOT TRADE until VIX<25 or new cluster with n>=6 found.",
+      "No new clusters found by auto-scanner (0 clusters meeting thresholds).",
+      "DEAD END: Analyst initiation BUY signal. N=177 events from 40 large-caps, 2021-2025. All p>0.45, 48-53% positive rate (pure coin flip at every horizon). Signal priced in before next-day open.",
+      "DEAD END: Analyst downgrade signal (Bullish->Hold/Sell). N=425 events. Real signal exists (p<0.0001, 59% negative rate, CI excludes zero) but net return after costs ~0.27% \u2014 below 1.0% threshold. Edge too thin for execution."
     ],
-    "blocked_on": "Nothing blocking. Waiting for Monday market open for GO execution.",
-    "next_step": "Monday: confirm GO executed. Thursday: close GO at open using close_go_trade.py. Then research short-interest spike signal.",
-    "written_at": "2026-03-22T14:20:48.777279"
+    "blocked_on": "Nothing. Waiting for Monday market open for GO execution.",
+    "next_step": "Monday confirm GO executed. Thursday close GO. Then research short-interest spike using FINRA bimonthly data.",
+    "written_at": "2026-03-22T14:22:56.105553"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

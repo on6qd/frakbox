@@ -829,8 +829,9 @@
     },
     {
       "event_type": "analyst_downgrade_short",
-      "reason": "Tested analyst downgrades (Bullish\u2192Hold/Neutral/Underperform) from major banks across 40 S&P 500 large-caps, 2021-present. N=425 events. Signal is statistically significant (passes multiple testing: True): 3d avg_abnormal=-0.640%, p<0.0001; 5d avg_abnormal=-0.620%, p=0.0007; bootstrap CI excludes zero at both horizons. Direction consistency: 59.3% negative at 3d. DEAD END due to transaction costs: avg round-trip cost=0.367% (volume-based estimate on large-caps), net expected return on SHORT=-0.273% at 3d \u2014 well below the 1.0% minimum net return threshold. The signal is real but not tradeable after costs. Likely priced in partially before open (similar to initiation signal) and further diluted by bid-ask spread on short entry.",
-      "recorded": "2026-03-22T14:20:26.503811"
+      "reason": "Tested analyst downgrades (Bullish->Hold/Neutral) from major banks across 40 S&P 500 large-caps, 2021-2025, N=425 events. Signal IS real: avg_abnormal_3d=-0.64%, negative_rate=59.3%, wilcoxon_p<0.0001, bootstrap CI [-0.925%,-0.350%] excludes zero. Passes multiple testing. However: avg round-trip transaction cost=0.367% (volume-based, large-cap), leaving net expected return of only ~0.27% \u2014 well below 1.0% minimum net return threshold. Dead end due to insufficient edge after realistic execution costs, not due to absence of signal. Note: if data source improves (pre-market data, access to analyst notes before open), this signal may become tradeable.",
+      "recorded": "2026-03-22T14:20:26.503811",
+      "updated": "2026-03-22T14:22:13.713326"
     }
   ]
 }
