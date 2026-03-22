@@ -9954,6 +9954,7 @@
     "trigger": "next_market_open",
     "trigger_position_size": 5000,
     "trigger_stop_loss_pct": 8,
-    "trigger_notes": "HD first-touch 52-week low on 2026-03-20, -1.9% below 52w low. SHORT at Monday open."
+    "trigger_notes": "52-week low first touch on 2026-03-20, breach=-1.9%",
+    "trigger_take_profit_pct": 10
   }
 ]
