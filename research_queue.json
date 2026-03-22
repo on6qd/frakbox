@@ -790,24 +790,46 @@
   ],
   "next_session_priorities": [
     {
-      "task": "PRIORITY 1: Verify GO (1cb6140f) trade executed at Monday March 23 open. Expected: LONG GO at market open ~$5000. Run run.py --status to see active experiments.",
-      "set_by_session": "2026-03-23T00:10:36.234550"
+      "task": {
+        "task": "PRIORITY 1: Verify GO (1cb6140f) trade executed at March 23 market open. Expected: LONG GO ~$5000. Run run.py --status."
+      },
+      "set_by_session": "2026-03-23T00:15:33.381730"
     },
     {
-      "task": "PRIORITY 2: Verify HD (86d28864) trade executed at Monday March 23 open. Expected: SHORT HD at market open ~$5000.",
-      "set_by_session": "2026-03-23T00:10:36.234556"
+      "task": {
+        "task": "PRIORITY 2: Verify HD (86d28864) trade executed at March 23 market open. Expected: SHORT HD ~$5000."
+      },
+      "set_by_session": "2026-03-23T00:15:33.381735"
     },
     {
-      "task": "PRIORITY 3: ABT OOS tracking for 86d28864. First-touch 52w-low was March 20 at 105.46. Market closed all weekend -- no new data yet. Check ABT close on March 23 (first trading day). Entry would have been open March 23 (next_market_open after March 20). NOTE: scanner detected both ABT and HD as signals on March 20, but hypothesis 86d28864 only has HD queued (scanner overwrites single hypothesis -- ABT was overwritten by HD). ABT is still relevant as OOS validation data point regardless of trade entry.",
-      "set_by_session": "2026-03-23T00:10:36.234557"
+      "task": {
+        "task": "PRIORITY 3: Monitor ABT OOS data point. ABT first-touched 52w-low March 20 at 105.46. Track ABT close March 23 through March 27 for OOS validation of hypothesis 86d28864. ABT was not traded (was overwritten by HD before scanner fix). Now logged in logs/52w_low_signals.jsonl for OOS tracking."
+      },
+      "set_by_session": "2026-03-23T00:15:33.381737"
     },
     {
-      "task": "PRIORITY 4: Fix scanner multi-signal limitation. The fiftytwo_week_low_scanner.py can only set one trigger at a time (it overwrites expected_symbol). When 2 signals appear simultaneously, only the last one is executed. Need to either: (a) create separate hypothesis instances per signal, or (b) use a queue. This is a design flaw logged as friction.",
-      "set_by_session": "2026-03-23T00:10:36.234557"
+      "task": {
+        "task": "PRIORITY 4: WD hypothesis (76678219) VIX gate still active. VIX closed at 26.78 on March 20 (most recent data) -- above 25 threshold. n=3 cluster, DO NOT TRADE until VIX < 25. Check VIX at session start each day. Gate: n=3-5 requires VIX < 25."
+      },
+      "set_by_session": "2026-03-23T00:15:33.381737"
     },
     {
-      "task": "PRIORITY 5: WD hypothesis (76678219) is VIX-gated. VIX was 26.78 on March 22 -- at Tier 3 (25-30), DO NOT TRADE for n<6 clusters. WD is n=3. Will trade when VIX drops below 25. Check VIX daily before activating WD.",
-      "set_by_session": "2026-03-23T00:10:36.234558"
+      "task": {
+        "task": "PRIORITY 5: AMRZ hypothesis (1f3ac0ec) entry window EXPIRED March 23. VIX gate blocked trade (n=4, VIX>25). Hypothesis remains pending for next AMRZ cluster formation. No action needed this session -- but review if insider cluster still valid or if stock has moved too far."
+      },
+      "set_by_session": "2026-03-23T00:15:33.381738"
+    },
+    {
+      "task": {
+        "task": "PRIORITY 6: DNLI PDUFA April 5. Multi-pipeline so 5f805860 clinical failure short likely does not apply. Monitor outcome. If CRL issued, assess crash magnitude before trading."
+      },
+      "set_by_session": "2026-03-23T00:15:33.381741"
+    },
+    {
+      "task": {
+        "task": "PRIORITY 7: ARVN PDUFA June 5. Single-pipeline NDA for PROTAC. If CRL issued, would qualify under 5f805860. Set reminder/watchlist check."
+      },
+      "set_by_session": "2026-03-23T00:15:33.381742"
     }
   ],
   "session_handoff": {
