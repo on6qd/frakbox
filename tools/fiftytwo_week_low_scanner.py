@@ -7,6 +7,13 @@ first breaks below its 52-week low (after 30+ days above that level).
 Hypothesis: sp500_52w_low_momentum_short (ID: 86d28864)
 Expected: SHORT at next-day open, hold 5 trading days, expected -1.68% abnormal
 
+Multi-signal behavior:
+- ALL signals are logged to logs/52w_low_signals.jsonl regardless of whether they trade
+- When multiple signals fire on the same day, only ONE trigger is set on the hypothesis
+- Priority: larger market cap wins (better liquidity, less slippage)
+- If hypothesis already has a pending trigger (from a prior run same day), the existing
+  trigger is only replaced if the new signal has higher market cap
+
 Usage:
     python tools/fiftytwo_week_low_scanner.py
     python tools/fiftytwo_week_low_scanner.py --dry-run    # show detections only
@@ -39,6 +46,7 @@ UNIVERSE = [
 
 HYPOTHESIS_ID = '86d28864'
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'logs', '52w_low_scanner_state.json')
+SIGNALS_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'logs', '52w_low_signals.jsonl')
 
 
 def load_state():
@@ -52,6 +60,24 @@ def save_state(state):
     os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
     with open(STATE_FILE, 'w') as f:
         json.dump(state, f, indent=2)
+
+
+def get_market_cap(ticker: str) -> float:
+    """Return market cap in dollars, or 0.0 on failure."""
+    try:
+        info = yf.Ticker(ticker).info
+        return float(info.get('marketCap', 0) or 0)
+    except Exception:
+        return 0.0
+
+
+def log_signal(detection: dict):
+    """Append a signal record to the persistent signals log (all signals, not just triggered ones)."""
+    os.makedirs(os.path.dirname(SIGNALS_LOG), exist_ok=True)
+    record = dict(detection)
+    record['logged_at'] = datetime.now().isoformat()
+    with open(SIGNALS_LOG, 'a') as f:
+        f.write(json.dumps(record) + '\n')
 
 
 def check_stock(ticker: str, lookback_days: int = 400, debounce_days: int = 30) -> dict | None:
@@ -147,35 +173,79 @@ def main():
         print("No signals detected.")
         save_state(state)
         return
-    
+
     print(f"\n{len(detections)} signal(s) detected.")
-    
+
+    # Log ALL signals to the persistent signal log (for OOS tracking even if not traded)
+    for det in detections:
+        log_signal(det)
+        print(f"  Logged signal: {det['ticker']} ({det['date']})")
+
     if args.dry_run:
         print("DRY RUN: No triggers set.")
         return
-    
-    # Set triggers for each detection
+
+    # Fetch market caps and rank signals — larger cap = better liquidity = priority
+    print("\nFetching market caps to prioritize signals...")
+    for det in detections:
+        det['market_cap'] = get_market_cap(det['ticker'])
+        print(f"  {det['ticker']}: ${det['market_cap']/1e9:.1f}B market cap")
+
+    detections_ranked = sorted(detections, key=lambda d: d['market_cap'], reverse=True)
+    top_signal = detections_ranked[0]
+    skipped = detections_ranked[1:]
+
+    print(f"\nTop signal (largest cap): {top_signal['ticker']} (${top_signal['market_cap']/1e9:.1f}B)")
+    if skipped:
+        print(f"Skipped signals (lower cap, logged only): {[s['ticker'] for s in skipped]}")
+
     import research
     hypotheses = research.load_hypotheses()
-    
-    for det in detections:
-        print(f"\nSetting trigger for {det['ticker']}...")
-        
-        # Find the hypothesis and set trigger
-        for h in hypotheses:
-            if h['id'] == HYPOTHESIS_ID and h['status'] == 'pending':
-                h['expected_symbol'] = det['ticker']
-                h['trigger'] = 'next_market_open'
-                h['trigger_position_size'] = 5000
-                h['trigger_stop_loss_pct'] = 8  # Stop loss at 8% (smaller for short)
-                h['trigger_take_profit_pct'] = 10
-                h['trigger_notes'] = f"52-week low first touch on {det['date']}, breach={det['pct_below']:.1f}%"
-                print(f"  Trigger set: {det['ticker']} SHORT at next open")
-                state['last_triggered'][det['ticker']] = det['date']
-                break
+
+    # Find the hypothesis record
+    hyp = next((h for h in hypotheses if h['id'] == HYPOTHESIS_ID and h['status'] == 'pending'), None)
+    if hyp is None:
+        print(f"WARNING: Could not find pending hypothesis {HYPOTHESIS_ID}. Hypothesis may be active or retired.")
+        save_state(state)
+        return
+
+    # Check if a trigger is already set (e.g. from a prior run today or from another signal)
+    existing_trigger = hyp.get('trigger')
+    existing_symbol = hyp.get('expected_symbol')
+
+    if existing_trigger == 'next_market_open' and existing_symbol and existing_symbol != 'TBD':
+        # Hypothesis already has a pending trigger — compare market caps
+        existing_cap = get_market_cap(existing_symbol)
+        print(f"\nHypothesis already has pending trigger: {existing_symbol} (${existing_cap/1e9:.1f}B)")
+
+        if top_signal['market_cap'] > existing_cap:
+            print(f"  New signal {top_signal['ticker']} has higher cap — replacing trigger.")
         else:
-            print(f"  WARNING: Could not find pending hypothesis {HYPOTHESIS_ID}")
-    
+            print(f"  Existing signal {existing_symbol} has equal/higher cap — keeping existing trigger.")
+            print(f"  New signal {top_signal['ticker']} logged for OOS tracking only.")
+            # Still record in state so debounce works correctly
+            for det in detections:
+                state['last_triggered'][det['ticker']] = det['date']
+            save_state(state)
+            return
+
+    # Set trigger for the top-ranked signal
+    hyp['expected_symbol'] = top_signal['ticker']
+    hyp['trigger'] = 'next_market_open'
+    hyp['trigger_position_size'] = 5000
+    hyp['trigger_stop_loss_pct'] = 8  # Stop loss at 8% (tighter for short)
+    hyp['trigger_take_profit_pct'] = 10
+    hyp['trigger_notes'] = (
+        f"52-week low first touch on {top_signal['date']}, breach={top_signal['pct_below']:.1f}%. "
+        f"Market cap: ${top_signal['market_cap']/1e9:.1f}B. "
+        + (f"Also detected (not traded): {[s['ticker'] for s in skipped]}" if skipped else "")
+    )
+    print(f"\nTrigger set: {top_signal['ticker']} SHORT at next market open")
+
+    # Update debounce state for ALL detected signals (not just the one traded)
+    for det in detections:
+        state['last_triggered'][det['ticker']] = det['date']
+
     research.save_hypotheses(hypotheses)
     save_state(state)
     print("\nDone. trade_loop.py will execute at next market open.")
