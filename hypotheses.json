@@ -44,7 +44,7 @@
       "PLTR",
       "DELL"
     ],
-    "backtest_events": 25,
+    "backtest_events": 29,
     "historical_evidence": [
       {
         "symbol": "ETSY",
@@ -220,10 +220,38 @@
         "timing": "after_hours",
         "abnormal_1d": 2.69,
         "abnormal_5d": 8.05
+      },
+      {
+        "symbol": "VRT",
+        "date": "2026-03-06",
+        "timing": "after_hours",
+        "abnormal_1d": 4.24,
+        "abnormal_5d": 4.44
+      },
+      {
+        "symbol": "LITE",
+        "date": "2026-03-06",
+        "timing": "after_hours",
+        "abnormal_1d": 9.97,
+        "abnormal_5d": 9.2
+      },
+      {
+        "symbol": "COHR",
+        "date": "2026-03-06",
+        "timing": "after_hours",
+        "abnormal_1d": 5.86,
+        "abnormal_5d": 4.19
+      },
+      {
+        "symbol": "SATS",
+        "date": "2026-03-06",
+        "timing": "after_hours",
+        "abnormal_1d": 0.73,
+        "abnormal_5d": 1.65
       }
     ],
-    "sample_size": 25,
-    "consistency_pct": 80,
+    "sample_size": 29,
+    "consistency_pct": 86.2,
     "out_of_sample_split": {
       "method": "temporal",
       "cutoff_date": "2023-01-01",
@@ -254,15 +282,19 @@
         21,
         22,
         23,
-        24
+        24,
+        25,
+        26,
+        27,
+        28
       ],
       "discovery_n": 15,
-      "validation_n": 10,
+      "validation_n": 14,
       "discovery_positive_rate_1d": 73,
-      "validation_positive_rate_1d": 100,
+      "validation_positive_rate_1d": 100.0,
       "discovery_avg_abnormal_1d": 4.09,
-      "validation_avg_abnormal_1d": 8.05,
-      "verdict": "PASS - effect holds in both temporal windows"
+      "validation_avg_abnormal_1d": 7.24,
+      "verdict": "PASS - effect holds in both temporal windows; 14/14 validation events positive"
     },
     "confounders": {
       "thematic_momentum": "TSLA, MRNA, SMCI, PLTR had sector tailwinds. Non-thematic additions still show +3-7% 1d.",
@@ -314,7 +346,41 @@
       "positive_rate": 100,
       "note": "5-day window already passed (Mar 9-13). All 4 additions positive, consistent with hypothesis. Effective date Mar 23.",
       "measured": "2026-03-19"
-    }
+    },
+    "validation_notes": [
+      {
+        "date": "2026-03-22",
+        "event": "Q1 2026 rebalance - VRT/LITE/COHR/SATS - 4/4 positive, avg abnormal 1d=+5.20%, 5d=+4.87%",
+        "note": "User-provided returns. Cross-check: measured data in live_validation_march_2026 shows avg +7.77% (different SPY benchmark window). Both confirm 4/4 positive and strong effect.",
+        "individual": [
+          {
+            "symbol": "VRT",
+            "abnormal_1d": 4.24,
+            "abnormal_5d": 4.44
+          },
+          {
+            "symbol": "LITE",
+            "abnormal_1d": 9.97,
+            "abnormal_5d": 9.2
+          },
+          {
+            "symbol": "COHR",
+            "abnormal_1d": 5.86,
+            "abnormal_5d": 4.19
+          },
+          {
+            "symbol": "SATS",
+            "abnormal_1d": 0.73,
+            "abnormal_5d": 1.65
+          }
+        ],
+        "avg_abnormal_1d": 5.2,
+        "avg_abnormal_5d": 4.87,
+        "positive_rate_1d": 100.0,
+        "trade_placed": false,
+        "reason_not_traded": "Watchlist gap - only June 2026 entry existed, missed Q1 2026-03-06 announcement"
+      }
+    ]
   },
   {
     "id": "0a093c90",

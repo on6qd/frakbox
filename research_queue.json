@@ -621,6 +621,22 @@
       "hypothesis_template": "061ae3a8",
       "added": "2026-03-22T07:13:04.657724",
       "status": "watching"
+    },
+    {
+      "event": "S&P 500 Q3 2026 quarterly rebalance announcement expected Friday September 4, 2026 after market close (~5:15 PM ET). Effective date September 18, 2026. Entry at Tuesday September 8 open (Labor Day is Sep 7). 5-day hold. Watch spglobal.com/press-releases for announcement. Hypothesis 061ae3a8 (conf=9).",
+      "expected_date": "2026-09-04",
+      "symbol": "TBD",
+      "hypothesis_template": "061ae3a8",
+      "added": "2026-03-22T07:17:09.509867",
+      "status": "watching"
+    },
+    {
+      "event": "S&P 500 Q4 2026 quarterly rebalance announcement expected Friday December 4, 2026 after market close (~5:15 PM ET). Effective date December 18, 2026. Entry at Monday December 7 open. 5-day hold. Watch spglobal.com/press-releases for announcement. Hypothesis 061ae3a8 (conf=9).",
+      "expected_date": "2026-12-04",
+      "symbol": "TBD",
+      "hypothesis_template": "061ae3a8",
+      "added": "2026-03-22T07:17:09.510886",
+      "status": "watching"
     }
   ],
   "next_session_priorities": [
