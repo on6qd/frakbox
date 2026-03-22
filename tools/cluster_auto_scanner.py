@@ -46,7 +46,9 @@ Key implication: When VIX is elevated (20-30), ONLY trade n=6-9 clusters.
 import argparse
 import json
 import os
+import re
 import sys
+import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -54,7 +56,194 @@ from zoneinfo import ZoneInfo
 BASE_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(BASE_DIR))
 
+import requests
 import yfinance as yf
+
+SEC_HEADERS = {"User-Agent": "research_bot cluster_scanner@research.com"}
+
+# Cache for CIK lookups to avoid repeated HTTP requests
+_cik_cache: dict[str, str] = {}
+
+
+def _load_cik_lookup() -> dict[str, str]:
+    """Load EDGAR company_tickers.json and build ticker->CIK mapping."""
+    try:
+        resp = requests.get(
+            "https://www.sec.gov/files/company_tickers.json",
+            headers=SEC_HEADERS,
+            timeout=20,
+        )
+        if resp.status_code != 200:
+            return {}
+        data = resp.json()
+        return {
+            info["ticker"].upper(): str(info["cik_str"]).zfill(10)
+            for info in data.values()
+            if "ticker" in info and "cik_str" in info
+        }
+    except Exception:
+        return {}
+
+
+def get_cik_for_ticker(ticker: str) -> str | None:
+    """Return zero-padded 10-digit CIK for a ticker, or None if not found."""
+    global _cik_cache
+    if not _cik_cache:
+        _cik_cache = _load_cik_lookup()
+    return _cik_cache.get(ticker.upper())
+
+
+def verify_edgar_open_market_purchases(
+    ticker: str,
+    days_back: int = 35,
+    min_value_usd: float = 50_000,
+    verbose: bool = True,
+) -> tuple[int, list[str]]:
+    """
+    Verify a cluster candidate actually has open-market purchases (Form 4 code P)
+    by fetching EDGAR Form 4 XMLs directly.
+
+    OpenInsider sometimes counts RSU award grants (code A) as 'cluster buys',
+    inflating the insider count. This function cross-checks against EDGAR source
+    data and returns only insiders with confirmed open-market purchases above
+    the minimum value threshold.
+
+    Args:
+        ticker: Stock ticker (e.g. 'POOL')
+        days_back: Look-back window in calendar days (default 35 to cover 1-month clusters)
+        min_value_usd: Minimum purchase value per insider to count (default $50K)
+        verbose: If True, print progress
+
+    Returns:
+        (verified_n_insiders, list_of_insider_names)
+        Returns (0, []) on failure or if no qualifying purchases found.
+    """
+    cik = get_cik_for_ticker(ticker)
+    if not cik:
+        if verbose:
+            print(f"  EDGAR VERIFY: No CIK found for {ticker} — skipping verification")
+        return 0, []
+
+    try:
+        resp = requests.get(
+            f"https://data.sec.gov/submissions/CIK{cik}.json",
+            headers=SEC_HEADERS,
+            timeout=15,
+        )
+        if resp.status_code != 200:
+            if verbose:
+                print(f"  EDGAR VERIFY: Submissions API failed for {ticker} (HTTP {resp.status_code})")
+            return 0, []
+        data = resp.json()
+    except Exception as e:
+        if verbose:
+            print(f"  EDGAR VERIFY: Request failed for {ticker}: {e}")
+        return 0, []
+
+    filings = data.get("filings", {}).get("recent", {})
+    forms = filings.get("form", [])
+    dates = filings.get("filingDate", [])
+    acc_nums = filings.get("accessionNumber", [])
+
+    cutoff = (datetime.now() - timedelta(days=days_back)).strftime("%Y-%m-%d")
+    form4_list = [
+        (d, a)
+        for f, d, a in zip(forms, dates, acc_nums)
+        if f == "4" and d >= cutoff
+    ]
+
+    if verbose:
+        print(f"  EDGAR VERIFY: {len(form4_list)} Form 4 filings for {ticker} in last {days_back} days")
+
+    # Parse each Form 4 XML — collect insiders with confirmed code-P purchases
+    # above the minimum value threshold
+    buyers: dict[str, float] = {}  # name -> total purchase value
+    cik_int = str(int(cik))  # EDGAR folder uses non-zero-padded CIK
+
+    for _filing_date, acc in form4_list:
+        acc_nodash = acc.replace("-", "")
+        folder_url = f"https://www.sec.gov/Archives/edgar/data/{cik_int}/{acc_nodash}/"
+        try:
+            fold_resp = requests.get(folder_url, headers=SEC_HEADERS, timeout=10)
+            time.sleep(0.08)  # Respect SEC rate limit
+            if fold_resp.status_code != 200:
+                continue
+        except Exception:
+            continue
+
+        xml_hrefs = re.findall(
+            r'href="(/Archives/edgar/data[^"]*\.xml)"',
+            fold_resp.text,
+            re.IGNORECASE,
+        )
+        if not xml_hrefs:
+            continue
+
+        xml_url = "https://www.sec.gov" + xml_hrefs[0]
+        try:
+            xml_resp = requests.get(xml_url, headers=SEC_HEADERS, timeout=10)
+            time.sleep(0.08)
+            if xml_resp.status_code != 200:
+                continue
+        except Exception:
+            continue
+
+        xml = xml_resp.text
+
+        # Only process filings that contain at least one open-market purchase
+        if "<transactionCode>P</transactionCode>" not in xml:
+            continue
+
+        # Extract reporter name
+        name_match = re.search(r"<rptOwnerName>(.*?)</rptOwnerName>", xml)
+        if not name_match:
+            continue
+        name = name_match.group(1).strip()
+
+        # Extract all non-derivative transactions (table 1)
+        # Iterate over transaction blocks: look for P-code entries with shares/price
+        # Pattern: find each <nonDerivativeTransaction> block
+        transaction_blocks = re.findall(
+            r"<nonDerivativeTransaction>(.*?)</nonDerivativeTransaction>",
+            xml,
+            re.DOTALL,
+        )
+
+        total_value = 0.0
+        for block in transaction_blocks:
+            code_m = re.search(r"<transactionCode>(.*?)</transactionCode>", block)
+            if not code_m or code_m.group(1).strip() != "P":
+                continue
+
+            shares_m = re.search(
+                r"<transactionShares>.*?<value>([\d.]+)</value>",
+                block,
+                re.DOTALL,
+            )
+            price_m = re.search(
+                r"<transactionPricePerShare>.*?<value>([\d.]+)</value>",
+                block,
+                re.DOTALL,
+            )
+            if shares_m and price_m:
+                try:
+                    val = float(shares_m.group(1)) * float(price_m.group(1))
+                    total_value += val
+                except ValueError:
+                    pass
+
+        if total_value >= min_value_usd:
+            buyers[name] = buyers.get(name, 0.0) + total_value
+
+    verified = [(name, val) for name, val in buyers.items()]
+    verified.sort(key=lambda x: -x[1])
+
+    if verbose:
+        print(f"  EDGAR VERIFY: {len(verified)} unique insiders with open-market purchases >= ${min_value_usd:,.0f}")
+        for name, val in verified:
+            print(f"    {name}: ${val:,.0f}")
+
+    return len(verified), [name for name, _ in verified]
 
 ET = ZoneInfo("America/New_York")
 
@@ -388,6 +577,31 @@ def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[d
             if verbose:
                 print(f"  SKIP: Market cap ${mktcap_m:.0f}M < ${MIN_MARKET_CAP_M}M threshold")
             continue
+
+        # EDGAR Form 4 verification: confirm OpenInsider counts are code-P open-market
+        # purchases and not RSU award grants (code A). OpenInsider can inflate counts
+        # by including non-purchase transactions (discovered 2026-03-22, POOL case).
+        openinsider_n = cluster.get('n_insiders', 0)
+        verified_n, verified_names = verify_edgar_open_market_purchases(
+            ticker, days_back=35, min_value_usd=50_000, verbose=verbose
+        )
+        if verified_n < MIN_INSIDERS:
+            if verbose:
+                print(
+                    f"  SKIP: EDGAR verified only {verified_n} open-market buyers "
+                    f"(OpenInsider reported {openinsider_n}, min={MIN_INSIDERS}). "
+                    f"Likely RSU/award inflation."
+                )
+            continue
+        if verbose and verified_n != openinsider_n:
+            print(
+                f"  NOTE: OpenInsider reported {openinsider_n} insiders; "
+                f"EDGAR confirms {verified_n} open-market buyers."
+            )
+        # Update cluster with verified count
+        cluster['n_insiders_verified'] = verified_n
+        cluster['n_insiders_openinsider'] = openinsider_n
+        cluster['n_insiders'] = verified_n  # Use verified count going forward
 
         # Get 52W position
         pos_52w = get_52w_position(ticker)
