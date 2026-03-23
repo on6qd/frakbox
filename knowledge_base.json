@@ -711,26 +711,17 @@
       "last_updated": "2026-03-22T13:46:08.253612"
     },
     "sp500_52w_low_momentum_short": {
-      "return_front_loading": true,
-      "return_profile": {
-        "1d": {
-          "mean": -1.279,
-          "accuracy": 63.6,
-          "t_stat": 8.956
-        },
-        "5d": {
-          "mean": -1.682,
-          "accuracy": 58.4,
-          "t_stat": 4.947
-        },
-        "10d": {
-          "mean": -1.468,
-          "accuracy": 54.1,
-          "t_stat": 3.518
-        }
+      "tariff_shock_confounder": true,
+      "april_2025_test": {
+        "n": 6,
+        "directional_accuracy_pct": 33.3,
+        "avg_abnormal_5d": -0.17,
+        "context": "April 2025 tariff shock + April 9 pause announcement caused SPY +9.1%. Only 2/6 short positions worked.",
+        "lesson": "Policy-driven VIX spikes (tariffs, geopolitics) can reverse sharply if policy is reversed. Stop-loss critical.",
+        "mitigation": "Stop-loss at 8% caps downside. 5d hold reduces multi-week exposure."
       },
-      "note": "Return is front-loaded: 75% of 5d return occurs on day 1. Signal accuracy: 63.6% at 1d vs 58.4% at 5d. Reversal begins day 6-10 (10d avg -1.47% < 5d avg -1.68%). Optimal hold is 3-5 days. Do not extend beyond 10d.",
-      "last_updated": "2026-03-23T11:30:55.082684"
+      "note": "Tariff policy reversal is an out-of-sample confounder for the 52w low short signal. Standard stop-loss (8%) is the primary mitigation.",
+      "last_updated": "2026-03-23T11:34:39.121492"
     },
     "insider_selling_cluster": {
       "summary": "Insider selling clusters (3+ insiders, 30-day window, K+ each) show regime-dependent negative abnormal returns.\n    FULL RESULTS BY PERIOD:\n    - 2021 (bull peak): 10d=-0.95% p<0.0001, 20d=-2.86% p<0.0001; N=420\n    - 2022 (bear market): 10d=-1.57% p=0.001, 20d=-2.30% p=0.002; N=347, passes MT\n    - 2023-24 (bull market): 10d=-0.92% p=0.002, 20d=-1.11% p=0.03; N=361, FAILS MT\n    - n>=6 filter 2021: 10d=-1.80% p=0.002, 20d=-2.63% p=0.003\n    - n>=6 filter 2022: 10d=-0.20% p=0.44, FAILS OOS (regime confound)\n    \n    VERDICT: Signal is real but regime-dependent. 20d hold exceeds 1.5% threshold in 2021-2022 but not 2023-24.\n    The 2021 result may be confounded by insiders selling ahead of the 2022 crash (hindsight bias risk).\n    n>=6 does NOT improve OOS stability; failed in 2022 bear market.\n    NOT FORMABLE as hypothesis due to: (1) regime dependence, (2) 20d hold too long for clean causal testing,\n    (3) n>=6 OOS failure, (4) 5d magnitude below 1.5% threshold in all periods.\n    Potential follow-up: test with large-cap filter (>5B market cap) to reduce micro-cap noise.",
