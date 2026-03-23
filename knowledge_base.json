@@ -965,6 +965,11 @@
       "event_type": "guidance_raise_announcement",
       "reason": "Guidance raise 8-K filings (phrase: raises full-year guidance, N=52, 2021-2024) show no signal: avg 1d abnormal=+0.32% (p=0.59), 3d=+0.41% (p=0.95), 5d=+0.07% (p=0.73). passes_multiple_testing=False. Root cause: guidance raises are almost always at quarterly earnings release dates, so the signal is fully confounded by the earnings beat effect. There is no independent mid-quarter guidance raise signal separable from EDGAR 8-K free-text search alone. A cleaner test would require identifying guidance raises OUTSIDE earnings season which needs a specialized dataset.",
       "recorded": "2026-03-23T04:23:36.371518"
+    },
+    {
+      "event_type": "pre_earnings_drift_consistent_beaters",
+      "reason": "Tested pre-earnings drift for consistent EPS beaters (3+ consecutive beats) on 30 large-cap S&P 500 stocks, 2020-2024. N=325 beater events across 29 tickers. RESULTS: 1d avg_abnormal=+0.08% (p=0.339, wilcoxon_p=0.584), 3d avg_abnormal=+0.23% (p=0.095, wilcoxon_p=0.206), 5d avg_abnormal=+0.06% (p=0.798, wilcoxon_p=0.941). None significant. passes_multiple_testing=False (0 of 5 horizons at p<0.05). Bootstrap 95% CI at 5d: [-0.38%, +0.51%] \u2014 CI includes zero. CONTROL GROUP (N=147, mixed EPS history): 5d avg=+0.57% \u2014 HIGHER than beaters, confirming no differential signal. Two-sample t-test (beater vs control) at 1d: p=0.674, at 3d: p=0.337, at 5d: p=0.242. Mann-Whitney at 1d: p=0.161. No statistically or economically significant differential. MECHANISM FAILURE: The signal is efficiently priced for large-caps. Institutional desks and quants have been running this exact strategy for 20+ years \u2014 any predictable pre-earnings drift in mega-caps is arbitraged away instantly. NOISE LEVEL: stdev_5d=4.06% dwarfs avg=0.06%, requiring N~36,000 to detect a 0.06% effect. The 3d p=0.095 (borderline) reflects noise + high skewness (1.04), not a real signal. Recommended N for 80% power: 2,473 (1d), 898 (3d), 35,939 (5d) \u2014 far beyond achievable. DO NOT pursue this signal for large-cap S&P 500. May exist in small/micro-cap where it is less efficiently priced, but that population has data quality and survivorship bias issues.",
+      "recorded": "2026-03-23T05:10:33.456984"
     }
   ]
 }
