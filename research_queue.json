@@ -233,6 +233,15 @@
       "added": "2026-03-23T07:28:18.041354"
     },
     {
+      "id": "5a7f31f4",
+      "category": "spinco_institutional_selling_short",
+      "question": "After FDXF investor day (April 8, 2026): Is FDXF being added to S&P 500 at separation? What is WI (when-issued) trading price vs expected? Is short borrow available? Re-evaluate go/no-go for FDXF short hypothesis.",
+      "priority": 1,
+      "status": "pending",
+      "reasoning": "June 1 first trading day is ~10 weeks away. Need S&P 500 inclusion decision (S&P announces additions for spinoffs shortly before effective date). WI trading begins a few days before June 1 and reveals whether FDXF is trading at premium or discount. If discount already, short thesis weakened further.",
+      "added": "2026-03-23T09:56:12.359735"
+    },
+    {
       "id": "seed-002",
       "category": "index_rebalancing",
       "question": "When a stock is announced for S&P 500 addition, what is the abnormal return between announcement and effective date, and does it reverse after inclusion? How does this compare to Russell 2000 rebalancing?",
@@ -1015,32 +1024,81 @@
       "hypothesis_template": "d302c84b",
       "added": "2026-03-23T08:37:16.550274",
       "status": "watching"
+    },
+    {
+      "event": "FedEx Freight (FDXF) NYSE listing \u2014 spinoff from FDX. Expected June 1 2026. Pure-play LTL carrier, ~$30-35B market cap. Potential target for spinco institutional selling short hypothesis.",
+      "expected_date": "2026-06-01",
+      "symbol": "FDXF",
+      "hypothesis_template": {
+        "event_type": "spinco_institutional_selling_short",
+        "parent_hypothesis_id": "2d94ac68",
+        "expected_direction": "short",
+        "entry_timing": "close_of_first_trading_day",
+        "hold_days": 5,
+        "expected_magnitude_pct": 5.69,
+        "decision_criteria": "QUALIFY if: FDX shareholders are broadly diversified across sectors (they are - FDX is in many balanced/blend funds); DISQUALIFY if: FDXF immediately enters LTL-specific indexes and attracts natural buyers equal to sellers. GXO was +1.8% 5d (logistics, desired). FDXF is similar risk profile to GXO - large, established, desirable LTL pure-play. Apply desirability discount.",
+        "key_risks": [
+          "FDXF is a WANTED spinoff - LTL sector has natural institutional buyers (transport-focused funds, value funds that want pure-play)",
+          "~$30-35B market cap means likely immediate S&P 500 inclusion - S&P index funds MUST buy, offsetting selling pressure",
+          "FDX is already classified as Industrials/Transportation - many FDX holders already have transport mandates and may KEEP FDXF",
+          "Analyst consensus is bullish on FDXF as pure-play value unlock - unlike KD (IT services spinoff nobody wanted) or BLCO (eye care nobody wanted)",
+          "Hard to borrow may be severe given size and high institutional ownership (78-80%)",
+          "Revenue declining slightly YoY - may not show strong first-day premium"
+        ],
+        "comparable_cases": {
+          "GXO": "Logistics spinoff from XPO in Aug 2021. Abnormal 5d=+1.8%, 10d=+23.4%. FDXF is analogous - desired LTL/logistics pure-play.",
+          "KD": "Kyndryl IT services from IBM, Nov 2021. Abnormal 5d=-18.6%. Classic unwanted spinco - IBM shareholders wanted nothing to do with legacy IT.",
+          "REZI": "Resideo from Honeywell, Oct 2018. Abnormal 5d=-7.9%. Mixed case."
+        },
+        "go_no_go_decision": "BORDERLINE. Lean NO-GO based on: (1) GXO analog suggests desired logistics spincos outperform; (2) probable S&P 500 inclusion creates forced buying; (3) FDX investor base already transport-oriented. Recommend WATCHLIST only, monitor for pre-spin discount in WI trading. Re-evaluate if FDXF shows significant first-day premium (shorts more likely to profit from premium reversal).",
+        "pre_spin_checklist": [
+          "Confirm June 1 2026 first trading day",
+          "Check if FDXF added to S&P 500 at separation (S&P policy: spinoffs from S&P 500 parents often added immediately)",
+          "Monitor when-issued (WI) trading to see if FDXF trades at premium or discount pre-listing",
+          "Check short borrow availability via Alpaca 1-2 days before listing",
+          "Confirm FDX shareholder base - what % are transport-sector funds vs diversified"
+        ]
+      },
+      "added": "2026-03-23T09:55:41.255869",
+      "status": "watching"
     }
   ],
   "next_session_priorities": [
     {
-      "task": "Monitor GO (1cb6140f) trade outcome \u2014 entry at next_market_open, 3d hold. Close by EOD ~2026-03-26.",
-      "set_by_session": "2026-03-23T09:50:42.353441"
+      "task": {
+        "task": "Monitor GO (1cb6140f) trade outcome - entry at next_market_open, 3d hold. Close by EOD ~2026-03-26."
+      },
+      "set_by_session": "2026-03-23T09:56:29.081320"
     },
     {
-      "task": "Monitor WD hypothesis if also active \u2014 check trade_loop.py status.",
-      "set_by_session": "2026-03-23T09:50:42.353446"
+      "task": {
+        "task": "Monitor WD hypothesis if also active - check trade_loop.py status."
+      },
+      "set_by_session": "2026-03-23T09:56:29.081325"
     },
     {
-      "task": "VST out-of-sample data added to f86dcb4e (first-IG) \u2014 needs pre-event-run-up filter research before next trade.",
-      "set_by_session": "2026-03-23T09:50:42.353447"
+      "task": {
+        "task": "VST out-of-sample data added to f86dcb4e (first-IG) - needs pre-event-run-up filter research before next trade."
+      },
+      "set_by_session": "2026-03-23T09:56:29.081326"
     },
     {
-      "task": "First-IG hypothesis (f86dcb4e) has expected_symbol=TBD \u2014 do not activate until next qualifying event AND pre-run-up filter is validated.",
-      "set_by_session": "2026-03-23T09:50:42.353448"
+      "task": {
+        "task": "First-IG hypothesis (f86dcb4e) has expected_symbol=TBD - do not activate until next qualifying event AND pre-run-up filter is validated."
+      },
+      "set_by_session": "2026-03-23T09:56:29.081326"
+    },
+    {
+      "task": {
+        "task": "FDXF (FedEx Freight spinoff June 1 2026): Currently WATCHLIST only - borderline case. In April after investor day (April 8): check S&P 500 inclusion decision, WI trading price, short borrow availability. Decision: GXO analog (logistics desired spinco) suggests lean NO-GO for short, but monitor."
+      },
+      "set_by_session": "2026-03-23T09:56:29.081327"
     }
   ],
   "session_handoff": {
-    "go_trade": "GO hypothesis 1cb6140f has trigger=next_market_open, , 10% stop-loss. Trade loop should execute at 9:30 ET. VIX is ~26.78 (elevated but signal confirmed in 2022 bear at same VIX). No VIX gate needed.",
-    "first_ig_update": "f86dcb4e updated with VST Dec 2025 OOS negative result (-3.79% 3d abnormal). VST had +400% run-up prior. Pre-event run-up >150% appears to neutralize the IG upgrade signal. Need to backtest this as a filter before next activation.",
-    "dead_end_recorded": "merger_hsr_clearance recorded as dead end. HSR 8-K events produce no measurable return (p=0.96). Do not re-investigate merger arb via clearance milestone.",
-    "vix_note": "VIX latest datapoint was 26.78 (March 20). Elevated but within regime covered by 2022 OOS bear cohort. Not crisis level.",
-    "written_at": "2026-03-23T09:50:42.353449"
+    "fdxf_decision": "FDXF is borderline for spinco short. Key uncertainty is S&P 500 inclusion (forced index buying offsets institutional selling) and investor mandate overlap (FDX shareholders are already transport-oriented). GXO (+1.8% 5d) is the right analog. Do NOT create hypothesis yet - add to watchlist and revisit late April/early May once S&P 500 inclusion decision and WI trading are observable.",
+    "vgnt_hypothesis_status": "VGNT (2d94ac68) is pending with trigger 2026-04-01T16:00. This will activate VGNT short on April 1 close. Confirm VGNT is still the right ticker for the Vigil Neuroscience / spinoff situation.",
+    "written_at": "2026-03-23T09:56:29.081329"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

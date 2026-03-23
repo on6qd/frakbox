@@ -755,14 +755,16 @@
       "last_updated": "2026-03-23T03:53:13.859364"
     },
     "spinco_institutional_selling_short": {
-      "summary": "SHORT newly-traded SpinCo at close of first trading day, hold 5 trading days. N=25 events 2018-2026, avg 5d abnormal=-5.69%, neg_rate=73.9%, p=0.007 (ttest), p=0.004 (wilcoxon). Passes multiple testing (5d and 10d both significant).",
-      "magnitude": "5.69% abnormal at 5d, 7.08% at 10d",
+      "summary": "SHORT newly-traded SpinCo at close of first trading day, hold 5 trading days. N=25 events 2018-2026, avg 5d abnormal=-6.73%, neg_rate=72%, 10d avg=-8.09%. Passes multiple testing.",
+      "magnitude": "6.73% abnormal at 5d, 8.09% at 10d",
       "direction": "SHORT SpinCo",
       "mechanism": "Institutional forced selling by parent shareholders who received SpinCo as distribution",
       "recent_validation": "VSNT Jan 2026: -17.5% abn 5d. LION May 2025: -19.9% abn 5d. Signal strengthening in recent years.",
-      "caution": "Signal weaker for highly desirable SpinCos (GXO +1.8%, GEV -5.7%). Strongest for out-of-favor industries (KD -18.6%, BLCO -9.1%, REZI -7.9%). Hard-to-borrow may limit tradability in first days.",
-      "upcoming": "HONA (Honeywell Aerospace) expected Q3 2026 - may not qualify (desired business). Watch for less popular spincos.",
-      "last_updated": "2026-03-23T04:40:51.160096"
+      "caution": "Signal MUCH weaker for desirable pure-play spincos with natural buyer base. GXO (logistics, Aug 2021) was +1.8% 5d, +23.4% 10d. GEHC (GE HealthCare) was +4.4% 5d. Strongest for truly unwanted spincos (KD -18.6%, BLCO -9.1%). FDXF likely falls in GXO bucket.",
+      "fdxf_assessment": "BORDERLINE. ~$30-35B market cap, desired pure-play LTL carrier, probable S&P 500 addition at separation, FDX shareholders already transport-oriented. Lean NO-GO for short hypothesis. Add to watchlist with decision tree.",
+      "upcoming": "FDXF (FedEx Freight) June 1 2026 - borderline case, see watchlist. HONA (Honeywell Aerospace) expected Q3 2026 - probably desired, similar concern.",
+      "desirability_filter": "Apply before trading: (1) Does SpinCo have natural institutional buyers in its sector? (2) Will it likely be added to S&P 500 at separation? (3) Is parent primarily in same sector as SpinCo? If YES to 2+, lean no-go.",
+      "last_updated": "2026-03-23T09:55:55.819144"
     },
     "edgar_efts_display_names_fix": {
       "summary": "EDGAR EFTS search-index API display_names field contains ticker symbol in parentheses",
