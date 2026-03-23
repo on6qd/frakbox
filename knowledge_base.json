@@ -328,6 +328,23 @@
       "minimum_gap_for_positive": "Appears ~180 days, though small n means threshold uncertain.",
       "live_candidates": "CCL S&P upgrade (currently BB+ positive outlook, Fitch IG Oct 1 2025). Gap by H1 2026: 6-9 months = LONG gap. ALLY Fitch/S&P follow-ons (timing unclear). TECK Moody's/S&P follow-on (unknown dates).",
       "recorded": "2026-03-23T07:59:37.317171"
+    },
+    "merger_arbitrage_catalytic_events": {
+      "summary": "Merger arbitrage spread compression is driven by specific catalytic events within the merger timeline, not just time passage. Key identified events: (1) HSR Early Termination grant or 30-day waiting period expiration - reduces regulatory uncertainty, observed in 1477 EDGAR 8-K filings 2020-2024; (2) Antitrust clearance announcement (8-K) - 293 EDGAR filings 2020-2024; (3) HSR Second Request issuance - associated with -2.8% abnormal return for ACQUIRERS (negative signal); (4) Shareholder vote approval - 8-K Item 5.07 filings, 3258 EDGAR filings 2020-2024; (5) DEFM14A filing (definitive proxy with vote date set) - 1167 filings 2020-2024. Giglio-Shue (2014) show deal success hazard rate is hump-shaped in event time (peaks ~month 3-6), creating predictable spread compression as time passes without failure.",
+      "known_magnitude": "HSR Second Request: -2.8% abnormal return for acquirer (Antitrust merger review costs, ScienceDirect 2017). Shareholder vote abnormal return: significantly positive but unquantified from search results. Target announcement premium: median +27% (establishing baseline spread ~3.5%). Post-announcement spread typical range: 3-7% total deal spread.",
+      "known_timeframe": "Typical merger timeline: announcement -> HSR filing (within 10 days) -> HSR waiting period expiration (day 30, or day 15 for all-cash tender) -> PREM14A filed -> SEC comments -> DEFM14A filed -> shareholder vote (typically 3-6 months post-announcement) -> closing. Early termination can shorten HSR to <30 days.",
+      "sources": [
+        "Giglio & Shue (2014) - No News is News: Do Markets Underreact to Nothing? - SSRN 2139564",
+        "Mitchell & Pulvino (2001) - Characteristics of Risk and Return in Risk Arbitrage - analyzed 1963-1998",
+        "Jetley & Ji (2010) - The Shrinking Merger Arbitrage Spread - FAJ, 2182 deals 1990-2007",
+        "Antitrust merger review costs ScienceDirect 2017 - -2.8% abnormal return on Second Request for acquirer",
+        "EDGAR EFTS API - 1167 DEFM14A, 1477 early termination 8-Ks, 293 antitrust clearance 8-Ks (2020-2024)",
+        "Verdad Capital merger arbitrage study - 835 deals 2000-2020 using Capital IQ",
+        "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2139564",
+        "https://www.insidearbitrage.com/merger-arbitrage-academic-research/"
+      ],
+      "gaps": "No academic paper found that specifically event-studies RETURN TO TARGET company at HSR early termination or antitrust clearance announcement. Second Request paper focuses on acquirer. Need: (1) manual construction of dataset pairing merger announcement dates with HSR clearance dates from EDGAR 8-Ks; (2) backtest of target company abnormal return in 1-5 day window after each specific catalyst; (3) need to resolve whether this is distinguishable from simple time-in-deal return (Giglio-Shue confound).",
+      "recorded": "2026-03-23T09:23:58.277733"
     }
   },
   "known_effects": {

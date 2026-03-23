@@ -717,6 +717,15 @@
       "added": "2026-03-23T08:56:07.970577"
     },
     {
+      "id": "8cd6537c",
+      "category": "merger_arbitrage",
+      "question": "Build EDGAR-based merger catalyst dataset: for each DEFM14A filing (2019-2024), extract acquiree ticker + vote date. For each early-termination 8-K, extract acquiree ticker + HSR clearance date. Pair these with merger announcement dates. Then backtest target company abnormal return [-1,+5] days around each catalyst. Need to resolve: is target spread compression at HSR clearance distinguishable from simple time-in-deal drift?",
+      "priority": 7,
+      "status": "pending",
+      "reasoning": "Dataset is feasible via EDGAR EFTS: 1167 DEFM14A + 1477 early-termination 8-Ks (2020-2024). No academic paper has event-studied target returns at intra-deal milestones specifically. If real, this is a timing signal (enter position when catalyst date is imminent) not a simple buy-and-hold signal.",
+      "added": "2026-03-23T09:24:07.997750"
+    },
+    {
       "id": "lockup_expiration_ded",
       "category": "ipo_lockup_expiration",
       "question": "IPO lockup expiration SHORT signal tested and dead-ended.",
