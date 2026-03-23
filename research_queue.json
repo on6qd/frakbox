@@ -1001,47 +1001,25 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. CLOSE GO and HD trades (GO exits March 26, HD exits whenever stop/profit hit) - run close scripts",
-      "set_by_session": "2026-03-23T08:59:11.572761"
+      "task": "Continue merger arbitrage research: test spread compression signal AFTER confirmed deal announcement (not clearance). Use Merger-Arb ETF holdings or M&A deal databases to get clean target lists.",
+      "set_by_session": "2026-03-23T09:41:34.232328"
     },
     {
-      "task": "2. Monitor REPL April 10 PDUFA - if CRL issued and it is a clinical efficacy deficiency, set short trigger on d302c84b",
-      "set_by_session": "2026-03-23T08:59:11.572766"
+      "task": "Consider testing: do M&A target stocks outperform in the 30-90 day window AFTER announcement vs clearance date specifically?",
+      "set_by_session": "2026-03-23T09:41:34.232334"
     },
     {
-      "task": "3. Research merger arbitrage spread compression signal (new task added this session)",
-      "set_by_session": "2026-03-23T08:59:11.572767"
-    },
-    {
-      "task": "4. VGNT spinoff trade: effective April 1 - confirm stock starts trading, verify short trigger fires via trade_loop",
-      "set_by_session": "2026-03-23T08:59:11.572767"
-    },
-    {
-      "task": "5. CEO departure scanner: check daily for qualifying events",
-      "set_by_session": "2026-03-23T08:59:11.572768"
+      "task": "Consider activation of any existing validated hypotheses sitting idle.",
+      "set_by_session": "2026-03-23T09:41:34.232335"
     }
   ],
   "session_handoff": {
-    "session_date": "2026-03-23",
-    "active_triggers": {
-      "GO_1cb6140f": "next_market_open long $5000 - fires 9:30 AM ET March 23",
-      "HD_86d28864": "next_market_open short $5000 - fires 9:30 AM ET March 23",
-      "VGNT_2d94ac68": "2026-04-01T16:00 short $5000 - spinoff effective April 1"
-    },
-    "watching": {
-      "REPL": "PDUFA April 10 2026 - second CRL would trigger d302c84b clinical failure short",
-      "CEO_departure": "ceo_departure_daily_scan.py running - alert fires to logs/ceo_departure_alerts.jsonl",
-      "CCL_credit_upgrade": "watching for BBB- upgrade from S&P, H2 2026"
-    },
-    "dead_ends_this_session": [
-      "russell_2000_reconstitution: data access limitation, no free constituent lists",
-      "strategic_alternatives_announcement: high heterogeneity, distress vs auction cases indistinguishable"
-    ],
-    "new_signal_to_research": "merger_arbitrage: confirmed deal announcement (stated price) => spread compression => 20d hold",
-    "vix_note": "WD trade (76678219) blocked by VIX gate - n=3 insiders + VIX=26.78 = negative EV. Re-evaluate when VIX<25",
-    "GO_close_date": "March 26 close (3 trading days from March 23 open entry)",
-    "friction_fix_done": "realtime_insider_scanner.py --max-check flag added (commit c0f1d65)",
-    "written_at": "2026-03-23T08:59:11.572769"
+    "investigated": "HSR early termination (antitrust clearance) as M&A target signal",
+    "state": "DEAD END - fully backtested and recorded",
+    "findings": "199 events scraped from EDGAR 8-K, 143 large-cap after filtering. Zero abnormal returns at all horizons (1d to 20d). Signal does not exist at clearance date. Literature signal is at announcement, not clearance.",
+    "blocker": "Dataset contamination: EDGAR HSR 8-Ks include acquirer filings and unrelated HSR mentions. No clean way to separate target vs acquirer from EDGAR text alone without hand-verification.",
+    "next_step": "Test a different merger arb signal: post-announcement drift for confirmed targets. Need a curated M&A deal database (e.g., Bloomberg/SDC or a hand-curated list) to get clean target symbols at announcement date.",
+    "written_at": "2026-03-23T09:41:34.232336"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
