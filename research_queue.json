@@ -543,18 +543,22 @@
       "category": "first_ig_credit_upgrade",
       "question": "REFINEMENT: Test whether second-agency IG upgrades are tradeable when there is a long time gap (>6 months) from first IG.\n    Observation: PR March 17 2026 (S&P BBB-, Fitch first IG was July 2025 = 8 months earlier) gave +4.37% 3d.\n    Our backtest negative control had n=3 follow-on events (DAL x2 close together, another), but those were short gaps.\n    Hypothesis to test: Follow-on IG upgrades with >6 month gap from first IG behave like first IG (institutions that couldn't buy on first upgrade wait for second agency confirmation).\n    Events to find: DAL 2024 S&P upgrade (July 2024, Moody's first IG was Feb 2016 = 8 years!), F Oct 2023 (Moody's first IG Sep 2023 = 1 month gap -- our backtest event).\n    If confirmed: expand f86dcb4e or create separate hypothesis for delayed follow-on upgrades.",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "PR March 2026 follow-on showed strong signal (+4.37% 3d). If this pattern holds, it would expand our trading universe significantly for the credit upgrade signal.",
-      "added": "2026-03-23T07:28:18.042495"
+      "added": "2026-03-23T07:28:18.042495",
+      "completed": "2026-03-23T13:19:37.026474",
+      "findings": "Dead end. Second-agency IG upgrades are not tradeable. Bloomberg Barclays Agg only requires 1 IG rating so no new forced buying. N=4 events: 3d avg=-0.11%, 50% pos rate. Mechanism does not support tradeable signal."
     },
     {
       "id": "5b7f12e8",
       "category": "merger_arbitrage",
       "question": "Does buying a target stock after confirmed M&A deal announcement (not \"strategic alternatives\") generate positive abnormal returns over 20d hold? The mechanism: deal spread compression as probability of completion rises. Test on 2020-2025 acquisitions of >$1B targets announced at >10% premium. Key discriminator vs strategic alternatives: deal PRICE is stated.",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Strategic alternatives dead end showed 43% base rate of completed deals and high heterogeneity. Confirmed deal announcements have stated prices - the signal is known deal spread, not uncertainty. Literature: risk arbitrage literature (Karolyi & Shannon 1999) shows 4-8% abnormal returns to target shareholders over the deal completion period. This is a well-documented effect that may still be exploitable for 3-5 day holds.",
-      "added": "2026-03-23T08:58:36.711244"
+      "added": "2026-03-23T08:58:36.711244",
+      "completed": "2026-03-23T13:19:37.025027",
+      "findings": "Dead end. See merger_arbitrage_announcement_drift knowledge base entry. Signal does not exist at 5d or 20d with N=20 verified events."
     },
     {
       "id": "eaedf856",
@@ -1087,40 +1091,36 @@
   ],
   "next_session_priorities": [
     {
-      "task": "Monitor for next first-IG upgrade candidate for hypothesis f86dcb4e. Best watch: S&P BBB- upgrade for CCL (currently BB+). Check S&P press releases after CCL quarterly earnings.",
-      "set_by_session": "2026-03-23T13:17:48.214339"
+      "task": "1. TRADE MONITORING: 4 trades fire at 9:30 AM ET today (GO 1cb6140f, HD 86d28864, ABT 9777ef67, CTAS cc88dd18). At next session, verify all entered correctly via Alpaca and record entry prices. Close dates: GO=March 26, HD/ABT/CTAS=March 28.",
+      "set_by_session": "2026-03-23T13:24:17.123318"
     },
     {
-      "task": "Consider re-running f86dcb4e backtest with DAL 2024-07-16 properly classified: it was already in both the first-IG backtest AND would be a second-agency test. The Fitch restoration of BBB- showed 3d=5.45% despite Moody maintaining IG. This suggests the DAL case is anomalous - Moody-only IG may not be viewed as full IG by the market.",
-      "set_by_session": "2026-03-23T13:17:48.214345"
+      "task": "2. GO CLOSE PREP: Script to close GO trade is in tools/close_go_trade.py. Needs to run March 26 after market open.",
+      "set_by_session": "2026-03-23T13:24:17.123322"
     },
     {
-      "task": "Search for post-2024 second-agency events to add data points (Delta S&P Dec 2024 3d return is needed to complete the second-agency analysis)",
-      "set_by_session": "2026-03-23T13:17:48.214346"
+      "task": "3. VGNT SPINOFF WATCH: VGNT when-issued starts March 27. Monitor price vs hypothesis expectations. Regular trading starts April 1 - trigger set for April 1 4PM ET close.",
+      "set_by_session": "2026-03-23T13:24:17.123324"
+    },
+    {
+      "task": "4. SHARE REPURCHASE SIGNAL: Research task 1c75adb0 - test open-market share repurchase in small-cap value stocks (P/B < 1.5). Need EDGAR 8-K search for repurchase program announcements. Use EFTS API with phrase \"stock repurchase program\" OR \"share repurchase program\", filter by filing date 2021-2024, then filter by market cap < $2B and P/B < 1.5.",
+      "set_by_session": "2026-03-23T13:24:17.123324"
+    },
+    {
+      "task": "5. ADBE 52W LOW: ADBE touched 52w low March 18-19 ($245.99) but does NOT qualify for trade (only 16 trading days above rolling 52w low, requirement is 30+). Monitor - if it recovers and stays above 52w low for 30 more days, could be a fresh signal in May 2026.",
+      "set_by_session": "2026-03-23T13:24:17.123325"
+    },
+    {
+      "task": "6. REPL PDUFA APRIL 10: Monitor news for PDUFA outcome. Hypothesis d302c84b would trigger if CRL issued. WebSearch for \"REPL replimune approval\" after April 10.",
+      "set_by_session": "2026-03-23T13:24:17.123326"
     }
   ],
   "session_handoff": {
-    "second_agency_ig": {
-      "status": "DEAD END - recorded",
-      "summary": "Second-agency IG upgrades do not produce tradeable signals. N=4 events showed 3d avg=-0.11%, 50% positive rate. Mechanism fails because Bloomberg Barclays Agg requires only 1 IG rating for index inclusion. Most forced buying happens at first-IG event.",
-      "events_checked": [
-        "KHC 2022-03-11",
-        "M 2022-05-18",
-        "F 2023-10-30",
-        "KHC 2022-05-05"
-      ],
-      "not_checked": [
-        "DAL 2024-12-03 (S&P, third-agency)",
-        "RCL 2025-05-19 (Moody, second-agency)"
-      ]
-    },
-    "active_hypothesis": {
-      "id": "f86dcb4e",
-      "event_type": "first_ig_credit_upgrade",
-      "status": "pending - waiting for next qualifying event",
-      "next_candidate": "CCL - S&P upgrade from BB+ to BBB- expected 2H 2026 or early 2027"
-    },
-    "written_at": "2026-03-23T13:17:48.214347"
+    "investigated": "Merger arbitrage expansion, second-agency IG upgrade signal, ABT 52w low validity check, 52w low scanner for new signals (ADBE/RACE)",
+    "key_findings": "1) Merger arb N=11 was selection bias - N=20 shows no signal (0.19% 5d, p=0.78). 2) Second-agency IG upgrades not tradeable - Bloomberg Barclays Agg only requires 1 IG rating so no new forced buying. 3) ABT March 20 trade is valid - stock was above rolling 52w low for 35 trading days before cross. 4) ADBE does not qualify for trade (16-day gap < 30-day requirement). 5) Built Tiingo disk cache at tools/tiingo_cache.py to prevent 429 rate limit errors.",
+    "blocked_by": "Nothing - all tasks completed or tracked.",
+    "next_immediate_step": "After 9:30 AM ET: verify 4 trades entered on Alpaca. Then for next session: check trade statuses, research share repurchase signal.",
+    "written_at": "2026-03-23T13:24:17.123327"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
