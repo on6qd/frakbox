@@ -686,6 +686,15 @@
       "findings": "ASSESSED: Activist 13D signal requires first-NEWS-DATE (not EDGAR filing date) due to 10-day filing window. EDGAR SC 13D filing date lags price movement by up to 10 days. The entity_name field in EDGAR EFTS search returns None for all results, making automated target company identification impossible. Feasibility test: checked 5 major activist funds (Elliott, Starboard, Icahn, Pershing, Trian) - CIK lookups mostly return empty. DATA ACCESS BLOCKED. Would require Bloomberg/Refinitiv for reliable news dates. Shelving until data access improves. Note: post-filing drift may still exist (Polk 2024 SSRN finds 3.8% at [-1,+1] window) but cannot build systematic event list with free data."
     },
     {
+      "id": "98c0e6cd",
+      "category": "first_ig_credit_upgrade",
+      "question": "VST first-IG negative result: was the Dec 2025 upgrade fully anticipated? Measure pre-event equity run-up vs other first-IG events to test whether anticipation level predicts return magnitude.",
+      "priority": 6,
+      "status": "pending",
+      "reasoning": "VST showed -3.79% 3d abnormal on a calm-VIX first-IG event. The hypothesis average is +2.42%. VST had extraordinary pre-event run-up (AI power hype). Testing whether pre-event equity performance is a moderator of the first-IG signal would help filter future trades and resolve hypothesis reliability question.",
+      "added": "2026-03-23T09:47:30.186554"
+    },
+    {
       "id": "3e7d2571",
       "category": "event_monitoring",
       "question": "Build EDGAR monitoring tool: daily scan of biotech 8-K filings for primary endpoint failure language. Use EDGAR EFTS full-text search API. Should flag: company name, ticker, date, keywords found. Run this at start of each session to catch qualifying events for d302c84b.",
@@ -724,6 +733,15 @@
       "status": "pending",
       "reasoning": "Dataset is feasible via EDGAR EFTS: 1167 DEFM14A + 1477 early-termination 8-Ks (2020-2024). No academic paper has event-studied target returns at intra-deal milestones specifically. If real, this is a timing signal (enter position when catalyst date is imminent) not a simple buy-and-hold signal.",
       "added": "2026-03-23T09:24:07.997750"
+    },
+    {
+      "id": "ba6d70e4",
+      "category": "first_ig_credit_upgrade",
+      "question": "Search for Moody's and S&P \"rising stars\" (BB/Ba1 companies on positive watch) published Q1 2026. Any US-listed >B market cap company on all three agency positive watch/review for upgrade is a potential first-IG candidate within 3-6 months.",
+      "priority": 7,
+      "status": "pending",
+      "reasoning": "Rising star lists identify first-IG candidates 3-12 months in advance. If we can find a large-cap company about to receive its first IG from ALL three major agencies, we can pre-position research and have the ticker ready when the upgrade hits. The signal window is short (24-48 hours post-announcement), so advance preparation is essential.",
+      "added": "2026-03-23T09:47:30.188489"
     },
     {
       "id": "lockup_expiration_ded",
@@ -1011,6 +1029,10 @@
     {
       "task": "Consider activation of any existing validated hypotheses sitting idle.",
       "set_by_session": "2026-03-23T09:41:34.232335"
+    },
+    {
+      "task": "For hypothesis f86dcb4e (first_ig_credit_upgrade): hypothesis still has expected_symbol=TBD. Search Moody's/S&P rising star lists Q1 2026 for US companies (>B mktcap) with all agencies at BB+/Ba1 and positive outlook. Candidate to watch: Permian Resources Moody upgrade (but PR is 3rd agency - skip). Look instead for companies with ZERO current IG ratings. Tool: WebSearch for \"Moody rising star 2026\" or \"S&P potential rising star\".",
+      "set_by_session": "2026-03-23-task3"
     }
   ],
   "session_handoff": {
