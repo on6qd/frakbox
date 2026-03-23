@@ -448,6 +448,22 @@ def get_historical_trades(
                 logger.info(f"  Reached stop_date {stop_date} at page {page}")
                 break
 
+        # Incremental save every 50 pages so partial fetches are preserved
+        if use_cache and page % 50 == 0:
+            partial_norm = []
+            seen = set()
+            for raw in all_raw:
+                tx = _normalise_trade(raw)
+                if tx and tx["_tx_id"] not in seen:
+                    seen.add(tx["_tx_id"])
+                    partial_norm.append(tx)
+            cache = _load_cache()
+            cache["trades"] = partial_norm
+            cache["last_updated"] = datetime.now(timezone.utc).isoformat()
+            cache["partial"] = True
+            _save_cache(cache)
+            logger.info(f"  Incremental save: {len(partial_norm)} trades at page {page}")
+
         time.sleep(SLEEP_BETWEEN_PAGES)
 
     # Normalise
