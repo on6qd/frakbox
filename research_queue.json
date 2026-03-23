@@ -853,74 +853,48 @@
   ],
   "next_session_priorities": [
     {
-      "task": {
-        "task": "MONDAY MARCH 23 (9:30 AM ET): Verify GO (1cb6140f) LONG and HD (86d28864) SHORT actually executed. Run python run.py --status to confirm active positions.",
-        "urgency": "critical",
-        "deadline": "2026-03-23 09:30 ET"
-      },
-      "set_by_session": "2026-03-23T02:32:45.775062"
+      "task": "Check active hypotheses for positions needing close - run python run.py --status",
+      "set_by_session": "2026-03-23T02:38:28.691685"
     },
     {
-      "task": {
-        "task": "WEDNESDAY MARCH 26: Close GO trade. Run python tools/close_go_trade.py. Expected 3d return from entry price.",
-        "urgency": "high",
-        "deadline": "2026-03-26"
-      },
-      "set_by_session": "2026-03-23T02:32:45.775067"
+      "task": "Investigate sector earnings dynamics further: background analysis found tech beats n=107 at p=0.0185 but FAANG-only replication failed completely (p=0.60). If pursuing further, need the actual dataset used in the background analysis to understand what stocks drove the 36.4% positive rate signal",
+      "set_by_session": "2026-03-23T02:38:28.691690"
     },
     {
-      "task": {
-        "task": "THURSDAY MARCH 27: Close HD trade. Run python tools/close_hd_trade.py. Also check V (Visa) 5d return (entry Mar 19 open, exit Mar 25 close) for 86d28864 OOS tracking.",
-        "urgency": "high",
-        "deadline": "2026-03-27"
-      },
-      "set_by_session": "2026-03-23T02:32:45.775069"
+      "task": "Consider testing PDUFA watchlist events: REPL (Apr 10), VRDN (Jun 30), RCKT (Mar 28) - these are active from last session",
+      "set_by_session": "2026-03-23T02:38:28.691691"
     },
     {
-      "task": {
-        "task": "APRIL 10 (RCKT PDUFA): Monitor REPL outcome. REPL prior CRL was -45.2% (Dec 2023) - DOES NOT qualify for d302c84b (need -55%). Track outcome as clinical failure database data point ONLY. Do not trade.",
-        "urgency": "medium",
-        "deadline": "2026-04-10"
-      },
-      "set_by_session": "2026-03-23T02:32:45.775069"
-    },
-    {
-      "task": {
-        "task": "VIX MONITORING: WD (76678219) needs VIX<25 for n=3 cluster. Check daily. Current VIX ~26-27 (elevated). If VIX drops: verify WD filing still fresh (within 7 days).",
-        "urgency": "medium",
-        "deadline": "ongoing"
-      },
-      "set_by_session": "2026-03-23T02:32:45.775070"
-    },
-    {
-      "task": {
-        "task": "NEW SIGNAL: Management guidance raise signal (beat+raise vs beat-no-raise). Guidance data not in yfinance - need external source. Options: (1) NLP on earnings call transcripts from SEC EDGAR EX-99.1 filings, (2) scrape Zacks or Estimize for guidance data. PEAD for large beats DEAD END (failed OOS 2024-2025).",
-        "urgency": "low",
-        "deadline": "next session"
-      },
-      "set_by_session": "2026-03-23T02:32:45.775071"
-    },
-    {
-      "task": {
-        "task": "CEO/CFO CLUSTER HYPOTHESIS (2bbe0f04): Already wired into cluster_auto_scanner.py. No action needed. Scanner will flag CEO/CFO presence in future clusters.",
-        "urgency": "none",
-        "deadline": "automated"
-      },
-      "set_by_session": "2026-03-23T02:32:45.775071"
+      "task": "FDA clinical efficacy failure short is known_effect - monitor for new events via edgar_clinical_failure_scanner.py",
+      "set_by_session": "2026-03-23T02:38:28.691691"
     }
   ],
   "session_handoff": {
-    "investigating": "PEAD (post-earnings announcement drift) for large-cap S&P 500 stocks. Finding: reverse-PEAD exists in 2021-2023 (-0.75% 5d abnormal, p=0.005) but FAILS out-of-sample in 2024-2025 (-0.16%, p=0.62). Dead end for current market conditions. Regime-specific.",
-    "intermediate_findings": [
-      "REPL first CRL (Dec 5, 2023): -45.2% close-to-close. Does NOT qualify for d302c84b (-55% threshold). Second CRL April 10 expected -30-50%. Do not trade.",
-      "AMRZ (1f3ac0ec) abandoned: cluster filing March 11-16, hypothesis created March 22. Window expired. Hypothetical return would have been -5.1%.",
-      "52w-low scanner expanded from 66 to 174 stocks. All GICS sectors now covered.",
-      "V (Visa) 52w low OOS: entered March 19 at .04. 2d return = +2.21% abnormal (against short hypothesis). 5d result pending March 25.",
-      "Mid-cap PEAD also no signal (n=268, p=0.59). PEAD as strategy does not work on available universe."
+    "session_summary": "Evaluated sector earnings surprise signals from background analysis. Both signals failed all gates.",
+    "signal_1_tech_beats": {
+      "background_result": "n=107, 5d=-1.17%, p=0.0185",
+      "verdict": "DEAD END",
+      "reasons": [
+        "Single horizon p=0.0185 fails Bonferroni threshold (need p<0.01)",
+        "Magnitude 1.17% below 1.5% minimum abnormal return threshold",
+        "FAANG+NVDA replication: disc 5d p=0.33, val 5d p=0.63 (reversed to +0.41%)"
+      ]
+    },
+    "signal_2_miss_relief": {
+      "background_result": "n=177, 5d=+0.56%",
+      "verdict": "DEAD END",
+      "reasons": [
+        "Direct backtest: 5d abnormal=-0.07%, p=0.94",
+        "Extremely heterogeneous: range -12.58% to +9.25% per event",
+        "No consistent direction at any horizon"
+      ]
+    },
+    "dead_ends_recorded": [
+      "earnings_surprise_tech_beat_sell_news_short",
+      "earnings_miss_relief_rally_long"
     ],
-    "blocked_by": "PEAD signal requires guidance data (beat+raise vs beat-only) not available in yfinance.",
-    "next_step": "Wait for GO and HD to close (March 26-27). Then evaluate signal quality for next research round. Consider: earnings call NLP for guidance signal, or FINRA short volume spike as short-squeeze precursor.",
-    "written_at": "2026-03-23T02:32:45.775073"
+    "next_step": "Run 'python run.py --status' to check active positions. Then check PDUFA watchlist for upcoming events (RCKT due Mar 28).",
+    "written_at": "2026-03-23T02:38:28.691693"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
