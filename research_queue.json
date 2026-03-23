@@ -1087,40 +1087,40 @@
   ],
   "next_session_priorities": [
     {
-      "task": "TRADE MONITORING: GO trade closes March 26/27 (3d hold from March 24 entry). Run tools/close_go_trade.py. HD/ABT/CTAS close March 31 (5d hold).",
-      "set_by_session": "2026-03-23T13:07:05.734148"
+      "task": "Monitor for next first-IG upgrade candidate for hypothesis f86dcb4e. Best watch: S&P BBB- upgrade for CCL (currently BB+). Check S&P press releases after CCL quarterly earnings.",
+      "set_by_session": "2026-03-23T13:17:48.214339"
     },
     {
-      "task": "VGNT WHEN-ISSUED: VGNT WI started trading March 27. Check if hypothesis 2d94ac68 April 1 short trigger is still valid given when-issued price.",
-      "set_by_session": "2026-03-23T13:07:05.734153"
+      "task": "Consider re-running f86dcb4e backtest with DAL 2024-07-16 properly classified: it was already in both the first-IG backtest AND would be a second-agency test. The Fitch restoration of BBB- showed 3d=5.45% despite Moody maintaining IG. This suggests the DAL case is anomalous - Moody-only IG may not be viewed as full IG by the market.",
+      "set_by_session": "2026-03-23T13:17:48.214345"
     },
     {
-      "task": "SECOND-AGENCY IG UPGRADE: Test if long-gap second agency upgrades are tradeable. DAL July 2024 Fitch first-IG (+7%), PR March 2026 S&P second-IG (+4.37%). Need 3+ more events. Task 7b031ca7.",
-      "set_by_session": "2026-03-23T13:07:05.734155"
-    },
-    {
-      "task": "CEO DEPARTURE SCANNER: Check ceo_departure_alerts.jsonl for fresh candidates from overnight 8-K scans. Signal validated p=0.0034 N=13.",
-      "set_by_session": "2026-03-23T13:07:05.734155"
-    },
-    {
-      "task": "CLINICAL FAILURE MONITOR: REPL PDUFA April 10 2026. Hypothesis d302c84b ready.",
-      "set_by_session": "2026-03-23T13:07:05.734156"
-    },
-    {
-      "task": "RECORD GO OUTCOME: After close_go_trade.py, complete hypothesis 1cb6140f with actual exit price and abnormal return vs SPY.",
-      "set_by_session": "2026-03-23T13:07:05.734157"
+      "task": "Search for post-2024 second-agency events to add data points (Delta S&P Dec 2024 3d return is needed to complete the second-agency analysis)",
+      "set_by_session": "2026-03-23T13:17:48.214346"
     }
   ],
   "session_handoff": {
-    "merger_arb_status": "DEAD END recorded. N=20 (2021-2024 all-cash confirmed completed deals) shows p=0.78, CI does not exclude zero. False positive at N=11 was selection bias. Do not revisit without new discriminating variable (e.g., arb spread >5%).",
-    "active_trades": [
-      "GO (1cb6140f): set trigger next_market_open March 24. Close target March 26-27.",
-      "HD (insider_cluster): set trigger next_market_open March 24. Close target March 31.",
-      "ABT (52w_low): set trigger next_market_open March 24. Close target March 31.",
-      "CTAS (52w_low): set trigger next_market_open March 24. Close target March 31.",
-      "VGNT (2d94ac68): short trigger April 1 at open."
-    ],
-    "written_at": "2026-03-23T13:07:05.734158"
+    "second_agency_ig": {
+      "status": "DEAD END - recorded",
+      "summary": "Second-agency IG upgrades do not produce tradeable signals. N=4 events showed 3d avg=-0.11%, 50% positive rate. Mechanism fails because Bloomberg Barclays Agg requires only 1 IG rating for index inclusion. Most forced buying happens at first-IG event.",
+      "events_checked": [
+        "KHC 2022-03-11",
+        "M 2022-05-18",
+        "F 2023-10-30",
+        "KHC 2022-05-05"
+      ],
+      "not_checked": [
+        "DAL 2024-12-03 (S&P, third-agency)",
+        "RCL 2025-05-19 (Moody, second-agency)"
+      ]
+    },
+    "active_hypothesis": {
+      "id": "f86dcb4e",
+      "event_type": "first_ig_credit_upgrade",
+      "status": "pending - waiting for next qualifying event",
+      "next_candidate": "CCL - S&P upgrade from BB+ to BBB- expected 2H 2026 or early 2027"
+    },
+    "written_at": "2026-03-23T13:17:48.214347"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
