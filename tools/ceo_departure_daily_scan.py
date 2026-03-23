@@ -98,6 +98,14 @@ def main():
             print(f"SKIP {ticker}: overnight drop only {overnight:.1f}% (need < -2.0%)")
             continue
 
+        # Welcome departure qualifier: if stock was RECOVERING before announcement,
+        # market likely celebrates the CEO removal — not a short signal.
+        # LULU March 2024: 20d prior abnormal = +5.7%, stock rose +3.8% on departure.
+        prior_abn = r.get("prior_20d_abnormal_return_pct")
+        if prior_abn is not None and prior_abn > 0.0:
+            print(f"SKIP {ticker}: welcome departure — 20d prior abnormal = +{prior_abn:.1f}% (market relieved)")
+            continue
+
         qualifying.append(r)
 
     # Log to file
@@ -149,6 +157,8 @@ def main():
                 "overnight_return_pct": overnight,
                 "departure_type": r.get("departure_type", "unknown"),
                 "market_cap_m": r.get("market_cap_m", 0),
+                "prior_20d_abnormal_return_pct": r.get("prior_20d_abnormal_return_pct"),
+                "is_welcome_departure": r.get("is_welcome_departure", False),
                 "action_required": True,
                 "hypothesis_id": "5dbcfb37",
                 "instruction": "SHORT at next-day open, 1d hold, $5000 position"

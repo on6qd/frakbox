@@ -361,6 +361,86 @@ def filter_by_market_cap(events: list, min_cap_m: float = 2000) -> list:
     return filtered
 
 
+def check_prior_performance(events: list, lookback_days: int = 20) -> list:
+    """
+    Add 20d prior abnormal return (vs SPY) for each event.
+
+    Key qualifier: if 20d prior abnormal return > 0% (stock was RECOVERING before
+    departure), this is likely a 'welcome departure' pattern (market celebrates removal
+    of underperforming CEO). LULU March 2024 was an example — stock rose +5% on departure.
+
+    Events where prior_20d_abnormal_return_pct > 0 should be SKIPPED for the short
+    hypothesis because the market is treating the departure positively.
+
+    Adds keys: prior_20d_return_pct, prior_20d_spy_return_pct, prior_20d_abnormal_return_pct,
+               is_welcome_departure (bool: True = skip for short signal)
+    """
+    print(f"Computing {lookback_days}d prior abnormal returns...")
+    from tools.yfinance_utils import safe_download
+
+    spy_cache = {}
+
+    for ev in events:
+        ticker = ev.get("ticker")
+        date_str = ev.get("filing_date")
+        if not ticker or not date_str:
+            ev["prior_20d_abnormal_return_pct"] = None
+            ev["is_welcome_departure"] = False
+            continue
+
+        try:
+            date = datetime.strptime(date_str[:10], "%Y-%m-%d")
+            start = (date - timedelta(days=lookback_days * 2)).strftime("%Y-%m-%d")  # extra buffer
+            end = date.strftime("%Y-%m-%d")
+
+            stock_hist = safe_download(ticker, start=start, end=end)
+            if stock_hist.empty or len(stock_hist) < lookback_days:
+                ev["prior_20d_abnormal_return_pct"] = None
+                ev["is_welcome_departure"] = False
+                continue
+
+            # Get the last lookback_days trading days before event
+            stock_closes = stock_hist["Close"].iloc[-lookback_days:]
+            stock_return = (float(stock_closes.iloc[-1]) - float(stock_closes.iloc[0])) / float(stock_closes.iloc[0])
+
+            # Get SPY for same period
+            spy_key = (start, end)
+            if spy_key not in spy_cache:
+                spy_hist = safe_download("SPY", start=start, end=end)
+                spy_cache[spy_key] = spy_hist
+            spy_hist = spy_cache[spy_key]
+
+            if spy_hist.empty or len(spy_hist) < lookback_days:
+                ev["prior_20d_abnormal_return_pct"] = None
+                ev["is_welcome_departure"] = False
+                continue
+
+            spy_closes = spy_hist["Close"].iloc[-lookback_days:]
+            spy_return = (float(spy_closes.iloc[-1]) - float(spy_closes.iloc[0])) / float(spy_closes.iloc[0])
+
+            abnormal = (stock_return - spy_return) * 100
+            ev["prior_20d_return_pct"] = round(stock_return * 100, 2)
+            ev["prior_20d_spy_return_pct"] = round(spy_return * 100, 2)
+            ev["prior_20d_abnormal_return_pct"] = round(abnormal, 2)
+            # Welcome departure = stock recovering BEFORE news broke → market is relieved
+            ev["is_welcome_departure"] = abnormal > 0.0
+
+            direction = "RECOVERING" if abnormal > 0 else "FALLING"
+            welcome = " → SKIP (welcome departure)" if ev["is_welcome_departure"] else ""
+            print(f"  {ticker} {date_str[:10]}: 20d prior={abnormal:.1f}% abn [{direction}]{welcome}")
+
+            time.sleep(0.2)
+
+        except Exception as e:
+            print(f"  {ticker}: prior performance check failed: {e}")
+            ev["prior_20d_abnormal_return_pct"] = None
+            ev["is_welcome_departure"] = False
+
+    welcome_count = sum(1 for e in events if e.get("is_welcome_departure"))
+    print(f"  {welcome_count} / {len(events)} flagged as welcome departures (skip for short signal)")
+    return events
+
+
 def check_stock_direction(events: list) -> list:
     """
     For each event, check if the stock FELL on the day after announcement.
@@ -497,6 +577,12 @@ def scan_ceo_departures(
     # Step 3b: Filter out planned retirements by fetching 8-K text
     if filter_departure_type and large_cap_events:
         large_cap_events = filter_by_departure_type(large_cap_events)
+
+    # Step 3c: Compute 20d prior abnormal return (welcome departure qualifier)
+    # This adds is_welcome_departure flag to each event — useful for manual review
+    # or filtering out LULU-type cases where board fires underperforming CEO but stock rallies
+    if large_cap_events:
+        large_cap_events = check_prior_performance(large_cap_events)
 
     # Step 4: Check stock direction (optional)
     if check_direction and large_cap_events:
