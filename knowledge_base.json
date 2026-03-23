@@ -345,6 +345,17 @@
       ],
       "gaps": "No academic paper found that specifically event-studies RETURN TO TARGET company at HSR early termination or antitrust clearance announcement. Second Request paper focuses on acquirer. Need: (1) manual construction of dataset pairing merger announcement dates with HSR clearance dates from EDGAR 8-Ks; (2) backtest of target company abnormal return in 1-5 day window after each specific catalyst; (3) need to resolve whether this is distinguishable from simple time-in-deal return (Giglio-Shue confound).",
       "recorded": "2026-03-23T09:23:58.277733"
+    },
+    "merger_arbitrage_announcement": {
+      "summary": "After confirmed M&A deal announcement (stated acquisition price), target stock continues to drift upward for 5 days. Mechanism: risk arbitrageurs buy to earn deal spread, price gradually compresses toward deal price over several days. Mitchell & Pulvino (2001, JF) documented 0.6-0.9%/month risk-adjusted returns from diversified arb portfolios.",
+      "known_magnitude": "5d avg abnormal +2.36% to +2.86% (N=9-11 deals, 2021-2024)",
+      "known_timeframe": "5 trading days from announcement",
+      "sources": [
+        "Mitchell & Pulvino (2001, JF) Characteristics of Risk and Return in Risk Arbitrage",
+        "Own backtest N=11 completed deals 2021-2024"
+      ],
+      "gaps": "Only 1 horizon (5d) passes p<0.05. 3d borderline (p=0.09). Need N=15+ for proper OOS split. Small deals (<B) may show stronger signal - untested. Key risk: deal breaks cause large negative returns.",
+      "recorded": "2026-03-23T12:33:17.708983"
     }
   },
   "known_effects": {
