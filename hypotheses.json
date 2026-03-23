@@ -380,7 +380,8 @@
         "trade_placed": false,
         "reason_not_traded": "Watchlist gap - only June 2026 entry existed, missed Q1 2026-03-06 announcement"
       }
-    ]
+    ],
+    "notes": "\n2026-03-23: CIEN Feb 4 2026 OOS validation (MISSED TRADE). Announcement Feb 4 AH, entry at Feb 5 open. 1d=+5.51%, 3d=+18.26%, 5d=+21.66%. Extremely strong OOS result. Scanner failed to detect due to RSS 403 blocking."
   },
   {
     "id": "0a093c90",

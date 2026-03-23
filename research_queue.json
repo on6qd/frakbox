@@ -244,6 +244,15 @@
       "added": "2026-03-23T09:56:12.359735"
     },
     {
+      "id": "31e905d1",
+      "category": "sp500_index_addition",
+      "question": "FIX S&P 500 addition scanner: CIEN (Feb 4 2026) was missed because S&P Global RSS returned 403 and EDGAR doesnt have 8-K for index changes. CIEN gave +21.66% 5d abnormal return (massive missed trade). Fix: WebSearch for 'S&P 500 index addition' weekly on Mondays, OR monitor press.spglobal.com/rss, OR check Wikipedia S&P 500 change log. CIEN jumped 7% on Feb 5 with no earnings - anomalous move detection could catch this. Critical: quarterly rebalance June 5 2026 is next major event but individual additions can fire any time.",
+      "priority": 1,
+      "status": "pending",
+      "reasoning": "CIEN missed trade represents a +21% abnormal return that should have been captured. Scanner needs reliable detection method beyond just quarterly rebalance monitoring.",
+      "added": "2026-03-23T14:04:15.888398"
+    },
+    {
       "id": "seed-002",
       "category": "index_rebalancing",
       "question": "When a stock is announced for S&P 500 addition, what is the abnormal return between announcement and effective date, and does it reverse after inclusion? How does this compare to Russell 2000 rebalancing?",
@@ -588,6 +597,15 @@
       "status": "pending",
       "reasoning": "Signal passes pooled MT test but fails OOS split due to small N per period. Need N>=28 per period. Discovery 2015-2022 already has N=19 - need just 9 more events from 2010-2014 to reach power threshold.",
       "added": "2026-03-23T13:48:32.045425"
+    },
+    {
+      "id": "ee74bf16",
+      "category": "sp500_52w_low_monitoring",
+      "question": "Monitor NKE (Nike) for 52-week low signal. NKE current $52.37, 52w low $51.97 (0.78% above). Has been above 52w low for 238 consecutive days. If NKE closes at or below $51.97 on any trading day in the next 2 weeks, hypothesis 86d28864 fires (SHORT at next open, 5d hold). Note: Capacity is limited - if GO/HD/ABT/CTAS are all active, must wait for one to close before entering NKE. NKE earnings expected late March/early April - check before trading (concurrent earnings disqualify). NKE 52w low was set April 2025 (~$52).",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "NKE is 0.78% above 52w low with 238 consecutive days above - primed for a signal. In tariff environment with Nike's exposure to Asian manufacturing, stock pressure could continue. But concurrent earnings announcement would disqualify the signal.",
+      "added": "2026-03-23T14:00:22.174448"
     },
     {
       "id": "seed-003",

@@ -358,16 +358,16 @@
       "recorded": "2026-03-23T12:33:17.708983"
     },
     "sec_wells_notice_short": {
-      "summary": "SEC Wells Notice disclosure (via 8-K) causes significant negative abnormal returns. Academic study (Griffin & Sun 2016, AFR) found -4.5% CAR over 3 days for first-time 8-K Wells disclosures with subsequent litigation. Our backtest (N=27, 2015-2024): 1d avg=-1.74% p=0.018, 3d avg=-2.21% p=0.013, 5d avg=-2.72% p=0.028. All 3 horizons pass MT. Wilcoxon p<0.04 at 1d/3d/5d. Bootstrap CI excludes zero at all 3 horizons. HOWEVER: OOS split (discovery 2015-2022, validation 2023-2024) shows discovery barely passes at 3d (p=0.041) but NOT at 1d/5d. Discovery alone does not pass multiple testing (needs 2 horizons). Dataset too small per period. Cannot pre-register hypothesis yet.",
-      "known_magnitude": "-1.74% to -2.72% abnormal (1d to 5d), stdev=4.60%",
-      "known_timeframe": "1-5 days post disclosure open",
+      "summary": "UPDATED 2026-03-23: Expanded to N=27 (2015-2024), adding 2015-2019 events. Pooled result: 1d avg=-1.74% p=0.018, 3d avg=-2.21% p=0.013, 5d avg=-2.72% p=0.028. passes_multiple_testing=True. Bootstrap CI excludes zero at 1d/3d/5d. Wilcoxon p<0.04. ISSUE: Pre-2015 events (N=10, 2010-2014) show no signal (3d avg=-0.68%). Only post-2015 period shows signal. OOS split: neither discovery (2015-2020, N=10) nor validation (2021-2024, N=17) individually passes MT. The pooled result is driven by a concentration of events in 2021-2024. Heterogeneity concern from prior test (fraud vs procedural) confirmed by NDAQ/XYL/HAYW showing near-zero reactions. CONCLUSION: Signal passes pooled MT but fails OOS temporal split. Use as watch category; accumulate more 2025-2026 events before pre-registration. Prior dead end noted at N=22 (2020-2024 only, 1d passes but 3d doesn't) was different dataset.",
+      "known_magnitude": "1d avg=-1.74%, 3d avg=-2.21%, 5d avg=-2.72%, stdev=4.60%",
+      "known_timeframe": "1-5 days post-disclosure open (entry at next-day open)",
       "sources": [
-        "Griffin & Sun (2016) 'Troublesome Tidings? Investors Response to a Wells Notice', AFR v5i1",
-        "SSRN 1809172",
-        "Own backtest N=27 2015-2024"
+        "Griffin & Sun (2016) AFR v5i1 SSRN:1809172",
+        "Own backtest N=27 2015-2024",
+        "Prior dead-end record March 21 (N=22, different split)"
       ],
-      "gaps": "Need N>=28 (power analysis requirement). Discovery alone (N=19) only reaches p=0.041 at 3d (borderline). Validation (N=9) doesn't pass MT. Need more 2025-2026 events or historical events from 2010-2014 (academic paper period). Also need to check timing: after-hours vs pre-market disclosure.",
-      "recorded": "2026-03-23T13:48:21.178308"
+      "gaps": "Requires N>=28 per OOS period for power at 80%. Discovery alone fails MT. Need 10-15 more events from 2010-2015 or accumulate 2025-2026 events. Fraud vs procedural sub-classification would sharpen signal. Legal case classification not available in EDGAR search.",
+      "recorded": "2026-03-23T13:57:18.337388"
     }
   },
   "known_effects": {
@@ -1256,6 +1256,11 @@
       "reason": "Tested whether second-agency IG upgrades (company already has one IG rating from another agency, gets second IG rating 6+ months later) are tradeable. N=4 events found (KHC Mar 2022, M May 2022, F Oct 2023, KHC Fitch May 2022): 3d avg = -0.11%, 50% positive rate. Mechanism fails: Bloomberg Barclays Aggregate only requires ONE IG rating for inclusion, so second agency upgrade triggers NO new mandatory bond fund buying. ICE BofA IG index uses average of ratings \u2014 marginal. Second-agency upgrades typically cluster within 55-90 days of first, so market fully anticipates. True long-gap second-agency events are extremely rare. Hypothesis f86dcb4e (first_ig_credit_upgrade) correctly excludes follow-on upgrades. No new hypothesis warranted.",
       "recorded": "2026-03-23T13:17:36.077273",
       "updated": "2026-03-23T13:19:31.476251"
+    },
+    {
+      "event_type": "sec_wells_notice_short",
+      "reason": "COMPREHENSIVE RETEST 2026-03-23 (session 15): Expanded to N=27 (2015-2024) from prior N=22 test. Pooled result passes MT: 1d avg=-1.74% p=0.018, 3d avg=-2.21% p=0.013, 5d avg=-2.72% p=0.028. HOWEVER: Cannot pass OOS split requirement. Every temporal split tested (2015-2020 disc + 2021-2024 val; 2015-2021 disc + 2022-2024 val; 2015-2022 disc + 2023-2024 val) shows neither period independently passes multiple testing. Root cause: N<28 per period required for 80% power at 2.5% effect size with stdev=4.60%. Maximum events in any 6-year window = 14 (insufficient). Pre-2015 events (N=10) show no signal and would introduce noise. FUNDAMENTAL LIMITATION: Wells Notice events from large-cap companies are too rare (~5-6 per year) to accumulate sufficient N for OOS split within a reasonable time window. Signal heterogeneity (fraud vs procedural) confirmed by NDAQ/XYL/HAYW near-zero reactions vs NRDS/BHC/BEN large reactions. Academic reference: Griffin & Sun (2016) AFR confirms effect but is pre-2013 data. CONFIRMED DEAD END - do not retest without N>=28 per temporal period.",
+      "recorded": "2026-03-23T14:02:09.415048"
     }
   ]
 }
