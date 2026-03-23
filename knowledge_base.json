@@ -356,6 +356,18 @@
       ],
       "gaps": "Only 1 horizon (5d) passes p<0.05. 3d borderline (p=0.09). Need N=15+ for proper OOS split. Small deals (<B) may show stronger signal - untested. Key risk: deal breaks cause large negative returns.",
       "recorded": "2026-03-23T12:33:17.708983"
+    },
+    "sec_wells_notice_short": {
+      "summary": "SEC Wells Notice disclosure (via 8-K) causes significant negative abnormal returns. Academic study (Griffin & Sun 2016, AFR) found -4.5% CAR over 3 days for first-time 8-K Wells disclosures with subsequent litigation. Our backtest (N=27, 2015-2024): 1d avg=-1.74% p=0.018, 3d avg=-2.21% p=0.013, 5d avg=-2.72% p=0.028. All 3 horizons pass MT. Wilcoxon p<0.04 at 1d/3d/5d. Bootstrap CI excludes zero at all 3 horizons. HOWEVER: OOS split (discovery 2015-2022, validation 2023-2024) shows discovery barely passes at 3d (p=0.041) but NOT at 1d/5d. Discovery alone does not pass multiple testing (needs 2 horizons). Dataset too small per period. Cannot pre-register hypothesis yet.",
+      "known_magnitude": "-1.74% to -2.72% abnormal (1d to 5d), stdev=4.60%",
+      "known_timeframe": "1-5 days post disclosure open",
+      "sources": [
+        "Griffin & Sun (2016) 'Troublesome Tidings? Investors Response to a Wells Notice', AFR v5i1",
+        "SSRN 1809172",
+        "Own backtest N=27 2015-2024"
+      ],
+      "gaps": "Need N>=28 (power analysis requirement). Discovery alone (N=19) only reaches p=0.041 at 3d (borderline). Validation (N=9) doesn't pass MT. Need more 2025-2026 events or historical events from 2010-2014 (academic paper period). Also need to check timing: after-hours vs pre-market disclosure.",
+      "recorded": "2026-03-23T13:48:21.178308"
     }
   },
   "known_effects": {
@@ -898,6 +910,20 @@
       "status": "Monitoring live - not trading (p=0.046 borderline, N=12 small)",
       "context": "Tariff-driven crisis, VIX >30 for first time since 2022-10",
       "last_updated": "2026-03-23T12:07:39.989089"
+    },
+    "sec_wells_notice_short": {
+      "effect": "SHORT after Wells Notice 8-K disclosure",
+      "avg_abnormal_3d": -2.21,
+      "stdev_3d": 4.6,
+      "neg_rate_3d": 0.65,
+      "p_3d": 0.013,
+      "ci_excludes_zero": true,
+      "n": 27,
+      "period": "2015-2024",
+      "status": "promising - needs more events for OOS split",
+      "discovery_mt": false,
+      "pooled_mt": true,
+      "last_updated": "2026-03-23T13:48:21.180215"
     }
   },
   "dead_ends": [

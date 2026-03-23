@@ -581,6 +581,15 @@
       "findings": "DEAD END. Expanded to N=20 (confirmed completed deals 2021-2024, all-cash). With correct methodology (entry at next-day open, timing=after_hours): 5d avg=+0.19%, pos_rate=45%, p=0.78, CI=[-1.04,+1.55]. NOT significant. Original N=11 (+2.36%, p=0.042) was false positive from selection bias + incorrect entry price methodology. The 4 outliers (ZNGA, POSH, HZNP, COUP) drove all the signal; 13 remaining events show near-zero drift. Do not pursue further."
     },
     {
+      "id": "67b2f450",
+      "category": "sec_wells_notice_short",
+      "question": "Wells Notice SHORT signal: pooled N=27 passes MT (3d p=0.013, CI excludes zero) but discovery split alone doesn't pass MT. BLOCKING: need more events. Action: (1) Search EDGAR EFTS for 2010-2014 Wells Notice 8-K disclosures to expand discovery period to N=30+. (2) Add 2025 events as they occur (WT Oct 2024 already counted). If discovery+validation both pass MT at p<0.05 at 2+ horizons: pre-register hypothesis as SHORT at open after Wells 8-K, 3d hold, expected return -2.2%. Causal mechanism: (a) regulatory risk repricing (b) management distraction/cost (c) peer/investor exit. Literature: Griffin & Sun 2016 AFR.",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "Signal passes pooled MT test but fails OOS split due to small N per period. Need N>=28 per period. Discovery 2015-2022 already has N=19 - need just 9 more events from 2010-2014 to reach power threshold.",
+      "added": "2026-03-23T13:48:32.045425"
+    },
+    {
       "id": "seed-003",
       "category": "fda_decision",
       "question": "For Phase 3 FDA approvals/rejections of novel drugs (not generics, not supplements), what is the typical abnormal return at 1d and 5d horizons? Does the effect differ between first-time submissions and resubmissions after a Complete Response Letter?",
