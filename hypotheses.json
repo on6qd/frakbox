@@ -4794,7 +4794,7 @@
     "created": "2026-03-22T09:52:27.649628",
     "prediction_hash": "d347be09066759b8",
     "idempotency_key": "537194e1543ccde7",
-    "status": "pending",
+    "status": "abandoned",
     "event_type": "insider_buying_cluster",
     "event_description": "When 3+ corporate insiders (officers/directors) make open-market stock purchases within 30 days of each other (each >50K), buy at next open after cluster is publicly detectable from SEC Form 4 filings and hold for 3 trading days. Instance: AMRZ (Amrize Ltd) - 4 unique insiders (Gross, Brouwer, Hill, Johnston) bought 57K-250K each, all officers, between March 11-16 2026.",
     "causal_mechanism": "4+ independent insiders buying within 5 days signals high collective conviction about undervaluation. Public Form 4 disclosure triggers institutional attention and momentum factor loading. 3-day hold captures attention-driven drift.",
@@ -4914,7 +4914,8 @@
     "trade": null,
     "result": null,
     "vix_gate_note": "VIX=26.78 (Tier 3, 25-30). n=4 cluster falls in n=3-5 tier. VIX gate: DO NOT TRADE at VIX>25 for n<6. AMRZ entry window closes March 23 so will not trade this instance. Hypothesis remains for future AMRZ signals.",
-    "trigger_blocked_reason": "VIX gate: n=4 in VIX>25 regime + entry window will expire"
+    "trigger_blocked_reason": "VIX gate: n=4 in VIX>25 regime + entry window will expire",
+    "abandonment_reason": "Entry window expired. Cluster filing dates March 11-16 2026. Hypothesis created March 22, 6+ days after latest filing. Entry price no longer valid. Hypothetical 3d return would have been -5.1% (loss)."
   },
   {
     "id": "2bbe0f04",

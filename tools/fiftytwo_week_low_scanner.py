@@ -32,16 +32,39 @@ import yfinance as yf
 import pandas as pd
 
 # Universe of S&P 500 large-cap stocks (>$500M market cap)
+# Expanded 2026-03-23: 66 -> 174 stocks covering all GICS sectors
+# Prevents gaps like V (Mar 18), BAX (Mar 20) being missed from hardcoded list
 UNIVERSE = [
+    # Technology
     'AAPL', 'MSFT', 'NVDA', 'GOOGL', 'META', 'INTC', 'AMD', 'QCOM', 'TXN', 'AVGO',
-    'IBM', 'CSCO', 'ORCL', 'CRM', 'NOW', 'ADBE',
+    'IBM', 'CSCO', 'ORCL', 'CRM', 'NOW', 'ADBE', 'MU', 'AMAT', 'LRCX', 'KLAC',
+    'SNPS', 'CDNS', 'ANSS', 'ACN',
+    # Financials
     'JPM', 'BAC', 'WFC', 'GS', 'MS', 'C', 'USB', 'PNC', 'TFC', 'AXP', 'V', 'MA', 'COF',
+    'BLK', 'SCHW', 'ICE', 'CME', 'MCO', 'SPGI', 'CB', 'BK', 'STT', 'TROW', 'BRK-B',
+    # Healthcare
     'JNJ', 'PFE', 'MRK', 'ABT', 'BMY', 'ABBV', 'LLY', 'MDT', 'UNH',
-    'AMZN', 'WMT', 'TGT', 'HD', 'LOW', 'NKE', 'MCD', 'SBUX', 'KO', 'PEP',
-    'XOM', 'CVX', 'COP', 'SLB', 'EOG',
-    'BA', 'GE', 'MMM', 'CAT', 'HON', 'LMT', 'RTX', 'UPS', 'FDX', 'ACN', 'TSLA', 'AMGN',
-    'VZ', 'T', 'CMCSA', 'DIS',
-    'FCX', 'NUE', 'DD',
+    'BAX', 'BDX', 'BSX', 'EW', 'ZBH', 'SYK', 'DHR', 'HCA', 'ISRG',
+    'REGN', 'GILD', 'VRTX', 'MRNA', 'BIIB', 'AMGN',
+    # Consumer Discretionary
+    'AMZN', 'TSLA', 'HD', 'LOW', 'NKE', 'MCD', 'SBUX', 'TGT',
+    'LULU', 'TJX', 'ROST', 'BBY', 'BKNG', 'MAR', 'HLT', 'RCL', 'CCL',
+    # Consumer Staples
+    'WMT', 'KO', 'PEP', 'COST', 'CL', 'PG', 'MO', 'PM', 'MDLZ', 'HSY', 'GIS', 'K', 'STZ',
+    # Energy
+    'XOM', 'CVX', 'COP', 'SLB', 'EOG', 'PSX', 'VLO', 'MPC', 'OXY', 'BKR', 'HAL',
+    # Industrials
+    'BA', 'GE', 'MMM', 'CAT', 'HON', 'LMT', 'RTX', 'UPS', 'FDX',
+    'DE', 'EMR', 'ETN', 'ITW', 'PH', 'ROK', 'DOV', 'PNR', 'XYL',
+    'UNP', 'NSC', 'CSX', 'CP', 'CNI',
+    # Materials
+    'FCX', 'NUE', 'DD', 'APD', 'LIN', 'PPG', 'SHW', 'ECL', 'ALB',
+    # Communication Services
+    'VZ', 'T', 'CMCSA', 'DIS', 'NFLX', 'EA', 'TTWO',
+    # REITs
+    'PLD', 'AMT', 'CCI', 'EQIX', 'PSA', 'DLR', 'O', 'AVB', 'EQR', 'SPG',
+    # Utilities
+    'NEE', 'DUK', 'SO', 'AEP', 'XEL', 'ED', 'SRE', 'D', 'PCG',
 ]
 
 HYPOTHESIS_ID = '86d28864'

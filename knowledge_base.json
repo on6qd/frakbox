@@ -907,6 +907,11 @@
       "event_type": "accelerated_share_repurchase_short",
       "reason": "Tested accelerated share repurchase (ASR) announcement as SHORT signal. Academic hypothesis: bank delta-hedging creates systematic selling pressure over 5-10 days. N=79 EDGAR 8-K ASR announcements 2020-2024 (excluding concurrent earnings). Results: 1d avg=+0.67% p=0.185, 3d avg=+0.49% p=0.511, 5d avg=+0.40% p=0.648, 10d avg=+0.05% p=0.858. All positive (WRONG direction) but not significant. Fails multiple testing. Conclusion: delta-hedging pressure is either too small, already priced in, or the market interprets ASR as a positive signal (management confidence). Dead end. Data limitation: EDGAR full-text search found only 80 events, may miss ASRs announced in press releases without 8-K filing.",
       "recorded": "2026-03-23T01:42:45.400530"
+    },
+    {
+      "event_type": "earnings_surprise_large_beat_drift",
+      "reason": "Large EPS beats (>10% surprise, |eps_est|>=0.20) for S&P 500 large-cap stocks show negative abnormal drift -0.55% at 5d (p=0.009, n=391, 2021-2025). However, this FAILS temporal split validation: discovery 2021-2023 shows -0.75% (p=0.0054), but validation 2024-2025 shows -0.16% (p=0.62). Signal is regime-specific: existed in rising rates / market rotation period (2021-2023) but collapsed in AI bull market (2024-2025). Cannot trade as current signal without regime conditioning. Root cause: in rising rate environments, large beats are sell-the-news (overpriced growth stocks). In momentum bull markets, beats are rewarded or neutral. No actionable edge without regime forecasting.",
+      "recorded": "2026-03-23T02:24:56.796412"
     }
   ]
 }
