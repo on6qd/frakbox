@@ -10534,9 +10534,10 @@
         9,
         10,
         11,
-        13
+        13,
+        14
       ],
-      "validation_consistency_pct": 80.0,
+      "validation_consistency_pct": 66.7,
       "oos_results_2026": {
         "VST_2025-12-02": {
           "run_up_24m_pct": 402.8,
@@ -10555,9 +10556,31 @@
           "direction_correct_3d": true,
           "counted_in_validation": true,
           "validation_index": 13
+        },
+        "CCL_2025-10-02": {
+          "run_up_24m_pct": 126.9,
+          "filter_passes": true,
+          "upgrade_agency": "Fitch",
+          "rating_change": "BB+ -> BBB- (first IG from any agency)",
+          "announcement_timing": "during_market_hours",
+          "abnormal_1d_close_entry": 1.62,
+          "abnormal_3d_close_entry": 2.11,
+          "abnormal_5d_close_entry": 1.29,
+          "abnormal_10d_close_entry": 2.19,
+          "abnormal_1d_next_open_entry": -1.49,
+          "abnormal_3d_next_open_entry": -0.99,
+          "abnormal_5d_next_open_entry": -2.2,
+          "abnormal_10d_next_open_entry": -1.45,
+          "direction_correct_3d_close_entry": true,
+          "direction_correct_3d_next_open_entry": false,
+          "counted_in_validation": true,
+          "validation_index": 14,
+          "entry_timing_note": "Signal front-run intraday. Close entry positive (+2.11% 3d), next-open entry negative (-0.99% 3d). Hypothesis uses next-open entry convention.",
+          "verdict": "NEGATIVE (next-open convention) / POSITIVE (close entry). Entry-timing ambiguous case."
         }
       },
-      "validation_period_extended": "2023-2026"
+      "validation_period_extended": "2023-2026",
+      "ccl_note": "CCL Oct 2025: entry-timing ambiguous. Next-open entry = negative (-0.99% 3d). Close entry = positive (+2.11% 3d). Counted as NEGATIVE per hypothesis convention."
     },
     "confounders": {
       "broad_market_direction": "Mixed: 8 of 12 events in rising markets, 4 in flat/declining markets. No broad market filter applied.",

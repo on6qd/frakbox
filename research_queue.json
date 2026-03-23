@@ -1074,32 +1074,40 @@
   ],
   "next_session_priorities": [
     {
-      "task": "Check Carnival CCL current 24m price run-up (from March 2026 back to March 2024) to assess whether CCL passes the <250% filter when S&P upgrade eventually comes.",
-      "set_by_session": "2026-03-23T10:41:40.985657"
+      "task": {
+        "task": "CCL Fitch BBB- upgrade (Oct 2 2025) measured. Result: ENTRY-DEPENDENT. Next-open entry = negative (-0.99% 3d). This is now OOS index 14, negative instance. OOS validation consistency drops to 66.7% (4/6). Consider whether signal remains tradeable or needs further qualification.",
+        "action": "Review whether OOS consistency at 66.7% (4/6) still supports hypothesis, or if we should add more qualification criteria (e.g., intraday announcement vs after-hours)"
+      },
+      "set_by_session": "2026-03-23T10:48:42.070445"
     },
     {
-      "task": "Scan for any new Ba1/BB+ positive-outlook companies via EDGAR 8-K or news search \u2014 could be telecoms, media, or consumer cyclical sectors.",
-      "set_by_session": "2026-03-23T10:41:40.985663"
+      "task": {
+        "task": "CCL S&P upgrade (still BB+ as of Oct 2025) is the next live trade opportunity. Monitor for S&P BBB- announcement \u2014 that would be the SECOND first-IG upgrade for CCL (but first from S&P, which may behave differently). Check current CCL 24m run-up: currently ~126.9% so still passes filter.",
+        "action": "Search for current CCL S&P rating and timeline \u2014 S&P upgrade to BBB- is estimated 2H 2026 or early 2027"
+      },
+      "set_by_session": "2026-03-23T10:48:42.070451"
     },
     {
-      "task": "Review hypothesis f86dcb4e OOS record: currently 5 OOS events, 4 correct (80%). Consider whether to activate the next qualifying event immediately upon announcement.",
-      "set_by_session": "2026-03-23T10:41:40.985665"
+      "task": {
+        "task": "GO (long) and HD (short) insider cluster trades should execute at March 24 market open. Verify triggers are set and trade_loop.py will execute.",
+        "action": "Check hypotheses.json for GO and HD trigger status before market open March 24"
+      },
+      "set_by_session": "2026-03-23T10:48:42.070452"
+    },
+    {
+      "task": {
+        "task": "REPL PDUFA April 10 2026 (Class II resubmission). CRL was efficacy/design concern. Measure post-PDUFA outcome when available.",
+        "action": "Monitor April 10 2026 PDUFA date for REPL approval/rejection \u2014 check repl_crl task in research queue"
+      },
+      "set_by_session": "2026-03-23T10:48:42.070453"
     }
   ],
   "session_handoff": {
-    "investigation": "first-IG credit upgrade signal (hypothesis f86dcb4e)",
-    "state": "VRT OOS result recorded and validated. OOS split updated to 5 events (indices 8,9,10,11,13), 80% correct. Research queue task eaedf856 added for candidate monitoring.",
-    "key_findings": [
-      "VRT already in backtest_events from prior session \u2014 no duplicate added.",
-      "OOS split was missing VRT (index 13) and 2026 results \u2014 now updated.",
-      "Carnival CCL is best near-term candidate: Fitch BBB- (Dec 2025), S&P BB+ positive momentum. S&P upgrade estimated 2H 2026 or early 2027.",
-      "All other candidates screened: DAL/LUV/UBER/MSCI/F already IG. NCLH at B+ (too far). CZR too leveraged. MGM BB- (too far).",
-      "CCL 24m run-up check needed before any trade \u2014 if CCL stock ran up >250% in prior 24 months, signal would be filtered out.",
-      "Moody upgrade activity in 2026: CSG (Czech industrial) Baa3 Feb 2026 \u2014 not tradeable (not US-listed)."
-    ],
-    "blocked_by": "Need actual S&P upgrade announcement for CCL \u2014 no firm date known. Monitor after each quarterly earnings (next ~June 2026).",
-    "next_step": "Run get_close_prices on CCL for 2024-03-23 to 2026-03-23 to compute 24m run-up. If <250%, CCL is trade-ready when S&P announces BBB-.",
-    "written_at": "2026-03-23T10:41:40.985666"
+    "ccl_fitch_measurement": "DONE. Oct 2 2025 upgrade: close-entry +2.11% 3d, next-open -0.99% 3d. Front-run intraday.",
+    "oos_status": "f86dcb4e now has 6 OOS events (validation_indices [8,9,10,11,13,14]), consistency 66.7% (4/6 correct at 3d next-open)",
+    "live_trades": "GO and HD set for March 24 open",
+    "next_ccl_event": "S&P BBB- upgrade still pending \u2014 the most impactful catalyst",
+    "written_at": "2026-03-23T10:48:42.070459"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
