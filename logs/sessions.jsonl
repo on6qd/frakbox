@@ -1,3 +1,0 @@
-{"date": "2026-03-19T19:20:28+01:00", "type": "research", "status": "completed", "max_turns": 80, "exit_code": 0, "log_file": "logs/2026-03-19_1845.log", "log_size_bytes": 2426, "validation_warnings": null}
-{"date": "2026-03-19T21:10:41+01:00", "type": "research", "status": "completed", "max_turns": 80, "exit_code": 0, "log_file": "logs/2026-03-19_2048.log", "log_size_bytes": 807591, "validation_warnings": null}
-{"date": "2026-03-20T20:42:05+01:00", "type": "research", "status": "completed", "max_turns": 80, "exit_code": 0, "log_file": "logs/2026-03-20_1952.log", "log_size_bytes": 689332, "validation_warnings": "research_journal.jsonl may not have been updated"}
