@@ -1118,36 +1118,34 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. TRADE MONITORING: 4 trades fire at 9:30 AM ET today (GO 1cb6140f, HD 86d28864, ABT 9777ef67, CTAS cc88dd18). At next session, verify all entered correctly via Alpaca and record entry prices. Close dates: GO=March 26, HD/ABT/CTAS=March 28.",
-      "set_by_session": "2026-03-23T13:24:17.123318"
+      "task": "1. TRADE MONITORING: GO closes March 26 (3d hold from March 23 entry). Run tools/close_go_trade.py at March 26 close. Also: GO test counts as 1 live OOS data point for 1cb6140f hypothesis.",
+      "set_by_session": "2026-03-23T14:08:55.430396"
     },
     {
-      "task": "2. GO CLOSE PREP: Script to close GO trade is in tools/close_go_trade.py. Needs to run March 26 after market open.",
-      "set_by_session": "2026-03-23T13:24:17.123322"
+      "task": "2. HD/ABT/CTAS CLOSE: All three close March 28 (5d hold). Run close scripts at March 28 close.",
+      "set_by_session": "2026-03-23T14:08:55.430398"
     },
     {
-      "task": "3. VGNT SPINOFF WATCH: VGNT when-issued starts March 27. Monitor price vs hypothesis expectations. Regular trading starts April 1 - trigger set for April 1 4PM ET close.",
-      "set_by_session": "2026-03-23T13:24:17.123324"
+      "task": "3. VGNT WI WATCH: When-issued trading starts March 27. Check VGNT WI price daily. If price >$50 with strong buying, reconsider short entry on April 1. If no S&P 500 inclusion announced, proceed with SHORT trigger at April 1 close.",
+      "set_by_session": "2026-03-23T14:08:55.430399"
     },
     {
-      "task": "4. SHARE REPURCHASE SIGNAL: Research task 1c75adb0 - test open-market share repurchase in small-cap value stocks (P/B < 1.5). Need EDGAR 8-K search for repurchase program announcements. Use EFTS API with phrase \"stock repurchase program\" OR \"share repurchase program\", filter by filing date 2021-2024, then filter by market cap < $2B and P/B < 1.5.",
-      "set_by_session": "2026-03-23T13:24:17.123324"
+      "task": "4. NKE SIGNAL: NKE is 0.78% above 52w low. If NKE closes below $51.97 during next session, can queue SHORT under hypothesis 86d28864 (must wait for one active trade to close first to stay under 5 max).",
+      "set_by_session": "2026-03-23T14:08:55.430400"
     },
     {
-      "task": "5. ADBE 52W LOW: ADBE touched 52w low March 18-19 ($245.99) but does NOT qualify for trade (only 16 trading days above rolling 52w low, requirement is 30+). Monitor - if it recovers and stays above 52w low for 30 more days, could be a fresh signal in May 2026.",
-      "set_by_session": "2026-03-23T13:24:17.123325"
+      "task": "5. S&P 500 INDIVIDUAL ADDITION WATCH: Scanner now has 90-day lookback (CIEN miss fixed). Run sp500_announcement_scanner.py -- should detect any new individual S&P 500 additions.",
+      "set_by_session": "2026-03-23T14:08:55.430400"
     },
     {
-      "task": "6. REPL PDUFA APRIL 10: Monitor news for PDUFA outcome. Hypothesis d302c84b would trigger if CRL issued. WebSearch for \"REPL replimune approval\" after April 10.",
-      "set_by_session": "2026-03-23T13:24:17.123326"
+      "task": "6. REPL PDUFA APRIL 10: Monitor for decision. If CRL issued with clinical efficacy deficiency and crash >55%, trigger d302c84b short at April 11 open.",
+      "set_by_session": "2026-03-23T14:08:55.430401"
     }
   ],
   "session_handoff": {
-    "investigated": "Merger arbitrage expansion, second-agency IG upgrade signal, ABT 52w low validity check, 52w low scanner for new signals (ADBE/RACE)",
-    "key_findings": "1) Merger arb N=11 was selection bias - N=20 shows no signal (0.19% 5d, p=0.78). 2) Second-agency IG upgrades not tradeable - Bloomberg Barclays Agg only requires 1 IG rating so no new forced buying. 3) ABT March 20 trade is valid - stock was above rolling 52w low for 35 trading days before cross. 4) ADBE does not qualify for trade (16-day gap < 30-day requirement). 5) Built Tiingo disk cache at tools/tiingo_cache.py to prevent 429 rate limit errors.",
-    "blocked_by": "Nothing - all tasks completed or tracked.",
-    "next_immediate_step": "After 9:30 AM ET: verify 4 trades entered on Alpaca. Then for next session: check trade statuses, research share repurchase signal.",
-    "written_at": "2026-03-23T13:24:17.123327"
+    "notes": "Session March 23: 4 trades fired at 9:30 ET (GO LONG, HD/ABT/CTAS SHORT). Verified entry pending. Wells Notice comprehensively retested: dead end confirmed (pooled MT passes but OOS split fundamentally underpowered). Critical: CIEN S&P 500 addition (Feb 4 2026) was a missed +21.66% 5d return - scanner bug fixed (45->90 day lookback). NKE at 0.78% above 52w low, primed. VGNT (Versigent, APTV spinoff) SHORT trigger set for April 1 close - tariff environment strengthens thesis. No new qualifying clinical failures detected.",
+    "set_by_session": "2026-03-23T14:08:55.430150",
+    "written_at": "2026-03-23T14:08:55.430403"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

@@ -10305,7 +10305,7 @@
     "dead_end_warnings": null,
     "trade": null,
     "result": null,
-    "notes": "\n2026-03-23: VSNT (Comcast spinoff Jan 5 2026) shows -17.5% 5d abnormal, -18.0% 10d abnormal. Strong OOS validation. N now 24.\n2026-03-23: LION (Lionsgate Studios May 2025) = -19.9% 5d abn, -21.3% 10d abn. N now 25. Two live OOS validations both massive.",
+    "notes": "\n2026-03-23: VSNT (Comcast spinoff Jan 5 2026) shows -17.5% 5d abnormal, -18.0% 10d abnormal. Strong OOS validation. N now 24.\n2026-03-23: LION (Lionsgate Studios May 2025) = -19.9% 5d abn, -21.3% 10d abn. N now 25. Two live OOS validations both massive.\n2026-03-23: Tariff environment strengthens SHORT thesis (VGNT = auto wire harnesses, Mexico/China mfg exposure). No S&P 500 inclusion announcement detected. CRITICAL CHECK before April 1: verify no S&P 500 inclusion for VGNT (would create LONG pressure). Also check VGNT WI price March 27+ vs hypothesis expected magnitude. Entry at April 1 close confirmed.",
     "trigger": "2026-04-01T16:00",
     "trigger_position_size": 5000,
     "trigger_stop_loss_pct": 10,
@@ -10425,6 +10425,45 @@
         "abnormal_3d": 1.36,
         "abnormal_5d": 1.12,
         "abnormal_10d": 6.31
+      },
+      {
+        "symbol": "ROL",
+        "date": "2025-02-13",
+        "timing": "pre_market",
+        "note": "Inaugural IG from BOTH Fitch (BBB+) and S&P (BBB) simultaneously. 24m run-up=46% (passes filter). 1d=+1.61%, 3d=-2.45%, 5d=+0.34%. NEGATIVE result.",
+        "outcome": "negative",
+        "run_up_24m_pct": 46.0,
+        "passes_runup_filter": true,
+        "abnormal_1d": 1.61,
+        "abnormal_3d": -2.45,
+        "abnormal_5d": 0.34,
+        "note2": "Dual-agency same-day inaugural upgrade may reduce surprise/demand effect"
+      },
+      {
+        "symbol": "LINE",
+        "date": "2024-08-07",
+        "timing": "pre_market",
+        "note": "Inaugural IG from Moody's (Baa2) and Fitch (BBB+). LINE IPO July 2024, only 2-3 weeks of trading history. 1d=+0.12%, 3d=-0.56%, 5d=-6.86%. NEGATIVE result.",
+        "outcome": "negative",
+        "run_up_24m_pct": null,
+        "passes_runup_filter": null,
+        "abnormal_1d": 0.12,
+        "abnormal_3d": -0.56,
+        "abnormal_5d": -6.86,
+        "note2": "Very recent IPO (2-3 wks old) makes pre-event run-up filter inapplicable. REIT sector. Excluded from confidence calculation."
+      },
+      {
+        "symbol": "CURB",
+        "date": "2025-05-08",
+        "timing": "pre_market",
+        "note": "Inaugural IG from Fitch (BBB). CURB spun off from SITE Centers Oct 2024. 24m run-up not computable (recent spinoff). 1d=-1.61%, 3d=-3.67%, 5d=-7.19%. NEGATIVE result.",
+        "outcome": "negative",
+        "run_up_24m_pct": null,
+        "passes_runup_filter": null,
+        "abnormal_1d": -1.61,
+        "abnormal_3d": -3.67,
+        "abnormal_5d": -7.19,
+        "note2": "Recent spinoff makes 24m run-up filter inapplicable."
       }
     ],
     "historical_evidence": [
@@ -10578,10 +10617,50 @@
           "validation_index": 14,
           "entry_timing_note": "Signal front-run intraday. Close entry positive (+2.11% 3d), next-open entry negative (-0.99% 3d). Hypothesis uses next-open entry convention.",
           "verdict": "NEGATIVE (next-open convention) / POSITIVE (close entry). Entry-timing ambiguous case."
+        },
+        "ROL_2025-02-13": {
+          "run_up_24m_pct": 46.0,
+          "filter_passes": true,
+          "abnormal_1d": 1.61,
+          "abnormal_3d": -2.45,
+          "abnormal_5d": 0.34,
+          "direction_correct_3d": false,
+          "counted_in_validation": true,
+          "note": "Dual-agency inaugural upgrade same day. Negative at 3d."
+        },
+        "LINE_2024-08-07": {
+          "run_up_24m_pct": null,
+          "filter_passes": null,
+          "abnormal_1d": 0.12,
+          "abnormal_3d": -0.56,
+          "abnormal_5d": -6.86,
+          "direction_correct_3d": false,
+          "counted_in_validation": false,
+          "note": "Recent IPO (2-3 weeks). Excluded from validation - no run-up history."
+        },
+        "CURB_2025-05-08": {
+          "run_up_24m_pct": null,
+          "filter_passes": null,
+          "abnormal_1d": -1.61,
+          "abnormal_3d": -3.67,
+          "abnormal_5d": -7.19,
+          "direction_correct_3d": false,
+          "counted_in_validation": false,
+          "note": "Recent spinoff (Oct 2024). No 24m run-up history. Excluded from validation."
         }
       },
       "validation_period_extended": "2023-2026",
-      "ccl_note": "CCL Oct 2025: entry-timing ambiguous. Next-open entry = negative (-0.99% 3d). Close entry = positive (+2.11% 3d). Counted as NEGATIVE per hypothesis convention."
+      "ccl_note": "CCL Oct 2025: entry-timing ambiguous. Next-open entry = negative (-0.99% 3d). Close entry = positive (+2.11% 3d). Counted as NEGATIVE per hypothesis convention.",
+      "full_oos_summary_2026_03_23": {
+        "events_tested": 9,
+        "events_countable": 6,
+        "positive_count_countable": 3,
+        "negative_count_countable": 3,
+        "positive_rate_countable": "50%",
+        "expected_rate_from_discovery": "75%",
+        "conclusion": "OOS rate (50%) is below discovery (75%). Signal may be weakening. Also: ROL negative (dual-agency upgrade). Need more OOS data. Confidence reduced to 5.",
+        "regime_note": "2023-2026 was high-rate environment with wave of corporate IG upgrades. Market may be less reactive to individual upgrade news when upgrades are more frequent."
+      }
     },
     "confounders": {
       "broad_market_direction": "Mixed: 8 of 12 events in rising markets, 4 in flat/declining markets. No broad market filter applied.",
@@ -10596,7 +10675,7 @@
     },
     "market_regime_note": "Tested across bull and correction markets with 12 events spanning 2016-2024. Signal appears regime-independent.",
     "regime_note": null,
-    "confidence": 7,
+    "confidence": 5,
     "literature_reference": "Kliger and Sarig (2000 JF), Hand et al. (1992 JF)",
     "survivorship_bias_note": "IG upgrades are public events with clear announcement dates. Companies receiving IG upgrades are by definition still listed. Excluded companies would likely be acquisitions at premium, making survivorship bias conservative -- our measured returns may understate the true effect.",
     "selection_bias_note": "Events were selected via web search for known rising star upgrades, biasing toward well-publicized large-cap events. Exclusion criteria (no concurrent M&A, no same-day earnings, no follow-on upgrades) are necessary to isolate the credit upgrade effect but reduce sample size. Systematic data access would enable a complete unbiased dataset.",
@@ -10615,7 +10694,8 @@
       "2026-03-23 (session 3): VRT OOS test \u2014 S&P BBB- first-IG upgrade Feb 12 2026 (AH). 24m pre-event run-up = 220.1% (passes <250% filter). Entry at Feb 13 open. 3d abnormal = +1.36% (positive, directionally correct, above 0.5% threshold). 5d = +1.12%, 10d = +6.31%. 1d = -1.62% (noise \u2014 consistent with backtest showing 1d is weak). VRT counts as a 2nd OOS positive after VST was excluded by the run-up filter. OOS record now: 1 positive (VRT), 1 negative pre-filter-exclusion (VST, 24m=402%). Signal continues to hold.",
       "2026-03-23 (session 4): Candidate pipeline search. Best near-term candidate: Carnival Corp (CCL). Fitch already upgraded to BBB- (Dec 2025). S&P currently BB+ \u2014 upgrade to BBB- estimated 2H 2026 or early 2027. CCL 24m run-up (Mar 2024 - Mar 2026) = 43.8% \u2014 EASILY passes <250% filter. CCL is trade-ready when S&P announces BBB- upgrade. All other candidates screened: DAL/LUV/UBER/MSCI/F already IG, NCLH at B+ (too far), CZR too leveraged, MGM BB- (too far). Monitor S&P press releases after CCL quarterly earnings.",
       "2026-03-23 TIMING FILTER INSIGHT (from CCL case): CCL Fitch upgrade (Oct 2, 2025) was announced DURING MARKET HOURS. By Oct 2 close, move was fully priced in (+1.62% abnormal on the day). Next-open entry (-0.99% 3d) was too late \u2014 missed the entire move. ALL PRIOR DISCOVERY EVENTS were after-hours announcements. ACTION RULE: Before activating this hypothesis, verify upgrade announcement was after-hours. If announced during market hours \u2192 DO NOT TRADE (move already priced in). If announced after-hours \u2192 ENTER AT NEXT OPEN as normal. This is not a retroactive exclusion of CCL \u2014 it counts as OOS negative (66.7% = 4/6). But it explains the mechanism and improves future trade selection."
-    ]
+    ],
+    "confidence_reduction_note": "2026-03-23: OOS validation shows 50% positive rate (3/6 countable events) vs 75% expected from discovery. New events: ROL -2.45% 3d, CURB -3.67%, LINE -0.56% (excluded from count). Hypothesis remains active but confidence reduced. Do not activate new trades on this signal until further OOS validation improves."
   },
   {
     "id": "9777ef67",
@@ -13710,5 +13790,196 @@
     "trigger_stop_loss_pct": 8,
     "trigger_take_profit_pct": 12,
     "trigger_notes": "52-week low first touch on 2026-03-20 in tariff-driven selloff"
+  },
+  {
+    "id": "6bd7d035",
+    "created": "2026-03-23T14:27:20.643543",
+    "prediction_hash": "a9b03e80a9269c6f",
+    "idempotency_key": "054b5d974723fb2e",
+    "status": "pending",
+    "event_type": "sp500_52w_low_momentum_short",
+    "event_description": "When an S&P 500 large-cap stock (>500M market cap) first crosses below its 52-week low on a close basis, SHORT at next-day open. Instance: BAX (Baxter International, ~$8.3B market cap, Healthcare sector) closed at $16.15 on March 20 2026, a new 52-week low close (previous 52w close-low was $17.09). Entry at March 23 open.",
+    "causal_mechanism": "When a stock breaks below its 52-week low for the first time, it triggers algorithmic selling (stop-losses, technical momentum systems) and institutional risk reduction. The 52-week low is a widely watched technical level.",
+    "causal_mechanism_criteria": {
+      "actors_and_incentives": "Algorithmic trading systems and institutional risk managers have explicit rules to reduce exposure when stocks breach 52-week lows.",
+      "transmission_channel": "Stop-loss orders below the 52w low level are triggered immediately. Momentum-factor ETFs and quant funds sell within 1-3 days of new lows.",
+      "academic_reference": "George & Hwang (2004): 52-week high as reference point. Jegadeesh & Titman (1993): momentum continuation."
+    },
+    "expected_symbol": "BAX",
+    "expected_direction": "short",
+    "expected_magnitude_pct": 1.68,
+    "expected_timeframe_days": 5,
+    "event_timing": "after_hours",
+    "backtest_symbols": [
+      "WFC",
+      "FDX",
+      "VZ",
+      "HD",
+      "ABT",
+      "CTAS"
+    ],
+    "backtest_events": [
+      {
+        "symbol": "BAX",
+        "date": "2026-03-23",
+        "timing": "after_hours",
+        "abnormal_5d": null,
+        "note": "BAX 52w low breach March 20 2026, entry March 23 open"
+      }
+    ],
+    "historical_evidence": [
+      {
+        "symbol": "WFC",
+        "date": "2020-10-27",
+        "abnormal_1d": -3.16,
+        "abnormal_5d": -0.45,
+        "abnormal_10d": 3.15
+      },
+      {
+        "symbol": "FDX",
+        "date": "2021-09-22",
+        "abnormal_1d": -3.15,
+        "abnormal_5d": -5.05,
+        "abnormal_10d": -4.11
+      },
+      {
+        "symbol": "VZ",
+        "date": "2021-10-11",
+        "abnormal_1d": -1.3,
+        "abnormal_5d": -3.7,
+        "abnormal_10d": -4.1
+      },
+      {
+        "symbol": "T",
+        "date": "2021-11-09",
+        "abnormal_1d": -0.08,
+        "abnormal_5d": 0.25,
+        "abnormal_10d": -0.19
+      },
+      {
+        "symbol": "BMY",
+        "date": "2021-11-29",
+        "abnormal_1d": -3.38,
+        "abnormal_5d": 2.06,
+        "abnormal_10d": -1.65
+      },
+      {
+        "symbol": "MDT",
+        "date": "2021-11-30",
+        "abnormal_1d": -0.67,
+        "abnormal_5d": 1.86,
+        "abnormal_10d": 2.57
+      },
+      {
+        "symbol": "DIS",
+        "date": "2021-11-30",
+        "abnormal_1d": 0.71,
+        "abnormal_5d": 3.74,
+        "abnormal_10d": 2.11
+      },
+      {
+        "symbol": "BA",
+        "date": "2021-12-01",
+        "abnormal_1d": -5.18,
+        "abnormal_5d": 1.2,
+        "abnormal_10d": -4.36
+      },
+      {
+        "symbol": "CMCSA",
+        "date": "2021-12-13",
+        "abnormal_1d": 0.33,
+        "abnormal_5d": 3.56,
+        "abnormal_10d": 3.44
+      },
+      {
+        "symbol": "DIS",
+        "date": "2022-01-21",
+        "abnormal_1d": -0.76,
+        "abnormal_5d": -0.65,
+        "abnormal_10d": -0.81
+      },
+      {
+        "symbol": "AMZN",
+        "date": "2022-01-21",
+        "abnormal_1d": -2.91,
+        "abnormal_5d": -3.4,
+        "abnormal_10d": -7.37
+      },
+      {
+        "symbol": "MMM",
+        "date": "2022-01-26",
+        "abnormal_1d": -2.61,
+        "abnormal_5d": -8.19,
+        "abnormal_10d": -10.6
+      },
+      {
+        "symbol": "HON",
+        "date": "2022-02-03",
+        "abnormal_1d": -1.86,
+        "abnormal_5d": -1.81,
+        "abnormal_10d": -3.2
+      },
+      {
+        "symbol": "META",
+        "date": "2022-02-03",
+        "abnormal_1d": -0.47,
+        "abnormal_5d": -5.22,
+        "abnormal_10d": -9.14
+      },
+      {
+        "symbol": "SBUX",
+        "date": "2022-02-04",
+        "abnormal_1d": -0.9,
+        "abnormal_5d": -0.2,
+        "abnormal_10d": 0.16
+      }
+    ],
+    "sample_size": 209,
+    "consistency_pct": 61.7,
+    "out_of_sample_split": {
+      "discovery_period": "2021-2023",
+      "validation_period": "2024-2025",
+      "validation_indices": [
+        2,
+        6,
+        8,
+        9,
+        10,
+        12,
+        14,
+        15,
+        16
+      ],
+      "validation_consistency_pct": 62.2
+    },
+    "confounders": {
+      "broad_market_direction": "Mixed market YTD (tariff uncertainty). Signal tested across bull and bear markets 2020-2025. Signal not dependent on broad market direction.",
+      "vix_level": "VIX=23.64 (Tier 2: 20-25, elevated). Signal tested across all VIX regimes (calm, elevated, crisis). No VIX gate for this signal.",
+      "sector_trend": "Healthcare sector (XLV). Sector has been under pressure YTD due to tariff concerns on medical supply chains and Medicare uncertainty. Sector headwind supports short.",
+      "survivorship_bias": "S&P 500 large-cap universe (>M market cap). Very low survivorship bias - S&P 500 members rarely delist. No adjustment needed.",
+      "selection_bias": "BAX identified by systematic screen of S&P 500 stocks within 5% of 52-week low. Not cherry-picked. Event definition is algorithmic (first close below 52w low).",
+      "event_timing": "Entry at open the day after new 52w low close (March 23 open). Avoids entering during the breakdown day.",
+      "market_regime": "VIX=23.64 elevated regime. Backtest shows signal is regime-robust: calm -1.71%, elevated -1.84%, crisis -1.47% avg 5d abnormal return."
+    },
+    "market_regime_note": "VIX=23.64 (elevated). Signal is regime-robust across all VIX tiers.",
+    "regime_note": null,
+    "confidence": 6,
+    "literature_reference": null,
+    "survivorship_bias_note": "S&P 500 large-cap universe. Very low survivorship bias.",
+    "selection_bias_note": "BAX identified by systematic screen of S&P 500 stocks within 5% of 52-week low.",
+    "passes_multiple_testing": true,
+    "multiple_testing_warning": null,
+    "confounder_warnings": null,
+    "symbol_warnings": null,
+    "dead_end_warnings": [
+      "Related dead end: sp500_deletion_short \u2014 Tested S&P 500 deletion effect (SHORT when stock removed from index), N=21 events (2021-2026).\nOverall results: 1d avg=-0.44% (pos%=52%, p=0.59 - random), 3d avg=-1.99% (pos%=19%, p=0.0078 - significant),\n5d avg=-1.23% (pos%=48%, p=0.27 - not significant). Technically passes multiple testing overall (3d at p<0.01 Bonferroni).\nBUT: OUT-OF-SAMPLE VALIDATION FAILS. Validation set (2024-2026, N=13): 1d avg=+0.27% (POSITIVE!), 3d avg=-2.14%\n(p=0.015, does NOT pass Bonferroni p<0.01 threshold). The 1d return is +0.27% in validation (opposite direction!).\nMany stocks RISE on day 1 after deletion (RHI +1.15%, BWA +2.80%, FMC +3.38%). Critical issue: SEVERE SELECTION BIAS -\nstocks are removed because they've already been declining fundamentally. Cannot separate deletion effect from fundamental\ndeterioration. Pattern at 3d likely reflects continued fundamental selling, not index rebalancing mechanics. The \n'forced selling' by index funds appears to be offset by contrarian buyers on D+1, with the net effect nearly flat.\nDO NOT pursue deletion SHORT hypothesis. The addition effect is clearly alive; the deletion SHORT is not actionable.",
+      "Related dead end: sp500_52w_low_bounce \u2014 52-week low first-touch for large-cap S&P 500 stocks does NOT generate positive returns (bounces). Tested 209 events 2021-2025. Results: 1d avg=-1.28% (76% negative), 5d avg=-1.68% (62% negative). The signal is REVERSED from hypothesis. Signal is a SHORT, not LONG. Momentum continuation dominates mean reversion for large-cap stocks. This is consistent with George & Hwang (2004): 52-week price levels act as momentum anchors, not mean-reversion triggers.",
+      "Related dead end: sp500_52w_high_momentum_long \u2014 Tested 52-week high breakout momentum (first-touch new 52w high, debounced 45 days) for 30 large-cap S&P 500 stocks, 2021-2024. N=100 sampled events. Results: 1d avg=+0.01% p=0.848, 3d avg=-0.08% p=0.555, 5d avg=-0.27% p=0.337. All horizons fail multiple testing. 50/50 positive rate at all horizons. Signal is pure noise for large-cap stocks - consistent with efficient market hypothesis. Momentum is already priced in before the 52w high breach. Dead end."
+    ],
+    "trade": null,
+    "result": null,
+    "trigger": "next_market_open",
+    "trigger_position_size": 5000,
+    "trigger_stop_loss_pct": 10
   }
 ]
