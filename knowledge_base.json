@@ -1264,6 +1264,21 @@
       "event_type": "deal_collapse_target_short",
       "reason": "Failed/cancelled acquisition deal - target company stock SHORT signal. Tested 5 events (KSU, FHN, SAVE, TGNA, ACI) 2021-2024. Results: 1d avg=-0.69%, positive_rate=20%, 5d avg=-1.56%. Fails multiple testing. Fundamental heterogeneity: FHN +7.22% 1d (TD withdrawal let FHN survive independently at better-than-feared standalone), ACI -5.81% (Kroger deal blocked, regulatory costs + uncertainty). The return sign depends on: (1) deal premium vs standalone value - high-premium deals crash more; (2) reason for collapse - regulatory vs acquirer withdrawal; (3) company financials - distressed targets (SAVE) crash more. Without ex-ante classification of deal-premium vs standalone-value, signal is untradeable systematically. Dead end.",
       "recorded": "2026-03-23T15:47:12.790047"
+    },
+    {
+      "event_type": "earnings_miss_continuation_short",
+      "reason": "Earnings miss continuation SHORT signal tested N=22 large-cap events (2022-2024). Pooled result appears significant: 5d avg=-3.26%, pos_rate=36.4%, p=0.012, CI=[-5.5%,-1.0%], passes_MT=True. However, REGIME SPLIT reveals complete breakdown: 2022 bear market (N=8): 5d avg=-8.12%, 12.5% positive, p=0.003 - STRONG. 2023-2024 bull market (N=10): 5d avg=-0.71%, 50% positive, p=0.59 - NO SIGNAL. Root cause: in bear markets, misses trigger risk-off selling; in bull markets, misses are bought as dips. Signal is entirely regime-dependent on bear market. Cannot use without bear market filter. Bear market detection (VIX>30 or SPY 20-day MA declining) would reduce frequency to <3 qualifying events/year - insufficient for systematic trading.",
+      "recorded": "2026-03-23T16:30:24.154422"
+    },
+    {
+      "event_type": "sp500_52w_high_breakout_long",
+      "reason": "Tested 52-week HIGH breakout LONG signal on 45 large-cap S&P 500 stocks, 2021-2022 discovery period. 118 events detected. 5d avg abnormal=+0.69%, positive_rate=59.3%, p=0.027, but fails multiple testing correction (p < 0.05 at only 1 horizon). avg_abnormal below 1.5% threshold. Consistent with academic literature showing momentum effects have decayed for large-cap stocks. Signal direction is correct (new high = continuation) but magnitude too small to trade after costs. Dead end.",
+      "recorded": "2026-03-23T16:35:06.527224"
+    },
+    {
+      "event_type": "spinco_parent_announcement_long",
+      "reason": "Tested parent company LONG at spinoff announcement. N=8 events (IBM/JNJ/GE/XPO/BDX/MMM/APTV/GSK 2021-2022). 1d avg=-1.02%, 3d avg=-2.04%, 5d avg=-1.88%, positive_rate=25%. NEGATIVE returns, not positive as Chemmanur & Yan (2004) documented. FDX and GE were confounded by concurrent earnings and restructuring news. Even clean cases (IBM, JNJ) showed -2% to -1%. Mechanism: market had often pre-priced the value unlock, announcement triggers profit-taking. N too small for definitive conclusion but direction is wrong. Dead end.",
+      "recorded": "2026-03-23T16:35:06.528885"
     }
   ]
 }

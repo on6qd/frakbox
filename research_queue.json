@@ -34,6 +34,15 @@
       "findings": "Monitoring status: GO, HD, ABT, CTAS triggers set to next_market_open for Monday March 24 (WD trigger removed due to VIX gate - n=3 in VIX>25 = DO NOT TRADE). VIX spiked to 31 intraday on March 23 but closed at 22.79. Tariff-driven volatility is the main confounder. All 4 trades proceed as planned. Close dates: GO=March 26 (3d), HD/ABT/CTAS=March 28 (5d). VGNT when-issued starts March 27, regular trading April 1. Monitor trade_loop.log at next session for confirmation of entries."
     },
     {
+      "id": "db3076a3",
+      "category": "trade_monitoring",
+      "question": "CLOSE TRADES WEEK OF MARCH 26-28: (1) GO closes Thursday March 26 via auto trade_loop. Check trade_loop.log for exit price. (2) HD/ABT/CTAS/BAX close Saturday March 28. Note CTAS as confounded by earnings March 25. Record outcomes in hypotheses. Run python tools/close_go_trade.py if auto-close fails. Check BAX P&L carefully - it was deepest underwater.",
+      "priority": 0,
+      "status": "pending",
+      "reasoning": "Active trades need monitoring and manual completion if trade_loop misses deadline.",
+      "added": "2026-03-23T16:35:27.288911"
+    },
+    {
       "id": "seed-001",
       "category": "earnings_surprise",
       "question": "What is the magnitude and duration of post-earnings announcement drift (PEAD) for S&P 500 stocks that beat consensus EPS by >10%? Is the effect still tradeable after decades of being published?",
@@ -632,6 +641,15 @@
       "findings": "NKE DISQUALIFIED for 52w low signal window March 23-31. NKE earnings confirmed March 31 2026 (from yfinance calendar). With 5-day hold, entering NKE 52w low short any day March 23-26 would overlap with earnings announcement on March 31 (within hold window). NKE bounced from $52.37 (March 20) to $53.37 (March 23). Signal did not fire today. POST-EARNINGS PLAN: After March 31 NKE earnings, if stock breaks to new 52w low, re-evaluate. 52w low from prior year was ~$52.00. Monitor in April."
     },
     {
+      "id": "435bfae5",
+      "category": "signal_discovery",
+      "question": "Test small-cap earnings restatement / material weakness announcement as SHORT signal. Large-cap version is too rare (<5/year), but mid-cap version may have 15+ events/year. Use EDGAR 8-K full-text search for material weakness + items 4.02, filter to market cap M-B range. Measure abnormal returns at 1d, 3d, 5d with open entry (after-hours announcement). Literature: Burns & Kedia (2006) JFE found accounting restatements cause -11% 1d return for issuers.",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "Material weakness announcements (6625 in EDGAR 2021-2025) are more frequent than clinical failures and have similar mechanism (forced institutional exit). Large-cap version is too rare but mid-cap provides better frequency. Burns & Kedia (2006) academic support. Not yet tested.",
+      "added": "2026-03-23T16:35:27.290698"
+    },
+    {
       "id": "seed-003",
       "category": "fda_decision",
       "question": "For Phase 3 FDA approvals/rejections of novel drugs (not generics, not supplements), what is the typical abnormal return at 1d and 5d horizons? Does the effect differ between first-time submissions and resubmissions after a Complete Response Letter?",
@@ -750,6 +768,15 @@
       "added": "2026-03-22T15:37:56.931766",
       "completed": "2026-03-23T01:41:16.348677",
       "findings": "ALREADY COMPLETED in prior session. Large-cap insider selling cluster (>5B market cap, 2+ insiders, 30d window) tested on N=80 events: avg abnormal 20d=+0.01%, positive_rate=48%, p=0.53. No signal. Dead end recorded as insider_selling_cluster_largecap in knowledge_base.json."
+    },
+    {
+      "id": "ae5921ba",
+      "category": "signal_discovery",
+      "question": "Test short-sale restriction lift (SSR reset) as a SHORT signal. When SEC applies SSR to a stock (down >10% in a day), short sellers cannot short on downtick. When SSR lifts the next trading day, pent-up short pressure may push stock further down. EDGAR does not have this data, but SSR can be inferred from daily price data: find stocks that dropped >10% in one day (SSR triggered), then measure abnormal return on day+1 when SSR lifts. Test hypothesis: stocks with >10% crash recover slightly (short squeeze via SSR), then SSR lifts day+2 and stock continues down.",
+      "priority": 3,
+      "status": "pending",
+      "reasoning": "SSR creates predictable trading dynamics. When it lifts, shorts can execute freely. Testable with yfinance (detect >10% drops, measure day+2 behavior). Academic reference: Boehmer et al (2009) on short sales and price discovery. Event frequency: ~20-50 large-cap events per year.",
+      "added": "2026-03-23T16:35:27.291984"
     },
     {
       "id": "d288c2b8",
@@ -1150,36 +1177,52 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. CLOSE GO TRADE (March 26): GO hypothesis 1cb6140f deadline is March 26 14:31 UTC. Trade loop will auto-close. Verify closure in trade_loop.log and complete hypothesis manually if trade loop misses it: python tools/close_go_trade.py",
-      "set_by_session": "2026-03-23T15:53:35.965524"
+      "task": {
+        "task": "1. CLOSE GO TRADE (March 26): Auto-close via trade_loop. Verify in logs. Run close_go_trade.py if missed. Record outcome in hypothesis 1cb6140f. Expected: +1.7% currently."
+      },
+      "set_by_session": "2026-03-23T16:35:52.455144"
     },
     {
-      "task": "2. CLOSE SHORT TRADES (March 28): HD/ABT/CTAS/BAX all deadline March 28 14:31 UTC. Auto-close via trade loop. Note: CTAS has earnings March 25 DURING the hold window - mark this as confounder in post-mortem.",
-      "set_by_session": "2026-03-23T15:53:35.965530"
+      "task": {
+        "task": "2. CLOSE SHORT TRADES (March 28): HD/ABT/CTAS/BAX auto-close. CTAS has earnings confounder (March 25) - note in post-mortem. Record all 4 outcomes. Check BAX (-1.4%) and CTAS (-2.5%) which are underwater."
+      },
+      "set_by_session": "2026-03-23T16:35:52.455149"
     },
     {
-      "task": "3. NEW SIGNALS WHEN SLOTS OPEN: After GO closes March 26, capacity = 4 active. First priority: KHC 52w low signal (March 19 first touch, still below 52w low). However 30-day debounce means cannot re-trigger until April 18. KHC is an OOS data point for hypothesis 86d28864 - record manually.",
-      "set_by_session": "2026-03-23T15:53:35.965531"
+      "task": {
+        "task": "3. VGNT FIRST TRADING DAY April 1: Trigger set at 2026-04-01T16:00 (short at close of first day). Monitor APTV for any spinoff term changes this week. Check whether VGNT when-issued trades starting March 27."
+      },
+      "set_by_session": "2026-03-23T16:35:52.455150"
     },
     {
-      "task": "4. VGNT SPINCO SHORT: April 1 is first trading day for VGNT (Versigent, Aptiv spinoff). Trigger is set (2026-04-01T16:00). Monitor VGNT WI pricing March 27-31 to verify institutional selling setup still valid. Check Aptiv (APTV) press release for any changes to spinoff terms.",
-      "set_by_session": "2026-03-23T15:53:35.965532"
+      "task": {
+        "task": "4. LOOK FOR NEW SIGNALS WHEN CAPACITY OPENS: After March 26, capacity = 4 active. After March 28, capacity = 1 active (VGNT from April 1). Priority signals: (a) 52w low scanner for new crosses, (b) n=6-9 insider cluster if VIX falls below 25, (c) any S&P 500 addition."
+      },
+      "set_by_session": "2026-03-23T16:35:52.455151"
     },
     {
-      "task": "5. REPL PDUFA MONITORING: Replimune PDUFA April 10. If CRL issued, assess if it is a clinical efficacy failure (not CMC), crash >55% from $6.98 (need <$3.14), and no stated path forward. REPL is a repeat CRL - likely will NOT qualify for d302c84b but verify.",
-      "set_by_session": "2026-03-23T15:53:35.965533"
+      "task": {
+        "task": "5. TEST MATERIAL WEAKNESS SHORT SIGNAL: Use EDGAR 8-K Item 4.02 search for material weakness announcements from mid-cap companies (M-B). Build dataset of 15+ events from 2021-2024, measure abnormal returns. Burns & Kedia (2006) found -11% 1d for accounting restatements."
+      },
+      "set_by_session": "2026-03-23T16:35:52.455152"
     },
     {
-      "task": "6. EXPLORE NEW SIGNALS: Consider testing earnings preannouncement (explicit intra-quarter warning before scheduled earnings) as SHORT signal. Different from guidance cut (within earnings call) - this is a separate 8-K filed days/weeks before official earnings. EDGAR 8-K search phrase: Item 2.02 with language about expected miss.",
-      "set_by_session": "2026-03-23T15:53:35.965533"
+      "task": {
+        "task": "6. REPL PDUFA April 10: Monitor Replimune outcome. If CRL issued, check: (a) clinical efficacy deficiency?, (b) stock crashes >55%?, (c) no stated path forward?. REPL is borderline - market cap M (slightly above limit), repeat CRL (different risk profile). Likely will NOT qualify."
+      },
+      "set_by_session": "2026-03-23T16:35:52.455153"
     },
     {
-      "task": "7. SCAN FOR INSIDER CLUSTERS: cluster_auto_scanner.py runs nightly at 9:15 PM ET. Check logs/cluster_scanner.log at session start. VIX at 24 (Tier 2 - n=6-9 tradeable, n=3-5 weak).",
-      "set_by_session": "2026-03-23T15:53:35.965534"
+      "task": {
+        "task": "7. SYK and CPT near 52w lows: SYK is 0.2% above 52w low today (may breach this week), CPT is 0.8% above. SYK earnings April 30 (safe for 5d hold until April 28). CPT earnings April 30 (same safety margin). If they cross, enter if market cap >B. SYK (.6B) qualifies; CPT (.5B) qualifies."
+      },
+      "set_by_session": "2026-03-23T16:35:52.455153"
     },
     {
-      "task": "8. S&P 500 ADDITION MONITOR: sp500_addition_scanner.py runs daily. Next major event: June 5 2026 quarterly rebalance. Any off-cycle additions would be detected within 24h.",
-      "set_by_session": "2026-03-23T15:53:35.965534"
+      "task": {
+        "task": "8. NKE 52w low POST-EARNINGS: NKE earnings March 31. If NKE reports and drops to new 52w low (.97), that would be a catalyst-driven new 52w low - NOT the momentum signal (needs 30+ day clean gap). Monitor but do NOT trade NKE 52w low until April 30+ gap from today."
+      },
+      "set_by_session": "2026-03-23T16:35:52.455154"
     }
   ],
   "session_handoff": {
