@@ -1065,40 +1065,42 @@
   ],
   "next_session_priorities": [
     {
-      "task": {
-        "task": "Monitor GO (1cb6140f) trade outcome - entry at next_market_open, 3d hold. Close by EOD ~2026-03-26."
-      },
-      "set_by_session": "2026-03-23T09:56:29.081320"
+      "task": "1. Verify GO and HD trades fired at market open today (March 23). Check run.py --status. If active, schedule close dates: GO exits ~March 26, HD exits ~March 27.",
+      "set_by_session": "2026-03-23T09:59:36.854610"
     },
     {
-      "task": {
-        "task": "Monitor WD hypothesis if also active - check trade_loop.py status."
-      },
-      "set_by_session": "2026-03-23T09:56:29.081325"
+      "task": "2. VGNT spinoff: Monitor April 1 effective date. Hypothesis 2d94ac68 has trigger set for 2026-04-01T16:00. Verify it fires.",
+      "set_by_session": "2026-03-23T09:59:36.854616"
     },
     {
-      "task": {
-        "task": "VST out-of-sample data added to f86dcb4e (first-IG) - needs pre-event-run-up filter research before next trade."
-      },
-      "set_by_session": "2026-03-23T09:56:29.081326"
+      "task": "3. REPL PDUFA April 10: If clinical efficacy deficiency CRL issued, set short trigger on hypothesis d302c84b. Watch for pre-announcement price action.",
+      "set_by_session": "2026-03-23T09:59:36.854618"
     },
     {
-      "task": {
-        "task": "First-IG hypothesis (f86dcb4e) has expected_symbol=TBD - do not activate until next qualifying event AND pre-run-up filter is validated."
-      },
-      "set_by_session": "2026-03-23T09:56:29.081326"
+      "task": "4. First IG upgrade candidates: f86dcb4e needs TBD symbol. Add pre-event-run-up filter (must be <150% in 12 months prior). Search for rising star BB+/Ba1 companies with positive outlook. NOTE: VST was a negative OOS result due to 400% run-up.",
+      "set_by_session": "2026-03-23T09:59:36.854619"
     },
     {
-      "task": {
-        "task": "FDXF (FedEx Freight spinoff June 1 2026): Currently WATCHLIST only - borderline case. In April after investor day (April 8): check S&P 500 inclusion decision, WI trading price, short borrow availability. Decision: GXO analog (logistics desired spinco) suggests lean NO-GO for short, but monitor."
-      },
-      "set_by_session": "2026-03-23T09:56:29.081327"
+      "task": "5. FDXF spinoff (June 1): Watchlist only. April 8 investor day is the gate \u2014 check for S&P 500 inclusion announcement. Short ONLY if: (a) S&P inclusion NOT announced, AND (b) WI trading shows premium vs intrinsic value, AND (c) shareholder base is predominantly non-transport investors.",
+      "set_by_session": "2026-03-23T09:59:36.854619"
+    },
+    {
+      "task": "6. Honeywell Aerospace spinoff HONA (Q3 2026): Same desirability filter applies. Aerospace/defense is a \"desired\" spinco (clear institutional mandate). Likely NOT a short candidate. Verify before September.",
+      "set_by_session": "2026-03-23T09:59:36.854620"
+    },
+    {
+      "task": "7. Merger arbitrage: HSR clearance is a dead end. DO NOT revisit. If researching merger arb, focus on announcement-date behavior or deal-completion timeline underreaction per Giglio-Shue 2014.",
+      "set_by_session": "2026-03-23T09:59:36.854621"
     }
   ],
   "session_handoff": {
-    "fdxf_decision": "FDXF is borderline for spinco short. Key uncertainty is S&P 500 inclusion (forced index buying offsets institutional selling) and investor mandate overlap (FDX shareholders are already transport-oriented). GXO (+1.8% 5d) is the right analog. Do NOT create hypothesis yet - add to watchlist and revisit late April/early May once S&P 500 inclusion decision and WI trading are observable.",
-    "vgnt_hypothesis_status": "VGNT (2d94ac68) is pending with trigger 2026-04-01T16:00. This will activate VGNT short on April 1 close. Confirm VGNT is still the right ticker for the Vigil Neuroscience / spinoff situation.",
-    "written_at": "2026-03-23T09:56:29.081329"
+    "session_date": "2026-03-23",
+    "trades_firing_today": "GO (1cb6140f) and HD (86d28864) both have next_market_open triggers set. Market opens 9:30 ET. VIX ~26-30 (within backtest range, no gate needed).",
+    "dead_ends_recorded": "merger_hsr_clearance (N=199, p=0.96, no signal at any horizon)",
+    "knowledge_updates": "VST Dec 2025 negative result added to f86dcb4e. Pre-event-run-up >150% identified as moderating variable for first-IG hypothesis. Desirability filter added to spinco short knowledge base.",
+    "tools_built": "tools/merger_catalyst_scraper.py \u2014 scrapes EDGAR EFTS for HSR early termination 8-Ks",
+    "critical_upcoming": "VGNT Apr 1, REPL PDUFA Apr 10, FDXF investor day Apr 8",
+    "written_at": "2026-03-23T09:59:36.854623"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
