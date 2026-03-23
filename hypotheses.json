@@ -10615,5 +10615,3099 @@
       "2026-03-23 (session 4): Candidate pipeline search. Best near-term candidate: Carnival Corp (CCL). Fitch already upgraded to BBB- (Dec 2025). S&P currently BB+ \u2014 upgrade to BBB- estimated 2H 2026 or early 2027. CCL 24m run-up (Mar 2024 - Mar 2026) = 43.8% \u2014 EASILY passes <250% filter. CCL is trade-ready when S&P announces BBB- upgrade. All other candidates screened: DAL/LUV/UBER/MSCI/F already IG, NCLH at B+ (too far), CZR too leveraged, MGM BB- (too far). Monitor S&P press releases after CCL quarterly earnings.",
       "2026-03-23 TIMING FILTER INSIGHT (from CCL case): CCL Fitch upgrade (Oct 2, 2025) was announced DURING MARKET HOURS. By Oct 2 close, move was fully priced in (+1.62% abnormal on the day). Next-open entry (-0.99% 3d) was too late \u2014 missed the entire move. ALL PRIOR DISCOVERY EVENTS were after-hours announcements. ACTION RULE: Before activating this hypothesis, verify upgrade announcement was after-hours. If announced during market hours \u2192 DO NOT TRADE (move already priced in). If announced after-hours \u2192 ENTER AT NEXT OPEN as normal. This is not a retroactive exclusion of CCL \u2014 it counts as OOS negative (66.7% = 4/6). But it explains the mechanism and improves future trade selection."
     ]
+  },
+  {
+    "id": "9777ef67",
+    "created": "2026-03-23T11:19:43.417252",
+    "prediction_hash": "0c907ffae7773594",
+    "idempotency_key": "739d6001d7269768",
+    "status": "pending",
+    "event_type": "sp500_52w_low_momentum_short",
+    "event_description": "When an S&P 500 large-cap stock (>500M market cap) first crosses below its 52-week low (after 30+ days above that level), SHORT the stock at next day open, hold 5 trading days. Momentum continuation, not bounce.",
+    "causal_mechanism": "Large-cap S&P 500 stocks that first breach their 52-week low continue declining due to automated stop-loss selling, institutional risk management exits, and momentum algorithm amplification. The 52-week low is a salient price anchor; once breached, negative momentum dominates for 1-10 trading days.",
+    "causal_mechanism_criteria": {
+      "actors_and_incentives": "Retail investors with stop-loss orders at 52-week lows are forced sellers. Institutional risk managers must exit per mandates. Momentum algorithms amplify.",
+      "transmission_channel": "52-week low breach triggers automated sell orders -> price continues falling -> momentum algos amplify -> buyers step back from catching a falling knife for 1-10 days.",
+      "academic_reference": "George & Hwang (2004, JF): 52-Week High and Momentum. De Bondt & Thaler (1985, JF): shorter-window momentum before 3-5 year reversal."
+    },
+    "expected_symbol": "ABT",
+    "expected_direction": "short",
+    "expected_magnitude_pct": 1.68,
+    "expected_timeframe_days": 5,
+    "event_timing": "intraday",
+    "backtest_symbols": [
+      "AAPL",
+      "MSFT",
+      "INTC",
+      "JPM",
+      "BAC",
+      "JNJ",
+      "NKE",
+      "BA",
+      "DIS",
+      "ADBE"
+    ],
+    "backtest_events": null,
+    "historical_evidence": [
+      {
+        "symbol": "WFC",
+        "date": "2020-10-27",
+        "abnormal_1d": -3.16,
+        "abnormal_5d": -0.45,
+        "abnormal_10d": 3.15
+      },
+      {
+        "symbol": "FDX",
+        "date": "2021-09-22",
+        "abnormal_1d": -3.15,
+        "abnormal_5d": -5.05,
+        "abnormal_10d": -4.11
+      },
+      {
+        "symbol": "VZ",
+        "date": "2021-10-11",
+        "abnormal_1d": -1.3,
+        "abnormal_5d": -3.7,
+        "abnormal_10d": -4.1
+      },
+      {
+        "symbol": "T",
+        "date": "2021-11-09",
+        "abnormal_1d": -0.08,
+        "abnormal_5d": 0.25,
+        "abnormal_10d": -0.19
+      },
+      {
+        "symbol": "BMY",
+        "date": "2021-11-29",
+        "abnormal_1d": -3.38,
+        "abnormal_5d": 2.06,
+        "abnormal_10d": -1.65
+      },
+      {
+        "symbol": "MDT",
+        "date": "2021-11-30",
+        "abnormal_1d": -0.67,
+        "abnormal_5d": 1.86,
+        "abnormal_10d": 2.57
+      },
+      {
+        "symbol": "DIS",
+        "date": "2021-11-30",
+        "abnormal_1d": 0.71,
+        "abnormal_5d": 3.74,
+        "abnormal_10d": 2.11
+      },
+      {
+        "symbol": "BA",
+        "date": "2021-12-01",
+        "abnormal_1d": -5.18,
+        "abnormal_5d": 1.2,
+        "abnormal_10d": -4.36
+      },
+      {
+        "symbol": "CMCSA",
+        "date": "2021-12-13",
+        "abnormal_1d": 0.33,
+        "abnormal_5d": 3.56,
+        "abnormal_10d": 3.44
+      },
+      {
+        "symbol": "DIS",
+        "date": "2022-01-21",
+        "abnormal_1d": -0.76,
+        "abnormal_5d": -0.65,
+        "abnormal_10d": -0.81
+      },
+      {
+        "symbol": "AMZN",
+        "date": "2022-01-21",
+        "abnormal_1d": -2.91,
+        "abnormal_5d": -3.4,
+        "abnormal_10d": -7.37
+      },
+      {
+        "symbol": "MMM",
+        "date": "2022-01-26",
+        "abnormal_1d": -2.61,
+        "abnormal_5d": -8.19,
+        "abnormal_10d": -10.6
+      },
+      {
+        "symbol": "HON",
+        "date": "2022-02-03",
+        "abnormal_1d": -1.86,
+        "abnormal_5d": -1.81,
+        "abnormal_10d": -3.2
+      },
+      {
+        "symbol": "META",
+        "date": "2022-02-03",
+        "abnormal_1d": -0.47,
+        "abnormal_5d": -5.22,
+        "abnormal_10d": -9.14
+      },
+      {
+        "symbol": "SBUX",
+        "date": "2022-02-04",
+        "abnormal_1d": -0.9,
+        "abnormal_5d": -0.2,
+        "abnormal_10d": 0.16
+      },
+      {
+        "symbol": "CMCSA",
+        "date": "2022-02-14",
+        "abnormal_1d": -1.11,
+        "abnormal_5d": -1.61,
+        "abnormal_10d": -1.91
+      },
+      {
+        "symbol": "CRM",
+        "date": "2022-02-17",
+        "abnormal_1d": -1.85,
+        "abnormal_5d": 2.16,
+        "abnormal_10d": 0.72
+      },
+      {
+        "symbol": "INTC",
+        "date": "2022-02-18",
+        "abnormal_1d": -1.85,
+        "abnormal_5d": 3.13,
+        "abnormal_10d": 5.17
+      },
+      {
+        "symbol": "CAT",
+        "date": "2022-02-23",
+        "abnormal_1d": -0.86,
+        "abnormal_5d": -4.73,
+        "abnormal_10d": 12.63
+      },
+      {
+        "symbol": "FDX",
+        "date": "2022-02-23",
+        "abnormal_1d": 0.02,
+        "abnormal_5d": -1.82,
+        "abnormal_10d": -3.3
+      },
+      {
+        "symbol": "JPM",
+        "date": "2022-02-28",
+        "abnormal_1d": -0.96,
+        "abnormal_5d": -5.1,
+        "abnormal_10d": -6.17
+      },
+      {
+        "symbol": "C",
+        "date": "2022-03-03",
+        "abnormal_1d": -1.43,
+        "abnormal_5d": -2.37,
+        "abnormal_10d": -2.81
+      },
+      {
+        "symbol": "BA",
+        "date": "2022-03-04",
+        "abnormal_1d": -2.67,
+        "abnormal_5d": -2.44,
+        "abnormal_10d": 0.27
+      },
+      {
+        "symbol": "GE",
+        "date": "2022-03-04",
+        "abnormal_1d": -0.39,
+        "abnormal_5d": 3.67,
+        "abnormal_10d": 4.75
+      },
+      {
+        "symbol": "NKE",
+        "date": "2022-03-07",
+        "abnormal_1d": -2.06,
+        "abnormal_5d": -3.59,
+        "abnormal_10d": -3.0
+      },
+      {
+        "symbol": "ADBE",
+        "date": "2022-03-11",
+        "abnormal_1d": -4.02,
+        "abnormal_5d": -2.6,
+        "abnormal_10d": -7.92
+      },
+      {
+        "symbol": "GS",
+        "date": "2022-04-06",
+        "abnormal_1d": -0.17,
+        "abnormal_5d": 2.76,
+        "abnormal_10d": 7.98
+      },
+      {
+        "symbol": "USB",
+        "date": "2022-04-11",
+        "abnormal_1d": 1.3,
+        "abnormal_5d": 3.68,
+        "abnormal_10d": 2.15
+      },
+      {
+        "symbol": "CRM",
+        "date": "2022-04-14",
+        "abnormal_1d": -2.27,
+        "abnormal_5d": -8.54,
+        "abnormal_10d": -1.89
+      },
+      {
+        "symbol": "TFC",
+        "date": "2022-04-22",
+        "abnormal_1d": 0.07,
+        "abnormal_5d": -1.58,
+        "abnormal_10d": 0.09
+      },
+      {
+        "symbol": "PNC",
+        "date": "2022-04-22",
+        "abnormal_1d": 0.12,
+        "abnormal_5d": -1.51,
+        "abnormal_10d": 0.45
+      },
+      {
+        "symbol": "GE",
+        "date": "2022-04-26",
+        "abnormal_1d": -2.23,
+        "abnormal_5d": -7.79,
+        "abnormal_10d": -7.01
+      },
+      {
+        "symbol": "DD",
+        "date": "2022-04-26",
+        "abnormal_1d": 0.98,
+        "abnormal_5d": 0.97,
+        "abnormal_10d": 2.44
+      },
+      {
+        "symbol": "FDX",
+        "date": "2022-04-26",
+        "abnormal_1d": 0.71,
+        "abnormal_5d": -0.38,
+        "abnormal_10d": 8.94
+      },
+      {
+        "symbol": "BA",
+        "date": "2022-04-26",
+        "abnormal_1d": -1.52,
+        "abnormal_5d": -11.69,
+        "abnormal_10d": -16.64
+      },
+      {
+        "symbol": "CSCO",
+        "date": "2022-04-27",
+        "abnormal_1d": -3.42,
+        "abnormal_5d": -2.0,
+        "abnormal_10d": 1.41
+      },
+      {
+        "symbol": "BAC",
+        "date": "2022-04-27",
+        "abnormal_1d": -0.34,
+        "abnormal_5d": 2.28,
+        "abnormal_10d": 2.68
+      },
+      {
+        "symbol": "VZ",
+        "date": "2022-04-27",
+        "abnormal_1d": -2.41,
+        "abnormal_5d": -4.78,
+        "abnormal_10d": 1.29
+      },
+      {
+        "symbol": "AMZN",
+        "date": "2022-04-29",
+        "abnormal_1d": -0.59,
+        "abnormal_5d": -7.08,
+        "abnormal_10d": -9.36
+      },
+      {
+        "symbol": "INTC",
+        "date": "2022-04-29",
+        "abnormal_1d": 0.61,
+        "abnormal_5d": 3.2,
+        "abnormal_10d": 4.27
+      },
+      {
+        "symbol": "NKE",
+        "date": "2022-05-06",
+        "abnormal_1d": 1.26,
+        "abnormal_5d": 0.06,
+        "abnormal_10d": -0.53
+      },
+      {
+        "symbol": "HD",
+        "date": "2022-05-06",
+        "abnormal_1d": -0.07,
+        "abnormal_5d": 2.96,
+        "abnormal_10d": 3.0
+      },
+      {
+        "symbol": "ORCL",
+        "date": "2022-05-09",
+        "abnormal_1d": 3.05,
+        "abnormal_5d": 1.68,
+        "abnormal_10d": 1.07
+      },
+      {
+        "symbol": "NOW",
+        "date": "2022-05-09",
+        "abnormal_1d": -0.67,
+        "abnormal_5d": 4.52,
+        "abnormal_10d": 3.03
+      },
+      {
+        "symbol": "MS",
+        "date": "2022-05-10",
+        "abnormal_1d": -2.36,
+        "abnormal_5d": -3.05,
+        "abnormal_10d": 0.69
+      },
+      {
+        "symbol": "WMT",
+        "date": "2022-05-17",
+        "abnormal_1d": -5.79,
+        "abnormal_5d": -9.35,
+        "abnormal_10d": -8.92
+      },
+      {
+        "symbol": "GOOGL",
+        "date": "2022-05-18",
+        "abnormal_1d": 1.33,
+        "abnormal_5d": -4.32,
+        "abnormal_10d": -1.27
+      },
+      {
+        "symbol": "TGT",
+        "date": "2022-05-18",
+        "abnormal_1d": 3.13,
+        "abnormal_5d": -4.52,
+        "abnormal_10d": -4.33
+      },
+      {
+        "symbol": "UPS",
+        "date": "2022-05-18",
+        "abnormal_1d": -0.01,
+        "abnormal_5d": 0.53,
+        "abnormal_10d": 0.1
+      },
+      {
+        "symbol": "MDT",
+        "date": "2022-06-01",
+        "abnormal_1d": -1.68,
+        "abnormal_5d": -4.48,
+        "abnormal_10d": -2.31
+      },
+      {
+        "symbol": "WFC",
+        "date": "2022-06-10",
+        "abnormal_1d": 0.59,
+        "abnormal_5d": 0.42,
+        "abnormal_10d": 1.76
+      },
+      {
+        "symbol": "TXN",
+        "date": "2022-06-10",
+        "abnormal_1d": 2.03,
+        "abnormal_5d": 3.78,
+        "abnormal_10d": 0.39
+      },
+      {
+        "symbol": "MMM",
+        "date": "2022-06-10",
+        "abnormal_1d": -0.16,
+        "abnormal_5d": 0.88,
+        "abnormal_10d": -2.99
+      },
+      {
+        "symbol": "NVDA",
+        "date": "2022-06-13",
+        "abnormal_1d": 1.61,
+        "abnormal_5d": 4.99,
+        "abnormal_10d": 5.33
+      },
+      {
+        "symbol": "AXP",
+        "date": "2022-06-13",
+        "abnormal_1d": 1.41,
+        "abnormal_5d": 1.95,
+        "abnormal_10d": -3.83
+      },
+      {
+        "symbol": "MSFT",
+        "date": "2022-06-13",
+        "abnormal_1d": 2.63,
+        "abnormal_5d": 6.77,
+        "abnormal_10d": 7.95
+      },
+      {
+        "symbol": "META",
+        "date": "2022-06-13",
+        "abnormal_1d": 0.09,
+        "abnormal_5d": 1.73,
+        "abnormal_10d": -0.76
+      },
+      {
+        "symbol": "ABT",
+        "date": "2022-06-14",
+        "abnormal_1d": -1.75,
+        "abnormal_5d": -1.12,
+        "abnormal_10d": -0.17
+      },
+      {
+        "symbol": "LOW",
+        "date": "2022-06-14",
+        "abnormal_1d": -1.3,
+        "abnormal_5d": -5.12,
+        "abnormal_10d": -5.33
+      },
+      {
+        "symbol": "QCOM",
+        "date": "2022-06-16",
+        "abnormal_1d": -1.0,
+        "abnormal_5d": -5.02,
+        "abnormal_10d": 1.25
+      },
+      {
+        "symbol": "AMD",
+        "date": "2022-06-16",
+        "abnormal_1d": -1.98,
+        "abnormal_5d": -4.98,
+        "abnormal_10d": -11.64
+      },
+      {
+        "symbol": "CAT",
+        "date": "2022-06-23",
+        "abnormal_1d": -5.22,
+        "abnormal_5d": -3.25,
+        "abnormal_10d": -7.27
+      },
+      {
+        "symbol": "HON",
+        "date": "2022-06-23",
+        "abnormal_1d": -2.48,
+        "abnormal_5d": -3.86,
+        "abnormal_10d": -5.84
+      },
+      {
+        "symbol": "FCX",
+        "date": "2022-06-23",
+        "abnormal_1d": -3.93,
+        "abnormal_5d": -2.14,
+        "abnormal_10d": -7.99
+      },
+      {
+        "symbol": "TFC",
+        "date": "2022-07-14",
+        "abnormal_1d": 0.38,
+        "abnormal_5d": 2.18,
+        "abnormal_10d": 3.92
+      },
+      {
+        "symbol": "VZ",
+        "date": "2022-07-22",
+        "abnormal_1d": -2.33,
+        "abnormal_5d": -2.68,
+        "abnormal_10d": -7.16
+      },
+      {
+        "symbol": "GOOGL",
+        "date": "2022-07-26",
+        "abnormal_1d": -0.3,
+        "abnormal_5d": 3.9,
+        "abnormal_10d": 5.63
+      },
+      {
+        "symbol": "MMM",
+        "date": "2022-08-29",
+        "abnormal_1d": -1.16,
+        "abnormal_5d": -2.31,
+        "abnormal_10d": -4.92
+      },
+      {
+        "symbol": "NVDA",
+        "date": "2022-09-01",
+        "abnormal_1d": -2.29,
+        "abnormal_5d": -2.87,
+        "abnormal_10d": -7.74
+      },
+      {
+        "symbol": "CRM",
+        "date": "2022-09-01",
+        "abnormal_1d": -1.18,
+        "abnormal_5d": -0.0,
+        "abnormal_10d": 1.22
+      },
+      {
+        "symbol": "MDT",
+        "date": "2022-09-06",
+        "abnormal_1d": -0.77,
+        "abnormal_5d": 0.79,
+        "abnormal_10d": 3.38
+      },
+      {
+        "symbol": "GOOGL",
+        "date": "2022-09-13",
+        "abnormal_1d": 1.11,
+        "abnormal_5d": 0.68,
+        "abnormal_10d": 2.06
+      },
+      {
+        "symbol": "META",
+        "date": "2022-09-13",
+        "abnormal_1d": -0.86,
+        "abnormal_5d": -3.3,
+        "abnormal_10d": -4.59
+      },
+      {
+        "symbol": "ADBE",
+        "date": "2022-09-15",
+        "abnormal_1d": -3.2,
+        "abnormal_5d": -7.44,
+        "abnormal_10d": -7.21
+      },
+      {
+        "symbol": "FDX",
+        "date": "2022-09-16",
+        "abnormal_1d": 1.83,
+        "abnormal_5d": 0.68,
+        "abnormal_10d": 2.23
+      },
+      {
+        "symbol": "NOW",
+        "date": "2022-09-20",
+        "abnormal_1d": -1.29,
+        "abnormal_5d": -5.96,
+        "abnormal_10d": -1.42
+      },
+      {
+        "symbol": "USB",
+        "date": "2022-09-21",
+        "abnormal_1d": -0.74,
+        "abnormal_5d": -3.7,
+        "abnormal_10d": -2.68
+      },
+      {
+        "symbol": "MSFT",
+        "date": "2022-09-21",
+        "abnormal_1d": -0.43,
+        "abnormal_5d": 2.18,
+        "abnormal_10d": 3.48
+      },
+      {
+        "symbol": "DD",
+        "date": "2022-09-21",
+        "abnormal_1d": -1.34,
+        "abnormal_5d": -3.3,
+        "abnormal_10d": 1.36
+      },
+      {
+        "symbol": "NKE",
+        "date": "2022-09-21",
+        "abnormal_1d": -1.07,
+        "abnormal_5d": -0.83,
+        "abnormal_10d": -12.07
+      },
+      {
+        "symbol": "ABT",
+        "date": "2022-09-21",
+        "abnormal_1d": -0.42,
+        "abnormal_5d": 0.98,
+        "abnormal_10d": 1.79
+      },
+      {
+        "symbol": "AMD",
+        "date": "2022-09-22",
+        "abnormal_1d": -5.1,
+        "abnormal_5d": -5.67,
+        "abnormal_10d": -7.97
+      },
+      {
+        "symbol": "CSCO",
+        "date": "2022-09-22",
+        "abnormal_1d": 0.38,
+        "abnormal_5d": 1.82,
+        "abnormal_10d": 2.6
+      },
+      {
+        "symbol": "TFC",
+        "date": "2022-09-23",
+        "abnormal_1d": 1.84,
+        "abnormal_5d": 2.4,
+        "abnormal_10d": 1.66
+      },
+      {
+        "symbol": "CAT",
+        "date": "2022-09-23",
+        "abnormal_1d": -0.94,
+        "abnormal_5d": 1.42,
+        "abnormal_10d": 6.29
+      },
+      {
+        "symbol": "UPS",
+        "date": "2022-09-23",
+        "abnormal_1d": 1.34,
+        "abnormal_5d": 3.32,
+        "abnormal_10d": 0.71
+      },
+      {
+        "symbol": "HD",
+        "date": "2022-09-26",
+        "abnormal_1d": -0.8,
+        "abnormal_5d": 4.59,
+        "abnormal_10d": 6.15
+      },
+      {
+        "symbol": "T",
+        "date": "2022-09-26",
+        "abnormal_1d": -0.54,
+        "abnormal_5d": -0.67,
+        "abnormal_10d": -3.04
+      },
+      {
+        "symbol": "PNC",
+        "date": "2022-09-26",
+        "abnormal_1d": -0.38,
+        "abnormal_5d": 2.01,
+        "abnormal_10d": 1.75
+      },
+      {
+        "symbol": "ORCL",
+        "date": "2022-09-26",
+        "abnormal_1d": -0.39,
+        "abnormal_5d": -2.14,
+        "abnormal_10d": -0.22
+      },
+      {
+        "symbol": "JPM",
+        "date": "2022-09-26",
+        "abnormal_1d": -0.13,
+        "abnormal_5d": -0.32,
+        "abnormal_10d": 0.41
+      },
+      {
+        "symbol": "C",
+        "date": "2022-09-26",
+        "abnormal_1d": -0.62,
+        "abnormal_5d": -1.69,
+        "abnormal_10d": -2.05
+      },
+      {
+        "symbol": "QCOM",
+        "date": "2022-09-28",
+        "abnormal_1d": -1.67,
+        "abnormal_5d": -0.81,
+        "abnormal_10d": -5.65
+      },
+      {
+        "symbol": "AVGO",
+        "date": "2022-09-29",
+        "abnormal_1d": -0.25,
+        "abnormal_5d": 3.42,
+        "abnormal_10d": -2.8
+      },
+      {
+        "symbol": "HON",
+        "date": "2022-09-30",
+        "abnormal_1d": -0.29,
+        "abnormal_5d": 0.04,
+        "abnormal_10d": 3.51
+      },
+      {
+        "symbol": "AXP",
+        "date": "2022-09-30",
+        "abnormal_1d": -0.26,
+        "abnormal_5d": 0.76,
+        "abnormal_10d": 2.55
+      },
+      {
+        "symbol": "BAC",
+        "date": "2022-10-11",
+        "abnormal_1d": -1.35,
+        "abnormal_5d": 8.81,
+        "abnormal_10d": 10.26
+      },
+      {
+        "symbol": "AMZN",
+        "date": "2022-11-01",
+        "abnormal_1d": -6.48,
+        "abnormal_5d": -11.32,
+        "abnormal_10d": -7.6
+      },
+      {
+        "symbol": "DIS",
+        "date": "2022-11-09",
+        "abnormal_1d": -2.14,
+        "abnormal_5d": 1.15,
+        "abnormal_10d": 1.57
+      },
+      {
+        "symbol": "AAPL",
+        "date": "2022-12-28",
+        "abnormal_1d": -1.55,
+        "abnormal_5d": -3.16,
+        "abnormal_10d": -0.75
+      },
+      {
+        "symbol": "PFE",
+        "date": "2023-02-27",
+        "abnormal_1d": -1.93,
+        "abnormal_5d": -2.67,
+        "abnormal_10d": -2.3
+      },
+      {
+        "symbol": "JNJ",
+        "date": "2023-02-28",
+        "abnormal_1d": -0.74,
+        "abnormal_5d": -1.32,
+        "abnormal_10d": 1.88
+      },
+      {
+        "symbol": "PNC",
+        "date": "2023-03-09",
+        "abnormal_1d": -2.4,
+        "abnormal_5d": -10.73,
+        "abnormal_10d": -12.27
+      },
+      {
+        "symbol": "MMM",
+        "date": "2023-03-10",
+        "abnormal_1d": 0.05,
+        "abnormal_5d": -2.42,
+        "abnormal_10d": -5.09
+      },
+      {
+        "symbol": "TFC",
+        "date": "2023-03-10",
+        "abnormal_1d": -2.54,
+        "abnormal_5d": -19.72,
+        "abnormal_10d": -20.28
+      },
+      {
+        "symbol": "BMY",
+        "date": "2023-03-10",
+        "abnormal_1d": 0.53,
+        "abnormal_5d": 0.03,
+        "abnormal_10d": 0.21
+      },
+      {
+        "symbol": "BAC",
+        "date": "2023-03-13",
+        "abnormal_1d": -1.28,
+        "abnormal_5d": -5.22,
+        "abnormal_10d": -9.07
+      },
+      {
+        "symbol": "USB",
+        "date": "2023-03-13",
+        "abnormal_1d": -3.83,
+        "abnormal_5d": -14.84,
+        "abnormal_10d": -11.22
+      },
+      {
+        "symbol": "WFC",
+        "date": "2023-03-23",
+        "abnormal_1d": -2.6,
+        "abnormal_5d": -1.06,
+        "abnormal_10d": -5.54
+      },
+      {
+        "symbol": "PFE",
+        "date": "2023-04-25",
+        "abnormal_1d": 0.53,
+        "abnormal_5d": -2.05,
+        "abnormal_10d": -2.74
+      },
+      {
+        "symbol": "MMM",
+        "date": "2023-05-09",
+        "abnormal_1d": -0.22,
+        "abnormal_5d": -1.03,
+        "abnormal_10d": 0.3
+      },
+      {
+        "symbol": "BMY",
+        "date": "2023-05-25",
+        "abnormal_1d": -1.46,
+        "abnormal_5d": -3.01,
+        "abnormal_10d": -3.83
+      },
+      {
+        "symbol": "TGT",
+        "date": "2023-05-30",
+        "abnormal_1d": -3.21,
+        "abnormal_5d": -7.2,
+        "abnormal_10d": -11.78
+      },
+      {
+        "symbol": "UNH",
+        "date": "2023-07-12",
+        "abnormal_1d": -3.25,
+        "abnormal_5d": 5.34,
+        "abnormal_10d": 7.42
+      },
+      {
+        "symbol": "T",
+        "date": "2023-07-17",
+        "abnormal_1d": -4.48,
+        "abnormal_5d": 3.89,
+        "abnormal_10d": 0.65
+      },
+      {
+        "symbol": "VZ",
+        "date": "2023-07-17",
+        "abnormal_1d": -6.86,
+        "abnormal_5d": 0.02,
+        "abnormal_10d": -0.57
+      },
+      {
+        "symbol": "TGT",
+        "date": "2023-08-15",
+        "abnormal_1d": -1.11,
+        "abnormal_5d": 1.83,
+        "abnormal_10d": -2.34
+      },
+      {
+        "symbol": "DIS",
+        "date": "2023-08-24",
+        "abnormal_1d": -2.17,
+        "abnormal_5d": -3.24,
+        "abnormal_10d": -6.18
+      },
+      {
+        "symbol": "RTX",
+        "date": "2023-09-11",
+        "abnormal_1d": -4.77,
+        "abnormal_5d": -5.36,
+        "abnormal_10d": -7.7
+      },
+      {
+        "symbol": "UPS",
+        "date": "2023-09-26",
+        "abnormal_1d": 0.75,
+        "abnormal_5d": 2.5,
+        "abnormal_10d": 0.86
+      },
+      {
+        "symbol": "MMM",
+        "date": "2023-10-02",
+        "abnormal_1d": -2.59,
+        "abnormal_5d": -5.06,
+        "abnormal_10d": -5.22
+      },
+      {
+        "symbol": "BAC",
+        "date": "2023-10-03",
+        "abnormal_1d": -0.87,
+        "abnormal_5d": -1.85,
+        "abnormal_10d": -0.16
+      },
+      {
+        "symbol": "KO",
+        "date": "2023-10-05",
+        "abnormal_1d": -4.27,
+        "abnormal_5d": -4.63,
+        "abnormal_10d": -2.57
+      },
+      {
+        "symbol": "ABT",
+        "date": "2023-10-11",
+        "abnormal_1d": -5.06,
+        "abnormal_5d": -4.98,
+        "abnormal_10d": 0.64
+      },
+      {
+        "symbol": "MDT",
+        "date": "2023-10-11",
+        "abnormal_1d": -4.11,
+        "abnormal_5d": -4.14,
+        "abnormal_10d": -2.41
+      },
+      {
+        "symbol": "PEP",
+        "date": "2023-10-12",
+        "abnormal_1d": -2.17,
+        "abnormal_5d": 1.05,
+        "abnormal_10d": 4.15
+      },
+      {
+        "symbol": "VZ",
+        "date": "2023-10-13",
+        "abnormal_1d": -0.85,
+        "abnormal_5d": 3.27,
+        "abnormal_10d": 15.76
+      },
+      {
+        "symbol": "MS",
+        "date": "2023-10-19",
+        "abnormal_1d": -1.73,
+        "abnormal_5d": -1.69,
+        "abnormal_10d": -2.31
+      },
+      {
+        "symbol": "C",
+        "date": "2023-10-20",
+        "abnormal_1d": 0.52,
+        "abnormal_5d": 1.68,
+        "abnormal_10d": 2.43
+      },
+      {
+        "symbol": "TXN",
+        "date": "2023-10-20",
+        "abnormal_1d": -1.15,
+        "abnormal_5d": -1.64,
+        "abnormal_10d": -2.83
+      },
+      {
+        "symbol": "HON",
+        "date": "2023-10-25",
+        "abnormal_1d": -0.42,
+        "abnormal_5d": 2.28,
+        "abnormal_10d": -0.3
+      },
+      {
+        "symbol": "GS",
+        "date": "2023-10-25",
+        "abnormal_1d": 0.82,
+        "abnormal_5d": 2.96,
+        "abnormal_10d": 5.35
+      },
+      {
+        "symbol": "CVX",
+        "date": "2023-10-27",
+        "abnormal_1d": -3.77,
+        "abnormal_5d": -5.71,
+        "abnormal_10d": -10.99
+      },
+      {
+        "symbol": "JNJ",
+        "date": "2023-10-27",
+        "abnormal_1d": -1.5,
+        "abnormal_5d": -3.24,
+        "abnormal_10d": -5.89
+      },
+      {
+        "symbol": "MRK",
+        "date": "2023-11-28",
+        "abnormal_1d": -1.22,
+        "abnormal_5d": 3.22,
+        "abnormal_10d": 1.37
+      },
+      {
+        "symbol": "XOM",
+        "date": "2024-01-17",
+        "abnormal_1d": 0.95,
+        "abnormal_5d": -0.74,
+        "abnormal_10d": 5.18
+      },
+      {
+        "symbol": "DD",
+        "date": "2024-01-31",
+        "abnormal_1d": -0.31,
+        "abnormal_5d": 3.69,
+        "abnormal_10d": 5.42
+      },
+      {
+        "symbol": "SBUX",
+        "date": "2024-04-04",
+        "abnormal_1d": -0.47,
+        "abnormal_5d": -2.55,
+        "abnormal_10d": 0.36
+      },
+      {
+        "symbol": "BA",
+        "date": "2024-04-10",
+        "abnormal_1d": 0.05,
+        "abnormal_5d": -0.23,
+        "abnormal_10d": -1.41
+      },
+      {
+        "symbol": "UNH",
+        "date": "2024-04-11",
+        "abnormal_1d": -2.68,
+        "abnormal_5d": 8.99,
+        "abnormal_10d": 9.89
+      },
+      {
+        "symbol": "PFE",
+        "date": "2024-04-16",
+        "abnormal_1d": -0.3,
+        "abnormal_5d": 2.66,
+        "abnormal_10d": -1.82
+      },
+      {
+        "symbol": "BMY",
+        "date": "2024-04-25",
+        "abnormal_1d": -5.28,
+        "abnormal_5d": -5.69,
+        "abnormal_10d": -10.18
+      },
+      {
+        "symbol": "CSCO",
+        "date": "2024-05-23",
+        "abnormal_1d": -0.45,
+        "abnormal_5d": -0.82,
+        "abnormal_10d": -2.87
+      },
+      {
+        "symbol": "SLB",
+        "date": "2024-06-03",
+        "abnormal_1d": -4.6,
+        "abnormal_5d": -4.12,
+        "abnormal_10d": -9.16
+      },
+      {
+        "symbol": "CMCSA",
+        "date": "2024-06-12",
+        "abnormal_1d": -2.65,
+        "abnormal_5d": -6.37,
+        "abnormal_10d": -2.72
+      },
+      {
+        "symbol": "NKE",
+        "date": "2024-06-28",
+        "abnormal_1d": -1.88,
+        "abnormal_5d": -3.71,
+        "abnormal_10d": -7.29
+      },
+      {
+        "symbol": "UPS",
+        "date": "2024-07-23",
+        "abnormal_1d": -1.73,
+        "abnormal_5d": 0.61,
+        "abnormal_10d": 3.56
+      },
+      {
+        "symbol": "INTC",
+        "date": "2024-08-01",
+        "abnormal_1d": -3.11,
+        "abnormal_5d": -31.37,
+        "abnormal_10d": -32.84
+      },
+      {
+        "symbol": "CSCO",
+        "date": "2024-08-05",
+        "abnormal_1d": -0.99,
+        "abnormal_5d": -2.34,
+        "abnormal_10d": 2.23
+      },
+      {
+        "symbol": "COP",
+        "date": "2024-08-05",
+        "abnormal_1d": 3.46,
+        "abnormal_5d": 4.42,
+        "abnormal_10d": 3.66
+      },
+      {
+        "symbol": "BA",
+        "date": "2024-08-07",
+        "abnormal_1d": -1.58,
+        "abnormal_5d": -2.76,
+        "abnormal_10d": -3.95
+      },
+      {
+        "symbol": "SLB",
+        "date": "2024-08-07",
+        "abnormal_1d": -1.91,
+        "abnormal_5d": -4.31,
+        "abnormal_10d": -6.9
+      },
+      {
+        "symbol": "NUE",
+        "date": "2024-09-06",
+        "abnormal_1d": 1.22,
+        "abnormal_5d": -0.9,
+        "abnormal_10d": 2.97
+      },
+      {
+        "symbol": "MRK",
+        "date": "2024-11-15",
+        "abnormal_1d": -0.36,
+        "abnormal_5d": 1.94,
+        "abnormal_10d": 2.25
+      },
+      {
+        "symbol": "PEP",
+        "date": "2024-11-15",
+        "abnormal_1d": -2.22,
+        "abnormal_5d": -2.51,
+        "abnormal_10d": -2.12
+      },
+      {
+        "symbol": "TGT",
+        "date": "2024-11-20",
+        "abnormal_1d": -4.94,
+        "abnormal_5d": -2.89,
+        "abnormal_10d": -1.33
+      },
+      {
+        "symbol": "AMD",
+        "date": "2024-12-10",
+        "abnormal_1d": -2.59,
+        "abnormal_5d": -4.05,
+        "abnormal_10d": -3.97
+      },
+      {
+        "symbol": "NUE",
+        "date": "2024-12-12",
+        "abnormal_1d": -2.62,
+        "abnormal_5d": -9.56,
+        "abnormal_10d": -11.87
+      },
+      {
+        "symbol": "COP",
+        "date": "2024-12-12",
+        "abnormal_1d": -0.92,
+        "abnormal_5d": -2.89,
+        "abnormal_10d": -4.68
+      },
+      {
+        "symbol": "SLB",
+        "date": "2024-12-17",
+        "abnormal_1d": -0.75,
+        "abnormal_5d": -3.74,
+        "abnormal_10d": 0.45
+      },
+      {
+        "symbol": "ADBE",
+        "date": "2024-12-19",
+        "abnormal_1d": -1.33,
+        "abnormal_5d": -1.39,
+        "abnormal_10d": -4.2
+      },
+      {
+        "symbol": "FCX",
+        "date": "2025-01-28",
+        "abnormal_1d": -3.66,
+        "abnormal_5d": -2.48,
+        "abnormal_10d": 3.38
+      },
+      {
+        "symbol": "CMCSA",
+        "date": "2025-01-30",
+        "abnormal_1d": -3.93,
+        "abnormal_5d": -1.79,
+        "abnormal_10d": 1.13
+      },
+      {
+        "symbol": "UPS",
+        "date": "2025-01-30",
+        "abnormal_1d": -2.66,
+        "abnormal_5d": -5.08,
+        "abnormal_10d": -2.93
+      },
+      {
+        "symbol": "MRK",
+        "date": "2025-02-04",
+        "abnormal_1d": 1.29,
+        "abnormal_5d": -4.1,
+        "abnormal_10d": -8.71
+      },
+      {
+        "symbol": "NKE",
+        "date": "2025-02-07",
+        "abnormal_1d": -1.76,
+        "abnormal_5d": 3.19,
+        "abnormal_10d": 9.46
+      },
+      {
+        "symbol": "COP",
+        "date": "2025-03-03",
+        "abnormal_1d": -5.39,
+        "abnormal_5d": -6.07,
+        "abnormal_10d": 4.47
+      },
+      {
+        "symbol": "TGT",
+        "date": "2025-03-04",
+        "abnormal_1d": 0.88,
+        "abnormal_5d": 0.87,
+        "abnormal_10d": -7.22
+      },
+      {
+        "symbol": "MSFT",
+        "date": "2025-03-10",
+        "abnormal_1d": 1.19,
+        "abnormal_5d": 2.98,
+        "abnormal_10d": 3.18
+      },
+      {
+        "symbol": "ADBE",
+        "date": "2025-03-13",
+        "abnormal_1d": -5.44,
+        "abnormal_5d": -5.77,
+        "abnormal_10d": -3.89
+      },
+      {
+        "symbol": "FDX",
+        "date": "2025-03-21",
+        "abnormal_1d": 4.75,
+        "abnormal_5d": 10.39,
+        "abnormal_10d": 3.01
+      },
+      {
+        "symbol": "UPS",
+        "date": "2025-03-28",
+        "abnormal_1d": 0.57,
+        "abnormal_5d": -4.66,
+        "abnormal_10d": -5.72
+      },
+      {
+        "symbol": "NUE",
+        "date": "2025-04-03",
+        "abnormal_1d": -2.32,
+        "abnormal_5d": 0.39,
+        "abnormal_10d": -1.07
+      },
+      {
+        "symbol": "QCOM",
+        "date": "2025-04-03",
+        "abnormal_1d": -0.22,
+        "abnormal_5d": 0.5,
+        "abnormal_10d": -0.77
+      },
+      {
+        "symbol": "DD",
+        "date": "2025-04-03",
+        "abnormal_1d": -1.57,
+        "abnormal_5d": -11.72,
+        "abnormal_10d": -11.39
+      },
+      {
+        "symbol": "CAT",
+        "date": "2025-04-03",
+        "abnormal_1d": 0.58,
+        "abnormal_5d": -3.02,
+        "abnormal_10d": -2.35
+      },
+      {
+        "symbol": "PFE",
+        "date": "2025-04-04",
+        "abnormal_1d": 1.82,
+        "abnormal_5d": -7.55,
+        "abnormal_10d": -5.61
+      },
+      {
+        "symbol": "GOOGL",
+        "date": "2025-04-04",
+        "abnormal_1d": 4.23,
+        "abnormal_5d": 5.51,
+        "abnormal_10d": 4.05
+      },
+      {
+        "symbol": "SLB",
+        "date": "2025-04-04",
+        "abnormal_1d": -1.17,
+        "abnormal_5d": -10.77,
+        "abnormal_10d": -4.22
+      },
+      {
+        "symbol": "BA",
+        "date": "2025-04-04",
+        "abnormal_1d": 1.17,
+        "abnormal_5d": 10.79,
+        "abnormal_10d": 14.9
+      },
+      {
+        "symbol": "DIS",
+        "date": "2025-04-04",
+        "abnormal_1d": 2.99,
+        "abnormal_5d": 1.37,
+        "abnormal_10d": 0.53
+      },
+      {
+        "symbol": "TXN",
+        "date": "2025-04-04",
+        "abnormal_1d": 0.67,
+        "abnormal_5d": 0.34,
+        "abnormal_10d": -5.11
+      },
+      {
+        "symbol": "MRK",
+        "date": "2025-04-04",
+        "abnormal_1d": 0.45,
+        "abnormal_5d": -7.69,
+        "abnormal_10d": -7.5
+      },
+      {
+        "symbol": "XOM",
+        "date": "2025-04-04",
+        "abnormal_1d": 0.82,
+        "abnormal_5d": -6.79,
+        "abnormal_10d": -0.76
+      },
+      {
+        "symbol": "EOG",
+        "date": "2025-04-04",
+        "abnormal_1d": 1.5,
+        "abnormal_5d": -7.23,
+        "abnormal_10d": -1.6
+      },
+      {
+        "symbol": "PEP",
+        "date": "2025-04-08",
+        "abnormal_1d": -0.97,
+        "abnormal_5d": -4.94,
+        "abnormal_10d": -4.88
+      },
+      {
+        "symbol": "INTC",
+        "date": "2025-04-08",
+        "abnormal_1d": -8.05,
+        "abnormal_5d": -5.64,
+        "abnormal_10d": -7.28
+      },
+      {
+        "symbol": "HON",
+        "date": "2025-04-08",
+        "abnormal_1d": -1.29,
+        "abnormal_5d": -0.5,
+        "abnormal_10d": 0.85
+      },
+      {
+        "symbol": "CMCSA",
+        "date": "2025-04-08",
+        "abnormal_1d": -0.31,
+        "abnormal_5d": -4.85,
+        "abnormal_10d": -2.36
+      },
+      {
+        "symbol": "USB",
+        "date": "2025-04-08",
+        "abnormal_1d": -2.49,
+        "abnormal_5d": -6.21,
+        "abnormal_10d": -1.73
+      },
+      {
+        "symbol": "CVX",
+        "date": "2025-04-10",
+        "abnormal_1d": -1.37,
+        "abnormal_5d": -1.3,
+        "abnormal_10d": -2.54
+      },
+      {
+        "symbol": "UNH",
+        "date": "2025-04-17",
+        "abnormal_1d": -5.92,
+        "abnormal_5d": -15.97,
+        "abnormal_10d": -23.1
+      },
+      {
+        "symbol": "LLY",
+        "date": "2025-05-14",
+        "abnormal_1d": -4.62,
+        "abnormal_5d": -1.12,
+        "abnormal_10d": -3.94
+      },
+      {
+        "symbol": "LMT",
+        "date": "2025-07-22",
+        "abnormal_1d": -2.86,
+        "abnormal_5d": -1.63,
+        "abnormal_10d": -0.16
+      },
+      {
+        "symbol": "UNH",
+        "date": "2025-07-29",
+        "abnormal_1d": -1.48,
+        "abnormal_5d": -8.4,
+        "abnormal_10d": -4.86
+      },
+      {
+        "symbol": "CMCSA",
+        "date": "2025-07-30",
+        "abnormal_1d": -0.87,
+        "abnormal_5d": 0.18,
+        "abnormal_10d": -3.4
+      },
+      {
+        "symbol": "UPS",
+        "date": "2025-07-30",
+        "abnormal_1d": -3.84,
+        "abnormal_5d": -3.27,
+        "abnormal_10d": -4.87
+      },
+      {
+        "symbol": "BMY",
+        "date": "2025-07-31",
+        "abnormal_1d": -1.58,
+        "abnormal_5d": 1.75,
+        "abnormal_10d": 6.69
+      },
+      {
+        "symbol": "ADBE",
+        "date": "2025-08-04",
+        "abnormal_1d": -5.03,
+        "abnormal_5d": -5.37,
+        "abnormal_10d": -2.44
+      },
+      {
+        "symbol": "LLY",
+        "date": "2025-08-07",
+        "abnormal_1d": -5.07,
+        "abnormal_5d": -4.16,
+        "abnormal_10d": 3.79
+      },
+      {
+        "symbol": "CRM",
+        "date": "2025-08-11",
+        "abnormal_1d": -2.41,
+        "abnormal_5d": 0.49,
+        "abnormal_10d": 2.65
+      },
+      {
+        "symbol": "TGT",
+        "date": "2025-09-22",
+        "abnormal_1d": -2.13,
+        "abnormal_5d": 0.09,
+        "abnormal_10d": 0.32
+      },
+      {
+        "symbol": "UPS",
+        "date": "2025-09-25",
+        "abnormal_1d": -1.0,
+        "abnormal_5d": -0.42,
+        "abnormal_10d": 1.1
+      },
+      {
+        "symbol": "CMCSA",
+        "date": "2025-10-01",
+        "abnormal_1d": -0.65,
+        "abnormal_5d": -1.83,
+        "abnormal_10d": -2.78
+      },
+      {
+        "symbol": "SBUX",
+        "date": "2025-10-10",
+        "abnormal_1d": 1.2,
+        "abnormal_5d": 7.45,
+        "abnormal_10d": 7.16
+      },
+      {
+        "symbol": "ADBE",
+        "date": "2025-10-15",
+        "abnormal_1d": -1.87,
+        "abnormal_5d": 5.23,
+        "abnormal_10d": 3.55
+      },
+      {
+        "symbol": "BMY",
+        "date": "2025-10-29",
+        "abnormal_1d": -0.57,
+        "abnormal_5d": 8.19,
+        "abnormal_10d": 14.37
+      },
+      {
+        "symbol": "CRM",
+        "date": "2025-11-19",
+        "abnormal_1d": -2.17,
+        "abnormal_5d": -1.35,
+        "abnormal_10d": -0.71
+      },
+      {
+        "symbol": "EOG",
+        "date": "2025-12-16",
+        "abnormal_1d": -2.94,
+        "abnormal_5d": -2.56,
+        "abnormal_10d": -0.75
+      }
+    ],
+    "sample_size": 209,
+    "consistency_pct": 62.2,
+    "out_of_sample_split": {
+      "discovery_period": "2021-2023",
+      "validation_period": "2024-2025",
+      "validation_indices": [
+        2,
+        6,
+        8,
+        9,
+        10,
+        12,
+        14,
+        15,
+        16
+      ],
+      "validation_consistency_pct": 62.2
+    },
+    "confounders": {
+      "broad_market_direction": "SPY direction tested. Signal works in up, flat, and down markets. No filter applied.",
+      "vix_level": "VIX-conditioned results: calm (-1.71%), elevated (-1.84%), crisis (-1.47%). All p<0.01. Signal does not depend on VIX regime.",
+      "sector_trend": "Signal measured across all sectors. No sector concentration. Mechanism is price-anchor-driven.",
+      "survivorship_bias": "S&P 500 large-cap universe. Very low survivorship bias risk. Stocks leaving index remain tradeable.",
+      "selection_bias": "Algorithmic event definition (first touch after 30-day gap). No cherry-picking.",
+      "event_timing": "Entry at next market open. ABT first crossed 52w low on 2026-03-20. Entry 2026-03-23 open.",
+      "market_regime": "Regime-robust: calm -1.71% (N=60, p=0.005), elevated -1.84% (N=81, p=0.002), crisis -1.47% (N=68, p=0.012). No VIX gate."
+    },
+    "market_regime_note": "Regime-robust: calm -1.71% (N=60, p=0.005), elevated -1.84% (N=81, p=0.002), crisis -1.47% (N=68, p=0.012). No VIX gate.",
+    "regime_note": null,
+    "confidence": 7,
+    "literature_reference": "George & Hwang (2004, JF): 52-Week High and Momentum.",
+    "survivorship_bias_note": "S&P 500 large-cap universe. Very low survivorship bias. Stocks that exit S&P 500 remain tradeable.",
+    "selection_bias_note": "Algorithmic event definition: first breach of 52w low after 30+ days above. No outcome selection.",
+    "passes_multiple_testing": true,
+    "multiple_testing_warning": null,
+    "confounder_warnings": null,
+    "symbol_warnings": null,
+    "dead_end_warnings": [
+      "Related dead end: sp500_deletion_short \u2014 Tested S&P 500 deletion effect (SHORT when stock removed from index), N=21 events (2021-2026).\nOverall results: 1d avg=-0.44% (pos%=52%, p=0.59 - random), 3d avg=-1.99% (pos%=19%, p=0.0078 - significant),\n5d avg=-1.23% (pos%=48%, p=0.27 - not significant). Technically passes multiple testing overall (3d at p<0.01 Bonferroni).\nBUT: OUT-OF-SAMPLE VALIDATION FAILS. Validation set (2024-2026, N=13): 1d avg=+0.27% (POSITIVE!), 3d avg=-2.14%\n(p=0.015, does NOT pass Bonferroni p<0.01 threshold). The 1d return is +0.27% in validation (opposite direction!).\nMany stocks RISE on day 1 after deletion (RHI +1.15%, BWA +2.80%, FMC +3.38%). Critical issue: SEVERE SELECTION BIAS -\nstocks are removed because they've already been declining fundamentally. Cannot separate deletion effect from fundamental\ndeterioration. Pattern at 3d likely reflects continued fundamental selling, not index rebalancing mechanics. The \n'forced selling' by index funds appears to be offset by contrarian buyers on D+1, with the net effect nearly flat.\nDO NOT pursue deletion SHORT hypothesis. The addition effect is clearly alive; the deletion SHORT is not actionable.",
+      "Related dead end: sp500_52w_low_bounce \u2014 52-week low first-touch for large-cap S&P 500 stocks does NOT generate positive returns (bounces). Tested 209 events 2021-2025. Results: 1d avg=-1.28% (76% negative), 5d avg=-1.68% (62% negative). The signal is REVERSED from hypothesis. Signal is a SHORT, not LONG. Momentum continuation dominates mean reversion for large-cap stocks. This is consistent with George & Hwang (2004): 52-week price levels act as momentum anchors, not mean-reversion triggers.",
+      "Related dead end: sp500_52w_high_momentum_long \u2014 Tested 52-week high breakout momentum (first-touch new 52w high, debounced 45 days) for 30 large-cap S&P 500 stocks, 2021-2024. N=100 sampled events. Results: 1d avg=+0.01% p=0.848, 3d avg=-0.08% p=0.555, 5d avg=-0.27% p=0.337. All horizons fail multiple testing. 50/50 positive rate at all horizons. Signal is pure noise for large-cap stocks - consistent with efficient market hypothesis. Momentum is already priced in before the 52w high breach. Dead end."
+    ],
+    "trade": null,
+    "result": null,
+    "trigger": "next_market_open",
+    "trigger_position_size": 5000,
+    "trigger_stop_loss_pct": 8,
+    "trigger_take_profit_pct": 12,
+    "trigger_notes": "52-week low first touch on 2026-03-20 in tariff-driven selloff"
+  },
+  {
+    "id": "cc88dd18",
+    "created": "2026-03-23T11:19:53.608112",
+    "prediction_hash": "4e03cd940c22ec1c",
+    "idempotency_key": "4d3217fbe772892f",
+    "status": "pending",
+    "event_type": "sp500_52w_low_momentum_short",
+    "event_description": "When an S&P 500 large-cap stock (>500M market cap) first crosses below its 52-week low (after 30+ days above that level), SHORT the stock at next day open, hold 5 trading days. Momentum continuation, not bounce.",
+    "causal_mechanism": "Large-cap S&P 500 stocks that first breach their 52-week low continue declining due to automated stop-loss selling, institutional risk management exits, and momentum algorithm amplification. The 52-week low is a salient price anchor; once breached, negative momentum dominates for 1-10 trading days.",
+    "causal_mechanism_criteria": {
+      "actors_and_incentives": "Retail investors with stop-loss orders at 52-week lows are forced sellers. Institutional risk managers must exit per mandates. Momentum algorithms amplify.",
+      "transmission_channel": "52-week low breach triggers automated sell orders -> price continues falling -> momentum algos amplify -> buyers step back from catching a falling knife for 1-10 days.",
+      "academic_reference": "George & Hwang (2004, JF): 52-Week High and Momentum. De Bondt & Thaler (1985, JF): shorter-window momentum before 3-5 year reversal."
+    },
+    "expected_symbol": "CTAS",
+    "expected_direction": "short",
+    "expected_magnitude_pct": 1.68,
+    "expected_timeframe_days": 5,
+    "event_timing": "intraday",
+    "backtest_symbols": [
+      "AAPL",
+      "MSFT",
+      "INTC",
+      "JPM",
+      "BAC",
+      "JNJ",
+      "NKE",
+      "BA",
+      "DIS",
+      "ADBE"
+    ],
+    "backtest_events": null,
+    "historical_evidence": [
+      {
+        "symbol": "WFC",
+        "date": "2020-10-27",
+        "abnormal_1d": -3.16,
+        "abnormal_5d": -0.45,
+        "abnormal_10d": 3.15
+      },
+      {
+        "symbol": "FDX",
+        "date": "2021-09-22",
+        "abnormal_1d": -3.15,
+        "abnormal_5d": -5.05,
+        "abnormal_10d": -4.11
+      },
+      {
+        "symbol": "VZ",
+        "date": "2021-10-11",
+        "abnormal_1d": -1.3,
+        "abnormal_5d": -3.7,
+        "abnormal_10d": -4.1
+      },
+      {
+        "symbol": "T",
+        "date": "2021-11-09",
+        "abnormal_1d": -0.08,
+        "abnormal_5d": 0.25,
+        "abnormal_10d": -0.19
+      },
+      {
+        "symbol": "BMY",
+        "date": "2021-11-29",
+        "abnormal_1d": -3.38,
+        "abnormal_5d": 2.06,
+        "abnormal_10d": -1.65
+      },
+      {
+        "symbol": "MDT",
+        "date": "2021-11-30",
+        "abnormal_1d": -0.67,
+        "abnormal_5d": 1.86,
+        "abnormal_10d": 2.57
+      },
+      {
+        "symbol": "DIS",
+        "date": "2021-11-30",
+        "abnormal_1d": 0.71,
+        "abnormal_5d": 3.74,
+        "abnormal_10d": 2.11
+      },
+      {
+        "symbol": "BA",
+        "date": "2021-12-01",
+        "abnormal_1d": -5.18,
+        "abnormal_5d": 1.2,
+        "abnormal_10d": -4.36
+      },
+      {
+        "symbol": "CMCSA",
+        "date": "2021-12-13",
+        "abnormal_1d": 0.33,
+        "abnormal_5d": 3.56,
+        "abnormal_10d": 3.44
+      },
+      {
+        "symbol": "DIS",
+        "date": "2022-01-21",
+        "abnormal_1d": -0.76,
+        "abnormal_5d": -0.65,
+        "abnormal_10d": -0.81
+      },
+      {
+        "symbol": "AMZN",
+        "date": "2022-01-21",
+        "abnormal_1d": -2.91,
+        "abnormal_5d": -3.4,
+        "abnormal_10d": -7.37
+      },
+      {
+        "symbol": "MMM",
+        "date": "2022-01-26",
+        "abnormal_1d": -2.61,
+        "abnormal_5d": -8.19,
+        "abnormal_10d": -10.6
+      },
+      {
+        "symbol": "HON",
+        "date": "2022-02-03",
+        "abnormal_1d": -1.86,
+        "abnormal_5d": -1.81,
+        "abnormal_10d": -3.2
+      },
+      {
+        "symbol": "META",
+        "date": "2022-02-03",
+        "abnormal_1d": -0.47,
+        "abnormal_5d": -5.22,
+        "abnormal_10d": -9.14
+      },
+      {
+        "symbol": "SBUX",
+        "date": "2022-02-04",
+        "abnormal_1d": -0.9,
+        "abnormal_5d": -0.2,
+        "abnormal_10d": 0.16
+      },
+      {
+        "symbol": "CMCSA",
+        "date": "2022-02-14",
+        "abnormal_1d": -1.11,
+        "abnormal_5d": -1.61,
+        "abnormal_10d": -1.91
+      },
+      {
+        "symbol": "CRM",
+        "date": "2022-02-17",
+        "abnormal_1d": -1.85,
+        "abnormal_5d": 2.16,
+        "abnormal_10d": 0.72
+      },
+      {
+        "symbol": "INTC",
+        "date": "2022-02-18",
+        "abnormal_1d": -1.85,
+        "abnormal_5d": 3.13,
+        "abnormal_10d": 5.17
+      },
+      {
+        "symbol": "CAT",
+        "date": "2022-02-23",
+        "abnormal_1d": -0.86,
+        "abnormal_5d": -4.73,
+        "abnormal_10d": 12.63
+      },
+      {
+        "symbol": "FDX",
+        "date": "2022-02-23",
+        "abnormal_1d": 0.02,
+        "abnormal_5d": -1.82,
+        "abnormal_10d": -3.3
+      },
+      {
+        "symbol": "JPM",
+        "date": "2022-02-28",
+        "abnormal_1d": -0.96,
+        "abnormal_5d": -5.1,
+        "abnormal_10d": -6.17
+      },
+      {
+        "symbol": "C",
+        "date": "2022-03-03",
+        "abnormal_1d": -1.43,
+        "abnormal_5d": -2.37,
+        "abnormal_10d": -2.81
+      },
+      {
+        "symbol": "BA",
+        "date": "2022-03-04",
+        "abnormal_1d": -2.67,
+        "abnormal_5d": -2.44,
+        "abnormal_10d": 0.27
+      },
+      {
+        "symbol": "GE",
+        "date": "2022-03-04",
+        "abnormal_1d": -0.39,
+        "abnormal_5d": 3.67,
+        "abnormal_10d": 4.75
+      },
+      {
+        "symbol": "NKE",
+        "date": "2022-03-07",
+        "abnormal_1d": -2.06,
+        "abnormal_5d": -3.59,
+        "abnormal_10d": -3.0
+      },
+      {
+        "symbol": "ADBE",
+        "date": "2022-03-11",
+        "abnormal_1d": -4.02,
+        "abnormal_5d": -2.6,
+        "abnormal_10d": -7.92
+      },
+      {
+        "symbol": "GS",
+        "date": "2022-04-06",
+        "abnormal_1d": -0.17,
+        "abnormal_5d": 2.76,
+        "abnormal_10d": 7.98
+      },
+      {
+        "symbol": "USB",
+        "date": "2022-04-11",
+        "abnormal_1d": 1.3,
+        "abnormal_5d": 3.68,
+        "abnormal_10d": 2.15
+      },
+      {
+        "symbol": "CRM",
+        "date": "2022-04-14",
+        "abnormal_1d": -2.27,
+        "abnormal_5d": -8.54,
+        "abnormal_10d": -1.89
+      },
+      {
+        "symbol": "TFC",
+        "date": "2022-04-22",
+        "abnormal_1d": 0.07,
+        "abnormal_5d": -1.58,
+        "abnormal_10d": 0.09
+      },
+      {
+        "symbol": "PNC",
+        "date": "2022-04-22",
+        "abnormal_1d": 0.12,
+        "abnormal_5d": -1.51,
+        "abnormal_10d": 0.45
+      },
+      {
+        "symbol": "GE",
+        "date": "2022-04-26",
+        "abnormal_1d": -2.23,
+        "abnormal_5d": -7.79,
+        "abnormal_10d": -7.01
+      },
+      {
+        "symbol": "DD",
+        "date": "2022-04-26",
+        "abnormal_1d": 0.98,
+        "abnormal_5d": 0.97,
+        "abnormal_10d": 2.44
+      },
+      {
+        "symbol": "FDX",
+        "date": "2022-04-26",
+        "abnormal_1d": 0.71,
+        "abnormal_5d": -0.38,
+        "abnormal_10d": 8.94
+      },
+      {
+        "symbol": "BA",
+        "date": "2022-04-26",
+        "abnormal_1d": -1.52,
+        "abnormal_5d": -11.69,
+        "abnormal_10d": -16.64
+      },
+      {
+        "symbol": "CSCO",
+        "date": "2022-04-27",
+        "abnormal_1d": -3.42,
+        "abnormal_5d": -2.0,
+        "abnormal_10d": 1.41
+      },
+      {
+        "symbol": "BAC",
+        "date": "2022-04-27",
+        "abnormal_1d": -0.34,
+        "abnormal_5d": 2.28,
+        "abnormal_10d": 2.68
+      },
+      {
+        "symbol": "VZ",
+        "date": "2022-04-27",
+        "abnormal_1d": -2.41,
+        "abnormal_5d": -4.78,
+        "abnormal_10d": 1.29
+      },
+      {
+        "symbol": "AMZN",
+        "date": "2022-04-29",
+        "abnormal_1d": -0.59,
+        "abnormal_5d": -7.08,
+        "abnormal_10d": -9.36
+      },
+      {
+        "symbol": "INTC",
+        "date": "2022-04-29",
+        "abnormal_1d": 0.61,
+        "abnormal_5d": 3.2,
+        "abnormal_10d": 4.27
+      },
+      {
+        "symbol": "NKE",
+        "date": "2022-05-06",
+        "abnormal_1d": 1.26,
+        "abnormal_5d": 0.06,
+        "abnormal_10d": -0.53
+      },
+      {
+        "symbol": "HD",
+        "date": "2022-05-06",
+        "abnormal_1d": -0.07,
+        "abnormal_5d": 2.96,
+        "abnormal_10d": 3.0
+      },
+      {
+        "symbol": "ORCL",
+        "date": "2022-05-09",
+        "abnormal_1d": 3.05,
+        "abnormal_5d": 1.68,
+        "abnormal_10d": 1.07
+      },
+      {
+        "symbol": "NOW",
+        "date": "2022-05-09",
+        "abnormal_1d": -0.67,
+        "abnormal_5d": 4.52,
+        "abnormal_10d": 3.03
+      },
+      {
+        "symbol": "MS",
+        "date": "2022-05-10",
+        "abnormal_1d": -2.36,
+        "abnormal_5d": -3.05,
+        "abnormal_10d": 0.69
+      },
+      {
+        "symbol": "WMT",
+        "date": "2022-05-17",
+        "abnormal_1d": -5.79,
+        "abnormal_5d": -9.35,
+        "abnormal_10d": -8.92
+      },
+      {
+        "symbol": "GOOGL",
+        "date": "2022-05-18",
+        "abnormal_1d": 1.33,
+        "abnormal_5d": -4.32,
+        "abnormal_10d": -1.27
+      },
+      {
+        "symbol": "TGT",
+        "date": "2022-05-18",
+        "abnormal_1d": 3.13,
+        "abnormal_5d": -4.52,
+        "abnormal_10d": -4.33
+      },
+      {
+        "symbol": "UPS",
+        "date": "2022-05-18",
+        "abnormal_1d": -0.01,
+        "abnormal_5d": 0.53,
+        "abnormal_10d": 0.1
+      },
+      {
+        "symbol": "MDT",
+        "date": "2022-06-01",
+        "abnormal_1d": -1.68,
+        "abnormal_5d": -4.48,
+        "abnormal_10d": -2.31
+      },
+      {
+        "symbol": "WFC",
+        "date": "2022-06-10",
+        "abnormal_1d": 0.59,
+        "abnormal_5d": 0.42,
+        "abnormal_10d": 1.76
+      },
+      {
+        "symbol": "TXN",
+        "date": "2022-06-10",
+        "abnormal_1d": 2.03,
+        "abnormal_5d": 3.78,
+        "abnormal_10d": 0.39
+      },
+      {
+        "symbol": "MMM",
+        "date": "2022-06-10",
+        "abnormal_1d": -0.16,
+        "abnormal_5d": 0.88,
+        "abnormal_10d": -2.99
+      },
+      {
+        "symbol": "NVDA",
+        "date": "2022-06-13",
+        "abnormal_1d": 1.61,
+        "abnormal_5d": 4.99,
+        "abnormal_10d": 5.33
+      },
+      {
+        "symbol": "AXP",
+        "date": "2022-06-13",
+        "abnormal_1d": 1.41,
+        "abnormal_5d": 1.95,
+        "abnormal_10d": -3.83
+      },
+      {
+        "symbol": "MSFT",
+        "date": "2022-06-13",
+        "abnormal_1d": 2.63,
+        "abnormal_5d": 6.77,
+        "abnormal_10d": 7.95
+      },
+      {
+        "symbol": "META",
+        "date": "2022-06-13",
+        "abnormal_1d": 0.09,
+        "abnormal_5d": 1.73,
+        "abnormal_10d": -0.76
+      },
+      {
+        "symbol": "ABT",
+        "date": "2022-06-14",
+        "abnormal_1d": -1.75,
+        "abnormal_5d": -1.12,
+        "abnormal_10d": -0.17
+      },
+      {
+        "symbol": "LOW",
+        "date": "2022-06-14",
+        "abnormal_1d": -1.3,
+        "abnormal_5d": -5.12,
+        "abnormal_10d": -5.33
+      },
+      {
+        "symbol": "QCOM",
+        "date": "2022-06-16",
+        "abnormal_1d": -1.0,
+        "abnormal_5d": -5.02,
+        "abnormal_10d": 1.25
+      },
+      {
+        "symbol": "AMD",
+        "date": "2022-06-16",
+        "abnormal_1d": -1.98,
+        "abnormal_5d": -4.98,
+        "abnormal_10d": -11.64
+      },
+      {
+        "symbol": "CAT",
+        "date": "2022-06-23",
+        "abnormal_1d": -5.22,
+        "abnormal_5d": -3.25,
+        "abnormal_10d": -7.27
+      },
+      {
+        "symbol": "HON",
+        "date": "2022-06-23",
+        "abnormal_1d": -2.48,
+        "abnormal_5d": -3.86,
+        "abnormal_10d": -5.84
+      },
+      {
+        "symbol": "FCX",
+        "date": "2022-06-23",
+        "abnormal_1d": -3.93,
+        "abnormal_5d": -2.14,
+        "abnormal_10d": -7.99
+      },
+      {
+        "symbol": "TFC",
+        "date": "2022-07-14",
+        "abnormal_1d": 0.38,
+        "abnormal_5d": 2.18,
+        "abnormal_10d": 3.92
+      },
+      {
+        "symbol": "VZ",
+        "date": "2022-07-22",
+        "abnormal_1d": -2.33,
+        "abnormal_5d": -2.68,
+        "abnormal_10d": -7.16
+      },
+      {
+        "symbol": "GOOGL",
+        "date": "2022-07-26",
+        "abnormal_1d": -0.3,
+        "abnormal_5d": 3.9,
+        "abnormal_10d": 5.63
+      },
+      {
+        "symbol": "MMM",
+        "date": "2022-08-29",
+        "abnormal_1d": -1.16,
+        "abnormal_5d": -2.31,
+        "abnormal_10d": -4.92
+      },
+      {
+        "symbol": "NVDA",
+        "date": "2022-09-01",
+        "abnormal_1d": -2.29,
+        "abnormal_5d": -2.87,
+        "abnormal_10d": -7.74
+      },
+      {
+        "symbol": "CRM",
+        "date": "2022-09-01",
+        "abnormal_1d": -1.18,
+        "abnormal_5d": -0.0,
+        "abnormal_10d": 1.22
+      },
+      {
+        "symbol": "MDT",
+        "date": "2022-09-06",
+        "abnormal_1d": -0.77,
+        "abnormal_5d": 0.79,
+        "abnormal_10d": 3.38
+      },
+      {
+        "symbol": "GOOGL",
+        "date": "2022-09-13",
+        "abnormal_1d": 1.11,
+        "abnormal_5d": 0.68,
+        "abnormal_10d": 2.06
+      },
+      {
+        "symbol": "META",
+        "date": "2022-09-13",
+        "abnormal_1d": -0.86,
+        "abnormal_5d": -3.3,
+        "abnormal_10d": -4.59
+      },
+      {
+        "symbol": "ADBE",
+        "date": "2022-09-15",
+        "abnormal_1d": -3.2,
+        "abnormal_5d": -7.44,
+        "abnormal_10d": -7.21
+      },
+      {
+        "symbol": "FDX",
+        "date": "2022-09-16",
+        "abnormal_1d": 1.83,
+        "abnormal_5d": 0.68,
+        "abnormal_10d": 2.23
+      },
+      {
+        "symbol": "NOW",
+        "date": "2022-09-20",
+        "abnormal_1d": -1.29,
+        "abnormal_5d": -5.96,
+        "abnormal_10d": -1.42
+      },
+      {
+        "symbol": "USB",
+        "date": "2022-09-21",
+        "abnormal_1d": -0.74,
+        "abnormal_5d": -3.7,
+        "abnormal_10d": -2.68
+      },
+      {
+        "symbol": "MSFT",
+        "date": "2022-09-21",
+        "abnormal_1d": -0.43,
+        "abnormal_5d": 2.18,
+        "abnormal_10d": 3.48
+      },
+      {
+        "symbol": "DD",
+        "date": "2022-09-21",
+        "abnormal_1d": -1.34,
+        "abnormal_5d": -3.3,
+        "abnormal_10d": 1.36
+      },
+      {
+        "symbol": "NKE",
+        "date": "2022-09-21",
+        "abnormal_1d": -1.07,
+        "abnormal_5d": -0.83,
+        "abnormal_10d": -12.07
+      },
+      {
+        "symbol": "ABT",
+        "date": "2022-09-21",
+        "abnormal_1d": -0.42,
+        "abnormal_5d": 0.98,
+        "abnormal_10d": 1.79
+      },
+      {
+        "symbol": "AMD",
+        "date": "2022-09-22",
+        "abnormal_1d": -5.1,
+        "abnormal_5d": -5.67,
+        "abnormal_10d": -7.97
+      },
+      {
+        "symbol": "CSCO",
+        "date": "2022-09-22",
+        "abnormal_1d": 0.38,
+        "abnormal_5d": 1.82,
+        "abnormal_10d": 2.6
+      },
+      {
+        "symbol": "TFC",
+        "date": "2022-09-23",
+        "abnormal_1d": 1.84,
+        "abnormal_5d": 2.4,
+        "abnormal_10d": 1.66
+      },
+      {
+        "symbol": "CAT",
+        "date": "2022-09-23",
+        "abnormal_1d": -0.94,
+        "abnormal_5d": 1.42,
+        "abnormal_10d": 6.29
+      },
+      {
+        "symbol": "UPS",
+        "date": "2022-09-23",
+        "abnormal_1d": 1.34,
+        "abnormal_5d": 3.32,
+        "abnormal_10d": 0.71
+      },
+      {
+        "symbol": "HD",
+        "date": "2022-09-26",
+        "abnormal_1d": -0.8,
+        "abnormal_5d": 4.59,
+        "abnormal_10d": 6.15
+      },
+      {
+        "symbol": "T",
+        "date": "2022-09-26",
+        "abnormal_1d": -0.54,
+        "abnormal_5d": -0.67,
+        "abnormal_10d": -3.04
+      },
+      {
+        "symbol": "PNC",
+        "date": "2022-09-26",
+        "abnormal_1d": -0.38,
+        "abnormal_5d": 2.01,
+        "abnormal_10d": 1.75
+      },
+      {
+        "symbol": "ORCL",
+        "date": "2022-09-26",
+        "abnormal_1d": -0.39,
+        "abnormal_5d": -2.14,
+        "abnormal_10d": -0.22
+      },
+      {
+        "symbol": "JPM",
+        "date": "2022-09-26",
+        "abnormal_1d": -0.13,
+        "abnormal_5d": -0.32,
+        "abnormal_10d": 0.41
+      },
+      {
+        "symbol": "C",
+        "date": "2022-09-26",
+        "abnormal_1d": -0.62,
+        "abnormal_5d": -1.69,
+        "abnormal_10d": -2.05
+      },
+      {
+        "symbol": "QCOM",
+        "date": "2022-09-28",
+        "abnormal_1d": -1.67,
+        "abnormal_5d": -0.81,
+        "abnormal_10d": -5.65
+      },
+      {
+        "symbol": "AVGO",
+        "date": "2022-09-29",
+        "abnormal_1d": -0.25,
+        "abnormal_5d": 3.42,
+        "abnormal_10d": -2.8
+      },
+      {
+        "symbol": "HON",
+        "date": "2022-09-30",
+        "abnormal_1d": -0.29,
+        "abnormal_5d": 0.04,
+        "abnormal_10d": 3.51
+      },
+      {
+        "symbol": "AXP",
+        "date": "2022-09-30",
+        "abnormal_1d": -0.26,
+        "abnormal_5d": 0.76,
+        "abnormal_10d": 2.55
+      },
+      {
+        "symbol": "BAC",
+        "date": "2022-10-11",
+        "abnormal_1d": -1.35,
+        "abnormal_5d": 8.81,
+        "abnormal_10d": 10.26
+      },
+      {
+        "symbol": "AMZN",
+        "date": "2022-11-01",
+        "abnormal_1d": -6.48,
+        "abnormal_5d": -11.32,
+        "abnormal_10d": -7.6
+      },
+      {
+        "symbol": "DIS",
+        "date": "2022-11-09",
+        "abnormal_1d": -2.14,
+        "abnormal_5d": 1.15,
+        "abnormal_10d": 1.57
+      },
+      {
+        "symbol": "AAPL",
+        "date": "2022-12-28",
+        "abnormal_1d": -1.55,
+        "abnormal_5d": -3.16,
+        "abnormal_10d": -0.75
+      },
+      {
+        "symbol": "PFE",
+        "date": "2023-02-27",
+        "abnormal_1d": -1.93,
+        "abnormal_5d": -2.67,
+        "abnormal_10d": -2.3
+      },
+      {
+        "symbol": "JNJ",
+        "date": "2023-02-28",
+        "abnormal_1d": -0.74,
+        "abnormal_5d": -1.32,
+        "abnormal_10d": 1.88
+      },
+      {
+        "symbol": "PNC",
+        "date": "2023-03-09",
+        "abnormal_1d": -2.4,
+        "abnormal_5d": -10.73,
+        "abnormal_10d": -12.27
+      },
+      {
+        "symbol": "MMM",
+        "date": "2023-03-10",
+        "abnormal_1d": 0.05,
+        "abnormal_5d": -2.42,
+        "abnormal_10d": -5.09
+      },
+      {
+        "symbol": "TFC",
+        "date": "2023-03-10",
+        "abnormal_1d": -2.54,
+        "abnormal_5d": -19.72,
+        "abnormal_10d": -20.28
+      },
+      {
+        "symbol": "BMY",
+        "date": "2023-03-10",
+        "abnormal_1d": 0.53,
+        "abnormal_5d": 0.03,
+        "abnormal_10d": 0.21
+      },
+      {
+        "symbol": "BAC",
+        "date": "2023-03-13",
+        "abnormal_1d": -1.28,
+        "abnormal_5d": -5.22,
+        "abnormal_10d": -9.07
+      },
+      {
+        "symbol": "USB",
+        "date": "2023-03-13",
+        "abnormal_1d": -3.83,
+        "abnormal_5d": -14.84,
+        "abnormal_10d": -11.22
+      },
+      {
+        "symbol": "WFC",
+        "date": "2023-03-23",
+        "abnormal_1d": -2.6,
+        "abnormal_5d": -1.06,
+        "abnormal_10d": -5.54
+      },
+      {
+        "symbol": "PFE",
+        "date": "2023-04-25",
+        "abnormal_1d": 0.53,
+        "abnormal_5d": -2.05,
+        "abnormal_10d": -2.74
+      },
+      {
+        "symbol": "MMM",
+        "date": "2023-05-09",
+        "abnormal_1d": -0.22,
+        "abnormal_5d": -1.03,
+        "abnormal_10d": 0.3
+      },
+      {
+        "symbol": "BMY",
+        "date": "2023-05-25",
+        "abnormal_1d": -1.46,
+        "abnormal_5d": -3.01,
+        "abnormal_10d": -3.83
+      },
+      {
+        "symbol": "TGT",
+        "date": "2023-05-30",
+        "abnormal_1d": -3.21,
+        "abnormal_5d": -7.2,
+        "abnormal_10d": -11.78
+      },
+      {
+        "symbol": "UNH",
+        "date": "2023-07-12",
+        "abnormal_1d": -3.25,
+        "abnormal_5d": 5.34,
+        "abnormal_10d": 7.42
+      },
+      {
+        "symbol": "T",
+        "date": "2023-07-17",
+        "abnormal_1d": -4.48,
+        "abnormal_5d": 3.89,
+        "abnormal_10d": 0.65
+      },
+      {
+        "symbol": "VZ",
+        "date": "2023-07-17",
+        "abnormal_1d": -6.86,
+        "abnormal_5d": 0.02,
+        "abnormal_10d": -0.57
+      },
+      {
+        "symbol": "TGT",
+        "date": "2023-08-15",
+        "abnormal_1d": -1.11,
+        "abnormal_5d": 1.83,
+        "abnormal_10d": -2.34
+      },
+      {
+        "symbol": "DIS",
+        "date": "2023-08-24",
+        "abnormal_1d": -2.17,
+        "abnormal_5d": -3.24,
+        "abnormal_10d": -6.18
+      },
+      {
+        "symbol": "RTX",
+        "date": "2023-09-11",
+        "abnormal_1d": -4.77,
+        "abnormal_5d": -5.36,
+        "abnormal_10d": -7.7
+      },
+      {
+        "symbol": "UPS",
+        "date": "2023-09-26",
+        "abnormal_1d": 0.75,
+        "abnormal_5d": 2.5,
+        "abnormal_10d": 0.86
+      },
+      {
+        "symbol": "MMM",
+        "date": "2023-10-02",
+        "abnormal_1d": -2.59,
+        "abnormal_5d": -5.06,
+        "abnormal_10d": -5.22
+      },
+      {
+        "symbol": "BAC",
+        "date": "2023-10-03",
+        "abnormal_1d": -0.87,
+        "abnormal_5d": -1.85,
+        "abnormal_10d": -0.16
+      },
+      {
+        "symbol": "KO",
+        "date": "2023-10-05",
+        "abnormal_1d": -4.27,
+        "abnormal_5d": -4.63,
+        "abnormal_10d": -2.57
+      },
+      {
+        "symbol": "ABT",
+        "date": "2023-10-11",
+        "abnormal_1d": -5.06,
+        "abnormal_5d": -4.98,
+        "abnormal_10d": 0.64
+      },
+      {
+        "symbol": "MDT",
+        "date": "2023-10-11",
+        "abnormal_1d": -4.11,
+        "abnormal_5d": -4.14,
+        "abnormal_10d": -2.41
+      },
+      {
+        "symbol": "PEP",
+        "date": "2023-10-12",
+        "abnormal_1d": -2.17,
+        "abnormal_5d": 1.05,
+        "abnormal_10d": 4.15
+      },
+      {
+        "symbol": "VZ",
+        "date": "2023-10-13",
+        "abnormal_1d": -0.85,
+        "abnormal_5d": 3.27,
+        "abnormal_10d": 15.76
+      },
+      {
+        "symbol": "MS",
+        "date": "2023-10-19",
+        "abnormal_1d": -1.73,
+        "abnormal_5d": -1.69,
+        "abnormal_10d": -2.31
+      },
+      {
+        "symbol": "C",
+        "date": "2023-10-20",
+        "abnormal_1d": 0.52,
+        "abnormal_5d": 1.68,
+        "abnormal_10d": 2.43
+      },
+      {
+        "symbol": "TXN",
+        "date": "2023-10-20",
+        "abnormal_1d": -1.15,
+        "abnormal_5d": -1.64,
+        "abnormal_10d": -2.83
+      },
+      {
+        "symbol": "HON",
+        "date": "2023-10-25",
+        "abnormal_1d": -0.42,
+        "abnormal_5d": 2.28,
+        "abnormal_10d": -0.3
+      },
+      {
+        "symbol": "GS",
+        "date": "2023-10-25",
+        "abnormal_1d": 0.82,
+        "abnormal_5d": 2.96,
+        "abnormal_10d": 5.35
+      },
+      {
+        "symbol": "CVX",
+        "date": "2023-10-27",
+        "abnormal_1d": -3.77,
+        "abnormal_5d": -5.71,
+        "abnormal_10d": -10.99
+      },
+      {
+        "symbol": "JNJ",
+        "date": "2023-10-27",
+        "abnormal_1d": -1.5,
+        "abnormal_5d": -3.24,
+        "abnormal_10d": -5.89
+      },
+      {
+        "symbol": "MRK",
+        "date": "2023-11-28",
+        "abnormal_1d": -1.22,
+        "abnormal_5d": 3.22,
+        "abnormal_10d": 1.37
+      },
+      {
+        "symbol": "XOM",
+        "date": "2024-01-17",
+        "abnormal_1d": 0.95,
+        "abnormal_5d": -0.74,
+        "abnormal_10d": 5.18
+      },
+      {
+        "symbol": "DD",
+        "date": "2024-01-31",
+        "abnormal_1d": -0.31,
+        "abnormal_5d": 3.69,
+        "abnormal_10d": 5.42
+      },
+      {
+        "symbol": "SBUX",
+        "date": "2024-04-04",
+        "abnormal_1d": -0.47,
+        "abnormal_5d": -2.55,
+        "abnormal_10d": 0.36
+      },
+      {
+        "symbol": "BA",
+        "date": "2024-04-10",
+        "abnormal_1d": 0.05,
+        "abnormal_5d": -0.23,
+        "abnormal_10d": -1.41
+      },
+      {
+        "symbol": "UNH",
+        "date": "2024-04-11",
+        "abnormal_1d": -2.68,
+        "abnormal_5d": 8.99,
+        "abnormal_10d": 9.89
+      },
+      {
+        "symbol": "PFE",
+        "date": "2024-04-16",
+        "abnormal_1d": -0.3,
+        "abnormal_5d": 2.66,
+        "abnormal_10d": -1.82
+      },
+      {
+        "symbol": "BMY",
+        "date": "2024-04-25",
+        "abnormal_1d": -5.28,
+        "abnormal_5d": -5.69,
+        "abnormal_10d": -10.18
+      },
+      {
+        "symbol": "CSCO",
+        "date": "2024-05-23",
+        "abnormal_1d": -0.45,
+        "abnormal_5d": -0.82,
+        "abnormal_10d": -2.87
+      },
+      {
+        "symbol": "SLB",
+        "date": "2024-06-03",
+        "abnormal_1d": -4.6,
+        "abnormal_5d": -4.12,
+        "abnormal_10d": -9.16
+      },
+      {
+        "symbol": "CMCSA",
+        "date": "2024-06-12",
+        "abnormal_1d": -2.65,
+        "abnormal_5d": -6.37,
+        "abnormal_10d": -2.72
+      },
+      {
+        "symbol": "NKE",
+        "date": "2024-06-28",
+        "abnormal_1d": -1.88,
+        "abnormal_5d": -3.71,
+        "abnormal_10d": -7.29
+      },
+      {
+        "symbol": "UPS",
+        "date": "2024-07-23",
+        "abnormal_1d": -1.73,
+        "abnormal_5d": 0.61,
+        "abnormal_10d": 3.56
+      },
+      {
+        "symbol": "INTC",
+        "date": "2024-08-01",
+        "abnormal_1d": -3.11,
+        "abnormal_5d": -31.37,
+        "abnormal_10d": -32.84
+      },
+      {
+        "symbol": "CSCO",
+        "date": "2024-08-05",
+        "abnormal_1d": -0.99,
+        "abnormal_5d": -2.34,
+        "abnormal_10d": 2.23
+      },
+      {
+        "symbol": "COP",
+        "date": "2024-08-05",
+        "abnormal_1d": 3.46,
+        "abnormal_5d": 4.42,
+        "abnormal_10d": 3.66
+      },
+      {
+        "symbol": "BA",
+        "date": "2024-08-07",
+        "abnormal_1d": -1.58,
+        "abnormal_5d": -2.76,
+        "abnormal_10d": -3.95
+      },
+      {
+        "symbol": "SLB",
+        "date": "2024-08-07",
+        "abnormal_1d": -1.91,
+        "abnormal_5d": -4.31,
+        "abnormal_10d": -6.9
+      },
+      {
+        "symbol": "NUE",
+        "date": "2024-09-06",
+        "abnormal_1d": 1.22,
+        "abnormal_5d": -0.9,
+        "abnormal_10d": 2.97
+      },
+      {
+        "symbol": "MRK",
+        "date": "2024-11-15",
+        "abnormal_1d": -0.36,
+        "abnormal_5d": 1.94,
+        "abnormal_10d": 2.25
+      },
+      {
+        "symbol": "PEP",
+        "date": "2024-11-15",
+        "abnormal_1d": -2.22,
+        "abnormal_5d": -2.51,
+        "abnormal_10d": -2.12
+      },
+      {
+        "symbol": "TGT",
+        "date": "2024-11-20",
+        "abnormal_1d": -4.94,
+        "abnormal_5d": -2.89,
+        "abnormal_10d": -1.33
+      },
+      {
+        "symbol": "AMD",
+        "date": "2024-12-10",
+        "abnormal_1d": -2.59,
+        "abnormal_5d": -4.05,
+        "abnormal_10d": -3.97
+      },
+      {
+        "symbol": "NUE",
+        "date": "2024-12-12",
+        "abnormal_1d": -2.62,
+        "abnormal_5d": -9.56,
+        "abnormal_10d": -11.87
+      },
+      {
+        "symbol": "COP",
+        "date": "2024-12-12",
+        "abnormal_1d": -0.92,
+        "abnormal_5d": -2.89,
+        "abnormal_10d": -4.68
+      },
+      {
+        "symbol": "SLB",
+        "date": "2024-12-17",
+        "abnormal_1d": -0.75,
+        "abnormal_5d": -3.74,
+        "abnormal_10d": 0.45
+      },
+      {
+        "symbol": "ADBE",
+        "date": "2024-12-19",
+        "abnormal_1d": -1.33,
+        "abnormal_5d": -1.39,
+        "abnormal_10d": -4.2
+      },
+      {
+        "symbol": "FCX",
+        "date": "2025-01-28",
+        "abnormal_1d": -3.66,
+        "abnormal_5d": -2.48,
+        "abnormal_10d": 3.38
+      },
+      {
+        "symbol": "CMCSA",
+        "date": "2025-01-30",
+        "abnormal_1d": -3.93,
+        "abnormal_5d": -1.79,
+        "abnormal_10d": 1.13
+      },
+      {
+        "symbol": "UPS",
+        "date": "2025-01-30",
+        "abnormal_1d": -2.66,
+        "abnormal_5d": -5.08,
+        "abnormal_10d": -2.93
+      },
+      {
+        "symbol": "MRK",
+        "date": "2025-02-04",
+        "abnormal_1d": 1.29,
+        "abnormal_5d": -4.1,
+        "abnormal_10d": -8.71
+      },
+      {
+        "symbol": "NKE",
+        "date": "2025-02-07",
+        "abnormal_1d": -1.76,
+        "abnormal_5d": 3.19,
+        "abnormal_10d": 9.46
+      },
+      {
+        "symbol": "COP",
+        "date": "2025-03-03",
+        "abnormal_1d": -5.39,
+        "abnormal_5d": -6.07,
+        "abnormal_10d": 4.47
+      },
+      {
+        "symbol": "TGT",
+        "date": "2025-03-04",
+        "abnormal_1d": 0.88,
+        "abnormal_5d": 0.87,
+        "abnormal_10d": -7.22
+      },
+      {
+        "symbol": "MSFT",
+        "date": "2025-03-10",
+        "abnormal_1d": 1.19,
+        "abnormal_5d": 2.98,
+        "abnormal_10d": 3.18
+      },
+      {
+        "symbol": "ADBE",
+        "date": "2025-03-13",
+        "abnormal_1d": -5.44,
+        "abnormal_5d": -5.77,
+        "abnormal_10d": -3.89
+      },
+      {
+        "symbol": "FDX",
+        "date": "2025-03-21",
+        "abnormal_1d": 4.75,
+        "abnormal_5d": 10.39,
+        "abnormal_10d": 3.01
+      },
+      {
+        "symbol": "UPS",
+        "date": "2025-03-28",
+        "abnormal_1d": 0.57,
+        "abnormal_5d": -4.66,
+        "abnormal_10d": -5.72
+      },
+      {
+        "symbol": "NUE",
+        "date": "2025-04-03",
+        "abnormal_1d": -2.32,
+        "abnormal_5d": 0.39,
+        "abnormal_10d": -1.07
+      },
+      {
+        "symbol": "QCOM",
+        "date": "2025-04-03",
+        "abnormal_1d": -0.22,
+        "abnormal_5d": 0.5,
+        "abnormal_10d": -0.77
+      },
+      {
+        "symbol": "DD",
+        "date": "2025-04-03",
+        "abnormal_1d": -1.57,
+        "abnormal_5d": -11.72,
+        "abnormal_10d": -11.39
+      },
+      {
+        "symbol": "CAT",
+        "date": "2025-04-03",
+        "abnormal_1d": 0.58,
+        "abnormal_5d": -3.02,
+        "abnormal_10d": -2.35
+      },
+      {
+        "symbol": "PFE",
+        "date": "2025-04-04",
+        "abnormal_1d": 1.82,
+        "abnormal_5d": -7.55,
+        "abnormal_10d": -5.61
+      },
+      {
+        "symbol": "GOOGL",
+        "date": "2025-04-04",
+        "abnormal_1d": 4.23,
+        "abnormal_5d": 5.51,
+        "abnormal_10d": 4.05
+      },
+      {
+        "symbol": "SLB",
+        "date": "2025-04-04",
+        "abnormal_1d": -1.17,
+        "abnormal_5d": -10.77,
+        "abnormal_10d": -4.22
+      },
+      {
+        "symbol": "BA",
+        "date": "2025-04-04",
+        "abnormal_1d": 1.17,
+        "abnormal_5d": 10.79,
+        "abnormal_10d": 14.9
+      },
+      {
+        "symbol": "DIS",
+        "date": "2025-04-04",
+        "abnormal_1d": 2.99,
+        "abnormal_5d": 1.37,
+        "abnormal_10d": 0.53
+      },
+      {
+        "symbol": "TXN",
+        "date": "2025-04-04",
+        "abnormal_1d": 0.67,
+        "abnormal_5d": 0.34,
+        "abnormal_10d": -5.11
+      },
+      {
+        "symbol": "MRK",
+        "date": "2025-04-04",
+        "abnormal_1d": 0.45,
+        "abnormal_5d": -7.69,
+        "abnormal_10d": -7.5
+      },
+      {
+        "symbol": "XOM",
+        "date": "2025-04-04",
+        "abnormal_1d": 0.82,
+        "abnormal_5d": -6.79,
+        "abnormal_10d": -0.76
+      },
+      {
+        "symbol": "EOG",
+        "date": "2025-04-04",
+        "abnormal_1d": 1.5,
+        "abnormal_5d": -7.23,
+        "abnormal_10d": -1.6
+      },
+      {
+        "symbol": "PEP",
+        "date": "2025-04-08",
+        "abnormal_1d": -0.97,
+        "abnormal_5d": -4.94,
+        "abnormal_10d": -4.88
+      },
+      {
+        "symbol": "INTC",
+        "date": "2025-04-08",
+        "abnormal_1d": -8.05,
+        "abnormal_5d": -5.64,
+        "abnormal_10d": -7.28
+      },
+      {
+        "symbol": "HON",
+        "date": "2025-04-08",
+        "abnormal_1d": -1.29,
+        "abnormal_5d": -0.5,
+        "abnormal_10d": 0.85
+      },
+      {
+        "symbol": "CMCSA",
+        "date": "2025-04-08",
+        "abnormal_1d": -0.31,
+        "abnormal_5d": -4.85,
+        "abnormal_10d": -2.36
+      },
+      {
+        "symbol": "USB",
+        "date": "2025-04-08",
+        "abnormal_1d": -2.49,
+        "abnormal_5d": -6.21,
+        "abnormal_10d": -1.73
+      },
+      {
+        "symbol": "CVX",
+        "date": "2025-04-10",
+        "abnormal_1d": -1.37,
+        "abnormal_5d": -1.3,
+        "abnormal_10d": -2.54
+      },
+      {
+        "symbol": "UNH",
+        "date": "2025-04-17",
+        "abnormal_1d": -5.92,
+        "abnormal_5d": -15.97,
+        "abnormal_10d": -23.1
+      },
+      {
+        "symbol": "LLY",
+        "date": "2025-05-14",
+        "abnormal_1d": -4.62,
+        "abnormal_5d": -1.12,
+        "abnormal_10d": -3.94
+      },
+      {
+        "symbol": "LMT",
+        "date": "2025-07-22",
+        "abnormal_1d": -2.86,
+        "abnormal_5d": -1.63,
+        "abnormal_10d": -0.16
+      },
+      {
+        "symbol": "UNH",
+        "date": "2025-07-29",
+        "abnormal_1d": -1.48,
+        "abnormal_5d": -8.4,
+        "abnormal_10d": -4.86
+      },
+      {
+        "symbol": "CMCSA",
+        "date": "2025-07-30",
+        "abnormal_1d": -0.87,
+        "abnormal_5d": 0.18,
+        "abnormal_10d": -3.4
+      },
+      {
+        "symbol": "UPS",
+        "date": "2025-07-30",
+        "abnormal_1d": -3.84,
+        "abnormal_5d": -3.27,
+        "abnormal_10d": -4.87
+      },
+      {
+        "symbol": "BMY",
+        "date": "2025-07-31",
+        "abnormal_1d": -1.58,
+        "abnormal_5d": 1.75,
+        "abnormal_10d": 6.69
+      },
+      {
+        "symbol": "ADBE",
+        "date": "2025-08-04",
+        "abnormal_1d": -5.03,
+        "abnormal_5d": -5.37,
+        "abnormal_10d": -2.44
+      },
+      {
+        "symbol": "LLY",
+        "date": "2025-08-07",
+        "abnormal_1d": -5.07,
+        "abnormal_5d": -4.16,
+        "abnormal_10d": 3.79
+      },
+      {
+        "symbol": "CRM",
+        "date": "2025-08-11",
+        "abnormal_1d": -2.41,
+        "abnormal_5d": 0.49,
+        "abnormal_10d": 2.65
+      },
+      {
+        "symbol": "TGT",
+        "date": "2025-09-22",
+        "abnormal_1d": -2.13,
+        "abnormal_5d": 0.09,
+        "abnormal_10d": 0.32
+      },
+      {
+        "symbol": "UPS",
+        "date": "2025-09-25",
+        "abnormal_1d": -1.0,
+        "abnormal_5d": -0.42,
+        "abnormal_10d": 1.1
+      },
+      {
+        "symbol": "CMCSA",
+        "date": "2025-10-01",
+        "abnormal_1d": -0.65,
+        "abnormal_5d": -1.83,
+        "abnormal_10d": -2.78
+      },
+      {
+        "symbol": "SBUX",
+        "date": "2025-10-10",
+        "abnormal_1d": 1.2,
+        "abnormal_5d": 7.45,
+        "abnormal_10d": 7.16
+      },
+      {
+        "symbol": "ADBE",
+        "date": "2025-10-15",
+        "abnormal_1d": -1.87,
+        "abnormal_5d": 5.23,
+        "abnormal_10d": 3.55
+      },
+      {
+        "symbol": "BMY",
+        "date": "2025-10-29",
+        "abnormal_1d": -0.57,
+        "abnormal_5d": 8.19,
+        "abnormal_10d": 14.37
+      },
+      {
+        "symbol": "CRM",
+        "date": "2025-11-19",
+        "abnormal_1d": -2.17,
+        "abnormal_5d": -1.35,
+        "abnormal_10d": -0.71
+      },
+      {
+        "symbol": "EOG",
+        "date": "2025-12-16",
+        "abnormal_1d": -2.94,
+        "abnormal_5d": -2.56,
+        "abnormal_10d": -0.75
+      }
+    ],
+    "sample_size": 209,
+    "consistency_pct": 62.2,
+    "out_of_sample_split": {
+      "discovery_period": "2021-2023",
+      "validation_period": "2024-2025",
+      "validation_indices": [
+        2,
+        6,
+        8,
+        9,
+        10,
+        12,
+        14,
+        15,
+        16
+      ],
+      "validation_consistency_pct": 62.2
+    },
+    "confounders": {
+      "broad_market_direction": "SPY direction tested. Signal works in up, flat, and down markets. No filter applied.",
+      "vix_level": "VIX-conditioned results: calm (-1.71%), elevated (-1.84%), crisis (-1.47%). All p<0.01. Signal does not depend on VIX regime.",
+      "sector_trend": "Signal measured across all sectors. No sector concentration. Mechanism is price-anchor-driven.",
+      "survivorship_bias": "S&P 500 large-cap universe. Very low survivorship bias risk. Stocks leaving index remain tradeable.",
+      "selection_bias": "Algorithmic event definition (first touch after 30-day gap). No cherry-picking.",
+      "event_timing": "Entry at next market open. CTAS first crossed 52w low on 2026-03-20. Entry 2026-03-23 open.",
+      "market_regime": "Regime-robust: calm -1.71% (N=60, p=0.005), elevated -1.84% (N=81, p=0.002), crisis -1.47% (N=68, p=0.012). No VIX gate."
+    },
+    "market_regime_note": "Regime-robust: calm -1.71% (N=60, p=0.005), elevated -1.84% (N=81, p=0.002), crisis -1.47% (N=68, p=0.012). No VIX gate.",
+    "regime_note": null,
+    "confidence": 7,
+    "literature_reference": "George & Hwang (2004, JF): 52-Week High and Momentum.",
+    "survivorship_bias_note": "S&P 500 large-cap universe. Very low survivorship bias. Stocks that exit S&P 500 remain tradeable.",
+    "selection_bias_note": "Algorithmic event definition: first breach of 52w low after 30+ days above. No outcome selection.",
+    "passes_multiple_testing": true,
+    "multiple_testing_warning": null,
+    "confounder_warnings": null,
+    "symbol_warnings": null,
+    "dead_end_warnings": [
+      "Related dead end: sp500_deletion_short \u2014 Tested S&P 500 deletion effect (SHORT when stock removed from index), N=21 events (2021-2026).\nOverall results: 1d avg=-0.44% (pos%=52%, p=0.59 - random), 3d avg=-1.99% (pos%=19%, p=0.0078 - significant),\n5d avg=-1.23% (pos%=48%, p=0.27 - not significant). Technically passes multiple testing overall (3d at p<0.01 Bonferroni).\nBUT: OUT-OF-SAMPLE VALIDATION FAILS. Validation set (2024-2026, N=13): 1d avg=+0.27% (POSITIVE!), 3d avg=-2.14%\n(p=0.015, does NOT pass Bonferroni p<0.01 threshold). The 1d return is +0.27% in validation (opposite direction!).\nMany stocks RISE on day 1 after deletion (RHI +1.15%, BWA +2.80%, FMC +3.38%). Critical issue: SEVERE SELECTION BIAS -\nstocks are removed because they've already been declining fundamentally. Cannot separate deletion effect from fundamental\ndeterioration. Pattern at 3d likely reflects continued fundamental selling, not index rebalancing mechanics. The \n'forced selling' by index funds appears to be offset by contrarian buyers on D+1, with the net effect nearly flat.\nDO NOT pursue deletion SHORT hypothesis. The addition effect is clearly alive; the deletion SHORT is not actionable.",
+      "Related dead end: sp500_52w_low_bounce \u2014 52-week low first-touch for large-cap S&P 500 stocks does NOT generate positive returns (bounces). Tested 209 events 2021-2025. Results: 1d avg=-1.28% (76% negative), 5d avg=-1.68% (62% negative). The signal is REVERSED from hypothesis. Signal is a SHORT, not LONG. Momentum continuation dominates mean reversion for large-cap stocks. This is consistent with George & Hwang (2004): 52-week price levels act as momentum anchors, not mean-reversion triggers.",
+      "Related dead end: sp500_52w_high_momentum_long \u2014 Tested 52-week high breakout momentum (first-touch new 52w high, debounced 45 days) for 30 large-cap S&P 500 stocks, 2021-2024. N=100 sampled events. Results: 1d avg=+0.01% p=0.848, 3d avg=-0.08% p=0.555, 5d avg=-0.27% p=0.337. All horizons fail multiple testing. 50/50 positive rate at all horizons. Signal is pure noise for large-cap stocks - consistent with efficient market hypothesis. Momentum is already priced in before the 52w high breach. Dead end."
+    ],
+    "trade": null,
+    "result": null,
+    "trigger": "next_market_open",
+    "trigger_position_size": 5000,
+    "trigger_stop_loss_pct": 8,
+    "trigger_take_profit_pct": 12,
+    "trigger_notes": "52-week low first touch on 2026-03-20 in tariff-driven selloff"
   }
 ]
