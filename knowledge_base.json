@@ -1259,6 +1259,11 @@
       "event_type": "profit_warning_continuation_short",
       "reason": "Large-cap profit warnings (intra-quarter negative preannouncements) do NOT show continuation. Tested N=13 events (FDX, NKE, BBWI, TGT, WMT, F, SNAP, MU, INTC, STX, WDC, AAPL, GOOG 2019-2022). Entry at open day after warning (after-hours timing). Results: 1d avg=+0.13% neg_rate=38.5% p=0.898, 5d avg=+1.58% neg_rate=23.1% p=0.232 -- POSITIVE direction. Stocks BOUNCE after initial crash (bounced 77% of events at 5d). Pattern: contrarian value buyers step in after -15-25% initial crash. SNAP (-11% 5d) and STX (-6.2% 5d) are the only continuations. This matches guidance cut dead end (record 284c6c2f): large-caps bounce after bad news. Same root cause as guidance cut: oversold bounce + institutional accumulation into weakness. Do not pursue. Causal mechanism supports LONG after crash, not short continuation.",
       "recorded": "2026-03-23T15:12:03.658058"
+    },
+    {
+      "event_type": "deal_collapse_target_short",
+      "reason": "Failed/cancelled acquisition deal - target company stock SHORT signal. Tested 5 events (KSU, FHN, SAVE, TGNA, ACI) 2021-2024. Results: 1d avg=-0.69%, positive_rate=20%, 5d avg=-1.56%. Fails multiple testing. Fundamental heterogeneity: FHN +7.22% 1d (TD withdrawal let FHN survive independently at better-than-feared standalone), ACI -5.81% (Kroger deal blocked, regulatory costs + uncertainty). The return sign depends on: (1) deal premium vs standalone value - high-premium deals crash more; (2) reason for collapse - regulatory vs acquirer withdrawal; (3) company financials - distressed targets (SAVE) crash more. Without ex-ante classification of deal-premium vs standalone-value, signal is untradeable systematically. Dead end.",
+      "recorded": "2026-03-23T15:47:12.790047"
     }
   ]
 }

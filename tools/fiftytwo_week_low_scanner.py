@@ -64,6 +64,7 @@ def _load_universe():
         'LULU', 'TJX', 'ROST', 'BBY', 'BKNG', 'MAR', 'HLT', 'RCL', 'CCL',
         # Consumer Staples
         'WMT', 'KO', 'PEP', 'COST', 'CL', 'PG', 'MO', 'PM', 'MDLZ', 'HSY', 'GIS', 'K', 'STZ',
+        'KHC', 'CAG', 'SJM', 'CPB', 'HRL', 'MKC', 'KMB', 'CHD', 'CLX',
         # Energy
         'XOM', 'CVX', 'COP', 'SLB', 'EOG', 'PSX', 'VLO', 'MPC', 'OXY', 'BKR', 'HAL',
         # Industrials
@@ -107,6 +108,50 @@ def get_market_cap(ticker: str) -> float:
         return float(info.get('marketCap', 0) or 0)
     except Exception:
         return 0.0
+
+
+def check_upcoming_earnings(ticker: str, hold_days: int = 5) -> dict:
+    """
+    Check if there is an upcoming earnings announcement within the hold period.
+
+    Returns dict with:
+        has_earnings_soon: bool
+        earnings_date: str or None
+        days_until_earnings: int or None
+    """
+    try:
+        t = yf.Ticker(ticker)
+        cal = t.calendar
+        if cal is None:
+            return {'has_earnings_soon': False, 'earnings_date': None, 'days_until_earnings': None}
+
+        earnings_dates = cal.get('Earnings Date', [])
+        if not isinstance(earnings_dates, list):
+            earnings_dates = [earnings_dates]
+
+        import datetime as dt_module
+        today = dt_module.date.today()
+
+        for ed in earnings_dates:
+            if ed is None:
+                continue
+            if hasattr(ed, 'date'):
+                ed = ed.date()
+            elif isinstance(ed, str):
+                ed = dt_module.date.fromisoformat(ed)
+
+            days_until = (ed - today).days
+            # Earnings within hold_days + 2 buffer days is a confounder
+            if 0 <= days_until <= hold_days + 2:
+                return {
+                    'has_earnings_soon': True,
+                    'earnings_date': ed.isoformat(),
+                    'days_until_earnings': days_until,
+                }
+
+        return {'has_earnings_soon': False, 'earnings_date': None, 'days_until_earnings': None}
+    except Exception:
+        return {'has_earnings_soon': False, 'earnings_date': None, 'days_until_earnings': None}
 
 
 def log_signal(detection: dict):
@@ -161,6 +206,7 @@ def check_stock(ticker: str, lookback_days: int = 400, debounce_days: int = 30) 
         if not last_row['first_touch']:
             return None
         
+        earnings_info = check_upcoming_earnings(ticker, hold_days=5)
         return {
             'ticker': ticker,
             'date': last_date,
@@ -170,6 +216,9 @@ def check_stock(ticker: str, lookback_days: int = 400, debounce_days: int = 30) 
             'hypothesis_id': HYPOTHESIS_ID,
             'action': 'SHORT at next market open',
             'hold_days': 5,
+            'earnings_soon': earnings_info['has_earnings_soon'],
+            'earnings_date': earnings_info['earnings_date'],
+            'days_until_earnings': earnings_info['days_until_earnings'],
         }
     except Exception as e:
         print(f"  ERROR {ticker}: {e}")
@@ -200,6 +249,14 @@ def main():
                     print(f"  {ticker}: SKIP (already triggered {days_since}d ago)")
                     continue
             
+            if result.get('earnings_soon'):
+                print(f"  SKIP (earnings confounder): {ticker} — earnings {result['earnings_date']} "
+                      f"({result['days_until_earnings']}d away, within hold window)")
+                # Still log for OOS tracking, but mark as disqualified
+                result['disqualified_reason'] = f"earnings {result['earnings_date']} within hold window"
+                log_signal(result)
+                continue
+
             detections.append(result)
             print(f"  SIGNAL: {ticker} on {result['date']}")
             print(f"    Close: {result['close']:.2f}, 52W Low: {result['52w_low']:.2f}")

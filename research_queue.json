@@ -255,6 +255,24 @@
       "findings": "RESOLVED. sp500_addition_scanner.py has 3 sources (press.spglobal.com, Wikipedia diff, EDGAR 8-K) running daily at 5PM ET via launchd. Wikipedia diff detected CIEN retroactively on March 23. Scanner is running correctly. For future off-cycle additions, Wikipedia diff will catch them within 24h."
     },
     {
+      "id": "60fc7884",
+      "category": "sp500_52w_low_monitoring",
+      "question": "NKE DISQUALIFIED for 52w low signal: NKE reports earnings March 31 2026 (confirmed from yfinance calendar). Any 52w low touch this week (March 23-27) would be within 5 trading days of earnings. Per hypothesis methodology, concurrent earnings disqualify the signal. Do NOT trade NKE 52w low until after March 31 earnings. Post-earnings assessment: if NKE drops further after earnings to new 52w low, that would be a fresh catalyst-driven event, not the 52w low momentum signal.",
+      "priority": 1,
+      "status": "pending",
+      "reasoning": "NKE earnings March 31 prevents trading 52w low signal this week.",
+      "added": "2026-03-23T15:47:35.375379"
+    },
+    {
+      "id": "228d8d40",
+      "category": "trade_monitoring",
+      "question": "CTAS confounder note: CTAS (Cintas) has Q3 2026 earnings on March 25 2026 (tomorrow). We are SHORT CTAS from March 23 as a 52w low short. The earnings announcement falls within our 5-day hold window (March 23-28). Per methodology, concurrent earnings within hold period is a known confounder. Action: (1) Do NOT close early - honor pre-registered exit; (2) Note CTAS outcome as confounded in post-mortem when closing March 28; (3) If CTAS pops on earnings, attribute to earnings not 52w low signal reversal; (4) Future scanner should check for upcoming earnings within 5 trading days before entering 52w low shorts.",
+      "priority": 1,
+      "status": "pending",
+      "reasoning": "CTAS earnings March 25 is within 5-day hold window of our short position entered March 23.",
+      "added": "2026-03-23T15:47:35.376656"
+    },
+    {
       "id": "seed-002",
       "category": "index_rebalancing",
       "question": "When a stock is announced for S&P 500 addition, what is the abnormal return between announcement and effective date, and does it reverse after inclusion? How does this compare to Russell 2000 rebalancing?",
@@ -607,9 +625,11 @@
       "category": "sp500_52w_low_monitoring",
       "question": "Monitor NKE (Nike) for 52-week low signal. NKE current $52.37, 52w low $51.97 (0.78% above). Has been above 52w low for 238 consecutive days. If NKE closes at or below $51.97 on any trading day in the next 2 weeks, hypothesis 86d28864 fires (SHORT at next open, 5d hold). Note: Capacity is limited - if GO/HD/ABT/CTAS are all active, must wait for one to close before entering NKE. NKE earnings expected late March/early April - check before trading (concurrent earnings disqualify). NKE 52w low was set April 2025 (~$52).",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "NKE is 0.78% above 52w low with 238 consecutive days above - primed for a signal. In tariff environment with Nike's exposure to Asian manufacturing, stock pressure could continue. But concurrent earnings announcement would disqualify the signal.",
-      "added": "2026-03-23T14:00:22.174448"
+      "added": "2026-03-23T14:00:22.174448",
+      "completed": "2026-03-23T15:53:07.253490",
+      "findings": "NKE DISQUALIFIED for 52w low signal window March 23-31. NKE earnings confirmed March 31 2026 (from yfinance calendar). With 5-day hold, entering NKE 52w low short any day March 23-26 would overlap with earnings announcement on March 31 (within hold window). NKE bounced from $52.37 (March 20) to $53.37 (March 23). Signal did not fire today. POST-EARNINGS PLAN: After March 31 NKE earnings, if stock breaks to new 52w low, re-evaluate. 52w low from prior year was ~$52.00. Monitor in April."
     },
     {
       "id": "seed-003",
@@ -1118,56 +1138,56 @@
       },
       "added": "2026-03-23T09:55:41.255869",
       "status": "watching"
+    },
+    {
+      "event": "KHC (Kraft Heinz) made new 52-week low on March 23 2026 at $21.33. First ever 52w low from this 52-week window (stock was above $22.96 all through 2025). Earnings April 28 (no confound). Market cap $25B (qualifies). Entry: SHORT at open March 26 or 27 when capacity opens (GO closes March 26). Run: fiftytwo_week_low_scanner will detect if still qualifying. Also verify KHC has no other news (tariffs are a risk for consumer staples).",
+      "expected_date": "2026-03-26",
+      "symbol": "KHC",
+      "hypothesis_template": "86d28864",
+      "added": "2026-03-23T15:47:35.373941",
+      "status": "watching"
     }
   ],
   "next_session_priorities": [
     {
-      "task": {
-        "task": "1. CLOSE GO TRADE: GO exits March 26 close (3d hold from March 23). Run: python tools/close_go_trade.py. Record entry=$6.20, note actual exit price. This is a live test of hypothesis 1cb6140f (3+ insider, 3d hold).",
-        "deadline": "2026-03-26 close"
-      },
-      "set_by_session": "2026-03-23T15:12:56.512143"
+      "task": "1. CLOSE GO TRADE (March 26): GO hypothesis 1cb6140f deadline is March 26 14:31 UTC. Trade loop will auto-close. Verify closure in trade_loop.log and complete hypothesis manually if trade loop misses it: python tools/close_go_trade.py",
+      "set_by_session": "2026-03-23T15:53:35.965524"
     },
     {
-      "task": {
-        "task": "2. CLOSE HD/ABT/CTAS/BAX TRADES: All four exit March 28 close (5d hold from March 23). Run close scripts. HD=86d28864, ABT=9777ef67, CTAS=cc88dd18, BAX=6bd7d035. These are live tests of the sp500_52w_low_momentum_short hypothesis.",
-        "deadline": "2026-03-28 close"
-      },
-      "set_by_session": "2026-03-23T15:12:56.512145"
+      "task": "2. CLOSE SHORT TRADES (March 28): HD/ABT/CTAS/BAX all deadline March 28 14:31 UTC. Auto-close via trade loop. Note: CTAS has earnings March 25 DURING the hold window - mark this as confounder in post-mortem.",
+      "set_by_session": "2026-03-23T15:53:35.965530"
     },
     {
-      "task": {
-        "task": "3. VGNT WI WATCH: VGNT when-issued trading starts March 27. Trigger is set for 2026-04-01T16:00 (close of first regular trading day). Check VGNT WI price daily from March 27. If WI price > $50 AND significant buying, reconsider short (hypothesis 2d94ac68). If strong selling pressure already showing, confirm short at April 1 close.",
-        "deadline": "2026-04-01"
-      },
-      "set_by_session": "2026-03-23T15:12:56.512146"
+      "task": "3. NEW SIGNALS WHEN SLOTS OPEN: After GO closes March 26, capacity = 4 active. First priority: KHC 52w low signal (March 19 first touch, still below 52w low). However 30-day debounce means cannot re-trigger until April 18. KHC is an OOS data point for hypothesis 86d28864 - record manually.",
+      "set_by_session": "2026-03-23T15:53:35.965531"
     },
     {
-      "task": {
-        "task": "4. REPL PDUFA April 10: Monitor for FDA decision. If APPROVAL: no trade. If CRL: check (a) clinical efficacy deficiency, (b) crash >55% from pre-PDUFA price (~$6.87), (c) NO stated path forward. NOTE: This is a REPEAT CRL - market may be priced in. REPEAT CRL cases historically show recovery (OTLK 2025, ALDX 2026). Qualifying threshold should be >65% crash (not 55%) for repeat CRL.",
-        "deadline": "2026-04-10"
-      },
-      "set_by_session": "2026-03-23T15:12:56.512147"
+      "task": "4. VGNT SPINCO SHORT: April 1 is first trading day for VGNT (Versigent, Aptiv spinoff). Trigger is set (2026-04-01T16:00). Monitor VGNT WI pricing March 27-31 to verify institutional selling setup still valid. Check Aptiv (APTV) press release for any changes to spinoff terms.",
+      "set_by_session": "2026-03-23T15:53:35.965532"
     },
     {
-      "task": {
-        "task": "5. SCAN FOR NEW INSIDER CLUSTERS: After GO/HD close, capacity opens for new trades. Run: python tools/openinsider_scraper.py at each session. Look for n=6-9 insider clusters at market cap >$500M. Current VIX ~25 (elevated) so only n=6-9 is tradeable (EV=+2.37%). CEO/CFO clusters (hypothesis 2bbe0f04) are also tradeable in any VIX regime.",
-        "next_scan_date": "2026-03-26"
-      },
-      "set_by_session": "2026-03-23T15:12:56.512147"
+      "task": "5. REPL PDUFA MONITORING: Replimune PDUFA April 10. If CRL issued, assess if it is a clinical efficacy failure (not CMC), crash >55% from $6.98 (need <$3.14), and no stated path forward. REPL is a repeat CRL - likely will NOT qualify for d302c84b but verify.",
+      "set_by_session": "2026-03-23T15:53:35.965533"
     },
     {
-      "task": {
-        "task": "6. NEW SIGNAL RESEARCH: Consider these unexplored directions: (a) Form 144 large insider block sales: when executives sell >$10M via 144, does stock fall? (b) Poison pill adoption (shareholder rights plan 8-Ks): undervaluation signal -> LONG. (c) Large-cap dividend reinstatement: COVID-era companies reinstating dividends showed positive reactions. See knowledge_base for dead ends to avoid re-exploring.",
-        "priority": "low - capacity is needed for existing signals first"
-      },
-      "set_by_session": "2026-03-23T15:12:56.512148"
+      "task": "6. EXPLORE NEW SIGNALS: Consider testing earnings preannouncement (explicit intra-quarter warning before scheduled earnings) as SHORT signal. Different from guidance cut (within earnings call) - this is a separate 8-K filed days/weeks before official earnings. EDGAR 8-K search phrase: Item 2.02 with language about expected miss.",
+      "set_by_session": "2026-03-23T15:53:35.965533"
+    },
+    {
+      "task": "7. SCAN FOR INSIDER CLUSTERS: cluster_auto_scanner.py runs nightly at 9:15 PM ET. Check logs/cluster_scanner.log at session start. VIX at 24 (Tier 2 - n=6-9 tradeable, n=3-5 weak).",
+      "set_by_session": "2026-03-23T15:53:35.965534"
+    },
+    {
+      "task": "8. S&P 500 ADDITION MONITOR: sp500_addition_scanner.py runs daily. Next major event: June 5 2026 quarterly rebalance. Any off-cycle additions would be detected within 24h.",
+      "set_by_session": "2026-03-23T15:53:35.965534"
     }
   ],
   "session_handoff": {
-    "notes": "Session (March 23): 5 trades active (GO long exits March 26, HD/ABT/CTAS/BAX short exits March 28). Wells Notice expansion confirmed dead end (EDGAR 2010-2022 all fails MT, underpowered). Profit warning continuation dead end (N=13, stocks BOUNCE after warnings). S&P 500 scanner working correctly (CIEN detected via Wikipedia diff). Current VIX: 24.7 (elevated, n=6-9 only for insider clusters). REPL PDUFA April 10: repeat CRL scenario - higher 65% crash threshold needed. VGNT WI starts March 27 - monitor daily.",
-    "set_by_session": "2026-03-23T15:12:56.511896",
-    "written_at": "2026-03-23T15:12:56.512149"
+    "investigating": "Session focused on monitoring 5 active trades, tool improvements, and signal exploration.",
+    "findings": "KHC made new 52w low March 19-23 but debounce prevents re-entry until April 18. CTAS earnings March 25 creates confounder in current short position. Updated fiftytwo_week_low_scanner.py with: (1) earnings check - now filters out signals when earnings are within hold_days+2 of signal date; (2) added Consumer Staples tickers to universe (KHC, CAG, SJM, CPB, HRL, MKC, KMB, CHD, CLX). Tested deal collapse target short signal (N=5, mixed results) - recorded as dead end. Tested dividend initiation (already dead end in knowledge base). No new tradeable signals discovered this session.",
+    "blocked_by": "At max capacity (5 active trades) so no new trades possible until March 26.",
+    "next_exact_step": "Verify GO auto-close on March 26 by checking trade_loop.log. If not closed by 10 AM ET, run: python tools/close_go_trade.py. Then check KHC as OOS data point for 86d28864.",
+    "written_at": "2026-03-23T15:53:35.965536"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
