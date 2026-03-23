@@ -82,3 +82,60 @@ KNOWN_R1_TO_R2_MIGRATIONS = [
 
 print("Dataset initialized with", len(KNOWN_R1_TO_R2_MIGRATIONS), "candidate events")
 print("Note: These need verification - many may be R_Microcap->R2000, not R1000->R2000")
+
+
+# ============================================================
+# DATA QUALITY AUDIT RESULTS (2026-03-23)
+# ============================================================
+# 
+# CONFIRMED EVENTS (market cap verified below R1000/R2000 breakpoint at rank day):
+#   GEF  (2019): $1.5B vs $2.5B breakpoint - CONFIRMED R1->R2 demotion
+#   M    (2020): $1.3B vs $3.4B breakpoint - CONFIRMED
+#   UA   (2022): $4.1B vs $4.6B breakpoint - CONFIRMED  
+#   UAA  (2022): $3.1B vs $4.6B breakpoint - CONFIRMED (duplicate of UA, same co.)
+#   BBBY (2022): $3.8B vs $4.6B breakpoint - CONFIRMED (went bankrupt 2023)
+#   XENE (2024): $3.7B vs $4.6B breakpoint - CONFIRMED (likely microcap->R2000 addition)
+#   GENI (2024): $1.3B vs $4.6B breakpoint - CONFIRMED (microcap->R2000)
+#
+# FACTUALLY WRONG ENTRIES (too large to be R2000):
+#   CCL  (2020): $17.5B - still R1000, NOT demoted
+#   RCL  (2020): $7.8B  - still R1000, NOT demoted  
+#   OMC  (2021): $14.5B - clearly R1000
+#   NWL  (2022): $7.6B  - clearly R1000
+#   RL   (2022): $7.2B  - clearly R1000
+#   CRSP (2024): $5.4B  - above breakpoint, NOT confirmed R2000 addition
+#
+# BORDERLINE (near breakpoint, uncertain):
+#   NWL  (2020): $4.3B vs $3.4B - above breakpoint, likely WRONG
+#   PVH  (2022): $5.0B vs $4.6B - slightly above, DOUBTFUL
+#
+# CANNOT VERIFY (delisted from yfinance):
+#   GPS, IPG, HBI, DISH, MDP
+#
+# BACKTEST RESULTS (7 verified events, announcement date effect):
+#   avg abnormal 1d: -0.25% (FAILS 0.5% direction threshold)
+#   avg abnormal 5d: -1.76%
+#   p-value 1d: 0.29 (NOT significant)
+#   passes_multiple_testing: False
+#   Verdict: DEAD END without paid constituent data
+#
+# THE CORE DATA PROBLEM:
+# FTSE Russell does not publish machine-readable constituent change lists freely.
+# EDGAR 8-K self-announcements yield only ~5-15 events/year (too few for backtest).
+# Market cap analysis yields many false positives.
+# Would need CRSP or Bloomberg Russell constituent data for clean backtest.
+# ============================================================
+
+# Functions for get_russell_additions (compatibility)
+def get_russell_additions():
+    """Returns only CONFIRMED events from data quality audit."""
+    confirmed = [
+        {'symbol': 'GEF',  'date': RECON_DATES[2019]['preliminary'], 'year': 2019, 'type': 'R1_to_R2_demotion'},
+        {'symbol': 'M',    'date': RECON_DATES[2020]['preliminary'], 'year': 2020, 'type': 'R1_to_R2_demotion'},
+        {'symbol': 'UA',   'date': RECON_DATES[2022]['preliminary'], 'year': 2022, 'type': 'R1_to_R2_demotion'},
+        {'symbol': 'UAA',  'date': RECON_DATES[2022]['preliminary'], 'year': 2022, 'type': 'R1_to_R2_demotion'},
+        {'symbol': 'BBBY', 'date': RECON_DATES[2022]['preliminary'], 'year': 2022, 'type': 'R1_to_R2_demotion'},
+        {'symbol': 'XENE', 'date': RECON_DATES[2024]['preliminary'], 'year': 2024, 'type': 'microcap_to_R2000'},
+        {'symbol': 'GENI', 'date': RECON_DATES[2024]['preliminary'], 'year': 2024, 'type': 'microcap_to_R2000'},
+    ]
+    return confirmed

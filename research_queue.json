@@ -974,23 +974,28 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. Complete repl_crl_history_check: find exact date and magnitude of first REPL CRL (2023), confirm clinical efficacy reason. PDUFA April 10 is 18 days away.",
-      "set_by_session": "2026-03-23T08:38:03.656957"
+      "task": "1. Complete repl_crl_history_check: find exact date and magnitude of first REPL CRL (2023), confirm clinical efficacy reason. PDUFA April 10 is only 18 days away.",
+      "set_by_session": "2026-03-23T08:49:44.849758"
     },
     {
       "task": "2. Monitor POOL cluster: VIX gate at <25 for n=3 cluster to qualify. Check VIX level.",
-      "set_by_session": "2026-03-23T08:38:03.656963"
+      "set_by_session": "2026-03-23T08:49:44.849763"
     },
     {
-      "task": "3. Russell 2000 reconstitution research (late June 2026): start backtest on small-cap addition effect.",
-      "set_by_session": "2026-03-23T08:38:03.656965"
+      "task": "3. Russell 2000 reconstitution is DEAD END (documented). No further action unless paid constituent data obtained (CRSP or Bloomberg).",
+      "set_by_session": "2026-03-23T08:49:44.849766"
+    },
+    {
+      "task": "4. New research direction to explore: MSCI Index inclusion effect for EM stocks (large AUM, documented Petajisto 2011 effect, potential for cleaner event list via MSCI press releases).",
+      "set_by_session": "2026-03-23T08:49:44.849767"
     }
   ],
   "session_handoff": {
-    "current_state": "realtime_insider_scanner.py fixed (--max-check, --quiet, sleep 0.3s). REPL added to watchlist (note: already disqualified as multi-pipeline in prior entry). REPL price $6.98, approaching April 10 PDUFA.",
-    "blocked_by": "None currently",
-    "next_action": "Run repl_crl_history_check to determine if second CRL would trigger d302c84b short. Use yfinance to find 2023 REPL crash date and magnitude.",
-    "written_at": "2026-03-23T08:38:03.656966"
+    "current_investigation": "Russell 2000 reconstitution - COMPLETED (dead end)",
+    "intermediate_findings": "R1->R2 demotion events: n=7 verified, avg 1d abnormal=-0.25%, p=0.29. Dataset cleaned to remove 6 wrong entries (stocks well above R1000/R2000 breakpoint). Key dates confirmed: 2023 prelim=May19, effective=June23. 2024 prelim=May24, effective=June28. 30 R1->R2 demotions in 2024, 25 in 2023.",
+    "blocked_by": "Free data access does not yield complete constituent change lists. FTSE Russell does not publish machine-readable addition/deletion lists publicly.",
+    "next_step": "Pivot to REPL CRL research (PDUFA April 10 is urgent - 18 days away). Then consider MSCI EM inclusion as next signal exploration.",
+    "written_at": "2026-03-23T08:49:44.849768"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

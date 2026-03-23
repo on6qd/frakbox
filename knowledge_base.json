@@ -1125,6 +1125,11 @@
       "event_type": "dividend_resumption",
       "reason": "Tested 9 EDGAR-confirmed dividend resumption events (8-K filings with 'reinstated' or 'resumed dividend' language) from 2020-2024. Found no consistent signal: 1d abnormal return avg=-1.37% (pos_rate=22.2%), 3d avg=-0.75%, 5d avg=-3.51% with large variance. All p-values >0.30, passes_multiple_testing=False. Key issue: The 2020 event cluster (OHI, DKS, FL, YUMC, CHH) occurred during COVID recovery when companies resumed dividends after pandemic cuts -- but this was a period of enormous concurrent news flow. IVT (-20.4% 5d) and OHI (-13.1% 5d) dragged down averages significantly. The signal is inconsistent and underpowered (only 9 qualifying large-cap events found in EDGAR 2019-2024). Note: dividend_initiation was already a dead end (see prior research). Dividend resumption similarly shows no effect.",
       "recorded": "2026-03-23T06:19:56.793894"
+    },
+    {
+      "event_type": "russell_reconstitution",
+      "reason": "Tested R1000->R2000 demotion announcement day effect. Cleaned 24-event dataset to 7 verified events. Avg abnormal 1d = -0.25% (fails 0.5% direction threshold), p=0.29, passes_multiple_testing=False. Root cause: free data sources cannot systematically identify Russell 2000 constituent changes. FTSE Russell does not publish machine-readable addition/deletion lists for free; EDGAR 8-K self-announcements only yield ~5-15 events/year (too few); market cap analysis of candidates produces many false positives. Academic mechanism (Chang et al 2015) is valid but data access blocks this signal. Would need paid CRSP or Bloomberg constituent data to run clean backtest. 6 of 24 dataset entries were factually wrong (stocks well above R1000/R2000 breakpoint).",
+      "recorded": "2026-03-23T08:49:21.263264"
     }
   ]
 }
