@@ -917,34 +917,45 @@
   ],
   "next_session_priorities": [
     {
-      "task": "Investigate activist-involvement qualifier for strategic alternatives: test if events where a 13D/13G was filed within 90 days before the 8-K show stronger/more reliable abnormal returns",
-      "set_by_session": "2026-03-23T05:41:41.827507"
+      "task": "Russell 2000 reconstitution: BLOCKED - needs paid CRSP/Bloomberg constituent data. Do not revisit without data source.",
+      "set_by_session": "2026-03-23T06:01:15.299391"
     },
     {
-      "task": "Check current active trades (GO, WD spinco VGNT) for status updates",
-      "set_by_session": "2026-03-23T05:41:41.827512"
+      "task": "S&P 500 addition hypothesis (061ae3a8): Activate on next S&P 500 announcement. Watchlist June 2026 recon.",
+      "set_by_session": "2026-03-23T06:01:15.299400"
     },
     {
-      "task": "Consider NLP approach to classify 8-K text - may be able to use keyword presence ('sale of company', 'unsolicited', 'merger') to filter strategic alternatives announcements to acquisition-target-only subset",
-      "set_by_session": "2026-03-23T05:41:41.827512"
+      "task": "Review other queued tasks - check research_queue.json for pending items.",
+      "set_by_session": "2026-03-23T06:01:15.299402"
+    },
+    {
+      "task": "Consider testing the REVERSE Russell signal: buy stocks being DELETED from S&P 500 at announcement (reversion after initial drop).",
+      "set_by_session": "2026-03-23T06:01:15.299403"
     }
   ],
   "session_handoff": {
-    "investigated": "Strategic alternatives announcement signal (8-K filings mentioning 'exploring strategic alternatives')",
-    "current_state": "DEAD END - recorded. Signal is real in magnitude but cannot be distinguished from negative events without reading 8-K content.",
-    "findings": {
-      "n_events_tested": 51,
-      "avg_abnormal_1d_open_entry": 0.76,
-      "p_value_1d": 0.26,
-      "passes_multiple_testing": false,
-      "key_insight": "Signal is heterogeneous: M&A-target events are strongly positive, restructuring/distress events are negative. Cannot sort without NLP or activist cross-reference.",
-      "overnight_gap_signal": "For positively-received subset (selected with look-ahead), overnight gap avg=3.40%, p=0.006. But selection criterion is circular.",
-      "transaction_cost": 0.34,
-      "net_expected": 0.42
-    },
-    "blocked_by": "No automated way to classify 8-K type (sale vs restructuring) without NLP",
-    "next_specific_step": "To potentially unlock this: build a keyword scanner that downloads the actual 8-K filing text and searches for 'sale of the company', 'unsolicited', 'going private', 'take private' to create a 'pure acquisition target' subset. Expected n~15-20 from current 51. Then re-backtest that subset.",
-    "written_at": "2026-03-23T05:41:41.827514"
+    "investigated": "Russell 2000 annual reconstitution addition signal (2018-2024)",
+    "current_state": "DEAD END - insufficient data",
+    "key_findings": [
+      "Backtest: 32 events from EDGAR 8-K self-announcements (microcap-biased)",
+      "1d abnormal: -0.79% (not significant, p=0.37)",
+      "5d abnormal: -0.06% (not significant, p=0.97)",
+      "Passes multiple testing: FALSE",
+      "Fundamental blocker: full R2000 constituent change lists require paid data (CRSP/Bloomberg)",
+      "R2000 reconstitution is PREDICTABLE (based on April Rank Day market cap) - largely front-run before announcement",
+      "IWM vs SPY in recon window: no pattern (avg -0.51%, 4/7 years positive)",
+      "R2000->R1000 promotions (n=10): +1.16% at 1d, but heavily confounded, n insufficient",
+      "Key structural reason signal is weaker: R2000 passive AUM ~$400B vs S&P 500 $5T+ (10x gap)"
+    ],
+    "blocked_by": "Paid Russell constituent change data (CRSP, Bloomberg, or FTSE Russell historical archive)",
+    "what_was_NOT_tested": [
+      "Full list of all 200+ R2000 additions per year (only tested ~15/year self-announcers)",
+      "R1000->R2000 demotions specifically (these are larger, more liquid)",
+      "The announcement-to-effective window for verified large-cap additions"
+    ],
+    "next_step": "Do NOT pursue without paid data. Focus S&P 500 addition trading instead.",
+    "comparison_to_sp500": "S&P 500 addition signal (061ae3a8) is clearly superior: complete data, 5x stronger AUM, surprise announcements, 86.2% consistency validated.",
+    "written_at": "2026-03-23T06:01:15.299405"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
