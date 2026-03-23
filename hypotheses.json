@@ -9972,7 +9972,7 @@
       "transmission_channel": "Forced selling pressure from institutional rebalancing is concentrated in first 5-10 trading days. SpinCo has no existing shareholder base that wants to own it.",
       "academic_reference": "Houlihan Lokey (2022) documents -6% average at 30 days post-separation. Cusatis, Miles & Woolridge (1993) original spinoff study. Mitchell, Pulvino & Stafford (2004) forced selling in distributions."
     },
-    "expected_symbol": "TBD",
+    "expected_symbol": "VGNT",
     "expected_direction": "short",
     "expected_magnitude_pct": 5.69,
     "expected_timeframe_days": 5,
@@ -10301,6 +10301,10 @@
     "dead_end_warnings": null,
     "trade": null,
     "result": null,
-    "notes": "\n2026-03-23: VSNT (Comcast spinoff Jan 5 2026) shows -17.5% 5d abnormal, -18.0% 10d abnormal. Strong OOS validation. N now 24.\n2026-03-23: LION (Lionsgate Studios May 2025) = -19.9% 5d abn, -21.3% 10d abn. N now 25. Two live OOS validations both massive."
+    "notes": "\n2026-03-23: VSNT (Comcast spinoff Jan 5 2026) shows -17.5% 5d abnormal, -18.0% 10d abnormal. Strong OOS validation. N now 24.\n2026-03-23: LION (Lionsgate Studios May 2025) = -19.9% 5d abn, -21.3% 10d abn. N now 25. Two live OOS validations both massive.",
+    "trigger": "2026-04-01T16:00",
+    "trigger_position_size": 5000,
+    "trigger_stop_loss_pct": 10,
+    "trigger_take_profit_pct": 15
   }
 ]
