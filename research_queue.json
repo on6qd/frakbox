@@ -884,45 +884,81 @@
   ],
   "next_session_priorities": [
     {
-      "task": "URGENT: Close GO trade on March 26 - run python tools/close_go_trade.py. Entry was at GO market open March 24. Hold 5 trading days from entry (close March 31).",
-      "set_by_session": "2026-03-23T04:03:46.961238"
+      "task": {
+        "task": "URGENT: Verify GO (1cb6140f) and HD (86d28864) trades executed at 9:30 AM ET March 23. Run python run.py --status after market open.",
+        "set_by_session": "2026-03-23T04:42:01.907847"
+      },
+      "set_by_session": "2026-03-23T04:42:01.908063"
     },
     {
-      "task": "URGENT: Close HD trade on March 27 - run python tools/close_hd_trade.py. Entry was at HD market open March 24. Hold 5 trading days from entry (close April 1).",
-      "set_by_session": "2026-03-23T04:03:46.961244"
+      "task": {
+        "task": "URGENT: Close GO trade March 26 - run python tools/close_go_trade.py at close.",
+        "set_by_session": "2026-03-23T04:42:01.907852"
+      },
+      "set_by_session": "2026-03-23T04:42:01.908065"
     },
     {
-      "task": "HIGH: Record V Visa OOS result - entry was March 19 open ($298.04). Exit March 26 close. Track actual 5d return for hypothesis 86d28864. As of March 20, V was UP +2.21% abnormal (SHORT was losing).",
-      "set_by_session": "2026-03-23T04:03:46.961245"
+      "task": {
+        "task": "URGENT: Close HD trade March 27 - run python tools/close_hd_trade.py at close.",
+        "set_by_session": "2026-03-23T04:42:01.907853"
+      },
+      "set_by_session": "2026-03-23T04:42:01.908066"
     },
     {
-      "task": "HIGH: Monitor RCKT PDUFA on March 28. If CRL issued AND crash >55%, qualifies for d302c84b short. Entry would be March 29 open. Threshold: stock must fall from ~$4.14 to below ~$1.86.",
-      "set_by_session": "2026-03-23T04:03:46.961246"
+      "task": {
+        "task": "HIGH: Monitor WD (76678219) activation when VIX drops below 25. Last VIX = 26.78 (March 20). The 5d entry window for WD cluster (filed March 20) is expiring - if VIX still above 25 by March 24, the entry window may be too old.",
+        "set_by_session": "2026-03-23T04:42:01.907854"
+      },
+      "set_by_session": "2026-03-23T04:42:01.908067"
     },
     {
-      "task": "MEDIUM: CEO departure refinement (20d qualifier): 20d abnormal > +3% before departure = SKIP (welcome departure). CVS correctly skipped by this rule (+8.23% prior). STLA still a miss (-9.17% prior but welcomed). Document in hypothesis 5dbcfb37 notes.",
-      "set_by_session": "2026-03-23T04:03:46.961246"
+      "task": {
+        "task": "HIGH: Monitor RCKT PDUFA on March 28. If CRL AND crash >55%, qualifies for d302c84b short entry March 29 open.",
+        "set_by_session": "2026-03-23T04:42:01.907855"
+      },
+      "set_by_session": "2026-03-23T04:42:01.908067"
     },
     {
-      "task": "MEDIUM: Research guidance raise signal - when companies raise full-year guidance mid-quarter via 8-K (not at earnings), does the stock drift up? Uses same EDGAR EFTS pipeline. Search for '8-K' filings with phrases 'raises guidance' or 'increases full-year'. This is different from PEAD - it's about mid-quarter news, not post-earnings.",
-      "set_by_session": "2026-03-23T04:03:46.961247"
+      "task": {
+        "task": "MEDIUM: SpinCo short (2d94ac68) - look for next tradeable spinco. Check stockspinoffs.com/upcoming-spinoffs/ for Q2/Q3 2026 announcements. HONA (Honeywell Aerospace) expected Q3 2026 but may be desired business. Need to monitor.",
+        "set_by_session": "2026-03-23T04:42:01.907855"
+      },
+      "set_by_session": "2026-03-23T04:42:01.908068"
     },
     {
-      "task": "MEDIUM: Monitor WD activation when VIX drops below 25. VIX was 26.78 on March 20. Check daily at market close. When VIX<25, set trigger=next_market_open on hypothesis 76678219.",
-      "set_by_session": "2026-03-23T04:03:46.961250"
+      "task": {
+        "task": "MEDIUM: Test SpinCo signal with timing refinement - is entering at OPEN of first trading day (not close) better? Some spincos gap down massively on open (CARR -28%). If entering at open catches more of the move, adjust hypothesis expected_entry. Run backtest with entry_price=\"open\".",
+        "set_by_session": "2026-03-23T04:42:01.907856"
+      },
+      "set_by_session": "2026-03-23T04:42:01.908069"
     },
     {
-      "task": "LOW: SpinCo institutional selling short - test if newly-traded SpinCo entities underperform for 30-90 days post-separation. Houlihan Lokey 2022 finds -6% at 30 days, -12% at 18 months. Need to identify ex-dates (when SpinCo began trading) and download price data.",
-      "set_by_session": "2026-03-23T04:03:46.961251"
+      "task": {
+        "task": "LOW: S&P 500 Q2 2026 rebalance monitoring - announcement expected June 5, 2026. Track hypothesis 061ae3a8.",
+        "set_by_session": "2026-03-23T04:42:01.907856"
+      },
+      "set_by_session": "2026-03-23T04:42:01.908069"
     }
   ],
   "session_handoff": {
-    "investigating": "Spin-off announcement LONG signal and FINRA short volume spikes",
-    "state": "Both tested and recorded as dead ends. Spin-off returns are captured in overnight pre-open gap (not tradeable at open). FINRA SVR large-cap signal: p=0.96, no effect.",
-    "intermediate_findings": "CEO departure 20d qualifier: adding '20d abnormal > 0% \u2192 SKIP' improves accuracy from 80% to 89%. CVS correctly filtered. FINRA REGSHO data is accessible from 2019 via CDN. Spin-off EDGAR 8-K dates lag actual announcement by days-weeks.",
-    "blocked_by": "Spin-off would need Bloomberg/Refinitiv press release timestamps. Guidance raise signal needs same EDGAR EFTS pipeline but different phrases (untested).",
-    "next_step": "First priority: confirm GO and HD trade entries at Monday open via run.py --status. Then close on deadlines. Then test guidance raise signal via EDGAR EFTS.",
-    "written_at": "2026-03-23T04:03:46.961252"
+    "session_date": "2026-03-23",
+    "investigated": "SpinCo institutional selling signal, guidance raise signal, SEO signal, activist 13D signal",
+    "state_of_investigation": "SpinCo signal VALIDATED and pre-registered as hypothesis 2d94ac68. Ready to trade next qualifying event. Guidance raise is dead end. SEO and activist 13D blocked by data access.",
+    "intermediate_findings": [
+      "VSNT (Comcast spinoff Jan 2026): -17.5% abnormal 5d - massive live OOS validation",
+      "LION (Lionsgate May 2025): -19.9% abnormal 5d - massive live OOS validation",
+      "SpinCo full N=25: 5d avg=-5.69%, p=0.007, neg_rate=73.9%, passes_multiple_testing=True",
+      "Discovery 2018-2021 (N=13): 69.2% negative. Validation 2022-2024 (N=10): 80% negative",
+      "Next tradeable: HONA (Honeywell Aerospace) Q3 2026 - but is a desired business so may not qualify",
+      "Guidance raise signal at earnings = noise (N=52, p=0.59-0.73)"
+    ],
+    "blocked_by": [
+      "SEO (secondary equity offering): EDGAR CIK-to-ticker match rate <2% for small/mid-cap issuers",
+      "Activist 13D: entity_name=None in EDGAR EFTS API, news dates not accessible without Bloomberg",
+      "WD activation: waiting for VIX < 25 (currently 26.78)"
+    ],
+    "exact_next_step": "After market open: verify GO and HD executed. Close GO March 26. Close HD March 27. For SpinCo: update spinco_first_trading event scanner to use stockspinoffs.com or stockanalysis.com for upcoming events rather than EDGAR. Consider building automated spinco_scanner.py that checks these sites monthly.",
+    "written_at": "2026-03-23T04:42:01.908071"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
