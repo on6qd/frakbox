@@ -260,6 +260,19 @@
       ],
       "gaps": "Need to test on small-cap universe. Also could test PERSISTENT high SVR (ratio >60% for 5+ consecutive days) as squeeze signal (long side).",
       "recorded": "2026-03-23T04:03:16.040984"
+    },
+    "russell_2000_reconstitution": {
+      "summary": "Russell 2000 annual reconstitution (late June effective date) was documented by Petajisto 2011 and Madhavan 2003 as generating positive abnormal returns for additions, primarily via passive index fund forced buying. However, the effect has been substantially arbitraged away (Greenwood & Sammon 2025, 'The Disappearing Index Effect'). R2000 reconstitution is predictable (based on April Rank Day market cap) unlike S&P 500 additions which are surprise announcements. Our backtest (32 microcap-biased events, 2020-2024) shows no significant abnormal return at 1d, 3d, or 5d horizons.",
+      "known_magnitude": "Academic: +3-8% CAR from announcement to effective date (pre-2010). Post-2015: largely arbitraged away. Our data: -0.79% at 1d (not significant)",
+      "known_timeframe": "Announcement (late May/early June preliminary list) to effective date (last Friday of June) = ~3-6 weeks",
+      "sources": [
+        "Petajisto, A. (2011). The Index Premium and Its Hidden Cost for Index Funds. JFM.",
+        "Madhavan, A. (2003). The Russell Reconstitution Effect. FAJ.",
+        "Greenwood, R. & Sammon, M. (2025). The Disappearing Index Effect. JF. - Key paper: effect declined sharply after 2013.",
+        "Wurgler, J. & Zhuravskaya, E. (2002). Does Arbitrage Flatten Demand Curves for Stocks? JB."
+      ],
+      "gaps": "Complete historical Russell constituent lists require paid CRSP or Bloomberg data. Annual preliminary list dates: 2020=May 8, 2021=June 4, 2022=June 3, 2023=May 19, 2024=May 24. Effective dates: 2020=June 26, 2021=June 25, 2022=June 24, 2023=June 23, 2024=June 28.",
+      "recorded": "2026-03-23T06:00:41.826730"
     }
   },
   "known_effects": {
@@ -936,8 +949,9 @@
     },
     {
       "event_type": "russell_2000_reconstitution",
-      "reason": "Russell 2000 annual reconstitution as a trading signal: CONDITIONAL DEAD END (data acquisition blocker). Academic literature well-established (Madhavan 2003, Chen et al 2006, Greenwood & Sammon 2023): effect was +8.3% cumulative in 2000s \u2192 +3.1% in 2010s \u2192 near-zero in 2020-2022 (only 8% of 2021-2022 additions positive per Seeking Alpha 2022). PRIMARY BARRIER: No free machine-readable list of Russell 2000 adds/deletes for 2019-2024. Manual compilation from FTSE Russell PDFs required. Small-cap yfinance failures would corrupt backtest (same population that frequently delists). STRUCTURAL CHANGE: 2026 adds a November semi-annual reconstitution, diluting the June 'big bang' effect. ONE EXCEPTION: IWM seasonal (buy IWM close late June, sell early July): +1.34%, 75% win rate, 6-day hold \u2014 but doesn't meet 1.5% abnormal return threshold. June 26, 2026 is the effective date for 2026 reconstitution (preliminary list ~May 22). CONCLUSION: Do not backtest. If a free Russell constituent change dataset surfaces, test deletions side first (more persistent effect, less crowded short side).",
-      "recorded": "2026-03-23T01:04:50.518006"
+      "reason": "\nRussell 2000 reconstitution addition signal tested 2020-2024 using EDGAR 8-K filings.\n\nBACKTEST RESULTS (32 events, microcap-dominated sample):\n- 1d abnormal return: -0.79% (43.8% positive rate, p=0.37 - not significant)\n- 5d abnormal return: -0.06% (40.6% positive rate, p=0.97 - not significant) \n- 10d abnormal return: +3.02% (68.8% positive rate, Wilcoxon p=0.06 - borderline)\n- Passes multiple testing: FALSE\n- Bootstrap CI at all horizons includes zero\n\nCRITICAL DATA LIMITATION: Free data sources (EDGAR 8-K search) only capture\nthe ~15/year microcap companies that self-announce their R2000 inclusion via press release.\nThe actual reconstitution includes 200-300 additions annually. The self-announcing subset\nis highly biased: these are often tiny, illiquid companies with high idiosyncratic volatility.\nWithout paid data (CRSP, Bloomberg), testing the full R2000 addition effect is not possible.\n\nWHY THIS SIGNAL IS STRUCTURALLY WEAKER THAN S&P 500:\n1. Predictability: R2000 reconstitution is determined by April 30 market cap rank.\n   Sophisticated traders predict additions weeks before the preliminary list.\n   Effect is front-run and largely arbitraged away before announcement.\n2. AUM: R2000 passive AUM ~$400B vs S&P 500 ~$5T+ (10x weaker buying pressure)\n3. Announcement uncertainty: Multiple weekly updates vs S&P's single clear announcement\n4. Liquidity: R2000 additions are small/microcap (wide bid-ask, hard to trade)\n5. Academic confirmation: Petajisto (2011), Greenwood & Sammon (2025) both confirm\n   R2000 effect has been more thoroughly arbitraged away than S&P 500 effect.\n\nR2000->R1000 PROMOTIONS tested separately (n=10):\n- 1d: +1.16% (80% positive) - hint of signal\n- 10d: -8.76% (10% positive) - NEGATIVE (confounded by oil crash, GME volatility)\n- N=10 is insufficient; events are clustered (5 from 2022 energy stocks)\n\nRECOMMENDATION: Do not pursue without paid CRSP/Bloomberg Russell constituent data.\nThe S&P 500 addition hypothesis (061ae3a8) already captures the index addition effect\nfor a more liquid, stronger-signal category.\n",
+      "recorded": "2026-03-23T01:04:50.518006",
+      "updated": "2026-03-23T06:00:41.825577"
     },
     {
       "event_type": "sp500_52w_high_momentum_long",
