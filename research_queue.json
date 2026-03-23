@@ -419,9 +419,11 @@
       "category": "secondary_equity_offering",
       "question": "Can we collect exact SEO announcement dates from EDGAR 8-K filings (item 8.01) to enable a proper announcement-day backtest?",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Primary SEO signal (announcement-day -3%) is documented in academic literature but requires exact announcement date. 424B4 filing lags by 0-7 days. 8-K item 8.01 may provide the announcement date. Alternative: focus on same-day bought deals (N=23, -3.67% median 10d drift, 70% neg) which do not have this timing problem.",
-      "added": "2026-03-22T08:04:24.655356"
+      "added": "2026-03-22T08:04:24.655356",
+      "completed": "2026-03-23T04:41:01.150493",
+      "findings": "PARTIAL PROGRESS. EDGAR 8-K full-text search for secondary offering language (\"underwritten public offering of\") returns ~1900 hits 2021-2024, but CIK-to-ticker match rate is ~1% due to SEC company_tickers.json only having 6002 exchange-listed entries. Most SEO issuers (small/mid-cap biotech, growth companies) are not in the lookup file. Obtaining event dates at scale requires either: (1) subscribing to Refinitiv/Bloomberg API, (2) building a scraper for SEC EDGAR company search, or (3) manual curation. NOT pursuing further - data access blocked. Recommend pursuing SpinCo institutional selling signal instead which has same dilution/distribution theme but better event accessibility (spinoffs are announced weeks ahead with specific ticker dates)."
     },
     {
       "id": "a7bc4d12",
@@ -466,6 +468,15 @@
       "added": "2026-03-23T01:41:06.455056",
       "completed": "2026-03-23T04:21:27.411970",
       "findings": "DEAD END. ASR announcement SHORT signal tested: N=79 EDGAR 8-K events 2020-2024. 1d avg=+0.67% (wrong direction - POSITIVE not negative), p=0.185. Direction inconsistent. Recorded as dead end."
+    },
+    {
+      "id": "3675f7e2",
+      "category": "spinco_institutional_selling_short",
+      "question": "Monitor upcoming SpinCo events for hypothesis 2d94ac68. Next known event: HONA (Honeywell Aerospace) expected Q3 2026. Action: (1) When HONA announces record date, assess whether HON shareholders WANT HONA (if yes, may not show selling). (2) Look for any additional Q2/Q3 2026 spinoffs from large-cap S&P 500 parents. (3) Check insidearbitrage.com/spinoffs/ and stockspinoffs.com/upcoming-spinoffs/ monthly. CRITICAL: SpinCo must start trading for SHORT entry - no after-hours issue. Entry: SHORT at close of first trading day.",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "SpinCo signal validated N=25 (incl VSNT -17.5% and LION -19.9% live OOS). Next trade opportunity depends on upcoming large-cap spinoffs. HONA is largest upcoming but may not qualify (desired business). Need to monitor for other spinoffs.",
+      "added": "2026-03-23T04:41:19.790972"
     },
     {
       "id": "seed-003",
@@ -601,9 +612,11 @@
       "category": "activist_investor_13d",
       "question": "Activist 13D first-news-date signal: Test activist campaigns using the FIRST NEWS COVERAGE DATE (not SEC filing date). The 10-day filing window means prices move on news leaks, not official filings. Would need Bloomberg News/Refinitiv to get publication dates. Brav et al (2008) found +7% for 2001-2006 using filing dates - this has decayed. But the causal mechanism is still valid. Test if usable via press release scraping (company press releases when activist publicly announces position). MEDIUM PRIORITY.",
       "priority": 4,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Activist 13D filing date signal fully decayed in 2020-2024 (avg +0.26% 1d, N=24 Starboard events). However academic support for the phenomenon is strong. Signal may be accessible via press release date rather than SEC filing date.",
-      "added": "2026-03-21T18:38:45.275867"
+      "added": "2026-03-21T18:38:45.275867",
+      "completed": "2026-03-23T04:41:11.044454",
+      "findings": "ASSESSED: Activist 13D signal requires first-NEWS-DATE (not EDGAR filing date) due to 10-day filing window. EDGAR SC 13D filing date lags price movement by up to 10 days. The entity_name field in EDGAR EFTS search returns None for all results, making automated target company identification impossible. Feasibility test: checked 5 major activist funds (Elliott, Starboard, Icahn, Pershing, Trian) - CIK lookups mostly return empty. DATA ACCESS BLOCKED. Would require Bloomberg/Refinitiv for reliable news dates. Shelving until data access improves. Note: post-filing drift may still exist (Polk 2024 SSRN finds 3.8% at [-1,+1] window) but cannot build systematic event list with free data."
     },
     {
       "id": "3e7d2571",
@@ -858,6 +871,14 @@
       "symbol": "RCKT",
       "hypothesis_template": "d302c84b",
       "added": "2026-03-23T03:56:10.491431",
+      "status": "watching"
+    },
+    {
+      "event": "HONA (Honeywell Aerospace) SpinCo first day of trading - expected Q3 2026. Determine if this is wanted or unwanted by parent shareholders. Honeywell Aerospace is the high-quality division being spun off. Check if HON shareholders actively want HONA - if yes, may not show institutional selling. Monitor Form 10 progress.",
+      "expected_date": "2026-09-01",
+      "symbol": "HONA",
+      "hypothesis_template": "2d94ac68",
+      "added": "2026-03-23T04:40:51.162842",
       "status": "watching"
     }
   ],

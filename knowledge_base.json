@@ -240,16 +240,16 @@
       "recorded": "2026-03-23T01:04:50.520100"
     },
     "spinco_institutional_selling_short": {
-      "summary": "SpinCo entities underperform in first 30-90 days after separation due to forced institutional selling. Index funds and large institutions that receive SpinCo shares often sell immediately (SpinCo too small for mandate, or different sector). Creates predictable downward price pressure.",
-      "known_magnitude": "Median SpinCo underperforms S&P by ~6% at 30 days, ~12% at 18 months (Houlihan Lokey 2022)",
-      "known_timeframe": "30-90 days post-separation date (when SpinCo begins independent trading)",
+      "summary": "SpinCo institutional selling pattern: parent shareholders receive forced distribution and sell unwanted exposure",
+      "known_magnitude": "-6% at 30 days (Houlihan Lokey 2022). Our finding: -5.69% at 5 days, stronger in recent events.",
+      "known_timeframe": "5-10 trading days optimal for short entry, effect persists to 30+ days for unwanted spincos",
       "sources": [
-        "Cusatis, Miles & Woolridge (1993) JFE - long-run spinco data",
-        "Houlihan Lokey 2022 Spin-Off Transaction Study - practitioner data",
-        "S&P Global 2017 Capital Market Implications of Spinoffs"
+        "Cusatis, Miles & Woolridge (1993) - spinoff abnormal returns at separation",
+        "Mitchell, Pulvino & Stafford (2004) - forced selling in distributions",
+        "Houlihan Lokey (2022) - practitioner research, -6% at 30 days"
       ],
-      "gaps": "Need to identify exact SpinCo first-trading dates and test systematically. Shorting newly-public SpinCo may have high borrow costs. Need to verify borrow availability for test cases.",
-      "recorded": "2026-03-23T03:53:13.860319"
+      "gaps": "No clean academic separation of wanted vs unwanted SpinCo effect. Borrow rate data not available for testing short feasibility.",
+      "recorded": "2026-03-23T04:40:51.161541"
     },
     "finra_short_volume_spike": {
       "summary": "FINRA REGSHO data provides daily short volume by ticker. Available from 2019 via cdn.finra.org/equity/regsho/daily/CNMSshvol{YYYYMMDD}.txt. Data is free and accessible. Academic work (Boehmer et al 2008) shows short volume is predictive but effect concentrated in small-caps, not large-caps where shorts are mostly hedging/HFT.",
@@ -668,6 +668,16 @@
       "negative_cases": "spin-merges (AT&T, PFE), asset dumps (MRK), pre-telegraphed (DHR) all negative",
       "data_limitation": "Need Bloomberg/Refinitiv for correct press release timestamps",
       "last_updated": "2026-03-23T03:53:13.859364"
+    },
+    "spinco_institutional_selling_short": {
+      "summary": "SHORT newly-traded SpinCo at close of first trading day, hold 5 trading days. N=25 events 2018-2026, avg 5d abnormal=-5.69%, neg_rate=73.9%, p=0.007 (ttest), p=0.004 (wilcoxon). Passes multiple testing (5d and 10d both significant).",
+      "magnitude": "5.69% abnormal at 5d, 7.08% at 10d",
+      "direction": "SHORT SpinCo",
+      "mechanism": "Institutional forced selling by parent shareholders who received SpinCo as distribution",
+      "recent_validation": "VSNT Jan 2026: -17.5% abn 5d. LION May 2025: -19.9% abn 5d. Signal strengthening in recent years.",
+      "caution": "Signal weaker for highly desirable SpinCos (GXO +1.8%, GEV -5.7%). Strongest for out-of-favor industries (KD -18.6%, BLCO -9.1%, REZI -7.9%). Hard-to-borrow may limit tradability in first days.",
+      "upcoming": "HONA (Honeywell Aerospace) expected Q3 2026 - may not qualify (desired business). Watch for less popular spincos.",
+      "last_updated": "2026-03-23T04:40:51.160096"
     }
   },
   "dead_ends": [
