@@ -8,7 +8,7 @@ Hypothesis: sp500_52w_low_momentum_short (ID: 86d28864)
 Expected: SHORT at next-day open, hold 5 trading days, expected -1.68% abnormal
 
 Multi-signal behavior:
-- ALL signals are logged to logs/52w_low_signals.jsonl regardless of whether they trade
+- ALL signals are logged to SQLite scanner_signals table regardless of whether they trade
 - When multiple signals fire on the same day, only ONE trigger is set on the hypothesis
 - Priority: larger market cap wins (better liquidity, less slippage)
 - If hypothesis already has a pending trigger (from a prior run same day), the existing
@@ -84,21 +84,19 @@ def _load_universe():
 UNIVERSE = _load_universe()
 
 HYPOTHESIS_ID = '86d28864'
-STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'logs', '52w_low_scanner_state.json')
-SIGNALS_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'logs', '52w_low_signals.jsonl')
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import db as _db
 
 
 def load_state():
-    if os.path.exists(STATE_FILE):
-        with open(STATE_FILE) as f:
-            return json.load(f)
-    return {'last_triggered': {}}  # ticker -> last trigger date
+    _db.init_db()
+    return _db.get_state('52w_scanner') or {'last_triggered': {}}
 
 
 def save_state(state):
-    os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
-    with open(STATE_FILE, 'w') as f:
-        json.dump(state, f, indent=2)
+    _db.init_db()
+    _db.set_state('52w_scanner', state)
 
 
 def get_market_cap(ticker: str) -> float:
@@ -155,12 +153,11 @@ def check_upcoming_earnings(ticker: str, hold_days: int = 5) -> dict:
 
 
 def log_signal(detection: dict):
-    """Append a signal record to the persistent signals log (all signals, not just triggered ones)."""
-    os.makedirs(os.path.dirname(SIGNALS_LOG), exist_ok=True)
+    """Append a signal record to the SQLite scanner_signals table."""
     record = dict(detection)
     record['logged_at'] = datetime.now().isoformat()
-    with open(SIGNALS_LOG, 'a') as f:
-        f.write(json.dumps(record) + '\n')
+    _db.init_db()
+    _db.append_scanner_signal('52w_low', record)
 
 
 def check_stock(ticker: str, lookback_days: int = 400, debounce_days: int = 30) -> dict | None:
@@ -341,7 +338,8 @@ def main():
     for det in detections:
         state['last_triggered'][det['ticker']] = det['date']
 
-    research.save_hypotheses(hypotheses)
+    import db as _db
+    _db.save_hypothesis(hyp)
     save_state(state)
     print("\nDone. trade_loop.py will execute at next market open.")
 

@@ -8,7 +8,7 @@ WHAT THIS DOES:
   2. Calls trader.close_position('GO') to submit market sell
   3. Calculates actual return vs SPY return
   4. Calls research.complete_hypothesis() with post-mortem
-  5. Records the result in hypotheses.json and results.jsonl
+  5. Records the result in SQLite (hypotheses + pre_registrations tables)
 
 Usage:
   python tools/close_go_trade.py [--dry-run]

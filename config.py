@@ -31,6 +31,7 @@ REPORT_RECIPIENT = os.environ.get("REPORT_RECIPIENT", GMAIL_ADDRESS)
 # Per-position limits
 MAX_POSITION_PCT = 0.05                # 5% of portfolio per experiment
 DEFAULT_STOP_LOSS_PCT = 10.0           # close if position loses more than 10%
+MIN_STOP_LOSS_PCT = 1.0               # absolute minimum — every trade MUST have a stop loss
 DEFAULT_TAKE_PROFIT_PCT = None         # no take-profit by default (hold to deadline)
 DEFAULT_POSITION_SIZE_USD = 5000       # default trade size in dollars
 

@@ -24,8 +24,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 LOG_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                         'logs', 'sp500_scanner.log')
-STATE_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                          'logs', 'sp500_scanner_state.json')
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import db as _db
 
 
 def log(msg):
@@ -38,17 +38,15 @@ def log(msg):
 
 
 def load_state():
-    """Load scanner state (last seen announcements)."""
-    if os.path.exists(STATE_FILE):
-        with open(STATE_FILE) as f:
-            return json.load(f)
-    return {"last_check": None, "seen_announcements": []}
+    """Load scanner state from SQLite."""
+    _db.init_db()
+    return _db.get_state('sp500_change_scanner') or {"last_check": None, "seen_announcements": []}
 
 
 def save_state(state):
-    """Save scanner state."""
-    with open(STATE_FILE, 'w') as f:
-        json.dump(state, f, indent=2, default=str)
+    """Save scanner state to SQLite."""
+    _db.init_db()
+    _db.set_state('sp500_change_scanner', state)
 
 
 def is_quarterly_announcement_week():

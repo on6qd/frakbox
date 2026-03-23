@@ -91,8 +91,55 @@ def build_daily_report():
             html += f'<li><b>{w.get("event", "?")}</b> — expected {w.get("expected_date", "?")}</li>'
         html += '</ul>'
 
+    # Token usage summary
+    html += build_token_usage_section()
+
     html += _PAGE_CLOSE
     return html
+
+
+def get_daily_token_usage(date_str=None):
+    """Sum token usage for all sessions on a given date (default: today)."""
+    import db as _db
+    return _db.get_daily_token_usage(date_str)
+
+
+def estimate_cost(usage):
+    """Estimate API cost from token usage (Opus 4.6 pricing)."""
+    # Opus 4.6: $5/MTok input, $25/MTok output, $0.50/MTok cache read, $6.25/MTok cache write
+    cost = (
+        usage.get("input_tokens", 0) / 1_000_000 * 5.00
+        + usage.get("output_tokens", 0) / 1_000_000 * 25.00
+        + usage.get("cache_read_tokens", 0) / 1_000_000 * 0.50
+        + usage.get("cache_creation_tokens", 0) / 1_000_000 * 6.25
+    )
+    return round(cost, 2)
+
+
+def build_token_usage_section():
+    """Build HTML section showing today's token usage and cost."""
+    usage = get_daily_token_usage()
+    if usage["sessions"] == 0:
+        return ""
+
+    cost = estimate_cost(usage)
+
+    def fmt_k(n):
+        return f"{n / 1000:,.1f}k" if n >= 1000 else str(n)
+
+    return f"""
+    <h3>Token Usage</h3>
+    <table style="border-collapse: collapse;">
+        <tr><td style="padding: 4px 12px;">Sessions</td><td style="padding: 4px 12px;"><b>{usage['sessions']}</b></td></tr>
+        <tr><td style="padding: 4px 12px;">API calls</td><td style="padding: 4px 12px;">{usage['api_calls']}</td></tr>
+        <tr><td style="padding: 4px 12px;">Input tokens</td><td style="padding: 4px 12px;">{fmt_k(usage['input_tokens'])}</td></tr>
+        <tr><td style="padding: 4px 12px;">Output tokens</td><td style="padding: 4px 12px;">{fmt_k(usage['output_tokens'])}</td></tr>
+        <tr><td style="padding: 4px 12px;">Cache read</td><td style="padding: 4px 12px;">{fmt_k(usage['cache_read_tokens'])}</td></tr>
+        <tr><td style="padding: 4px 12px;">Cache write</td><td style="padding: 4px 12px;">{fmt_k(usage['cache_creation_tokens'])}</td></tr>
+        <tr><td style="padding: 4px 12px;">Total</td><td style="padding: 4px 12px;"><b>{fmt_k(usage['total_tokens'])}</b></td></tr>
+        <tr><td style="padding: 4px 12px;">Estimated cost</td><td style="padding: 4px 12px;"><b>${cost:.2f}</b></td></tr>
+    </table>
+    """
 
 
 def send_email(subject, body):
@@ -192,20 +239,9 @@ def parse_session_narrative(log_file):
 
 def get_latest_journal_entry():
     """Get the most recent research journal entry."""
-    import json
-    import os
-
-    journal_path = os.path.join(os.path.dirname(__file__), "logs", "research_journal.jsonl")
-    last = None
-    try:
-        with open(journal_path) as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    last = json.loads(line)
-    except Exception:
-        pass
-    return last
+    import db as _db
+    entries = _db.get_recent_journal(1)
+    return entries[0] if entries else None
 
 
 def _to_str(val):

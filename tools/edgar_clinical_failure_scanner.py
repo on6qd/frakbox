@@ -36,22 +36,17 @@ from tools.blacklist_manager import is_blacklisted, get_blacklist_reason
 EDGAR_SEARCH_URL = "https://efts.sec.gov/LATEST/search-index"
 HEADERS = {"User-Agent": "financial-researcher-bot contact@example.com"}
 
-# Persistent disqualification memory — events we've already evaluated and rejected
-DISQUALIFIED_EVENTS_FILE = Path(__file__).parent.parent / "logs" / "clinical_disqualified_events.json"
+sys.path.insert(0, str(Path(__file__).parent.parent))
+import db as _db
 
 
 def load_disqualified_events() -> dict:
-    """Load previously evaluated and disqualified events from persistent file.
+    """Load previously evaluated and disqualified events from SQLite.
 
     Returns dict keyed by 'TICKER:YYYY-MM-DD' -> {reason, disqualified_date}
     """
-    if DISQUALIFIED_EVENTS_FILE.exists():
-        try:
-            with open(DISQUALIFIED_EVENTS_FILE) as f:
-                return json.load(f)
-        except Exception:
-            return {}
-    return {}
+    _db.init_db()
+    return _db.get_state('clinical_disqualified') or {}
 
 
 def save_disqualified_event(ticker: str, filing_date: str, reason: str):
@@ -64,9 +59,7 @@ def save_disqualified_event(ticker: str, filing_date: str, reason: str):
         "reason": reason,
         "disqualified_date": datetime.today().strftime("%Y-%m-%d"),
     }
-    DISQUALIFIED_EVENTS_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with open(DISQUALIFIED_EVENTS_FILE, "w") as f:
-        json.dump(events, f, indent=2)
+    _db.set_state('clinical_disqualified', events)
 
 
 def add_manual_disqualification(ticker: str, filing_date: str, reason: str):

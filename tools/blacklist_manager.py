@@ -2,23 +2,22 @@
 Scanner blacklist manager — persistent disqualification memory.
 Prevents re-investigating already-ruled-out symbols.
 """
-import json
 import os
+import sys
 from datetime import datetime
 
-BLACKLIST_PATH = os.path.join(os.path.dirname(__file__), 'scanner_blacklist.json')
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import db as _db
 
 def load_blacklist():
-    """Load the blacklist from disk."""
-    if os.path.exists(BLACKLIST_PATH):
-        with open(BLACKLIST_PATH) as f:
-            return json.load(f)
-    return {}
+    """Load the blacklist from SQLite."""
+    _db.init_db()
+    return _db.get_state('scanner_blacklist') or {}
 
 def save_blacklist(blacklist):
-    """Save the blacklist to disk."""
-    with open(BLACKLIST_PATH, 'w') as f:
-        json.dump(blacklist, f, indent=2)
+    """Save the blacklist to SQLite."""
+    _db.init_db()
+    _db.set_state('scanner_blacklist', blacklist)
 
 def is_blacklisted(scanner_name, symbol):
     """Check if a symbol is blacklisted for a given scanner."""

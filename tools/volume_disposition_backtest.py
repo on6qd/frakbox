@@ -296,9 +296,11 @@ def main():
             for k, v in results.items()
         }
     }
-    with open("logs/volume_disposition_results.json", "w") as f:
-        json.dump(summary, f, indent=2)
-    print(f"\nResults saved to logs/volume_disposition_results.json")
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    import db as _db
+    _db.init_db()
+    _db.set_state('volume_disposition', summary)
+    print(f"\nResults saved to SQLite kv_state")
 
     return df, results
 

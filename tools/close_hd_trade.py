@@ -8,7 +8,7 @@ WHAT THIS DOES:
   2. Calls trader.close_position('HD') to submit market buy-to-cover
   3. Calculates actual return vs SPY return
   4. Calls research.complete_hypothesis() with post-mortem
-  5. Records the result in hypotheses.json and results.jsonl
+  5. Records the result in SQLite (hypotheses + pre_registrations tables)
 
 Hypothesis: 86d28864 (sp500_52w_low_momentum_short)
 Entry: SHORT HD at Monday March 23 open

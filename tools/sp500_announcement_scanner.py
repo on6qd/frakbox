@@ -25,8 +25,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 HYPOTHESIS_ID = "061ae3a8"
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
-STATE_FILE = os.path.join(LOGS_DIR, "sp500_announcement_state.json")
 os.makedirs(LOGS_DIR, exist_ok=True)
+sys.path.insert(0, BASE_DIR)
+import db as _db
 
 # Archive URL — returns HTML listing of press releases, filterable by keyword
 PRESS_ARCHIVE_URL = "https://press.spglobal.com/index.php?keywords=s%26p+500+index&l=30&s=2429"
@@ -59,15 +60,13 @@ ADDITION_TITLE_KEYWORDS = [
 # ------------------------------------------------------------------
 
 def load_state():
-    if os.path.exists(STATE_FILE):
-        with open(STATE_FILE) as f:
-            return json.load(f)
-    return {"seen_links": [], "last_check": None}
+    _db.init_db()
+    return _db.get_state('sp500_announcements') or {"seen_links": [], "last_check": None}
 
 
 def save_state(state):
-    with open(STATE_FILE, "w") as f:
-        json.dump(state, f, indent=2, default=str)
+    _db.init_db()
+    _db.set_state('sp500_announcements', state)
 
 
 # ------------------------------------------------------------------

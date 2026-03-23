@@ -171,6 +171,86 @@ CREATE TABLE IF NOT EXISTS session_handoff (
     data TEXT NOT NULL,  -- JSON dict
     written_at TEXT
 );
+
+-- Append-only log tables (replacing JSONL files)
+CREATE TABLE IF NOT EXISTS research_journal (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    date TEXT NOT NULL,
+    session_type TEXT,
+    investigated TEXT,
+    findings TEXT,
+    surprised_by TEXT,
+    next_step TEXT,
+    category TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_journal_date ON research_journal(date);
+
+CREATE TABLE IF NOT EXISTS friction_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    date TEXT NOT NULL,
+    category TEXT NOT NULL DEFAULT 'other',
+    description TEXT,
+    turns_wasted INTEGER DEFAULT 0,
+    potential_fix TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_friction_category ON friction_log(category);
+
+CREATE TABLE IF NOT EXISTS token_usage (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    input_tokens INTEGER DEFAULT 0,
+    output_tokens INTEGER DEFAULT 0,
+    cache_read_tokens INTEGER DEFAULT 0,
+    cache_creation_tokens INTEGER DEFAULT 0,
+    total_tokens INTEGER DEFAULT 0,
+    api_calls INTEGER DEFAULT 0,
+    session TEXT,
+    status TEXT,
+    timestamp TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_token_timestamp ON token_usage(timestamp);
+
+CREATE TABLE IF NOT EXISTS trade_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type TEXT NOT NULL,
+    hypothesis_id TEXT,
+    symbol TEXT,
+    direction TEXT,
+    entry_price REAL,
+    position_size REAL,
+    order_id TEXT,
+    trigger_type TEXT,
+    error TEXT,
+    extra TEXT,
+    timestamp TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS pre_registrations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    hypothesis_id TEXT NOT NULL,
+    prediction_hash TEXT,
+    data TEXT NOT NULL,
+    timestamp TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_prereg_hyp ON pre_registrations(hypothesis_id);
+
+CREATE TABLE IF NOT EXISTS patterns (
+    event_type TEXT PRIMARY KEY,
+    data TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS kv_state (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    updated_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS scanner_signals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    scanner TEXT NOT NULL,
+    data TEXT NOT NULL,
+    timestamp TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_scanner_name ON scanner_signals(scanner);
 """
 
 # ---------------------------------------------------------------------------
@@ -842,4 +922,474 @@ def migrate_from_json(base_dir=None):
         summary["queue_tasks"] = len(rq.get("queue", []))
         summary["watchlist"] = len(rq.get("event_watchlist", []))
 
+    return summary
+
+
+# ---------------------------------------------------------------------------
+# Research Journal
+# ---------------------------------------------------------------------------
+
+def append_journal_entry(date, session_type, investigated, findings,
+                         surprised_by=None, next_step=None, category=None):
+    """Append one research journal entry. Returns the row id."""
+    conn = get_db()
+    init_db()
+    cur = conn.execute(
+        "INSERT INTO research_journal (date, session_type, investigated, findings, surprised_by, next_step, category) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (date, session_type, investigated, findings, surprised_by, next_step, category),
+    )
+    conn.commit()
+    return cur.lastrowid
+
+
+def get_recent_journal(n=5):
+    """Get the N most recent journal entries (newest first)."""
+    conn = get_db()
+    init_db()
+    rows = conn.execute(
+        "SELECT * FROM research_journal ORDER BY id DESC LIMIT ?", (n,)
+    ).fetchall()
+    return [dict(r) for r in reversed(rows)]  # return in chronological order
+
+
+def count_journal_entries():
+    conn = get_db()
+    init_db()
+    return conn.execute("SELECT COUNT(*) FROM research_journal").fetchone()[0]
+
+
+# ---------------------------------------------------------------------------
+# Friction Log
+# ---------------------------------------------------------------------------
+
+def append_friction(date, category, description, turns_wasted=0, potential_fix=None):
+    """Append one friction log entry. Returns the row id."""
+    conn = get_db()
+    init_db()
+    cur = conn.execute(
+        "INSERT INTO friction_log (date, category, description, turns_wasted, potential_fix) "
+        "VALUES (?, ?, ?, ?, ?)",
+        (date, category, description, turns_wasted, potential_fix),
+    )
+    conn.commit()
+    return cur.lastrowid
+
+
+def get_friction_summary(top_n=3):
+    """Get top friction categories with counts and latest description."""
+    conn = get_db()
+    init_db()
+    rows = conn.execute(
+        "SELECT category, COUNT(*) as cnt FROM friction_log GROUP BY category ORDER BY cnt DESC LIMIT ?",
+        (top_n,),
+    ).fetchall()
+    result = []
+    for row in rows:
+        latest = conn.execute(
+            "SELECT description FROM friction_log WHERE category = ? ORDER BY id DESC LIMIT 1",
+            (row["category"],),
+        ).fetchone()
+        result.append({
+            "category": row["category"],
+            "count": row["cnt"],
+            "latest_description": latest["description"] if latest else "",
+        })
+    return result
+
+
+def count_friction_entries():
+    conn = get_db()
+    init_db()
+    return conn.execute("SELECT COUNT(*) FROM friction_log").fetchone()[0]
+
+
+# ---------------------------------------------------------------------------
+# Token Usage
+# ---------------------------------------------------------------------------
+
+def append_token_usage(input_tokens=0, output_tokens=0, cache_read_tokens=0,
+                       cache_creation_tokens=0, total_tokens=0, api_calls=0,
+                       session=None, status=None, timestamp=None):
+    """Append one token usage record."""
+    conn = get_db()
+    init_db()
+    if timestamp is None:
+        timestamp = datetime.now().isoformat()
+    conn.execute(
+        "INSERT INTO token_usage (input_tokens, output_tokens, cache_read_tokens, "
+        "cache_creation_tokens, total_tokens, api_calls, session, status, timestamp) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (input_tokens, output_tokens, cache_read_tokens, cache_creation_tokens,
+         total_tokens, api_calls, session, status, timestamp),
+    )
+    conn.commit()
+
+
+def get_daily_token_usage(date_str=None):
+    """Sum token usage for all sessions on a given date."""
+    conn = get_db()
+    init_db()
+    if date_str is None:
+        date_str = datetime.now().strftime("%Y-%m-%d")
+    row = conn.execute(
+        "SELECT COALESCE(SUM(input_tokens),0), COALESCE(SUM(output_tokens),0), "
+        "COALESCE(SUM(cache_read_tokens),0), COALESCE(SUM(cache_creation_tokens),0), "
+        "COALESCE(SUM(total_tokens),0), COALESCE(SUM(api_calls),0), COUNT(*) "
+        "FROM token_usage WHERE timestamp LIKE ?",
+        (date_str + "%",),
+    ).fetchone()
+    return {
+        "input_tokens": row[0], "output_tokens": row[1],
+        "cache_read_tokens": row[2], "cache_creation_tokens": row[3],
+        "total_tokens": row[4], "api_calls": row[5], "sessions": row[6],
+    }
+
+
+# ---------------------------------------------------------------------------
+# Trade Log
+# ---------------------------------------------------------------------------
+
+def append_trade_log(action):
+    """Append a trade action. Extracts known columns, puts rest in extra."""
+    conn = get_db()
+    init_db()
+    known = {"type", "hypothesis_id", "symbol", "direction", "entry_price",
+             "position_size", "order_id", "trigger_type", "error", "timestamp"}
+    extra = {k: v for k, v in action.items() if k not in known}
+    # Map 'trigger' key to 'trigger_type' column to avoid SQL keyword
+    trigger_type = action.get("trigger_type") or action.get("trigger")
+    conn.execute(
+        "INSERT INTO trade_log (type, hypothesis_id, symbol, direction, entry_price, "
+        "position_size, order_id, trigger_type, error, extra, timestamp) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (action.get("type", "unknown"), action.get("hypothesis_id"),
+         action.get("symbol"), action.get("direction"),
+         action.get("entry_price"), action.get("position_size"),
+         action.get("order_id"), trigger_type,
+         action.get("error"), json.dumps(extra) if extra else None,
+         action.get("timestamp", datetime.now().isoformat())),
+    )
+    conn.commit()
+
+
+# ---------------------------------------------------------------------------
+# Pre-registrations (replaces results.jsonl)
+# ---------------------------------------------------------------------------
+
+def append_pre_registration(hypothesis_id, prediction_hash, data):
+    """Log a pre-registration entry."""
+    conn = get_db()
+    init_db()
+    conn.execute(
+        "INSERT INTO pre_registrations (hypothesis_id, prediction_hash, data, timestamp) "
+        "VALUES (?, ?, ?, ?)",
+        (hypothesis_id, prediction_hash, json.dumps(data) if isinstance(data, dict) else data,
+         datetime.now().isoformat()),
+    )
+    conn.commit()
+
+
+def get_pre_registrations():
+    """Get all pre-registration entries."""
+    conn = get_db()
+    init_db()
+    rows = conn.execute("SELECT * FROM pre_registrations ORDER BY id").fetchall()
+    result = []
+    for r in rows:
+        d = dict(r)
+        try:
+            d["data"] = json.loads(d["data"])
+        except (json.JSONDecodeError, TypeError):
+            pass
+        result.append(d)
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Patterns (replaces patterns.json)
+# ---------------------------------------------------------------------------
+
+def load_patterns():
+    """Load all patterns as a dict keyed by event_type."""
+    conn = get_db()
+    init_db()
+    rows = conn.execute("SELECT * FROM patterns").fetchall()
+    result = {}
+    for r in rows:
+        try:
+            result[r["event_type"]] = json.loads(r["data"])
+        except (json.JSONDecodeError, TypeError):
+            result[r["event_type"]] = r["data"]
+    return result
+
+
+def save_patterns(patterns):
+    """Save patterns dict (full replacement)."""
+    conn = get_db()
+    init_db()
+    conn.execute("DELETE FROM patterns")
+    for event_type, data in patterns.items():
+        conn.execute(
+            "INSERT INTO patterns (event_type, data) VALUES (?, ?)",
+            (event_type, json.dumps(data) if isinstance(data, (dict, list)) else str(data)),
+        )
+    conn.commit()
+
+
+def save_pattern(event_type, data):
+    """Upsert a single pattern."""
+    conn = get_db()
+    init_db()
+    conn.execute(
+        "INSERT OR REPLACE INTO patterns (event_type, data) VALUES (?, ?)",
+        (event_type, json.dumps(data) if isinstance(data, (dict, list)) else str(data)),
+    )
+    conn.commit()
+
+
+# ---------------------------------------------------------------------------
+# KV State (replaces peak_equity.json, scanner states, etc.)
+# ---------------------------------------------------------------------------
+
+def get_state(key):
+    """Get a state value by key. Returns parsed dict/value or None."""
+    conn = get_db()
+    init_db()
+    row = conn.execute("SELECT value FROM kv_state WHERE key = ?", (key,)).fetchone()
+    if not row:
+        return None
+    try:
+        return json.loads(row["value"])
+    except (json.JSONDecodeError, TypeError):
+        return row["value"]
+
+
+def set_state(key, value):
+    """Set a state value (upsert). Value can be dict, list, or scalar."""
+    conn = get_db()
+    init_db()
+    conn.execute(
+        "INSERT OR REPLACE INTO kv_state (key, value, updated_at) VALUES (?, ?, ?)",
+        (key, json.dumps(value) if isinstance(value, (dict, list)) else str(value),
+         datetime.now().isoformat()),
+    )
+    conn.commit()
+
+
+# ---------------------------------------------------------------------------
+# Scanner Signals (replaces scanner JSONL files)
+# ---------------------------------------------------------------------------
+
+def append_scanner_signal(scanner, data):
+    """Append a scanner signal."""
+    conn = get_db()
+    init_db()
+    conn.execute(
+        "INSERT INTO scanner_signals (scanner, data, timestamp) VALUES (?, ?, ?)",
+        (scanner, json.dumps(data) if isinstance(data, (dict, list)) else str(data),
+         datetime.now().isoformat()),
+    )
+    conn.commit()
+
+
+def get_scanner_signals(scanner, limit=50):
+    """Get recent signals for a scanner."""
+    conn = get_db()
+    init_db()
+    rows = conn.execute(
+        "SELECT * FROM scanner_signals WHERE scanner = ? ORDER BY id DESC LIMIT ?",
+        (scanner, limit),
+    ).fetchall()
+    result = []
+    for r in rows:
+        d = dict(r)
+        try:
+            d["data"] = json.loads(d["data"])
+        except (json.JSONDecodeError, TypeError):
+            pass
+        result.append(d)
+    return list(reversed(result))
+
+
+# ---------------------------------------------------------------------------
+# Migration from JSONL/JSON log files
+# ---------------------------------------------------------------------------
+
+def migrate_logs(base_dir=None):
+    """One-time migration of JSONL/JSON log files into SQLite tables.
+
+    Idempotent — skips tables that already have data.
+    Returns a summary dict.
+    """
+    if base_dir is None:
+        base_dir = os.path.dirname(__file__)
+
+    init_db()
+    conn = get_db()
+    summary = {}
+
+    def _read_jsonl(path):
+        entries = []
+        if not os.path.exists(path):
+            return entries
+        with open(path) as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entries.append(json.loads(line))
+                except json.JSONDecodeError:
+                    continue
+        return entries
+
+    def _read_json(path):
+        if not os.path.exists(path):
+            return None
+        try:
+            with open(path) as f:
+                return json.load(f)
+        except (json.JSONDecodeError, Exception):
+            return None
+
+    def _str(val):
+        """Convert any value to string for TEXT columns."""
+        if val is None:
+            return None
+        if isinstance(val, (list, dict)):
+            return json.dumps(val)
+        return str(val)
+
+    # 1. Research journal
+    if conn.execute("SELECT COUNT(*) FROM research_journal").fetchone()[0] == 0:
+        entries = _read_jsonl(os.path.join(base_dir, "logs", "research_journal.jsonl"))
+        for e in entries:
+            conn.execute(
+                "INSERT INTO research_journal (date, session_type, investigated, findings, surprised_by, next_step, category) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (_str(e.get("date")), _str(e.get("session_type")), _str(e.get("investigated")),
+                 _str(e.get("findings")), _str(e.get("surprised_by")), _str(e.get("next_step")),
+                 _str(e.get("category"))),
+            )
+        summary["journal"] = len(entries)
+
+    # 2. Friction log
+    if conn.execute("SELECT COUNT(*) FROM friction_log").fetchone()[0] == 0:
+        entries = _read_jsonl(os.path.join(base_dir, "logs", "friction_log.jsonl"))
+        for e in entries:
+            conn.execute(
+                "INSERT INTO friction_log (date, category, description, turns_wasted, potential_fix) "
+                "VALUES (?, ?, ?, ?, ?)",
+                (e.get("date"), e.get("category", "other"), e.get("description"),
+                 e.get("turns_wasted", 0), e.get("potential_fix")),
+            )
+        summary["friction"] = len(entries)
+
+    # 3. Token usage
+    if conn.execute("SELECT COUNT(*) FROM token_usage").fetchone()[0] == 0:
+        entries = _read_jsonl(os.path.join(base_dir, "logs", "token_usage.jsonl"))
+        for e in entries:
+            conn.execute(
+                "INSERT INTO token_usage (input_tokens, output_tokens, cache_read_tokens, "
+                "cache_creation_tokens, total_tokens, api_calls, session, status, timestamp) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (e.get("input_tokens", 0), e.get("output_tokens", 0),
+                 e.get("cache_read_tokens", 0), e.get("cache_creation_tokens", 0),
+                 e.get("total_tokens", 0), e.get("api_calls", 0),
+                 e.get("session"), e.get("status"), e.get("timestamp", "")),
+            )
+        summary["token_usage"] = len(entries)
+
+    # 4. Trade log
+    if conn.execute("SELECT COUNT(*) FROM trade_log").fetchone()[0] == 0:
+        entries = _read_jsonl(os.path.join(base_dir, "logs", "trade_log.jsonl"))
+        for e in entries:
+            known = {"type", "hypothesis_id", "symbol", "direction", "entry_price",
+                     "position_size", "order_id", "trigger", "error", "timestamp"}
+            extra = {k: v for k, v in e.items() if k not in known}
+            conn.execute(
+                "INSERT INTO trade_log (type, hypothesis_id, symbol, direction, entry_price, "
+                "position_size, order_id, trigger_type, error, extra, timestamp) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (e.get("type", "unknown"), e.get("hypothesis_id"), e.get("symbol"),
+                 e.get("direction"), e.get("entry_price"), e.get("position_size"),
+                 e.get("order_id"), e.get("trigger"), e.get("error"),
+                 json.dumps(extra) if extra else None,
+                 e.get("timestamp", "")),
+            )
+        summary["trade_log"] = len(entries)
+
+    # 5. Pre-registrations (results.jsonl)
+    if conn.execute("SELECT COUNT(*) FROM pre_registrations").fetchone()[0] == 0:
+        entries = _read_jsonl(os.path.join(base_dir, "results.jsonl"))
+        for e in entries:
+            conn.execute(
+                "INSERT INTO pre_registrations (hypothesis_id, prediction_hash, data, timestamp) "
+                "VALUES (?, ?, ?, ?)",
+                (e.get("hypothesis_id", e.get("id", "")),
+                 e.get("prediction_hash"),
+                 json.dumps(e),
+                 e.get("timestamp", e.get("created", ""))),
+            )
+        summary["pre_registrations"] = len(entries)
+
+    # 6. Patterns
+    if conn.execute("SELECT COUNT(*) FROM patterns").fetchone()[0] == 0:
+        data = _read_json(os.path.join(base_dir, "patterns.json"))
+        if data and isinstance(data, dict):
+            for event_type, pattern_data in data.items():
+                conn.execute(
+                    "INSERT INTO patterns (event_type, data) VALUES (?, ?)",
+                    (event_type, json.dumps(pattern_data)),
+                )
+            summary["patterns"] = len(data)
+
+    # 7. KV state — peak_equity
+    if get_state("peak_equity") is None:
+        data = _read_json(os.path.join(base_dir, "logs", "peak_equity.json"))
+        if data:
+            conn.execute(
+                "INSERT OR REPLACE INTO kv_state (key, value, updated_at) VALUES (?, ?, ?)",
+                ("peak_equity", json.dumps(data), data.get("updated", datetime.now().isoformat())),
+            )
+            summary["peak_equity"] = 1
+
+    # 8. KV state — scanner states
+    for key, path in [
+        ("52w_scanner", os.path.join(base_dir, "logs", "52w_low_scanner_state.json")),
+        ("sp500_scanner", os.path.join(base_dir, "logs", "sp500_scanner_state.json")),
+        ("sp500_announcements", os.path.join(base_dir, "logs", "sp500_announcement_state.json")),
+        ("health_state", os.path.join(base_dir, "logs", "health_state.json")),
+        ("session_state", os.path.join(base_dir, "logs", "session_state.json")),
+        ("clinical_disqualified", os.path.join(base_dir, "logs", "clinical_disqualified_events.json")),
+        ("scanner_blacklist", os.path.join(base_dir, "tools", "scanner_blacklist.json")),
+        ("volume_disposition", os.path.join(base_dir, "logs", "volume_disposition_results.json")),
+    ]:
+        if get_state(key) is None:
+            data = _read_json(path)
+            if data is not None:
+                conn.execute(
+                    "INSERT OR REPLACE INTO kv_state (key, value, updated_at) VALUES (?, ?, ?)",
+                    (key, json.dumps(data), datetime.now().isoformat()),
+                )
+                summary[key] = 1
+
+    # 9. Scanner signals from JSONL files
+    if conn.execute("SELECT COUNT(*) FROM scanner_signals").fetchone()[0] == 0:
+        for scanner, path in [
+            ("52w_low", os.path.join(base_dir, "logs", "52w_low_signals.jsonl")),
+            ("sp500_additions", os.path.join(base_dir, "logs", "sp500_additions_detected.jsonl")),
+            ("ceo_departure", os.path.join(base_dir, "logs", "ceo_departure_alerts.jsonl")),
+        ]:
+            entries = _read_jsonl(path)
+            for e in entries:
+                conn.execute(
+                    "INSERT INTO scanner_signals (scanner, data, timestamp) VALUES (?, ?, ?)",
+                    (scanner, json.dumps(e), e.get("timestamp", e.get("date", ""))),
+                )
+            if entries:
+                summary[f"signals_{scanner}"] = len(entries)
+
+    conn.commit()
     return summary

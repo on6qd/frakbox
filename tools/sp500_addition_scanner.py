@@ -19,8 +19,8 @@ Usage:
 
 Schedule: Daily at ~9:15 PM ET via launchd alongside cluster_auto_scanner.
 
-State file: data/sp500_additions_state.json
-Detection log: logs/sp500_additions_detected.jsonl
+State: SQLite kv_state table (key='sp500_scanner')
+Detection log: SQLite scanner_signals table
 """
 
 import sys
@@ -39,8 +39,7 @@ import requests
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, BASE_DIR)
 
-STATE_FILE = os.path.join(BASE_DIR, "data", "sp500_additions_state.json")
-DETECT_LOG = os.path.join(BASE_DIR, "logs", "sp500_additions_detected.jsonl")
+import db as _db
 
 os.makedirs(os.path.join(BASE_DIR, "data"), exist_ok=True)
 os.makedirs(os.path.join(BASE_DIR, "logs"), exist_ok=True)
@@ -144,18 +143,13 @@ EFFECTIVE_DATE_RE = re.compile(
 # ---------------------------------------------------------------------------
 
 def load_state() -> dict:
-    if os.path.exists(STATE_FILE):
-        try:
-            with open(STATE_FILE) as f:
-                return json.load(f)
-        except Exception:
-            pass
-    return {
+    _db.init_db()
+    return _db.get_state('sp500_scanner') or {
         "last_check": None,
         "seen_press_links": [],
-        "wikipedia_tickers": [],     # last known S&P 500 tickers from Wikipedia
-        "wikipedia_dates": {},       # ticker -> date_added string
-        "triggered_tickers": [],     # tickers we already set a trigger for
+        "wikipedia_tickers": [],
+        "wikipedia_dates": {},
+        "triggered_tickers": [],
         "last_triggered_hypothesis": None,
     }
 
@@ -163,10 +157,8 @@ def load_state() -> dict:
 def save_state(state: dict, dry_run: bool = False) -> None:
     if dry_run:
         return
-    tmp = STATE_FILE + ".tmp"
-    with open(tmp, "w") as f:
-        json.dump(state, f, indent=2, default=str)
-    os.replace(tmp, STATE_FILE)
+    _db.init_db()
+    _db.set_state('sp500_scanner', state)
 
 
 # ---------------------------------------------------------------------------
@@ -174,12 +166,12 @@ def save_state(state: dict, dry_run: bool = False) -> None:
 # ---------------------------------------------------------------------------
 
 def log_detection(record: dict, dry_run: bool = False) -> None:
-    """Append one detection event to the JSONL log."""
+    """Append one detection event to the SQLite scanner_signals table."""
     if dry_run:
         print(f"  [DRY-RUN] Would log: {json.dumps(record)}")
         return
-    with open(DETECT_LOG, "a") as f:
-        f.write(json.dumps(record, default=str) + "\n")
+    _db.init_db()
+    _db.append_scanner_signal('sp500_additions', record)
 
 
 # ---------------------------------------------------------------------------
@@ -691,7 +683,8 @@ def update_hypothesis(ticker: str, announcement_date: str, effective_date: str,
             "source": source,
             "scanner_set_at": datetime.now().isoformat(),
         }
-        research.save_hypotheses(hypotheses)
+        import db as _db
+        _db.save_hypothesis(target)
         print(f"  Hypothesis saved. trade_loop.py will execute at next market open.")
     else:
         print(f"  [DRY-RUN] No changes written.")

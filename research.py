@@ -19,10 +19,6 @@ from datetime import datetime, timedelta
 
 import db as _db
 
-RESULTS_FILE = os.path.join(os.path.dirname(__file__), "results.jsonl")
-PATTERNS_FILE = os.path.join(os.path.dirname(__file__), "patterns.json")
-
-
 def load_hypotheses():
     return _db.load_hypotheses()
 
@@ -32,15 +28,13 @@ def save_hypotheses(hypotheses):
 
 
 def load_patterns():
-    """Load validated patterns — the growing knowledge base."""
-    if not os.path.exists(PATTERNS_FILE):
-        return []
-    with open(PATTERNS_FILE) as f:
-        return json.load(f)
+    """Load validated patterns from SQLite."""
+    return _db.load_patterns()
 
 
 def save_patterns(patterns):
-    _atomic_write(PATTERNS_FILE, patterns)
+    """Save patterns to SQLite."""
+    _db.save_patterns(patterns)
 
 
 def validate_causal_mechanism(mechanism_text, criteria_met):
@@ -307,6 +301,18 @@ def create_hypothesis(
             f"Use a 1-5 character ticker, or 'TBD' for event-driven hypotheses."
         )
 
+    # Validate direction
+    if expected_direction not in ("long", "short"):
+        raise ValueError(
+            f"expected_direction must be 'long' or 'short', got '{expected_direction}'."
+        )
+
+    # Validate timeframe
+    if not isinstance(expected_timeframe_days, (int, float)) or expected_timeframe_days < 1:
+        raise ValueError(
+            f"expected_timeframe_days must be >= 1, got {expected_timeframe_days}."
+        )
+
     # Validate causal mechanism
     valid, msg = validate_causal_mechanism(causal_mechanism, causal_mechanism_criteria)
     if not valid:
@@ -455,32 +461,27 @@ def create_hypothesis(
         "result": None,
     }
 
-    # Pre-registration: log the prediction to results.jsonl BEFORE any trade
+    # Pre-registration: log prediction to SQLite BEFORE any trade
     _log_pre_registration(hypothesis)
 
-    hypotheses.append(hypothesis)
-    save_hypotheses(hypotheses)
+    _db.save_hypothesis(hypothesis)
     return hypothesis
 
 
 def _log_pre_registration(hypothesis):
-    """Log prediction to results.jsonl at creation time for pre-registration."""
+    """Log prediction to SQLite at creation time for pre-registration."""
     # Idempotency: check if already logged
-    if os.path.exists(RESULTS_FILE):
-        with open(RESULTS_FILE) as f:
-            for line in f:
-                try:
-                    entry = json.loads(line.strip())
-                    if (entry.get("type") == "pre_registration"
-                            and entry.get("id") == hypothesis["id"]):
-                        return  # Already logged
-                except (json.JSONDecodeError, KeyError):
-                    continue
+    existing = _db.get_pre_registrations()
+    for entry in existing:
+        data = entry.get("data", {})
+        if isinstance(data, dict) and data.get("id") == hypothesis["id"]:
+            return  # Already logged
 
-    with open(RESULTS_FILE, "a") as f:
-        f.write(json.dumps({
+    _db.append_pre_registration(
+        hypothesis_id=hypothesis["id"],
+        prediction_hash=hypothesis["prediction_hash"],
+        data={
             "type": "pre_registration",
-            "timestamp": datetime.now().isoformat(),
             "id": hypothesis["id"],
             "prediction_hash": hypothesis["prediction_hash"],
             "event_type": hypothesis["event_type"],
@@ -489,7 +490,8 @@ def _log_pre_registration(hypothesis):
             "magnitude_pct": hypothesis["expected_magnitude_pct"],
             "timeframe_days": hypothesis["expected_timeframe_days"],
             "backtest_symbols": hypothesis.get("backtest_symbols"),
-        }) + "\n")
+        },
+    )
 
 
 def activate_hypothesis(hypothesis_id, entry_price, position_size, order_id=None,
@@ -499,11 +501,11 @@ def activate_hypothesis(hypothesis_id, entry_price, position_size, order_id=None
     Enforces max_concurrent_experiments from methodology.json.
 
     Args:
-        stop_loss_pct: Max loss before auto-close (default: 10%). Set to None to disable.
+        stop_loss_pct: Max loss before auto-close (default: 10%). Cannot be disabled.
         take_profit_pct: Profit target for auto-close (default: None = hold to deadline).
     """
     from self_review import load_methodology
-    from config import DEFAULT_STOP_LOSS_PCT, DEFAULT_TAKE_PROFIT_PCT
+    from config import DEFAULT_STOP_LOSS_PCT, DEFAULT_TAKE_PROFIT_PCT, MIN_STOP_LOSS_PCT
     from trader import check_portfolio_drawdown
 
     m = load_methodology()
@@ -538,6 +540,11 @@ def activate_hypothesis(hypothesis_id, entry_price, position_size, order_id=None
                     f"Cannot activate hypothesis {hypothesis_id}: symbol is still 'TBD'. "
                     f"Update expected_symbol to a real ticker first."
                 )
+            # Enforce minimum stop loss — every trade MUST have one
+            effective_stop = stop_loss_pct if stop_loss_pct is not None else DEFAULT_STOP_LOSS_PCT
+            if effective_stop < MIN_STOP_LOSS_PCT:
+                effective_stop = DEFAULT_STOP_LOSS_PCT
+
             h["status"] = "active"
             h["trade"] = {
                 "entry_price": entry_price,
@@ -546,7 +553,7 @@ def activate_hypothesis(hypothesis_id, entry_price, position_size, order_id=None
                 "order_id": order_id,
                 "deadline": (datetime.now() + timedelta(days=h["expected_timeframe_days"])).isoformat(),
                 # Risk controls
-                "stop_loss_pct": stop_loss_pct if stop_loss_pct is not None else DEFAULT_STOP_LOSS_PCT,
+                "stop_loss_pct": effective_stop,
                 "take_profit_pct": take_profit_pct if take_profit_pct is not None else DEFAULT_TAKE_PROFIT_PCT,
                 # Market context at entry — needed for computing abnormal returns at exit
                 "spy_at_entry": spy_price,
@@ -556,7 +563,7 @@ def activate_hypothesis(hypothesis_id, entry_price, position_size, order_id=None
             break
     if not found:
         raise ValueError(f"Hypothesis {hypothesis_id} not found.")
-    save_hypotheses(hypotheses)
+    _db.save_hypothesis(h)
 
 
 def complete_hypothesis(hypothesis_id, exit_price, actual_return_pct, post_mortem,
@@ -664,7 +671,7 @@ def complete_hypothesis(hypothesis_id, exit_price, actual_return_pct, post_morte
             break
     if not found:
         raise ValueError(f"Hypothesis {hypothesis_id} not found.")
-    save_hypotheses(hypotheses)
+    _db.save_hypothesis(h)
 
 
 def invalidate_hypothesis(hypothesis_id, reason):
@@ -679,7 +686,7 @@ def invalidate_hypothesis(hypothesis_id, reason):
             break
     if not found:
         raise ValueError(f"Hypothesis {hypothesis_id} not found.")
-    save_hypotheses(hypotheses)
+    _db.save_hypothesis(h)
 
 
 def _update_pattern(completed_hypothesis):
@@ -743,24 +750,21 @@ def get_completed_hypotheses():
 
 
 def log_result(hypothesis):
-    """Append a completed hypothesis to the results log."""
+    """Append a completed hypothesis result to the pre-registrations log."""
     r = hypothesis["result"]
 
     # Idempotency: check if already logged
-    if os.path.exists(RESULTS_FILE):
-        with open(RESULTS_FILE) as f:
-            for line in f:
-                try:
-                    entry = json.loads(line.strip())
-                    if (entry.get("type") != "pre_registration"
-                            and entry.get("id") == hypothesis["id"]):
-                        return  # Already logged
-                except (json.JSONDecodeError, KeyError):
-                    continue
+    existing = _db.get_pre_registrations()
+    for entry in existing:
+        data = entry.get("data", {})
+        if isinstance(data, dict) and data.get("type") != "pre_registration" and data.get("id") == hypothesis["id"]:
+            return  # Already logged
 
-    with open(RESULTS_FILE, "a") as f:
-        f.write(json.dumps({
-            "timestamp": datetime.now().isoformat(),
+    _db.append_pre_registration(
+        hypothesis_id=hypothesis["id"],
+        prediction_hash=hypothesis.get("prediction_hash"),
+        data={
+            "type": "result",
             "id": hypothesis["id"],
             "event_type": hypothesis["event_type"],
             "symbol": hypothesis["expected_symbol"],
@@ -777,7 +781,8 @@ def log_result(hypothesis):
             "post_mortem": r["post_mortem"],
             "backtest_symbols": hypothesis.get("backtest_symbols"),
             "confounders_at_exit": r.get("confounders_at_exit"),
-        }) + "\n")
+        },
+    )
 
 
 def get_research_summary():
@@ -1013,20 +1018,16 @@ def verify_data_integrity():
                         f"which is not a known hypothesis or task ID."
                     )
 
-    # Check results.jsonl for orphaned pre-registrations
-    if os.path.exists(RESULTS_FILE):
-        with open(RESULTS_FILE) as f:
-            for line_num, line in enumerate(f, 1):
-                try:
-                    entry = json.loads(line.strip())
-                    rid = entry.get("id")
-                    if rid and entry.get("type") == "pre_registration" and rid not in hyp_ids:
-                        issues.append(
-                            f"ORPHANED PRE-REGISTRATION: results.jsonl line {line_num} "
-                            f"has pre-registration for '{rid}' but hypothesis is missing."
-                        )
-                except json.JSONDecodeError:
-                    issues.append(f"CORRUPT DATA: results.jsonl line {line_num} is not valid JSON")
+    # Check pre_registrations for orphaned entries
+    for entry in _db.get_pre_registrations():
+        data = entry.get("data", {})
+        if isinstance(data, dict):
+            rid = data.get("id")
+            if rid and data.get("type") == "pre_registration" and rid not in hyp_ids:
+                issues.append(
+                    f"ORPHANED PRE-REGISTRATION: pre_registrations row {entry.get('id')} "
+                    f"has pre-registration for '{rid}' but hypothesis is missing."
+                )
 
     # Check active hypotheses have real symbols
     for h in hypotheses:

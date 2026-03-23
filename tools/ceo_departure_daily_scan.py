@@ -28,7 +28,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from tools.edgar_ceo_departure_scanner import scan_ceo_departures
 
 LOG_PATH = Path(__file__).parent.parent / "logs" / "ceo_departure_scan.log"
-ALERT_PATH = Path(__file__).parent.parent / "logs" / "ceo_departure_alerts.jsonl"
+import db as _db
 
 # Known relief-rally exclusions from hypothesis 5dbcfb37
 # These companies show POSITIVE stock reaction to CEO departure -- do NOT short
@@ -163,10 +163,10 @@ def main():
                 "hypothesis_id": "5dbcfb37",
                 "instruction": "SHORT at next-day open, 1d hold, $5000 position"
             }
-            with open(ALERT_PATH, "a") as f:
-                f.write(json.dumps(alert) + "\n")
+            _db.init_db()
+            _db.append_scanner_signal('ceo_departure', alert)
 
-        print(f"\nAlerts written to {ALERT_PATH}")
+        print(f"\nAlerts written to scanner_signals table")
     else:
         print(f"\nNo qualifying CEO departure events found in {start} to {end}.")
 

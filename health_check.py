@@ -19,26 +19,23 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).parent
 DAEMON_LOG = BASE_DIR / "logs" / "daemon.log"
-HEALTH_STATE = BASE_DIR / "logs" / "health_state.json"
 VENV_PYTHON = BASE_DIR / "venv" / "bin" / "python3"
 MAX_SILENCE_MINUTES = 120  # alert if no session in 2 hours
 
 # Add project to path for imports
 sys.path.insert(0, str(BASE_DIR))
+import db as _db
 
 
 def _load_state():
-    try:
-        with open(HEALTH_STATE) as f:
-            return json.load(f)
-    except Exception:
-        return {}
+    _db.init_db()
+    return _db.get_state('health_state') or {}
 
 
 def _save_state(state):
     state["last_check"] = datetime.now().isoformat()
-    with open(HEALTH_STATE, "w") as f:
-        json.dump(state, f, indent=2)
+    _db.init_db()
+    _db.set_state('health_state', state)
 
 
 def _daemon_is_alive():

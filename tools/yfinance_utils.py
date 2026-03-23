@@ -1,7 +1,7 @@
 """
 yfinance_utils.py - Shared utility wrappers for yfinance downloads.
 
-Solves the recurring MultiIndex column-handling bug documented in logs/friction_log.jsonl.
+Solves the recurring MultiIndex column-handling bug documented in friction_log.
 In yfinance >= 0.2.x (and confirmed in 1.2.0), BOTH single-ticker and multi-ticker
 yf.download() calls return a MultiIndex column structure like:
 

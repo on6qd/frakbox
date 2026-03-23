@@ -23,9 +23,6 @@ from config import (
     MAX_PORTFOLIO_DRAWDOWN_PCT, require_alpaca,
 )
 
-_PEAK_EQUITY_PATH = os.path.join(os.path.dirname(__file__), "logs", "peak_equity.json")
-
-
 def get_api():
     require_alpaca()
     return tradeapi.REST(ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_BASE_URL, api_version="v2")
@@ -188,22 +185,11 @@ def _load_hypotheses():
     return _db.load_hypotheses()
 
 
-def _save_hypotheses(hypotheses):
-    """Save hypotheses to SQLite database."""
-    _db.save_hypotheses(hypotheses)
-
-
 def _update_peak_equity(current_equity):
-    """Track peak portfolio equity for drawdown calculation."""
-    peak = current_equity
-    try:
-        with open(_PEAK_EQUITY_PATH) as f:
-            data = json.load(f)
-            peak = max(data.get("peak_equity", current_equity), current_equity)
-    except Exception:
-        pass
-    with open(_PEAK_EQUITY_PATH, "w") as f:
-        json.dump({"peak_equity": peak, "updated": datetime.now().isoformat()}, f)
+    """Track peak portfolio equity for drawdown calculation. Uses SQLite kv_state."""
+    data = _db.get_state("peak_equity") or {}
+    peak = max(data.get("peak_equity", current_equity), current_equity)
+    _db.set_state("peak_equity", {"peak_equity": peak, "updated": datetime.now().isoformat()})
     return peak
 
 
@@ -233,7 +219,6 @@ def check_stop_losses():
 
     actions = []
     now = datetime.now()
-    modified = False
 
     for h in hypotheses:
         if h.get("status") != "active":
@@ -246,7 +231,7 @@ def check_stop_losses():
 
         entry_price = trade.get("entry_price", 0)
         direction = h.get("expected_direction", "long")
-        stop_loss_pct = trade.get("stop_loss_pct", DEFAULT_STOP_LOSS_PCT)
+        stop_loss_pct = trade.get("stop_loss_pct") or DEFAULT_STOP_LOSS_PCT
         take_profit_pct = trade.get("take_profit_pct", DEFAULT_TAKE_PROFIT_PCT)
         deadline = trade.get("deadline")
 
@@ -272,8 +257,8 @@ def check_stop_losses():
 
         reason = None
 
-        # Stop-loss check
-        if stop_loss_pct and position_return_pct <= -stop_loss_pct:
+        # Stop-loss check (always active — stop_loss_pct is never None/0 after the guard above)
+        if stop_loss_pct is not None and position_return_pct <= -stop_loss_pct:
             reason = f"STOP-LOSS: {symbol} down {position_return_pct:+.1f}% (limit: -{stop_loss_pct}%)"
 
         # Take-profit check
@@ -303,7 +288,8 @@ def check_stop_losses():
                     "auto_closed": True,
                     "spy_at_entry": trade.get("spy_at_entry"),
                 }
-                modified = True
+                # Save THIS hypothesis only (avoids bulk overwrite race condition)
+                _db.save_hypothesis(h)
                 actions.append({
                     "action": "closed",
                     "hypothesis_id": h["id"],
@@ -329,9 +315,6 @@ def check_stop_losses():
                        f"New trades should be halted.",
             "drawdown_pct": round(drawdown_pct, 1),
         })
-
-    if modified:
-        _save_hypotheses(hypotheses)
 
     return actions
 

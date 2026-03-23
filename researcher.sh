@@ -76,38 +76,19 @@ run_session() {
 
   local prompt
   prompt=$(cat <<'PROMPT'
-Your agent constitution (.claude/agents/financial-researcher.md) is loaded automatically — it defines your scientific standards and operational rules.
+Run: python3 run.py --context
+This is your complete state — account, trades, hypotheses, knowledge, queue, journal, friction, and data integrity. Steer.md (human directions) is included. Prioritize human directions over your own queue.
 
-Read steer.md first — it contains directions from the human researcher. If there are active directions, prioritize them over your own queue. Note which ones you picked up.
+Do NOT dump full datasets (load_hypotheses(), load_knowledge(), load_queue()). Only query individual items (get_hypothesis_by_id, get_known_effect, db.get_recent_journal, etc.) when you need deep detail.
 
-Then read CLAUDE.md and your state files:
-- research_queue.json (priorities and handoff from last session)
-- knowledge_base.json (what you know)
-- hypotheses.json (all hypotheses)
-- methodology.json (research parameters)
-- logs/research_journal.jsonl (session history)
-- tools/ (custom analysis tools built by previous sessions)
+Read API_REFERENCE.md only when you need a function signature — not at session start.
 
-Then run: python run.py --status (if it fails, read the JSON files directly)
-
-You have approximately 50 minutes before this session times out. Commit to git after each significant finding.
-
-Check logs/friction_log.jsonl for recurring friction patterns (3+ occurrences) — build tools to fix them.
-
-Run research.verify_data_integrity() to check for data loss or dangling references.
-
-Decide what is most valuable to work on right now. You might:
-- Follow up on priorities from the last session
-- Check news for events matching your watchlist
-- Research a new question from the queue
-- Run backtests and form hypotheses
-- Review active experiments past their deadline
-- Place or close paper trades
+You have ~50 minutes. Commit to git after each significant finding.
 
 Do the work. When done:
-1. Update research_queue.json with handoff for the next session
-2. Append to logs/research_journal.jsonl
-3. Commit your changes to git
+1. Update research_queue with handoff for the next session
+2. Log journal entry: db.append_journal_entry(date, type, investigated, findings, surprised_by, next_step)
+3. Commit to git
 PROMPT
   )
 
@@ -138,6 +119,25 @@ PROMPT
     status="crashed"
   fi
 
+  # Log token usage from the session to SQLite
+  python3 -c "
+from email_report import parse_token_usage
+import db
+db.init_db()
+usage = parse_token_usage('$logfile')
+if usage.get('total_tokens', 0) > 0:
+    db.append_token_usage(
+        input_tokens=usage.get('input_tokens', 0),
+        output_tokens=usage.get('output_tokens', 0),
+        cache_read_tokens=usage.get('cache_read_tokens', 0),
+        cache_creation_tokens=usage.get('cache_creation_tokens', 0),
+        total_tokens=usage.get('total_tokens', 0),
+        api_calls=usage.get('api_calls', 0),
+        session='$logfile',
+        status='$status',
+    )
+" >> logs/daemon.log 2>&1 || true
+
   # Log status (daily digest sent at end of research window instead)
   echo "Session $status: $logfile" >> logs/daemon.log
 }
@@ -162,8 +162,8 @@ while true; do
   fi
 
   # Research session — every 15 min, only during night window (9 PM – 7 AM)
-  local hour=$(date +%H)
-  local in_window=0
+  hour=$(date +%H)
+  in_window=0
   if (( hour >= RESEARCH_START_HOUR || hour < RESEARCH_END_HOUR )); then
     in_window=1
     if (( current - last_session >= SESSION_INTERVAL )); then

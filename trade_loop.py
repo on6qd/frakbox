@@ -28,7 +28,6 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 BASE_DIR = Path(__file__).parent
-TRADE_LOG_PATH = BASE_DIR / "logs" / "trade_log.jsonl"
 
 ET = ZoneInfo("America/New_York")
 
@@ -42,16 +41,10 @@ def _load_hypotheses():
     return _db.load_hypotheses()
 
 
-def _save_hypotheses(hypotheses):
-    _db.save_hypotheses(hypotheses)
-
-
 def _log_trade_action(action):
-    """Append a trade action to the trade log."""
+    """Append a trade action to the SQLite trade log."""
     action["timestamp"] = datetime.now().isoformat()
-    os.makedirs(BASE_DIR / "logs", exist_ok=True)
-    with open(TRADE_LOG_PATH, "a") as f:
-        f.write(json.dumps(action) + "\n")
+    _db.append_trade_log(action)
 
 
 def _market_is_open():
@@ -164,11 +157,11 @@ def _send_trade_email(subject, actions):
 def execute_pending_triggers():
     """Check all pending hypotheses for ready triggers and execute trades."""
     from trader import place_experiment, check_portfolio_drawdown, get_current_price
-    from config import DEFAULT_STOP_LOSS_PCT, DEFAULT_TAKE_PROFIT_PCT
+    from config import DEFAULT_STOP_LOSS_PCT, DEFAULT_TAKE_PROFIT_PCT, MIN_STOP_LOSS_PCT, MAX_CONCURRENT_EXPERIMENTS
 
     hypotheses = _load_hypotheses()
+    active_count = sum(1 for h in hypotheses if h.get("status") == "active")
     actions = []
-    modified = False
 
     for h in hypotheses:
         if h.get("status") != "pending":
@@ -193,6 +186,17 @@ def execute_pending_triggers():
             })
             continue
 
+        # Enforce max concurrent experiments
+        if active_count >= MAX_CONCURRENT_EXPERIMENTS:
+            actions.append({
+                "action": "blocked",
+                "symbol": symbol,
+                "hypothesis_id": h["id"],
+                "detail": f"Max {MAX_CONCURRENT_EXPERIMENTS} concurrent experiments reached",
+                "success": False,
+            })
+            continue
+
         direction = h.get("expected_direction", "long")
         position_size = h.get("trigger_position_size", 5000)
 
@@ -207,6 +211,11 @@ def execute_pending_triggers():
                 "success": False,
             })
             continue
+
+        # Enforce minimum stop loss — every trade MUST have one
+        stop_loss = h.get("trigger_stop_loss_pct")
+        if stop_loss is None or stop_loss < MIN_STOP_LOSS_PCT:
+            stop_loss = DEFAULT_STOP_LOSS_PCT
 
         # Place the trade (extended_hours=True for after_hours_immediate trigger)
         if use_extended_hours:
@@ -225,7 +234,7 @@ def execute_pending_triggers():
                 "entry_time": datetime.now().isoformat(),
                 "order_id": result.get("order_id"),
                 "deadline": (datetime.now() + timedelta(days=h.get("expected_timeframe_days", 5))).isoformat(),
-                "stop_loss_pct": h.get("trigger_stop_loss_pct", DEFAULT_STOP_LOSS_PCT),
+                "stop_loss_pct": stop_loss,
                 "take_profit_pct": h.get("trigger_take_profit_pct", DEFAULT_TAKE_PROFIT_PCT),
                 "spy_at_entry": spy_price,
                 "vix_at_entry": None,
@@ -235,7 +244,10 @@ def execute_pending_triggers():
                 "limit_price": result.get("limit_price"),
             }
             h["trigger"] = None  # consumed
-            modified = True
+
+            # Save THIS hypothesis only (avoids bulk overwrite race condition)
+            _db.save_hypothesis(h)
+            active_count += 1
 
             actions.append({
                 "action": "activated",
@@ -268,9 +280,6 @@ def execute_pending_triggers():
                 "symbol": symbol,
                 "error": result.get("error"),
             })
-
-    if modified:
-        _save_hypotheses(hypotheses)
 
     return actions
 
@@ -379,7 +388,7 @@ if __name__ == "__main__":
         if active:
             print(f"\nActive positions: {len(active)}")
             for h in active:
-                print(f"  {h['id'][:8]} | {h['expected_symbol']} | deadline={h.get('trade',{}).get('deadline','?')[:10]}")
+                print(f"  {h['id'][:8]} | {h['expected_symbol']} | deadline={str((h.get('trade') or {}).get('deadline','?'))[:10]}")
         recon = reconcile_positions()
         if recon:
             print(f"\nReconciliation warnings:")
