@@ -849,71 +849,57 @@
       "hypothesis_template": "86d28864",
       "added": "2026-03-23T01:41:06.453926",
       "status": "watching"
+    },
+    {
+      "event": "RCKT (Rocket Pharmaceuticals) PDUFA date - FDA decision expected March 28 2026. If CRL issued and stock crashes >55% from ~$4.14 base, qualifies for d302c84b short (enter next-day open, hold 3 days for -27% additional decline).",
+      "expected_date": "2026-03-28",
+      "symbol": "RCKT",
+      "hypothesis_template": "d302c84b",
+      "added": "2026-03-23T03:56:10.491431",
+      "status": "watching"
     }
   ],
   "next_session_priorities": [
     {
-      "task": {
-        "task": "Close GO long trade: run python tools/close_go_trade.py on March 26. Entry was at market open March 23 (~$5.79). Measure 5d abnormal return vs SPY from entry to March 28 close.",
-        "deadline": "2026-03-26",
-        "priority": "URGENT"
-      },
-      "set_by_session": "2026-03-23T03:18:42.017101"
+      "task": "URGENT: Close GO trade on March 26 - run python tools/close_go_trade.py. Entry was at GO market open March 24. Hold 5 trading days from entry (close March 31).",
+      "set_by_session": "2026-03-23T04:03:46.961238"
     },
     {
-      "task": {
-        "task": "Close HD short trade: run python tools/close_hd_trade.py on March 27 (5 trading days from entry March 23). Entry was at market open March 23 (~$320.75). Compare vs SPY 5d abnormal return.",
-        "deadline": "2026-03-27",
-        "priority": "URGENT"
-      },
-      "set_by_session": "2026-03-23T03:18:42.017106"
+      "task": "URGENT: Close HD trade on March 27 - run python tools/close_hd_trade.py. Entry was at HD market open March 24. Hold 5 trading days from entry (close April 1).",
+      "set_by_session": "2026-03-23T04:03:46.961244"
     },
     {
-      "task": {
-        "task": "CEO departure signal refinement: Hypothesis 5dbcfb37 needs an additional qualifier. OOS March 2026: FBIN correctly fell (genuine surprise), LULU incorrectly rallied (welcome departure). Need to add: IF stock was recovering (20d return positive before CEO announcement), do NOT trade. If stuck in continued downtrend (20d negative), trade short.",
-        "priority": "HIGH"
-      },
-      "set_by_session": "2026-03-23T03:18:42.017107"
+      "task": "HIGH: Record V Visa OOS result - entry was March 19 open ($298.04). Exit March 26 close. Track actual 5d return for hypothesis 86d28864. As of March 20, V was UP +2.21% abnormal (SHORT was losing).",
+      "set_by_session": "2026-03-23T04:03:46.961245"
     },
     {
-      "task": {
-        "task": "Monitor REPL PDUFA April 10 (Replimune). If FDA issues CRL and stock crashes >55%, it may qualify for d302c84b. But REPL first CRL was -45.2% (below 55% threshold) so likely won't qualify. Monitor as data point.",
-        "deadline": "2026-04-10",
-        "priority": "MEDIUM"
-      },
-      "set_by_session": "2026-03-23T03:18:42.017108"
+      "task": "HIGH: Monitor RCKT PDUFA on March 28. If CRL issued AND crash >55%, qualifies for d302c84b short. Entry would be March 29 open. Threshold: stock must fall from ~$4.14 to below ~$1.86.",
+      "set_by_session": "2026-03-23T04:03:46.961246"
     },
     {
-      "task": {
-        "task": "Research new signal: consider testing large-cap SPIN-OFF announcement effect. When a large-cap announces spinning off a division, does the parent or child stock drift? Academic backing: Cusatis et al 1993 finds spinoffs outperform. Use EDGAR 8-K search for 'spin-off' or 'separation' or 'spinco' events 2020-2024.",
-        "priority": "MEDIUM"
-      },
-      "set_by_session": "2026-03-23T03:18:42.017109"
+      "task": "MEDIUM: CEO departure refinement (20d qualifier): 20d abnormal > +3% before departure = SKIP (welcome departure). CVS correctly skipped by this rule (+8.23% prior). STLA still a miss (-9.17% prior but welcomed). Document in hypothesis 5dbcfb37 notes.",
+      "set_by_session": "2026-03-23T04:03:46.961246"
     },
     {
-      "task": {
-        "task": "Monitor VIX level for WD trade activation. WD (76678219) activates when VIX drops below 25. VIX on March 20 was 26.78. If VIX drops to <25, activate WD using the trigger mechanism.",
-        "priority": "MEDIUM"
-      },
-      "set_by_session": "2026-03-23T03:18:42.017109"
+      "task": "MEDIUM: Research guidance raise signal - when companies raise full-year guidance mid-quarter via 8-K (not at earnings), does the stock drift up? Uses same EDGAR EFTS pipeline. Search for '8-K' filings with phrases 'raises guidance' or 'increases full-year'. This is different from PEAD - it's about mid-quarter news, not post-earnings.",
+      "set_by_session": "2026-03-23T04:03:46.961247"
+    },
+    {
+      "task": "MEDIUM: Monitor WD activation when VIX drops below 25. VIX was 26.78 on March 20. Check daily at market close. When VIX<25, set trigger=next_market_open on hypothesis 76678219.",
+      "set_by_session": "2026-03-23T04:03:46.961250"
+    },
+    {
+      "task": "LOW: SpinCo institutional selling short - test if newly-traded SpinCo entities underperform for 30-90 days post-separation. Houlihan Lokey 2022 finds -6% at 30 days, -12% at 18 months. Need to identify ex-dates (when SpinCo began trading) and download price data.",
+      "set_by_session": "2026-03-23T04:03:46.961251"
     }
   ],
   "session_handoff": {
-    "investigation": "Multiple OOS CEO departure data points collected (FBIN, LULU, SDRL). Market hypothesis 5dbcfb37 needs refinement.",
-    "key_findings": [
-      "FBIN CEO departure March 16: stock fell ~2.91% abnormal (correct direction)",
-      "LULU CEO departure March 17: stock RALLIED ~5% abnormal (welcome departure - CEO was widely blamed, market saw this as positive)",
-      "SDRL CEO departure March 18: SCANNER FALSE POSITIVE (internal promotion, not performance failure)",
-      "SP500 universe now cached in data/sp500_universe.json (433 tickers)",
-      "52w-low scanner now loads from SP500 cache instead of hardcoded list",
-      "GO long and HD short executing at market open March 23",
-      "Tested FDA approval drift (N=12, p=0.09-0.16) - dead end due to delistings and high variance",
-      "Tested insider cluster near earnings - dead end (p=0.87, data limitation)",
-      "Sector earnings signal confirmed dead end from last session"
-    ],
-    "blocked_by": "Market opens at 9:30 ET for GO/HD trades. VIX still elevated (26.78 on March 20) blocking WD activation.",
-    "next_session_immediate_action": "Run python run.py --status to verify GO and HD executed. Check current VIX. If VIX <25, activate WD. Run close_go_trade.py March 26 and close_hd_trade.py March 27.",
-    "written_at": "2026-03-23T03:18:42.017111"
+    "investigating": "Spin-off announcement LONG signal and FINRA short volume spikes",
+    "state": "Both tested and recorded as dead ends. Spin-off returns are captured in overnight pre-open gap (not tradeable at open). FINRA SVR large-cap signal: p=0.96, no effect.",
+    "intermediate_findings": "CEO departure 20d qualifier: adding '20d abnormal > 0% \u2192 SKIP' improves accuracy from 80% to 89%. CVS correctly filtered. FINRA REGSHO data is accessible from 2019 via CDN. Spin-off EDGAR 8-K dates lag actual announcement by days-weeks.",
+    "blocked_by": "Spin-off would need Bloomberg/Refinitiv press release timestamps. Guidance raise signal needs same EDGAR EFTS pipeline but different phrases (untested).",
+    "next_step": "First priority: confirm GO and HD trade entries at Monday open via run.py --status. Then close on deadlines. Then test guidance raise signal via EDGAR EFTS.",
+    "written_at": "2026-03-23T04:03:46.961252"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

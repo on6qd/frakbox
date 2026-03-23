@@ -250,6 +250,16 @@
       ],
       "gaps": "Need to identify exact SpinCo first-trading dates and test systematically. Shorting newly-public SpinCo may have high borrow costs. Need to verify borrow availability for test cases.",
       "recorded": "2026-03-23T03:53:13.860319"
+    },
+    "finra_short_volume_spike": {
+      "summary": "FINRA REGSHO data provides daily short volume by ticker. Available from 2019 via cdn.finra.org/equity/regsho/daily/CNMSshvol{YYYYMMDD}.txt. Data is free and accessible. Academic work (Boehmer et al 2008) shows short volume is predictive but effect concentrated in small-caps, not large-caps where shorts are mostly hedging/HFT.",
+      "known_magnitude": "Near zero for large-caps. Paper finds significant effect but for small-caps in 2000-2004 era.",
+      "known_timeframe": "1-5 days if effect exists",
+      "sources": [
+        "Boehmer, Jones & Zhang (2008) 'Which Shorts Are Informed?' JFE 93(2):307-345"
+      ],
+      "gaps": "Need to test on small-cap universe. Also could test PERSISTENT high SVR (ratio >60% for 5+ consecutive days) as squeeze signal (long side).",
+      "recorded": "2026-03-23T04:03:16.040984"
     }
   },
   "known_effects": {
@@ -451,29 +461,12 @@
       "last_updated": "2026-03-21T21:33:45.174443"
     },
     "ceo_performance_failure_departure_short": {
-      "event": "CVBF CVB Financial 8-K filed 2026-03-18",
-      "ticker": "CVBF",
-      "market_cap_m": 2526,
-      "departure_type": "NOT_A_CEO_DEPARTURE",
-      "scanner_classification": "unknown -- manual review needed (false positive)",
-      "actual_classification": "DISQUALIFIED - FALSE POSITIVE",
-      "qualification_check": {
-        "market_cap_above_1B": true,
-        "is_ceo_departure": false,
-        "qualifies": false
-      },
-      "disqualification_reasons": [
-        "(1) The March 18, 2026 8-K is NOT an officer departure filing. It reports Item 8.01 (Other Events), not Item 5.02.",
-        "(2) The 8-K is a supplement to the Heritage Commerce merger proxy statement, disclosing shareholder lawsuits and financial metric updates.",
-        "(3) David Brager remains CEO of CVB Financial and will continue as CEO of the combined entity post-merger.",
-        "(4) CVB Financial is performing well: Q4 2025 EPS $0.40/share, FY2025 EPS $1.52 (+5.6% YoY), no earnings misses.",
-        "(5) The scanner false-positive likely occurred because the 8-K text mentions officers in the context of executive compensation disclosures for the merger."
-      ],
-      "scanner_false_positive_reason": "The 8-K keyword scan matched officer-related language in a merger proxy supplement. No Item 5.02 filed. No CEO departure occurred.",
-      "filing_date": "2026-03-18",
-      "action": "NO TRADE - not a CEO departure event at all",
-      "date_reviewed": "2026-03-22",
-      "last_updated": "2026-03-22T13:45:56.493042"
+      "qualifier_test": "20d_abnormal_prior_return",
+      "finding": "Stock recovering (20d abnormal > 0%) before CEO departure often signals WELCOME departure (relief rally). CVS Oct 2024: +8.23% 20d prior, CEO departure \u2192 +0.95% (should SKIP). Adding 20d qualifier: accuracy improves from 80% to 89% on N=9 (PARA/WBA delisted).",
+      "remaining_failure": "STLA Dec 2024: still fell -9.17% 20d prior (still in downtrend) but CEO departure was welcomed (+0.62%). Tavares was perceived as the problem. Hard to filter mechanically.",
+      "recommended_filter": "Add 20d abnormal > +3% as SKIP criterion. Avoids CVS type. Doesn't solve all cases.",
+      "hypothesis_id": "5dbcfb37",
+      "last_updated": "2026-03-23T03:55:33.984643"
     },
     "ceo_performance_departure": {
       "OOS_SDRL_march_18": {
@@ -952,6 +945,11 @@
       "event_type": "spinoff_announcement_long_parent",
       "reason": "EDGAR 8-K filing dates lag actual press release/announcement dates by days to weeks. When using correct announcement dates (verified via web research for IBM 10/08, GE 11/09, MMM 7/26), the return is concentrated in the OVERNIGHT GAP (close-of-announcement-day to next-day open, avg +5.5% for focus-increasing events). By the time we enter at market open, the entire return is already priced in. Backtest with EDGAR dates (n=18 firm phrase events): avg abnormal 1d=+0.13%, p=0.79 \u2014 essentially noise. Backtest with curated correct dates (n=13): avg 1d=+0.23%, p=0.75 \u2014 still noise because we enter at open post-gap. Gap decomposition: avg overnight gap = +0.01%, avg intraday = +0.62% (high variance). DATA FIX NEEDED: Press release dates from Bloomberg/Refinitiv API. ALTERNATIVE: Test SpinCo institutional selling pressure as SHORT signal in first 30-90 days after SpinCo begins trading (different, potentially testable strategy). SIGNAL IS REAL (IBM +5.1%, GE +2.98%, MMM +6.12% abnormal on announcement day close-to-close), but not tradeable at next-day open with our current data access.",
       "recorded": "2026-03-23T03:53:13.858014"
+    },
+    {
+      "event_type": "finra_short_volume_spike",
+      "reason": "FINRA REGSHO daily short volume ratio (SVR) spike detection tested on 30 large-cap S&P 500 stocks (2023-H2). N=111 spike events (z > 2.0 above 20d rolling mean). Results: mean next-day abnormal = -0.009%, % negative = 49.5%, p=0.9639. High spikes only (z>3, n=10): mean = -0.387% (too few events for significance). Academic paper (Boehmer et al 2008 JFE 'Which Shorts Are Informed?') found short volume IS predictive, but effect is concentrated in SMALLER stocks where shorts have informational advantage. Large-cap short sellers are mostly HFT/hedging, not informed directional bets. Conclusion: test on micro/small-cap universe might show different results, but those stocks have execution risk and liquidity issues. Dead end for large-cap focus.",
+      "recorded": "2026-03-23T04:03:16.039574"
     }
   ]
 }
