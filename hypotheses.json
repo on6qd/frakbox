@@ -3238,7 +3238,10 @@
     },
     "trigger": "next_market_open",
     "trigger_position_size": 5000,
-    "trigger_stop_loss_pct": 10
+    "trigger_stop_loss_pct": 10,
+    "notes": [
+      "2026-03-23: VIX at ~26.78 (elevated range 20-30). NO VIX gate applied. Rationale: 2022 OOS bear market validation (n=66, VIX ranged 18-37, median ~25) showed 3d avg +3.89% with 70%+ consistency - signal confirmed in elevated VIX. Current VIX ~26-27 is within the regime already tested. A VIX gate would have blocked 2022 validation events that confirmed the signal. If VIX were >35 (crisis/spike) that would warrant pause - but at 26-27 signal remains valid. Proceeding with next_market_open trigger as planned."
+    ]
   },
   {
     "id": "5f805860",
@@ -10400,6 +10403,14 @@
         "symbol": "UBER",
         "date": "2024-08-16",
         "timing": "pre_market"
+      },
+      {
+        "symbol": "VST",
+        "date": "2025-12-02",
+        "note": "Negative result: stock up ~400% pre-upgrade (AI/power hype). 3d abnormal=-3.79%. Suggests pre-event run-up >150% may neutralize signal.",
+        "outcome": "negative",
+        "abnormal_1d": -0.93,
+        "abnormal_3d": -3.79
       }
     ],
     "historical_evidence": [
@@ -10536,6 +10547,9 @@
     ],
     "dead_end_warnings": null,
     "trade": null,
-    "result": null
+    "result": null,
+    "notes": [
+      "2026-03-23: VST (Dec 2025 out-of-sample) was negative (-3.79% 3d abnormal). VST had run up ~400% in 12 months prior. Hypothesis: pre-event equity run-up >150% may neutralize first-IG signal (market already priced in credit improvement). Need to add pre-event-run-up filter to hypothesis before next trade."
+    ]
   }
 ]

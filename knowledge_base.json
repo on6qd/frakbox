@@ -1150,8 +1150,9 @@
     },
     {
       "event_type": "merger_hsr_clearance",
-      "reason": "HSR early termination (antitrust clearance) shows zero abnormal returns for M&A targets. Backtest on 199 EDGAR-sourced events (2019-2024): 1d avg abnormal=-0.02% (p=0.96), 3d=-0.28% (p=0.87), 5d=1.00% (p=0.53), 10d=2.17% (p=0.33). Large-cap-only subset (143 events, 1B+ market cap): 1d=-0.20% (p=0.56), 5d=0.30% (p=0.74). Bootstrap CI at every horizon includes zero. Passes multiple testing: False. Root cause: (1) HSR clearance is typically anticipated and priced in once deal announcement occurs. (2) Filing contamination -- many events in the dataset are NOT true M&A targets: acquirers filing HSR for their own acquisitions, companies with unrelated stock runs (PLUG, RUN, MARA, etc.) that happened to file HSR 8-Ks. (3) The signal in the literature (Giglio & Shue 2014) is at deal announcement, not clearance. Clearance is a confirmatory non-event for risk arb. Do not re-test without a curated, hand-verified list of confirmed M&A targets at clearance date.",
-      "recorded": "2026-03-23T09:41:15.894051"
+      "reason": "HSR early termination 8-K events (antitrust clearance) do not produce measurable abnormal returns for M&A targets. Backtest: N=199 likely targets 2019-2024, avg_1d=-0.02% (p=0.96), no horizon passes multiple testing. Reasons: (1) clearance is confirmatory, not discovery - market already prices completion probability at announcement; (2) EDGAR 8-K filter contaminated by acquirer filings even after 15% pre-event return filter; (3) actual target identification from EDGAR EFTS requires deal price data not freely available. HSR clearance resolves <20% of remaining deal risk; the spread compression at clearance is too small vs transaction costs. Better approach for merger arb: buy at ANNOUNCEMENT date and hold (well-studied), not at clearance milestone.",
+      "recorded": "2026-03-23T09:41:15.894051",
+      "updated": "2026-03-23T09:50:04.068875"
     }
   ]
 }

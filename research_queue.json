@@ -1019,29 +1019,28 @@
   ],
   "next_session_priorities": [
     {
-      "task": "Continue merger arbitrage research: test spread compression signal AFTER confirmed deal announcement (not clearance). Use Merger-Arb ETF holdings or M&A deal databases to get clean target lists.",
-      "set_by_session": "2026-03-23T09:41:34.232328"
+      "task": "Monitor GO (1cb6140f) trade outcome \u2014 entry at next_market_open, 3d hold. Close by EOD ~2026-03-26.",
+      "set_by_session": "2026-03-23T09:50:42.353441"
     },
     {
-      "task": "Consider testing: do M&A target stocks outperform in the 30-90 day window AFTER announcement vs clearance date specifically?",
-      "set_by_session": "2026-03-23T09:41:34.232334"
+      "task": "Monitor WD hypothesis if also active \u2014 check trade_loop.py status.",
+      "set_by_session": "2026-03-23T09:50:42.353446"
     },
     {
-      "task": "Consider activation of any existing validated hypotheses sitting idle.",
-      "set_by_session": "2026-03-23T09:41:34.232335"
+      "task": "VST out-of-sample data added to f86dcb4e (first-IG) \u2014 needs pre-event-run-up filter research before next trade.",
+      "set_by_session": "2026-03-23T09:50:42.353447"
     },
     {
-      "task": "For hypothesis f86dcb4e (first_ig_credit_upgrade): hypothesis still has expected_symbol=TBD. Search Moody's/S&P rising star lists Q1 2026 for US companies (>B mktcap) with all agencies at BB+/Ba1 and positive outlook. Candidate to watch: Permian Resources Moody upgrade (but PR is 3rd agency - skip). Look instead for companies with ZERO current IG ratings. Tool: WebSearch for \"Moody rising star 2026\" or \"S&P potential rising star\".",
-      "set_by_session": "2026-03-23-task3"
+      "task": "First-IG hypothesis (f86dcb4e) has expected_symbol=TBD \u2014 do not activate until next qualifying event AND pre-run-up filter is validated.",
+      "set_by_session": "2026-03-23T09:50:42.353448"
     }
   ],
   "session_handoff": {
-    "investigated": "HSR early termination (antitrust clearance) as M&A target signal",
-    "state": "DEAD END - fully backtested and recorded",
-    "findings": "199 events scraped from EDGAR 8-K, 143 large-cap after filtering. Zero abnormal returns at all horizons (1d to 20d). Signal does not exist at clearance date. Literature signal is at announcement, not clearance.",
-    "blocker": "Dataset contamination: EDGAR HSR 8-Ks include acquirer filings and unrelated HSR mentions. No clean way to separate target vs acquirer from EDGAR text alone without hand-verification.",
-    "next_step": "Test a different merger arb signal: post-announcement drift for confirmed targets. Need a curated M&A deal database (e.g., Bloomberg/SDC or a hand-curated list) to get clean target symbols at announcement date.",
-    "written_at": "2026-03-23T09:41:34.232336"
+    "go_trade": "GO hypothesis 1cb6140f has trigger=next_market_open, , 10% stop-loss. Trade loop should execute at 9:30 ET. VIX is ~26.78 (elevated but signal confirmed in 2022 bear at same VIX). No VIX gate needed.",
+    "first_ig_update": "f86dcb4e updated with VST Dec 2025 OOS negative result (-3.79% 3d abnormal). VST had +400% run-up prior. Pre-event run-up >150% appears to neutralize the IG upgrade signal. Need to backtest this as a filter before next activation.",
+    "dead_end_recorded": "merger_hsr_clearance recorded as dead end. HSR 8-K events produce no measurable return (p=0.96). Do not re-investigate merger arb via clearance milestone.",
+    "vix_note": "VIX latest datapoint was 26.78 (March 20). Elevated but within regime covered by 2022 OOS bear cohort. Not crisis level.",
+    "written_at": "2026-03-23T09:50:42.353449"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
