@@ -6,7 +6,24 @@ The researcher will note which items it picked up.
 
 ## Directions
 
--look into the relationship between the buy/sell orders of us politicians, or any legal entity they can be connected too, or relatives etc.
+## 2026-03-23 Politician Trading Signal (RESPONDED)
+User asked: look into the relationship between the buy/sell orders of us politicians, or any legal entity they can be connected too, or relatives etc.
+
+EXHAUSTIVELY TESTED (5 approaches, all dead ends):
+1. 2023-2026 Capitol Trades (25,493 records, all large-cap purchases): +0.20% avg, direction=44%. Effect too small, below 0.5% threshold.
+2. 2012-2020 Senate Stock Watcher data (8,350 records with SPOUSE flag): Tested self/spouse/joint/child separately. All p>0.10, direction 39-45%. No signal. STOCK Act disclosure lag (avg 30 days) eliminates any informational edge.
+3. Reporting gap segmentation (fast/medium/slow disclosures): Medium(11-30d) p=0.0004 but direction=47% ONLY — below 50% threshold. Not tradeable.
+4. Timothy Moore (R/House): Signal only in 2025 — regime-specific to Trump tariff volatility. Not generalizable.
+5. Markwayne Mullin (Senate): n=83, direction=51%, too small.
+
+Conclusion: DEAD END. US politician stock trading offers no consistently tradeable signal. Tested across:
+- Date ranges: 2012-2020 and 2023-2026
+- Owner types: politician self, spouse, joint accounts, children
+- Trade sizes: all amounts, >$15K, >$50K
+- Disclosure speed: fast (<10d), medium (11-30d), slow (>30d)
+- Individual politicians with high activity
+
+Root cause: STOCK Act 30-45 day disclosure lag means all information is priced in by the time it's public. Dead ends recorded in knowledge base.
 
 ## 2026-03-22 Disposition Effect / Cost Basis Signal (RESPONDED)
 User suggested: When stock rises on low volume, lots of investors have unrealized gains -> produces selling pressure. When stock rises on high volume, less investors have unrealized gains -> produces less selling. Is it possible to calculate the average price at which investors are in a stock, and compare that to the actual price to predict direction?
