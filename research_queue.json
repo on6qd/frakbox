@@ -479,6 +479,15 @@
       "added": "2026-03-23T04:41:19.790972"
     },
     {
+      "id": "664eed59",
+      "category": "signal_refinement",
+      "question": "Can keyword analysis of 8-K text ('sale of the company', 'unsolicited proposal', 'take private') isolate a pure acquisition-target subset from strategic alternatives announcements with stronger signal?",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "Strategic alternatives full dataset: p=0.26, dead end. But the 'acquisition target' subset may have p<0.05 if we can identify it using text keywords without look-ahead bias. Would need to download and parse ~51 8-K filing documents from EDGAR.",
+      "added": "2026-03-23T05:41:41.828941"
+    },
+    {
       "id": "seed-003",
       "category": "fda_decision",
       "question": "For Phase 3 FDA approvals/rejections of novel drugs (not generics, not supplements), what is the typical abnormal return at 1d and 5d horizons? Does the effect differ between first-time submissions and resubmissions after a Complete Response Letter?",
@@ -908,56 +917,34 @@
   ],
   "next_session_priorities": [
     {
-      "task": "URGENT: Verify GO (1cb6140f) and HD (86d28864) trades executed at 9:30 AM ET March 23. Check run.py --status after market open.",
-      "set_by_session": "2026-03-23T05:16:10.970702"
+      "task": "Investigate activist-involvement qualifier for strategic alternatives: test if events where a 13D/13G was filed within 90 days before the 8-K show stronger/more reliable abnormal returns",
+      "set_by_session": "2026-03-23T05:41:41.827507"
     },
     {
-      "task": "URGENT: Close GO trade March 26 - run python tools/close_go_trade.py at close.",
-      "set_by_session": "2026-03-23T05:16:10.970708"
+      "task": "Check current active trades (GO, WD spinco VGNT) for status updates",
+      "set_by_session": "2026-03-23T05:41:41.827512"
     },
     {
-      "task": "URGENT: Close HD trade March 27 - run python tools/close_hd_trade.py at close.",
-      "set_by_session": "2026-03-23T05:16:10.970709"
-    },
-    {
-      "task": "URGENT: VGNT (Versigent/Aptiv EDS spinoff) first trading day April 1. When-issued trading starts ~March 27 on NYSE. Update hypothesis 2d94ac68 expected_symbol to VGNT and set trigger for April 1 CLOSE (trigger=\"2026-04-01T16:00\"). VERIFY shortability on Alpaca before setting trigger. VGNT is legacy commodity auto parts = qualifies for SpinCo short hypothesis.",
-      "set_by_session": "2026-03-23T05:16:10.970709"
-    },
-    {
-      "task": "HIGH: Monitor WD (76678219) activation when VIX drops below 25. Last VIX = 26.78 (March 20). WD cluster filed March 20, entry window expiring by March 24-25.",
-      "set_by_session": "2026-03-23T05:16:10.970710"
-    },
-    {
-      "task": "HIGH: RCKT PDUFA March 28 - DOES NOT QUALIFY (CMC resubmission, not clinical failure). Monitor only. No trade action needed.",
-      "set_by_session": "2026-03-23T05:16:10.970712"
-    },
-    {
-      "task": "HIGH: REPL PDUFA April 10 (resubmission after trial-design CRL). Stock at ~ vs  pre-CRL. Analysts target +. Binary event - watch only.",
-      "set_by_session": "2026-03-23T05:16:10.970713"
-    },
-    {
-      "task": "MEDIUM: FDXF (FedEx Freight) first trading day ~June 1. Need to assess if LTL business qualifies as unwanted SpinCo. FedEx Investor Day April 8 for more info.",
-      "set_by_session": "2026-03-23T05:16:10.970714"
-    },
-    {
-      "task": "MEDIUM: HONA (Honeywell Aerospace) - Investor Day June 3 in Phoenix will reveal specific trading start date. Very large SpinCo (.4B revenue). Set calendar reminder.",
-      "set_by_session": "2026-03-23T05:16:10.970714"
-    },
-    {
-      "task": "LOW: S&P 500 Q2 2026 rebalance monitoring - announcement expected June 5, 2026.",
-      "set_by_session": "2026-03-23T05:16:10.970715"
-    },
-    {
-      "task": "LOW: Test strategic alternatives signal for large-caps: 11 events found with mkt cap >500M (2019-2024). DVN 2019, PEG 2020, EHC 2020, MOD 2019, ATGE 2021, HRI 2023, EMR 2024. Run measure_event_impact() on these dates to test if stock rallies on SA announcement.",
-      "set_by_session": "2026-03-23T05:16:10.970716"
+      "task": "Consider NLP approach to classify 8-K text - may be able to use keyword presence ('sale of company', 'unsolicited', 'merger') to filter strategic alternatives announcements to acquisition-target-only subset",
+      "set_by_session": "2026-03-23T05:41:41.827512"
     }
   ],
   "session_handoff": {
-    "investigated": "VGNT/Versigent spinoff assessment (Aptiv EDS), REPL CRL details, RCKT PDUFA context, CEO departure scanner 20d qualifier, EDGAR display_names fix",
-    "intermediate_findings": "VGNT starts regular-way trading April 1 - EDS legacy commodity auto parts, raised .6B in senior notes, qualifies for SpinCo short hypothesis. FDXF June 1 (LTL - may be high-value, needs assessment). HONA Q3 (investor day June 3 for specific date). EDGAR display_names fix documented in CLAUDE.md. Pre-earnings drift confirmed dead end (background agent still processing). Activist 13D signal decayed 2020-2024.",
-    "blocked_by": "Market not open (session at 4:58 AM ET). VIX above 25 blocking WD. VGNT not yet listed on yfinance (starts trading April 1). Need to verify Alpaca shortability for new spinoffs.",
-    "next_step": "After market open: (1) Verify GO/HD executed. (2) Set VGNT trigger for April 1 close SHORT - update hypothesis 2d94ac68 expected_symbol=VGNT. (3) Close GO March 26, HD March 27. For research: run strategic alternatives backtest (11 large-cap events from EDGAR display_names search).",
-    "written_at": "2026-03-23T05:16:10.970717"
+    "investigated": "Strategic alternatives announcement signal (8-K filings mentioning 'exploring strategic alternatives')",
+    "current_state": "DEAD END - recorded. Signal is real in magnitude but cannot be distinguished from negative events without reading 8-K content.",
+    "findings": {
+      "n_events_tested": 51,
+      "avg_abnormal_1d_open_entry": 0.76,
+      "p_value_1d": 0.26,
+      "passes_multiple_testing": false,
+      "key_insight": "Signal is heterogeneous: M&A-target events are strongly positive, restructuring/distress events are negative. Cannot sort without NLP or activist cross-reference.",
+      "overnight_gap_signal": "For positively-received subset (selected with look-ahead), overnight gap avg=3.40%, p=0.006. But selection criterion is circular.",
+      "transaction_cost": 0.34,
+      "net_expected": 0.42
+    },
+    "blocked_by": "No automated way to classify 8-K type (sale vs restructuring) without NLP",
+    "next_specific_step": "To potentially unlock this: build a keyword scanner that downloads the actual 8-K filing text and searches for 'sale of the company', 'unsolicited', 'going private', 'take private' to create a 'pure acquisition target' subset. Expected n~15-20 from current 51. Then re-backtest that subset.",
+    "written_at": "2026-03-23T05:41:41.827514"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

@@ -691,6 +691,16 @@
       ],
       "example": "Searching exploring+strategic+alternatives returned 267 hits, 84 parseable tickers. Large-cap events include DVN, PEG, EMR, HRI",
       "last_updated": "2026-03-23T05:12:06.156545"
+    },
+    "strategic_alternatives_announcement": {
+      "finding": "Overnight gap component shows positive tendency (avg=3.4%, p=0.006) but only in the positively-received subset selected with look-ahead bias.",
+      "caveat": "Cannot distinguish positive from negative events in advance. Full dataset effect: +0.76% at open, p=0.26, not tradable.",
+      "n_events": 51,
+      "time_period": "2019-2024",
+      "data_source": "SEC EDGAR 8-K filings mentioning 'strategic alternatives', large-cap filter >$500M",
+      "skewness": 1.45,
+      "potential_refinement": "NLP classifier on 8-K text to identify 'sale of company' vs 'sell division' framing",
+      "last_updated": "2026-03-23T05:41:22.336682"
     }
   },
   "dead_ends": [
@@ -983,6 +993,11 @@
       "event_type": "pre_earnings_drift_consistent_beaters",
       "reason": "Tested pre-earnings drift for consistent EPS beaters (3+ consecutive beats) on 30 large-cap S&P 500 stocks, 2020-2024. N=325 beater events across 29 tickers. RESULTS: 1d avg_abnormal=+0.08% (p=0.339, wilcoxon_p=0.584), 3d avg_abnormal=+0.23% (p=0.095, wilcoxon_p=0.206), 5d avg_abnormal=+0.06% (p=0.798, wilcoxon_p=0.941). None significant. passes_multiple_testing=False (0 of 5 horizons at p<0.05). Bootstrap 95% CI at 5d: [-0.38%, +0.51%] \u2014 CI includes zero. CONTROL GROUP (N=147, mixed EPS history): 5d avg=+0.57% \u2014 HIGHER than beaters, confirming no differential signal. Two-sample t-test (beater vs control) at 1d: p=0.674, at 3d: p=0.337, at 5d: p=0.242. Mann-Whitney at 1d: p=0.161. No statistically or economically significant differential. MECHANISM FAILURE: The signal is efficiently priced for large-caps. Institutional desks and quants have been running this exact strategy for 20+ years \u2014 any predictable pre-earnings drift in mega-caps is arbitraged away instantly. NOISE LEVEL: stdev_5d=4.06% dwarfs avg=0.06%, requiring N~36,000 to detect a 0.06% effect. The 3d p=0.095 (borderline) reflects noise + high skewness (1.04), not a real signal. Recommended N for 80% power: 2,473 (1d), 898 (3d), 35,939 (5d) \u2014 far beyond achievable. DO NOT pursue this signal for large-cap S&P 500. May exist in small/micro-cap where it is less efficiently priced, but that population has data quality and survivorship bias issues.",
       "recorded": "2026-03-23T05:10:33.456984"
+    },
+    {
+      "event_type": "strategic_alternatives_announcement",
+      "reason": "Tested 51 large-cap (>$500M) 8-K filings mentioning 'strategic alternatives' (2019-2024). \n    \n    RESULT: Signal does not pass statistical tests as a tradable strategy.\n    \n    Full dataset (n=51), open entry (realistic post-AH announcement):\n    - avg_abnormal_1d: +0.76%, p=0.26, bootstrap CI [-0.42%, +2.12%] (does not exclude zero)\n    - avg_abnormal_3d: +1.70%, p=0.22\n    - passes_multiple_testing: False\n    - Transaction cost: 0.34% round-trip\n    - Net expected: +0.42% (below 1.0% minimum threshold)\n    \n    Full dataset (n=51), close entry (hypothetical - assumes prediction of announcement):\n    - avg_abnormal_1d: +1.56%, p=0.10 (marginally better but conceptually invalid)\n    - Skewness=1.45, Kurtosis=2.23 (heavy outliers, not systematic effect)\n    \n    Core problem: 'Exploring strategic alternatives' has at least 3 distinct contexts:\n    1. Company announcing itself as M&A target (positive: +5% to +20% moves)\n    2. Company restructuring / selling division (mixed: +2% to -5%)\n    3. Distressed company announcing review (negative: -5% to -20%)\n    Without reading the 8-K text, these cannot be distinguished in advance.\n    \n    Subset analysis showed positive-only events (n=25) had p=0.02 at close entry - but this \n    subset was selected using the OUTCOME (>3% move near announcement), making it circular.\n    \n    What would be needed to make this work:\n    - NLP classification of 8-K text to identify 'acquisition target' vs 'restructuring' framing\n    - Activist investor cross-reference (13D/13G filed recently)\n    - Pre-announcement rumor/news detection\n    None of these are currently available in our toolkit.\n    \n    Events tested (51): ACHC, ACI, ATGE, AUPH, AXTA, BAX, BHC, BLFS, CCO, CMI, CSV, CVI, \n    DLTR, DXC, ECVT, ED, EHAB, EHC, EMR, GFF, GNW, HAS, HI, HRI, KN, KSS, LAUR, LII, MAS, \n    MATW, MDRX, MOD, MRCY, NVRI, PEG, PFG, PINC, PLTK, PSIX, QNST, RIG, RYAM, SNDA, SWX, \n    TGLS, THS, TPB, TXT, UGI, VSEC, WDC.",
+      "recorded": "2026-03-23T05:41:22.335272"
     }
   ]
 }
