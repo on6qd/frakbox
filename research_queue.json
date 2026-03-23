@@ -248,9 +248,11 @@
       "category": "sp500_index_addition",
       "question": "FIX S&P 500 addition scanner: CIEN (Feb 4 2026) was missed because S&P Global RSS returned 403 and EDGAR doesnt have 8-K for index changes. CIEN gave +21.66% 5d abnormal return (massive missed trade). Fix: WebSearch for 'S&P 500 index addition' weekly on Mondays, OR monitor press.spglobal.com/rss, OR check Wikipedia S&P 500 change log. CIEN jumped 7% on Feb 5 with no earnings - anomalous move detection could catch this. Critical: quarterly rebalance June 5 2026 is next major event but individual additions can fire any time.",
       "priority": 1,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "CIEN missed trade represents a +21% abnormal return that should have been captured. Scanner needs reliable detection method beyond just quarterly rebalance monitoring.",
-      "added": "2026-03-23T14:04:15.888398"
+      "added": "2026-03-23T14:04:15.888398",
+      "completed": "2026-03-23T15:12:29.752049",
+      "findings": "RESOLVED. sp500_addition_scanner.py has 3 sources (press.spglobal.com, Wikipedia diff, EDGAR 8-K) running daily at 5PM ET via launchd. Wikipedia diff detected CIEN retroactively on March 23. Scanner is running correctly. For future off-cycle additions, Wikipedia diff will catch them within 24h."
     },
     {
       "id": "seed-002",
@@ -594,9 +596,11 @@
       "category": "sec_wells_notice_short",
       "question": "Wells Notice SHORT signal: pooled N=27 passes MT (3d p=0.013, CI excludes zero) but discovery split alone doesn't pass MT. BLOCKING: need more events. Action: (1) Search EDGAR EFTS for 2010-2014 Wells Notice 8-K disclosures to expand discovery period to N=30+. (2) Add 2025 events as they occur (WT Oct 2024 already counted). If discovery+validation both pass MT at p<0.05 at 2+ horizons: pre-register hypothesis as SHORT at open after Wells 8-K, 3d hold, expected return -2.2%. Causal mechanism: (a) regulatory risk repricing (b) management distraction/cost (c) peer/investor exit. Literature: Griffin & Sun 2016 AFR.",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Signal passes pooled MT test but fails OOS split due to small N per period. Need N>=28 per period. Discovery 2015-2022 already has N=19 - need just 9 more events from 2010-2014 to reach power threshold.",
-      "added": "2026-03-23T13:48:32.045425"
+      "added": "2026-03-23T13:48:32.045425",
+      "completed": "2026-03-23T15:12:29.750585",
+      "findings": "CONFIRMED DEAD END. Extended search: (1) EDGAR 2010-2014: 7 large-cap events, pre-2015 shows NO signal. (2) EDGAR 2015-2022: 12 new qualified candidates (BK, JOE, RPM, AON, PRKS, FICO, GE, BHC, FAF, COIN, NDAQ, SWI) avg 1d=-1.03% pos_rate=45.5% p=0.146 -- FAILS multiple testing. Root cause: extreme heterogeneity (financial fraud vs procedural Wells Notices). Cannot classify without Bloomberg Law. Would need N=50+ fraud-only cases. Signal is underpowered AND heterogeneous. Do not pursue."
     },
     {
       "id": "ee74bf16",
@@ -1118,34 +1122,52 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. TRADE MONITORING: GO closes March 26 (3d hold from March 23 entry). Run tools/close_go_trade.py at March 26 close. Also: GO test counts as 1 live OOS data point for 1cb6140f hypothesis.",
-      "set_by_session": "2026-03-23T14:08:55.430396"
+      "task": {
+        "task": "1. CLOSE GO TRADE: GO exits March 26 close (3d hold from March 23). Run: python tools/close_go_trade.py. Record entry=$6.20, note actual exit price. This is a live test of hypothesis 1cb6140f (3+ insider, 3d hold).",
+        "deadline": "2026-03-26 close"
+      },
+      "set_by_session": "2026-03-23T15:12:56.512143"
     },
     {
-      "task": "2. HD/ABT/CTAS CLOSE: All three close March 28 (5d hold). Run close scripts at March 28 close.",
-      "set_by_session": "2026-03-23T14:08:55.430398"
+      "task": {
+        "task": "2. CLOSE HD/ABT/CTAS/BAX TRADES: All four exit March 28 close (5d hold from March 23). Run close scripts. HD=86d28864, ABT=9777ef67, CTAS=cc88dd18, BAX=6bd7d035. These are live tests of the sp500_52w_low_momentum_short hypothesis.",
+        "deadline": "2026-03-28 close"
+      },
+      "set_by_session": "2026-03-23T15:12:56.512145"
     },
     {
-      "task": "3. VGNT WI WATCH: When-issued trading starts March 27. Check VGNT WI price daily. If price >$50 with strong buying, reconsider short entry on April 1. If no S&P 500 inclusion announced, proceed with SHORT trigger at April 1 close.",
-      "set_by_session": "2026-03-23T14:08:55.430399"
+      "task": {
+        "task": "3. VGNT WI WATCH: VGNT when-issued trading starts March 27. Trigger is set for 2026-04-01T16:00 (close of first regular trading day). Check VGNT WI price daily from March 27. If WI price > $50 AND significant buying, reconsider short (hypothesis 2d94ac68). If strong selling pressure already showing, confirm short at April 1 close.",
+        "deadline": "2026-04-01"
+      },
+      "set_by_session": "2026-03-23T15:12:56.512146"
     },
     {
-      "task": "4. NKE SIGNAL: NKE is 0.78% above 52w low. If NKE closes below $51.97 during next session, can queue SHORT under hypothesis 86d28864 (must wait for one active trade to close first to stay under 5 max).",
-      "set_by_session": "2026-03-23T14:08:55.430400"
+      "task": {
+        "task": "4. REPL PDUFA April 10: Monitor for FDA decision. If APPROVAL: no trade. If CRL: check (a) clinical efficacy deficiency, (b) crash >55% from pre-PDUFA price (~$6.87), (c) NO stated path forward. NOTE: This is a REPEAT CRL - market may be priced in. REPEAT CRL cases historically show recovery (OTLK 2025, ALDX 2026). Qualifying threshold should be >65% crash (not 55%) for repeat CRL.",
+        "deadline": "2026-04-10"
+      },
+      "set_by_session": "2026-03-23T15:12:56.512147"
     },
     {
-      "task": "5. S&P 500 INDIVIDUAL ADDITION WATCH: Scanner now has 90-day lookback (CIEN miss fixed). Run sp500_announcement_scanner.py -- should detect any new individual S&P 500 additions.",
-      "set_by_session": "2026-03-23T14:08:55.430400"
+      "task": {
+        "task": "5. SCAN FOR NEW INSIDER CLUSTERS: After GO/HD close, capacity opens for new trades. Run: python tools/openinsider_scraper.py at each session. Look for n=6-9 insider clusters at market cap >$500M. Current VIX ~25 (elevated) so only n=6-9 is tradeable (EV=+2.37%). CEO/CFO clusters (hypothesis 2bbe0f04) are also tradeable in any VIX regime.",
+        "next_scan_date": "2026-03-26"
+      },
+      "set_by_session": "2026-03-23T15:12:56.512147"
     },
     {
-      "task": "6. REPL PDUFA APRIL 10: Monitor for decision. If CRL issued with clinical efficacy deficiency and crash >55%, trigger d302c84b short at April 11 open.",
-      "set_by_session": "2026-03-23T14:08:55.430401"
+      "task": {
+        "task": "6. NEW SIGNAL RESEARCH: Consider these unexplored directions: (a) Form 144 large insider block sales: when executives sell >$10M via 144, does stock fall? (b) Poison pill adoption (shareholder rights plan 8-Ks): undervaluation signal -> LONG. (c) Large-cap dividend reinstatement: COVID-era companies reinstating dividends showed positive reactions. See knowledge_base for dead ends to avoid re-exploring.",
+        "priority": "low - capacity is needed for existing signals first"
+      },
+      "set_by_session": "2026-03-23T15:12:56.512148"
     }
   ],
   "session_handoff": {
-    "notes": "Session March 23: 4 trades fired at 9:30 ET (GO LONG, HD/ABT/CTAS SHORT). Verified entry pending. Wells Notice comprehensively retested: dead end confirmed (pooled MT passes but OOS split fundamentally underpowered). Critical: CIEN S&P 500 addition (Feb 4 2026) was a missed +21.66% 5d return - scanner bug fixed (45->90 day lookback). NKE at 0.78% above 52w low, primed. VGNT (Versigent, APTV spinoff) SHORT trigger set for April 1 close - tariff environment strengthens thesis. No new qualifying clinical failures detected.",
-    "set_by_session": "2026-03-23T14:08:55.430150",
-    "written_at": "2026-03-23T14:08:55.430403"
+    "notes": "Session (March 23): 5 trades active (GO long exits March 26, HD/ABT/CTAS/BAX short exits March 28). Wells Notice expansion confirmed dead end (EDGAR 2010-2022 all fails MT, underpowered). Profit warning continuation dead end (N=13, stocks BOUNCE after warnings). S&P 500 scanner working correctly (CIEN detected via Wikipedia diff). Current VIX: 24.7 (elevated, n=6-9 only for insider clusters). REPL PDUFA April 10: repeat CRL scenario - higher 65% crash threshold needed. VGNT WI starts March 27 - monitor daily.",
+    "set_by_session": "2026-03-23T15:12:56.511896",
+    "written_at": "2026-03-23T15:12:56.512149"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

@@ -1251,8 +1251,14 @@
     },
     {
       "event_type": "sec_wells_notice_short",
-      "reason": "COMPREHENSIVE RETEST 2026-03-23 (session 15): Expanded to N=27 (2015-2024) from prior N=22 test. Pooled result passes MT: 1d avg=-1.74% p=0.018, 3d avg=-2.21% p=0.013, 5d avg=-2.72% p=0.028. HOWEVER: Cannot pass OOS split requirement. Every temporal split tested (2015-2020 disc + 2021-2024 val; 2015-2021 disc + 2022-2024 val; 2015-2022 disc + 2023-2024 val) shows neither period independently passes multiple testing. Root cause: N<28 per period required for 80% power at 2.5% effect size with stdev=4.60%. Maximum events in any 6-year window = 14 (insufficient). Pre-2015 events (N=10) show no signal and would introduce noise. FUNDAMENTAL LIMITATION: Wells Notice events from large-cap companies are too rare (~5-6 per year) to accumulate sufficient N for OOS split within a reasonable time window. Signal heterogeneity (fraud vs procedural) confirmed by NDAQ/XYL/HAYW near-zero reactions vs NRDS/BHC/BEN large reactions. Academic reference: Griffin & Sun (2016) AFR confirms effect but is pre-2013 data. CONFIRMED DEAD END - do not retest without N>=28 per temporal period.",
-      "recorded": "2026-03-23T14:02:09.415048"
+      "reason": "Wells Notice 8-K disclosure SHORT signal confirmed dead end after exhaustive search. Summary: N=27 pooled (2015-2024) passes multiple testing marginally (1d p=0.018, 3d p=0.013) but OOS temporal split fails (needs N=28/period, only has 19/8). Extended search: (1) EDGAR 2010-2014 yielded 7 qualified large-cap events - pre-2015 data shows NO signal. (2) EDGAR 2015-2022 yielded 12 new candidates (BK, JOE, RPM, AON, PRKS, FICO, GE, BHC, FAF, COIN, NDAQ, SWI): avg 1d=-1.03%, pos_rate=45.5%, p=0.146 - FAILS multiple testing, direction inconsistent (6/11 positive = worse than random). Root cause: Wells Notice disclosures are extremely heterogeneous. BHC (-5.9%) vs NDAQ (+1.5%) are structurally different events (financial fraud vs procedural). Without fraud/procedural classification, pooled signal is noise. Building such classification requires Bloomberg Law or SEC enforcement database (not free). Would need N=50+ fraud-only Wells Notices for a viable hypothesis. FINAL DECISION: Do not pursue further. Record in knowledge base as confirmed dead end.",
+      "recorded": "2026-03-23T14:02:09.415048",
+      "updated": "2026-03-23T15:07:14.500790"
+    },
+    {
+      "event_type": "profit_warning_continuation_short",
+      "reason": "Large-cap profit warnings (intra-quarter negative preannouncements) do NOT show continuation. Tested N=13 events (FDX, NKE, BBWI, TGT, WMT, F, SNAP, MU, INTC, STX, WDC, AAPL, GOOG 2019-2022). Entry at open day after warning (after-hours timing). Results: 1d avg=+0.13% neg_rate=38.5% p=0.898, 5d avg=+1.58% neg_rate=23.1% p=0.232 -- POSITIVE direction. Stocks BOUNCE after initial crash (bounced 77% of events at 5d). Pattern: contrarian value buyers step in after -15-25% initial crash. SNAP (-11% 5d) and STX (-6.2% 5d) are the only continuations. This matches guidance cut dead end (record 284c6c2f): large-caps bounce after bad news. Same root cause as guidance cut: oversold bounce + institutional accumulation into weakness. Do not pursue. Causal mechanism supports LONG after crash, not short continuation.",
+      "recorded": "2026-03-23T15:12:03.658058"
     }
   ]
 }

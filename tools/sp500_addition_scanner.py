@@ -919,6 +919,10 @@ def run_scan(days_back: int = 2, dry_run: bool = False, verbose: bool = True) ->
         )
 
         if updated or dry_run:
+            if not dry_run:
+                # Add to triggered set BEFORE logging so state is consistent even if log write fails
+                triggered_tickers.add(ticker)
+
             # Log the detection
             log_record = {
                 "timestamp": datetime.now().isoformat(),
@@ -933,9 +937,6 @@ def run_scan(days_back: int = 2, dry_run: bool = False, verbose: bool = True) ->
                 "dry_run": dry_run,
             }
             log_detection(log_record, dry_run=dry_run)
-
-            if not dry_run:
-                triggered_tickers.add(ticker)
 
             # For this hypothesis, only set one trigger at a time.
             # If multiple additions are announced simultaneously (quarterly rebalance),
