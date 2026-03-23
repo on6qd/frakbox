@@ -1218,6 +1218,11 @@
       "event_type": "dividend_cut_announcement_short",
       "reason": "N=8 large-cap post-2021 dividend cut/suspension announcements. 5d avg abnormal: -0.47% (p=0.844). 25% positive at 1d and 3d, but 50/50 at 5d. Does NOT pass multiple testing. High variance: EL -7.26% (strong), CBRL -8.39% (strong), but SPR +13.84% (acquired by Boeing, confounder), CE +1.12% (one-time), WBA near flat. Signal overwhelmed by idiosyncratic factors. COVID-era events not included (would be contaminated by macro). Conclusion: Dividend cut is already priced in to large extent; 5d drift is noise. If pursuing further: filter to FIRST EVER dividend cut for that stock + no ongoing M&A.",
       "recorded": "2026-03-23T12:07:29.517413"
+    },
+    {
+      "event_type": "merger_arbitrage_announcement_drift",
+      "reason": "N=20 backtest (confirmed completed deals 2021-2024, >1B market cap, all-cash) shows no post-announcement drift. 5d avg abnormal=+0.19%, pos_rate=45%, p=0.78, bootstrap CI=[-1.04,+1.55] does not exclude zero. The original N=11 result (+2.36%, p=0.042) was a false positive from: (1) small sample selection bias favoring high-profile deals (ZNGA +8%, POSH +6%, HZNP +5%, COUP +4%), (2) incorrect entry price methodology in original session (used prior close, not post-announcement open). With correct methodology (entry at next-day open after announcement), the effect is noise. Strategy: buy M&A target at open following announcement, hold 5 days. THIS DOES NOT WORK. Also note: VG (Vonage) and SAIL (SailPoint) have no yfinance or Tiingo data available (delisted before Tiingo data starts). Events tested: ZNGA POSH HZNP COUP ATVI SGEN JNPR MIME CTXS MNDT TWTR ZEN PING AVLR KNBE FORG DCT XM SPLK KRTX (N=20). Do NOT revisit this strategy with the same event set.",
+      "recorded": "2026-03-23T13:06:17.118903"
     }
   ]
 }

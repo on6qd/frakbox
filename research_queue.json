@@ -570,9 +570,11 @@
       "category": "merger_arbitrage",
       "question": "Expand merger arbitrage 5d drift backtest from N=11 to N=20+. Find 9+ more confirmed completed deals 2019-2024 where acquirer stated specific price. Required: (1) deal was completed (no breakups); (2) target market cap >M; (3) no concurrent earnings. Current finding: 5d avg=+2.36%, pos_rate=73%, p=0.042, CI excludes zero, but only 1 horizon significant (need 2 for MT correction). Strong hypothesis candidate if confirmed at N=15+. SOURCES: Mitchell & Pulvino (2001, JF), own backtest N=11. Per-event: ZNGA +8.1%, POSH +6.3%, HZNP +4.8%, COUP +4.1%, ZEN and XM unknown. HYPOTHESIS: buy target at open day after confirmed deal announcement, hold 5d. Note: need to also test whether deal size (<B vs >B) is a better filter.",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "5d return signal at p=0.042 with CI excluding zero. One more significant horizon would enable hypothesis pre-registration. Need N=15+ for OOS split. Mitchell & Pulvino (2001) academic support.",
-      "added": "2026-03-23T12:33:26.336971"
+      "added": "2026-03-23T12:33:26.336971",
+      "completed": "2026-03-23T13:06:23.436329",
+      "findings": "DEAD END. Expanded to N=20 (confirmed completed deals 2021-2024, all-cash). With correct methodology (entry at next-day open, timing=after_hours): 5d avg=+0.19%, pos_rate=45%, p=0.78, CI=[-1.04,+1.55]. NOT significant. Original N=11 (+2.36%, p=0.042) was false positive from selection bias + incorrect entry price methodology. The 4 outliers (ZNGA, POSH, HZNP, COUP) drove all the signal; 13 remaining events show near-zero drift. Do not pursue further."
     },
     {
       "id": "seed-003",
@@ -1085,39 +1087,40 @@
   ],
   "next_session_priorities": [
     {
-      "task": "TRADE MONITORING: Verify GO/HD/ABT/CTAS all entered at Monday March 24 open. Check trade_loop.log for confirmation. GO closes March 27 (3d hold), HD/ABT/CTAS close March 31 (5d hold). Record actual entry prices.",
-      "set_by_session": "2026-03-23T12:34:30.901208"
+      "task": "TRADE MONITORING: GO trade closes March 26/27 (3d hold from March 24 entry). Run tools/close_go_trade.py. HD/ABT/CTAS close March 31 (5d hold).",
+      "set_by_session": "2026-03-23T13:07:05.734148"
     },
     {
-      "task": "VGNT WHEN-ISSUED: VGNT WI starts trading March 27. Check if when-issued price is trading at discount or premium to implied fair value. The April 1 short trigger is set on hypothesis 2d94ac68.",
-      "set_by_session": "2026-03-23T12:34:30.901214"
+      "task": "VGNT WHEN-ISSUED: VGNT WI started trading March 27. Check if hypothesis 2d94ac68 April 1 short trigger is still valid given when-issued price.",
+      "set_by_session": "2026-03-23T13:07:05.734153"
     },
     {
-      "task": "MERGER ARBITRAGE: Expand N from 11 to 20+ by finding more confirmed completed deals 2019-2024. Need 9+ more events. Promising signal: 5d avg=+2.36%, 73% pos_rate, p=0.042, CI excludes zero. Need 2 significant horizons for MT correction. See research_queue task added this session.",
-      "set_by_session": "2026-03-23T12:34:30.901215"
+      "task": "SECOND-AGENCY IG UPGRADE: Test if long-gap second agency upgrades are tradeable. DAL July 2024 Fitch first-IG (+7%), PR March 2026 S&P second-IG (+4.37%). Need 3+ more events. Task 7b031ca7.",
+      "set_by_session": "2026-03-23T13:07:05.734155"
     },
     {
-      "task": "SECOND-AGENCY IG UPGRADE: Test if long-gap (>6 months) second agency upgrades are tradeable like first-IG. Key case: DAL July 2024 Fitch first-IG (+7% on announcement day). PR March 2026 S&P second-IG (+4.37% 3d). Need to identify 3+ more events to test. Task 7b031ca7 in queue.",
-      "set_by_session": "2026-03-23T12:34:30.901216"
+      "task": "CEO DEPARTURE SCANNER: Check ceo_departure_alerts.jsonl for fresh candidates from overnight 8-K scans. Signal validated p=0.0034 N=13.",
+      "set_by_session": "2026-03-23T13:07:05.734155"
     },
     {
-      "task": "CEO DEPARTURE SCANNER: Check edgar_ceo_departure_scanner.py for any overnight 8-K filings from Friday March 21 to today. The scanner runs via background but check ceo_departure_alerts.jsonl for fresh candidates. Signal validated at p=0.0034, N=13.",
-      "set_by_session": "2026-03-23T12:34:30.901216"
+      "task": "CLINICAL FAILURE MONITOR: REPL PDUFA April 10 2026. Hypothesis d302c84b ready.",
+      "set_by_session": "2026-03-23T13:07:05.734156"
     },
     {
-      "task": "CLINICAL FAILURE MONITOR: REPL (Replimune) PDUFA April 10 2026. If CRL: check clinical vs CMC, check crash >55%, check no stated FDA path forward. Hypothesis d302c84b ready.",
-      "set_by_session": "2026-03-23T12:34:30.901217"
-    },
-    {
-      "task": "RECORD GO/WD OUTCOMES: When GO closes March 27, run tools/close_go_trade.py and complete hypothesis 1cb6140f. WD was not traded (VIX gate). Update task 7b8afceb.",
-      "set_by_session": "2026-03-23T12:34:30.901218"
+      "task": "RECORD GO OUTCOME: After close_go_trade.py, complete hypothesis 1cb6140f with actual exit price and abnormal return vs SPY.",
+      "set_by_session": "2026-03-23T13:07:05.734157"
     }
   ],
   "session_handoff": {
-    "summary": "Session March 23: (1) Verified all 5 trade triggers set for Monday open. VIX closed 22.79 (elevated but manageable). (2) Ran merger arbitrage backtest N=11: 5d avg=+2.36%, p=0.042, CI=[0.50,4.29] excludes zero - borderline signal needing more data. (3) VGNT when-issued confirmed starting March 27 per Aptiv 8-K. (4) Literature recorded for merger_arbitrage_announcement. (5) Research queue updated.",
-    "blocking": "Tiingo 429 rate limit prevented follow-up merger arb analysis. Resolved by waiting 60s between runs.",
-    "next_step": "At next session start: immediately check trade_loop.log to confirm 4 trades entered at March 24 open (GO, HD, ABT, CTAS). Then continue merger arb N expansion.",
-    "written_at": "2026-03-23T12:34:30.901219"
+    "merger_arb_status": "DEAD END recorded. N=20 (2021-2024 all-cash confirmed completed deals) shows p=0.78, CI does not exclude zero. False positive at N=11 was selection bias. Do not revisit without new discriminating variable (e.g., arb spread >5%).",
+    "active_trades": [
+      "GO (1cb6140f): set trigger next_market_open March 24. Close target March 26-27.",
+      "HD (insider_cluster): set trigger next_market_open March 24. Close target March 31.",
+      "ABT (52w_low): set trigger next_market_open March 24. Close target March 31.",
+      "CTAS (52w_low): set trigger next_market_open March 24. Close target March 31.",
+      "VGNT (2d94ac68): short trigger April 1 at open."
+    ],
+    "written_at": "2026-03-23T13:07:05.734158"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
