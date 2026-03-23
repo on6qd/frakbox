@@ -7,15 +7,44 @@ Learn to trade perfectly. Discover cause-and-effect relationships between real-w
 
 | File | Purpose |
 |---|---|
-| `research.py` | Hypothesis lifecycle, knowledge base, pattern library |
+| `db.py` | SQLite database layer — all CRUD for hypotheses, knowledge base, research queue |
+| `research.py` | Hypothesis lifecycle, knowledge base, pattern library (uses db.py) |
 | `market_data.py` | Historical prices, event impact measurement, power analysis |
 | `self_review.py` | Confidence scoring, methodology management |
-| `research_queue.py` | Task queue, event watchlist, cross-session handoffs |
-| `trader.py` | Paper trades via Alpaca |
+| `research_queue.py` | Task queue, event watchlist, cross-session handoffs (uses db.py) |
+| `trader.py` | Paper trades via Alpaca (uses db.py) |
+| `trade_loop.py` | Deterministic trading loop — triggers, stops, reconciliation (uses db.py) |
 | `run.py` | `python run.py --status` or `--review` |
-| `email_report.py` | HTML email digest |
-| `config.py` | Environment config (Alpaca, Gmail, Tiingo keys) |
+| `email_report.py` | HTML email digest (uses db.py) |
+| `config.py` | Environment config + consolidated risk parameters |
+| `migrate.py` | One-time migration from JSON files to SQLite |
 | `tools/` | Custom analysis tools (e.g., `insider_cluster_detector.py`) |
+
+## Storage
+
+All research data lives in `research.db` (SQLite with WAL mode). Tables:
+- `hypotheses` — full hypothesis lifecycle with trigger and trade fields
+- `known_effects` — validated causal effects
+- `dead_ends` — research directions that didn't work
+- `literature` — literature review findings
+- `research_queue` — prioritized research tasks
+- `event_watchlist` — upcoming events to monitor
+- `session_priorities` — cross-session handoff priorities
+- `session_handoff` — structured session context
+
+The public API (function names, signatures, return types) is unchanged.
+All modules delegate to `db.py` for persistence.
+
+## Risk Configuration
+
+All risk parameters are centralized in `config.py`:
+- `MAX_POSITION_PCT` — max % of portfolio per experiment (5%)
+- `DEFAULT_STOP_LOSS_PCT` — per-position stop-loss (10%)
+- `DEFAULT_TAKE_PROFIT_PCT` — per-position take-profit (None)
+- `MAX_PORTFOLIO_DRAWDOWN_PCT` — portfolio-level halt (15%)
+- `ESTIMATED_ROUND_TRIP_COST_PCT` — default transaction cost (0.1%)
+- `MIN_NET_RETURN_AFTER_COSTS_PCT` — minimum viable return (1.0%)
+- `EVENT_COST_DEFAULTS` — per-event-type cost estimates
 
 ## API Quick Reference
 

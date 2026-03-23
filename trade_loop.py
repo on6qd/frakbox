@@ -28,7 +28,6 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 BASE_DIR = Path(__file__).parent
-HYPOTHESES_PATH = BASE_DIR / "hypotheses.json"
 TRADE_LOG_PATH = BASE_DIR / "logs" / "trade_log.jsonl"
 
 ET = ZoneInfo("America/New_York")
@@ -36,20 +35,15 @@ ET = ZoneInfo("America/New_York")
 # Add project to path
 sys.path.insert(0, str(BASE_DIR))
 
+import db as _db
+
 
 def _load_hypotheses():
-    try:
-        with open(HYPOTHESES_PATH) as f:
-            return json.load(f)
-    except Exception:
-        return []
+    return _db.load_hypotheses()
 
 
 def _save_hypotheses(hypotheses):
-    tmp = str(HYPOTHESES_PATH) + ".tmp"
-    with open(tmp, "w") as f:
-        json.dump(hypotheses, f, indent=2)
-    os.replace(tmp, str(HYPOTHESES_PATH))
+    _db.save_hypotheses(hypotheses)
 
 
 def _log_trade_action(action):
@@ -169,10 +163,8 @@ def _send_trade_email(subject, actions):
 
 def execute_pending_triggers():
     """Check all pending hypotheses for ready triggers and execute trades."""
-    from trader import (
-        place_experiment, check_portfolio_drawdown, get_current_price,
-        DEFAULT_STOP_LOSS_PCT, DEFAULT_TAKE_PROFIT_PCT,
-    )
+    from trader import place_experiment, check_portfolio_drawdown, get_current_price
+    from config import DEFAULT_STOP_LOSS_PCT, DEFAULT_TAKE_PROFIT_PCT
 
     hypotheses = _load_hypotheses()
     actions = []
@@ -367,14 +359,8 @@ def run_trading_cycle():
 
 
 if __name__ == "__main__":
-    # Load .env
-    env_file = BASE_DIR / ".env"
-    if env_file.exists():
-        for line in env_file.read_text().splitlines():
-            line = line.strip()
-            if line and not line.startswith("#") and "=" in line:
-                k, v = line.split("=", 1)
-                os.environ.setdefault(k.strip(), v.strip().strip("'\""))
+    from config import load_env
+    load_env()
 
     if len(sys.argv) > 1 and sys.argv[1] == "--dry-run":
         # Show what would happen without executing

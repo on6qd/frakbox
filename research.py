@@ -17,21 +17,18 @@ import tempfile
 import uuid
 from datetime import datetime, timedelta
 
-HYPOTHESES_FILE = os.path.join(os.path.dirname(__file__), "hypotheses.json")
+import db as _db
+
 RESULTS_FILE = os.path.join(os.path.dirname(__file__), "results.jsonl")
 PATTERNS_FILE = os.path.join(os.path.dirname(__file__), "patterns.json")
-KNOWLEDGE_FILE = os.path.join(os.path.dirname(__file__), "knowledge_base.json")
 
 
 def load_hypotheses():
-    if not os.path.exists(HYPOTHESES_FILE):
-        return []
-    with open(HYPOTHESES_FILE) as f:
-        return json.load(f)
+    return _db.load_hypotheses()
 
 
 def save_hypotheses(hypotheses):
-    _atomic_write(HYPOTHESES_FILE, hypotheses)
+    _db.save_hypotheses(hypotheses)
 
 
 def load_patterns():
@@ -506,7 +503,8 @@ def activate_hypothesis(hypothesis_id, entry_price, position_size, order_id=None
         take_profit_pct: Profit target for auto-close (default: None = hold to deadline).
     """
     from self_review import load_methodology
-    from trader import DEFAULT_STOP_LOSS_PCT, DEFAULT_TAKE_PROFIT_PCT, check_portfolio_drawdown
+    from config import DEFAULT_STOP_LOSS_PCT, DEFAULT_TAKE_PROFIT_PCT
+    from trader import check_portfolio_drawdown
 
     m = load_methodology()
     max_concurrent = m["defaults"].get("max_concurrent_experiments", 5)
@@ -835,14 +833,11 @@ def _group_accuracy_by_type(completed):
 
 def load_knowledge():
     """Load the knowledge base."""
-    if not os.path.exists(KNOWLEDGE_FILE):
-        return {"literature": {}, "known_effects": {}, "dead_ends": []}
-    with open(KNOWLEDGE_FILE) as f:
-        return json.load(f)
+    return _db.load_knowledge()
 
 
 def save_knowledge(kb):
-    _atomic_write(KNOWLEDGE_FILE, kb)
+    _db.save_knowledge(kb)
 
 
 def _atomic_write(filepath, data):
@@ -871,12 +866,7 @@ def record_literature(event_type, findings):
             - sources: list of paper/article references
             - gaps: what isn't known yet (what we can research)
     """
-    kb = load_knowledge()
-    kb["literature"][event_type] = {
-        **findings,
-        "recorded": datetime.now().isoformat(),
-    }
-    save_knowledge(kb)
+    _db.record_literature(event_type, findings)
 
 
 def record_known_effect(event_type, effect):
@@ -894,30 +884,12 @@ def record_known_effect(event_type, effect):
             - our_tests: number of our own experiments confirming this
             - status: "strong", "moderate", "weak", "disproven"
     """
-    kb = load_knowledge()
-    kb["known_effects"][event_type] = {
-        **effect,
-        "last_updated": datetime.now().isoformat(),
-    }
-    save_knowledge(kb)
+    _db.record_known_effect(event_type, effect)
 
 
 def record_dead_end(event_type, reason):
     """Record a research direction that didn't pan out, so we don't revisit it."""
-    kb = load_knowledge()
-    # Deduplication: don't re-record the same dead end
-    for existing in kb["dead_ends"]:
-        if existing.get("event_type") == event_type:
-            existing["reason"] = reason
-            existing["updated"] = datetime.now().isoformat()
-            save_knowledge(kb)
-            return
-    kb["dead_ends"].append({
-        "event_type": event_type,
-        "reason": reason,
-        "recorded": datetime.now().isoformat(),
-    })
-    save_knowledge(kb)
+    _db.record_dead_end(event_type, reason)
 
 
 def check_promotion_or_retirement(event_type):
@@ -1008,19 +980,17 @@ def verify_data_integrity():
     hypotheses = load_hypotheses()
     hyp_ids = {h["id"] for h in hypotheses}
 
-    # Check research_queue.json references
-    rq_path = os.path.join(os.path.dirname(__file__), "research_queue.json")
-    if os.path.exists(rq_path):
-        with open(rq_path) as f:
-            rq = json.load(f)
+    # Check research queue references
+    rq = _db.load_queue()
+    if rq:
 
         # Check session_handoff hypothesis_ids
         handoff = rq.get("session_handoff", {})
         for key, hid in handoff.get("hypothesis_ids", {}).items():
             if hid not in hyp_ids:
                 issues.append(
-                    f"MISSING HYPOTHESIS: research_queue.json session_handoff references "
-                    f"'{hid}' ({key}) but it does not exist in hypotheses.json. "
+                    f"MISSING HYPOTHESIS: session_handoff references "
+                    f"'{hid}' ({key}) but it does not exist in the database. "
                     f"The hypothesis was likely lost due to a session timeout. Re-create it."
                 )
 

@@ -57,10 +57,8 @@ def main():
     print()
 
     # Load hypothesis to get entry details
-    import json
-    with open('hypotheses.json') as f:
-        hyps = json.load(f)
-
+    import db as _db
+    hyps = _db.load_hypotheses()
     h = next((h for h in hyps if h['id'] == '1cb6140f'), None)
     if not h:
         print("ERROR: Hypothesis 1cb6140f not found")

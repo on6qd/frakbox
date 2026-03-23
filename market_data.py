@@ -130,15 +130,8 @@ def _fetch_stock_data(symbol, start_str, end_str):
 
 # --- Transaction cost estimation ---
 
-# Event-type cost defaults (round-trip %) when volume data unavailable
-_EVENT_COST_DEFAULTS = {
-    "sp500_index_addition": 0.25,
-    "sp500_index_deletion": 0.25,
-    "fda_decision": 0.30,
-    "insider_buying_cluster": 0.10,
-    "earnings_surprise": 0.20,
-}
-_DEFAULT_COST_PCT = 0.10
+from config import EVENT_COST_DEFAULTS as _EVENT_COST_DEFAULTS
+from config import DEFAULT_EVENT_COST_PCT as _DEFAULT_COST_PCT
 
 
 def estimate_transaction_cost(event_type=None, avg_daily_volume=None,
