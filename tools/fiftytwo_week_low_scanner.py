@@ -31,41 +31,56 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import yfinance as yf
 import pandas as pd
 
-# Universe of S&P 500 large-cap stocks (>$500M market cap)
-# Expanded 2026-03-23: 66 -> 174 stocks covering all GICS sectors
-# Prevents gaps like V (Mar 18), BAX (Mar 20) being missed from hardcoded list
-UNIVERSE = [
-    # Technology
-    'AAPL', 'MSFT', 'NVDA', 'GOOGL', 'META', 'INTC', 'AMD', 'QCOM', 'TXN', 'AVGO',
-    'IBM', 'CSCO', 'ORCL', 'CRM', 'NOW', 'ADBE', 'MU', 'AMAT', 'LRCX', 'KLAC',
-    'SNPS', 'CDNS', 'ANSS', 'ACN',
-    # Financials
-    'JPM', 'BAC', 'WFC', 'GS', 'MS', 'C', 'USB', 'PNC', 'TFC', 'AXP', 'V', 'MA', 'COF',
-    'BLK', 'SCHW', 'ICE', 'CME', 'MCO', 'SPGI', 'CB', 'BK', 'STT', 'TROW', 'BRK-B',
-    # Healthcare
-    'JNJ', 'PFE', 'MRK', 'ABT', 'BMY', 'ABBV', 'LLY', 'MDT', 'UNH',
-    'BAX', 'BDX', 'BSX', 'EW', 'ZBH', 'SYK', 'DHR', 'HCA', 'ISRG',
-    'REGN', 'GILD', 'VRTX', 'MRNA', 'BIIB', 'AMGN',
-    # Consumer Discretionary
-    'AMZN', 'TSLA', 'HD', 'LOW', 'NKE', 'MCD', 'SBUX', 'TGT',
-    'LULU', 'TJX', 'ROST', 'BBY', 'BKNG', 'MAR', 'HLT', 'RCL', 'CCL',
-    # Consumer Staples
-    'WMT', 'KO', 'PEP', 'COST', 'CL', 'PG', 'MO', 'PM', 'MDLZ', 'HSY', 'GIS', 'K', 'STZ',
-    # Energy
-    'XOM', 'CVX', 'COP', 'SLB', 'EOG', 'PSX', 'VLO', 'MPC', 'OXY', 'BKR', 'HAL',
-    # Industrials
-    'BA', 'GE', 'MMM', 'CAT', 'HON', 'LMT', 'RTX', 'UPS', 'FDX',
-    'DE', 'EMR', 'ETN', 'ITW', 'PH', 'ROK', 'DOV', 'PNR', 'XYL',
-    'UNP', 'NSC', 'CSX', 'CP', 'CNI',
-    # Materials
-    'FCX', 'NUE', 'DD', 'APD', 'LIN', 'PPG', 'SHW', 'ECL', 'ALB',
-    # Communication Services
-    'VZ', 'T', 'CMCSA', 'DIS', 'NFLX', 'EA', 'TTWO',
-    # REITs
-    'PLD', 'AMT', 'CCI', 'EQIX', 'PSA', 'DLR', 'O', 'AVB', 'EQR', 'SPG',
-    # Utilities
-    'NEE', 'DUK', 'SO', 'AEP', 'XEL', 'ED', 'SRE', 'D', 'PCG',
-]
+# Universe of S&P 500 large-cap stocks
+# Loaded from data/sp500_universe.json (built by tools/build_sp500_universe.py)
+# Falls back to static 174-ticker list if cache is unavailable
+def _load_universe():
+    """Load SP500 universe from cache file, falling back to static list."""
+    cache_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'sp500_universe.json')
+    if os.path.exists(cache_file):
+        try:
+            with open(cache_file) as f:
+                data = json.load(f)
+            tickers = data.get('tickers', [])
+            if len(tickers) >= 200:  # sanity check
+                return tickers
+        except Exception:
+            pass
+    # Static fallback list (174 tickers, last updated 2026-03-23)
+    return [
+        # Technology
+        'AAPL', 'MSFT', 'NVDA', 'GOOGL', 'META', 'INTC', 'AMD', 'QCOM', 'TXN', 'AVGO',
+        'IBM', 'CSCO', 'ORCL', 'CRM', 'NOW', 'ADBE', 'MU', 'AMAT', 'LRCX', 'KLAC',
+        'SNPS', 'CDNS', 'ANSS', 'ACN',
+        # Financials
+        'JPM', 'BAC', 'WFC', 'GS', 'MS', 'C', 'USB', 'PNC', 'TFC', 'AXP', 'V', 'MA', 'COF',
+        'BLK', 'SCHW', 'ICE', 'CME', 'MCO', 'SPGI', 'CB', 'BK', 'STT', 'TROW', 'BRK-B',
+        # Healthcare
+        'JNJ', 'PFE', 'MRK', 'ABT', 'BMY', 'ABBV', 'LLY', 'MDT', 'UNH',
+        'BAX', 'BDX', 'BSX', 'EW', 'ZBH', 'SYK', 'DHR', 'HCA', 'ISRG',
+        'REGN', 'GILD', 'VRTX', 'MRNA', 'BIIB', 'AMGN',
+        # Consumer Discretionary
+        'AMZN', 'TSLA', 'HD', 'LOW', 'NKE', 'MCD', 'SBUX', 'TGT',
+        'LULU', 'TJX', 'ROST', 'BBY', 'BKNG', 'MAR', 'HLT', 'RCL', 'CCL',
+        # Consumer Staples
+        'WMT', 'KO', 'PEP', 'COST', 'CL', 'PG', 'MO', 'PM', 'MDLZ', 'HSY', 'GIS', 'K', 'STZ',
+        # Energy
+        'XOM', 'CVX', 'COP', 'SLB', 'EOG', 'PSX', 'VLO', 'MPC', 'OXY', 'BKR', 'HAL',
+        # Industrials
+        'BA', 'GE', 'MMM', 'CAT', 'HON', 'LMT', 'RTX', 'UPS', 'FDX',
+        'DE', 'EMR', 'ETN', 'ITW', 'PH', 'ROK', 'DOV', 'PNR', 'XYL',
+        'UNP', 'NSC', 'CSX', 'CP', 'CNI',
+        # Materials
+        'FCX', 'NUE', 'DD', 'APD', 'LIN', 'PPG', 'SHW', 'ECL', 'ALB',
+        # Communication Services
+        'VZ', 'T', 'CMCSA', 'DIS', 'NFLX', 'EA', 'TTWO',
+        # REITs
+        'PLD', 'AMT', 'CCI', 'EQIX', 'PSA', 'DLR', 'O', 'AVB', 'EQR', 'SPG',
+        # Utilities
+        'NEE', 'DUK', 'SO', 'AEP', 'XEL', 'ED', 'SRE', 'D', 'PCG',
+    ]
+
+UNIVERSE = _load_universe()
 
 HYPOTHESIS_ID = '86d28864'
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'logs', '52w_low_scanner_state.json')

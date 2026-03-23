@@ -464,28 +464,21 @@
       "last_updated": "2026-03-22T13:45:56.493042"
     },
     "ceo_performance_departure": {
-      "finding": "Signal fires entirely in overnight gap, not intraday",
-      "close_entry_stats": {
-        "n": 13,
-        "avg_abnormal_1d": -3.25,
-        "positive_rate": 0.17,
-        "directionally_correct": "83%"
+      "OOS_SDRL_march_18": {
+        "event": "SDRL Seadrill CEO departure March 18 2026 - SCANNER FALSE POSITIVE",
+        "note": "Scanner classified as performance_failure. Actually was an orderly internal CCO\u2192CEO promotion. Stock up from market ($44.18 \u2192 $44.89 vs SPY down). Does NOT qualify for 5dbcfb37.",
+        "action": "No trade - scanner false positive, same pattern as noted in friction log 2026-03-22"
       },
-      "open_entry_stats": {
-        "n": 13,
-        "avg_abnormal_1d": -0.14,
-        "p_value": 1.0,
-        "conclusion": "Not tradeable from next-day open"
+      "OOS_validation_summary_march_2026": {
+        "events": 3,
+        "true_qualifying": 2,
+        "in_direction": 1,
+        "against_direction": 1,
+        "false_positives": 1,
+        "key_refinement": "Welcome departures (CEO clearly blamed by market) may RALLY. Need to distinguish: (1) Surprise firing that reveals hidden problems \u2192 SHORT works; (2) Long-telegraphed firing of unpopular CEO \u2192 likely RALLY, do NOT short",
+        "refinement_proxy": "Stock that was already recovering (past 20d positive) before CEO firing = welcome departure, do not trade"
       },
-      "gap_contribution": "avg -3.11% of total -3.25% effect is in overnight gap",
-      "adbe_validation": {
-        "date": "2026-03-12",
-        "overnight_abnormal": -8.18,
-        "open_entry_1d_abnormal": 0.69,
-        "note": "CEO Narayen step-down amid AI competition"
-      },
-      "actionability_conclusion": "Signal requires after-hours entry (post-announcement, pre-gap) to capture. Intraday-only accounts cannot trade this signal.",
-      "last_updated": "2026-03-22T00:11:19.333449"
+      "last_updated": "2026-03-23T03:18:14.699822"
     },
     "insider_cluster_6_to_9": {
       "description": "OPTIMAL CLUSTER SIZE TIER: 6-9 insiders is the uniquely regime-robust tier",
@@ -922,6 +915,16 @@
       "event_type": "earnings_miss_relief_rally_long",
       "reason": "Earnings misses -> long 5d drift (relief rally hypothesis). Background analysis: n=177, 5d=+0.56% (borderline direction threshold). MY backtest of 29 large-cap miss events (2021-2023): 5d abnormal=-0.07% (p=0.94) -- essentially zero signal. Extremely high heterogeneity in per-event returns: range from -12.58% (NFLX Q1 2022 catastrophic miss) to +9.25% (Ford Q2 2022). No consistent direction at any horizon (all p > 0.36). The 'relief rally' mechanism breaks down because misses are not homogeneous: (a) structural/secular misses (subscriber losses, market share losses) signal continued deterioration and get SOLD further; (b) cyclical/cost-driven misses (WMT inventory, TGT margins) in a rising-rate period also had macro headwinds overwhelming any relief bounce; (c) guidance cuts on the miss call amplify negative drift. The 0.56% signal in the background analysis is likely noise or a regime artifact from the specific 2021-2025 sample mix. Even if the effect existed, it requires identifying which type of miss you're trading -- which makes it untradeable as a mechanical signal. FAILED: magnitude below threshold, no statistical significance in direct backtest, high heterogeneity.",
       "recorded": "2026-03-23T02:38:14.332301"
+    },
+    {
+      "event_type": "fda_nda_bla_approval_drift",
+      "reason": "Tested post-FDA approval drift for small/mid biotech NDA/BLA approvals 2020-2024. N=12 testable events (many others delisted after acquisition). Results: 5d avg=+4.84% abnormal, p=0.164; 10d avg=+6.22%, p=0.091. Does not pass multiple testing threshold. Key issues: (1) survivorship bias - approved stocks often acquired and delisted within 1-2 years, skewing sample; (2) high variance (stdev=14.55%), driven by outliers like IOVA (+43% at 5d) and AQST (-11% at 5d); (3) correlation pre-runup vs post-drift = +0.45, suggesting anticipated approvals drift MORE post-approval (contradicts sell-the-news hypothesis); (4) insufficient N for temporal validation split. Dead end unless more events can be found from non-delisted companies.",
+      "recorded": "2026-03-23T03:07:27.114890"
+    },
+    {
+      "event_type": "insider_cluster_near_earnings_boost",
+      "reason": "Tested whether insider buying clusters within 30 days of next earnings release show stronger abnormal returns than clusters >30 days from earnings. N=17 near (0-30d) vs N=106 far (>30d), t-test p=0.87. No signal. Key limitation: yfinance earnings_dates only provides UPCOMING earnings, not historical, so for 2021-2024 clusters the matched earnings dates are 2026 (showing many years in future). True historical earnings dates would be needed to test properly. Additionally, positive_rate was 47% for near vs 46% for far - essentially identical.",
+      "recorded": "2026-03-23T03:16:51.109764"
     }
   ]
 }

@@ -853,48 +853,67 @@
   ],
   "next_session_priorities": [
     {
-      "task": "Check active hypotheses for positions needing close - run python run.py --status",
-      "set_by_session": "2026-03-23T02:38:28.691685"
+      "task": {
+        "task": "Close GO long trade: run python tools/close_go_trade.py on March 26. Entry was at market open March 23 (~$5.79). Measure 5d abnormal return vs SPY from entry to March 28 close.",
+        "deadline": "2026-03-26",
+        "priority": "URGENT"
+      },
+      "set_by_session": "2026-03-23T03:18:42.017101"
     },
     {
-      "task": "Investigate sector earnings dynamics further: background analysis found tech beats n=107 at p=0.0185 but FAANG-only replication failed completely (p=0.60). If pursuing further, need the actual dataset used in the background analysis to understand what stocks drove the 36.4% positive rate signal",
-      "set_by_session": "2026-03-23T02:38:28.691690"
+      "task": {
+        "task": "Close HD short trade: run python tools/close_hd_trade.py on March 27 (5 trading days from entry March 23). Entry was at market open March 23 (~$320.75). Compare vs SPY 5d abnormal return.",
+        "deadline": "2026-03-27",
+        "priority": "URGENT"
+      },
+      "set_by_session": "2026-03-23T03:18:42.017106"
     },
     {
-      "task": "Consider testing PDUFA watchlist events: REPL (Apr 10), VRDN (Jun 30), RCKT (Mar 28) - these are active from last session",
-      "set_by_session": "2026-03-23T02:38:28.691691"
+      "task": {
+        "task": "CEO departure signal refinement: Hypothesis 5dbcfb37 needs an additional qualifier. OOS March 2026: FBIN correctly fell (genuine surprise), LULU incorrectly rallied (welcome departure). Need to add: IF stock was recovering (20d return positive before CEO announcement), do NOT trade. If stuck in continued downtrend (20d negative), trade short.",
+        "priority": "HIGH"
+      },
+      "set_by_session": "2026-03-23T03:18:42.017107"
     },
     {
-      "task": "FDA clinical efficacy failure short is known_effect - monitor for new events via edgar_clinical_failure_scanner.py",
-      "set_by_session": "2026-03-23T02:38:28.691691"
+      "task": {
+        "task": "Monitor REPL PDUFA April 10 (Replimune). If FDA issues CRL and stock crashes >55%, it may qualify for d302c84b. But REPL first CRL was -45.2% (below 55% threshold) so likely won't qualify. Monitor as data point.",
+        "deadline": "2026-04-10",
+        "priority": "MEDIUM"
+      },
+      "set_by_session": "2026-03-23T03:18:42.017108"
+    },
+    {
+      "task": {
+        "task": "Research new signal: consider testing large-cap SPIN-OFF announcement effect. When a large-cap announces spinning off a division, does the parent or child stock drift? Academic backing: Cusatis et al 1993 finds spinoffs outperform. Use EDGAR 8-K search for 'spin-off' or 'separation' or 'spinco' events 2020-2024.",
+        "priority": "MEDIUM"
+      },
+      "set_by_session": "2026-03-23T03:18:42.017109"
+    },
+    {
+      "task": {
+        "task": "Monitor VIX level for WD trade activation. WD (76678219) activates when VIX drops below 25. VIX on March 20 was 26.78. If VIX drops to <25, activate WD using the trigger mechanism.",
+        "priority": "MEDIUM"
+      },
+      "set_by_session": "2026-03-23T03:18:42.017109"
     }
   ],
   "session_handoff": {
-    "session_summary": "Evaluated sector earnings surprise signals from background analysis. Both signals failed all gates.",
-    "signal_1_tech_beats": {
-      "background_result": "n=107, 5d=-1.17%, p=0.0185",
-      "verdict": "DEAD END",
-      "reasons": [
-        "Single horizon p=0.0185 fails Bonferroni threshold (need p<0.01)",
-        "Magnitude 1.17% below 1.5% minimum abnormal return threshold",
-        "FAANG+NVDA replication: disc 5d p=0.33, val 5d p=0.63 (reversed to +0.41%)"
-      ]
-    },
-    "signal_2_miss_relief": {
-      "background_result": "n=177, 5d=+0.56%",
-      "verdict": "DEAD END",
-      "reasons": [
-        "Direct backtest: 5d abnormal=-0.07%, p=0.94",
-        "Extremely heterogeneous: range -12.58% to +9.25% per event",
-        "No consistent direction at any horizon"
-      ]
-    },
-    "dead_ends_recorded": [
-      "earnings_surprise_tech_beat_sell_news_short",
-      "earnings_miss_relief_rally_long"
+    "investigation": "Multiple OOS CEO departure data points collected (FBIN, LULU, SDRL). Market hypothesis 5dbcfb37 needs refinement.",
+    "key_findings": [
+      "FBIN CEO departure March 16: stock fell ~2.91% abnormal (correct direction)",
+      "LULU CEO departure March 17: stock RALLIED ~5% abnormal (welcome departure - CEO was widely blamed, market saw this as positive)",
+      "SDRL CEO departure March 18: SCANNER FALSE POSITIVE (internal promotion, not performance failure)",
+      "SP500 universe now cached in data/sp500_universe.json (433 tickers)",
+      "52w-low scanner now loads from SP500 cache instead of hardcoded list",
+      "GO long and HD short executing at market open March 23",
+      "Tested FDA approval drift (N=12, p=0.09-0.16) - dead end due to delistings and high variance",
+      "Tested insider cluster near earnings - dead end (p=0.87, data limitation)",
+      "Sector earnings signal confirmed dead end from last session"
     ],
-    "next_step": "Run 'python run.py --status' to check active positions. Then check PDUFA watchlist for upcoming events (RCKT due Mar 28).",
-    "written_at": "2026-03-23T02:38:28.691693"
+    "blocked_by": "Market opens at 9:30 ET for GO/HD trades. VIX still elevated (26.78 on March 20) blocking WD activation.",
+    "next_session_immediate_action": "Run python run.py --status to verify GO and HD executed. Check current VIX. If VIX <25, activate WD. Run close_go_trade.py March 26 and close_hd_trade.py March 27.",
+    "written_at": "2026-03-23T03:18:42.017111"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
