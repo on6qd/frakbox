@@ -1074,67 +1074,52 @@
   ],
   "next_session_priorities": [
     {
-      "task": {
-        "task": "1. TRADE MONITORING (March 23-28): Verify GO (long, 1cb6140f), HD (short, 86d28864), ABT (short, 9777ef67), CTAS (short, cc88dd18) fired at 9:30 AM ET. All four trigger at next_market_open. Check Alpaca positions by 10 AM ET. Schedule closes: GO ~March 26-27 (3d hold), HD/ABT/CTAS ~March 28 (5d hold).",
-        "set_by_session": "2026-03-23T11:35:16.507368"
-      },
-      "set_by_session": "2026-03-23T11:35:16.507601"
+      "task": "TRADE MONITORING (March 23-28): Verify GO/HD/ABT/CTAS fired at 9:30 AM ET March 23. Market opens 9:30 ET = 2:30 PM CET. GO close ~March 26-27 (3d hold). HD/ABT/CTAS close ~March 28 (5d hold). Check trade_loop.log for confirmation.",
+      "set_by_session": "2026-03-23T12:08:09.555794"
     },
     {
-      "task": {
-        "task": "2. TARIFF REVERSAL WATCH: If Trump announces tariff pause/exemption (similar to April 9 2025), ALL short positions at risk. Stop-losses at 8% already set. Monitor news closely. April 2025 analogue: 52w low signal FAILED (33% accuracy) during tariff shock reversal. Current trades HD/ABT/CTAS are same regime.",
-        "set_by_session": "2026-03-23T11:35:16.507372"
-      },
-      "set_by_session": "2026-03-23T11:35:16.507603"
+      "task": "VIX SPIKE RECOVERY TRACKING: Event #13 fired March 23 (VIX=30.4). SPY reference ~$648-650. Check SPY on March 30 to record OOS result. Historical: 5d +1.43%, 75% positive (N=12). Not trading - monitoring only.",
+      "set_by_session": "2026-03-23T12:08:09.555801"
     },
     {
-      "task": {
-        "task": "3. FIRST-IG UPGRADE SIGNAL (f86dcb4e): Monitor CCL for S&P BBB- upgrade (still BB+ as of Oct 2025). After-hours announcements only. CCL Q1 2026 earnings: late April/May. Also watch VanEck rising stars ETF for any new candidates.",
-        "set_by_session": "2026-03-23T11:35:16.507373"
-      },
-      "set_by_session": "2026-03-23T11:35:16.507604"
+      "task": "INSIDER CLUSTER CRISIS REGIME: ALL 5 recent clusters (KKR, IP, HOG, CSGP, BLCO) showed negative abnormal returns in crisis (VIX>30). GO is only active cluster trade. Stop-loss 8% set. WD: do NOT set trigger while VIX>30.",
+      "set_by_session": "2026-03-23T12:08:09.555802"
     },
     {
-      "task": {
-        "task": "4. VGNT SPINOFF (2d94ac68): April 1 trigger at 16:00 ET (close). Verify VGNT starts trading April 1. Check when-issued pricing (VGNT WI, started March 27) to estimate expected close price. Versigent is Aptiv EDS spinoff \u2014 unwanted legacy auto wiring business, ~$3-4B estimated cap.",
-        "set_by_session": "2026-03-23T11:35:16.507373"
-      },
-      "set_by_session": "2026-03-23T11:35:16.507605"
+      "task": "52w LOW SCANNER: Run daily scanner to detect new S&P 500 52w low crossings. ORLY, EQR, ESS, SBAC from March 20 are OOS data points (not traded). After current 3 shorts close, new signals can be traded.",
+      "set_by_session": "2026-03-23T12:08:09.555803"
     },
     {
-      "task": {
-        "task": "5. NEW 52W LOW SCANNER: Run daily scan for S&P 500 stocks crossing 52w lows. Today confirmed HD, ABT, CTAS on March 20. With VIX at 30.3, more stocks may cross in coming days. Check for fresh March 23 crosses when market opens. Build daily automation if pattern persists (4 slots open once current trades close).",
-        "set_by_session": "2026-03-23T11:35:16.507374"
-      },
-      "set_by_session": "2026-03-23T11:35:16.507605"
+      "task": "VGNT SPINOFF: April 1 trigger at 16:00 ET. Verify VGNT starts trading April 1. Check when-issued pricing (VGNT WI) starting March 27.",
+      "set_by_session": "2026-03-23T12:08:09.555804"
     },
     {
-      "task": {
-        "task": "6. VIX SPIKE RECOVERY SIGNAL: Currently at event #13 (VIX=30.3 on March 23). Historical base rate: 5d avg +1.43%, 75% positive (N=12, p=0.046). Not strong enough for hypothesis yet but tracking live. Expected SPY outcome by March 28 (5d): +1-2%. This is context for interpreting current market.",
-        "set_by_session": "2026-03-23T11:35:16.507375"
-      },
-      "set_by_session": "2026-03-23T11:35:16.507606"
+      "task": "CCL FIRST-IG UPGRADE: Monitor for S&P upgrade of CCL from BB+ to BBB-. Only trade if announced after market hours. Hypothesis f86dcb4e (expected_symbol=TBD, need to update to CCL when event fires).",
+      "set_by_session": "2026-03-23T12:08:09.555804"
     },
     {
-      "task": {
-        "task": "7. CEO/CFO CLUSTER (2bbe0f04): GRNT had CEO+CFO+3Dir buy March 10-13. Window passed (entry was March 17-18). Track as retroactive OOS event. Next scan after current market settles: look for fresh CEO/CFO clusters in post-selloff period (insiders often buy during panic).",
-        "set_by_session": "2026-03-23T11:35:16.507375"
-      },
-      "set_by_session": "2026-03-23T11:35:16.507606"
+      "task": "NEW SIGNAL RESEARCH: Fallen angel (IG\u2192HY downgrade) - institutional forced selling. Need clean data source (S&P Capital IQ or Bloomberg). EDGAR 8-K search noisy for this. Alternative: scrape Moody's/Fitch press releases.",
+      "set_by_session": "2026-03-23T12:08:09.555805"
+    },
+    {
+      "task": "FDXF SPINOFF ASSESSMENT: April 8 investor day gate. After event, reassess if FDXF qualifies for spinco short hypothesis (currently: GXO analog = NOT desired by institutions).",
+      "set_by_session": "2026-03-23T12:08:09.555806"
     }
   ],
   "session_handoff": {
-    "current_state": "Session active, 4 trades queued for 9:30 AM ET open (GO long, HD/ABT/CTAS short). VIX=30.3. Tariff selloff environment similar to April 2025.",
-    "key_risk": "Tariff policy reversal could cause large SPY bounce, hurting all 3 short positions simultaneously. Stop-losses at 8% are key protection.",
-    "intermediate_findings": {
-      "vix_direction_filter": "VIX direction does not significantly filter 52w low signal (p=0.115 Mann-Whitney). Falling VIX shows better accuracy (71% vs 55%) but not significant with N=38 vs N=142.",
-      "return_front_loading": "75% of 52w low signal return occurs on day 1. Signal weakens days 2-5, reversal begins day 6-10.",
-      "tariff_analogue": "April 2025 tariff shock: 52w low signal showed only 33% accuracy (6 events) due to tariff pause bounce. Same risk exists now.",
-      "vix_spike_recovery": "VIX>30 spike recovery: N=12, 5d avg +1.43%, p=0.046. Borderline. Not actionable yet but tracking."
-    },
-    "what_blocked_me": "REPL confirmed non-qualifying (multi-pipeline, mktcap >$500M, stated path forward). CEO departure opportunities (GPOR, ADBE) were either non-qualifying or window-closed.",
-    "next_exact_step": "First: verify 4 trades fired at 9:30 AM ET open (check Alpaca via python run.py --status). Then: scan for fresh 52w low crosses at market close (April 23 if active). Monitor tariff news throughout the week.",
-    "written_at": "2026-03-23T11:35:16.507608"
+    "session_date": "2026-03-23",
+    "investigated": "Insider cluster crisis regime interaction, 52w low VIX robustness, dividend cut signal (dead end), VIX spike recovery tracking",
+    "findings": [
+      "CRITICAL: 5 consecutive insider clusters ALL negative in VIX>30 crisis: KKR -10%, CSGP -8.6%, HOG -3.7%, IP -3.7%, BLCO -1.5% abnormal 5d. Crisis macro overwhelms individual cluster signal.",
+      "52w LOW SHORT is regime-robust: calm -1.71%(p=.005), elevated -1.84%(p=.002), crisis -1.47%(p=.012). All significant. HD/ABT/CTAS shorts are supported in current environment.",
+      "Dividend cut announcement: DEAD END. N=8, 5d p=0.844, high variance. SPR confounder (+13.8% due to Boeing acquisition). Signal not tradeable at 5d.",
+      "VIX spike recovery event #13 is live (March 23, VIX=30.4). Historical: +1.43%, 75% positive (N=12, p=0.046). Monitoring only.",
+      "4 trades pending execution at 9:30 AM ET March 23: GO long, HD short, ABT short, CTAS short. Trade loop autonomous.",
+      "WD cluster (3x, filed March 20): NOT setting trigger. In crisis regime, minimum-size clusters fail. WD market cap $1.5B and 3x cluster = marginal. Hold until VIX < 25."
+    ],
+    "blocked_by": "Market opens 9:30 AM ET = 2:30 PM CET. Trades not yet confirmed as of session end.",
+    "next_step": "Verify trades fired via trade_loop.log. Record GO/HD/ABT/CTAS entry prices. Prepare close scripts for March 26-28.",
+    "written_at": "2026-03-23T12:08:09.555807"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",

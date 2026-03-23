@@ -29,7 +29,24 @@ def print_header(text):
 
 def show_status():
     """Show account state, active experiments, and research progress."""
-    print_header(f"RESEARCH STATUS — {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+    from datetime import timezone
+    import zoneinfo
+    now_local = datetime.now()
+    now_et = datetime.now(zoneinfo.ZoneInfo("America/New_York"))
+    et_str = now_et.strftime("%H:%M ET")
+    market_open = now_et.replace(hour=9, minute=30, second=0, microsecond=0)
+    market_close = now_et.replace(hour=16, minute=0, second=0, microsecond=0)
+    if market_open <= now_et <= market_close and now_et.weekday() < 5:
+        market_status = "OPEN"
+    elif now_et.weekday() >= 5:
+        market_status = "CLOSED (weekend)"
+    else:
+        mins_to_open = int((market_open - now_et).total_seconds() / 60)
+        if mins_to_open < 0:
+            market_status = "CLOSED (after hours)"
+        else:
+            market_status = f"CLOSED (opens in {mins_to_open}m)"
+    print_header(f"RESEARCH STATUS — {now_local.strftime('%Y-%m-%d %H:%M')} | {et_str} | Market: {market_status}")
 
     # Account
     summary = get_account_summary()
