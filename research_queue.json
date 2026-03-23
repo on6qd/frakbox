@@ -803,9 +803,29 @@
       "hypothesis_template": "86d28864 (sp500_52w_low_momentum_short) \u2014 with post-spinoff caveat",
       "added": "2026-03-23T00:58:02.619384",
       "status": "watching"
+    },
+    {
+      "event": "REPL (Replimune) PDUFA April 10, 2026 \u2014 CRL resubmission for RP1+nivolumab in advanced melanoma. Class II resubmission = highest rejection probability. If rejected: measure crash magnitude and reason. If crash >55% on clinical efficacy \u2192 d302c84b SHORT trigger. If smaller crash on CMC \u2192 5f805860 bounce. NOTE: Second CRL may not trigger continuation short (ALDX precedent).",
+      "expected_date": "2026-04-10",
+      "symbol": "REPL",
+      "hypothesis_template": "d302c84b (clinical_efficacy_failure_short) or 5f805860 (fda_crl_clinical_post_crash) \u2014 assess after event",
+      "added": "2026-03-23T01:02:01.580556",
+      "status": "watching"
+    },
+    {
+      "event": "VRDN (Viridian Therapeutics) PDUFA June 30, 2026 \u2014 Veligrotug for TED. +75% trailing year, near 52w high. Potential sell-the-news on approval (TEPEZZA incumbent). No current hypothesis for 'sell-the-news on approval' \u2014 would need new hypothesis if signal validates.",
+      "expected_date": "2026-06-30",
+      "symbol": "VRDN",
+      "hypothesis_template": "No current hypothesis. If approved and stock sells off >5% in 5d, research sell-the-news signal.",
+      "added": "2026-03-23T01:02:01.581445",
+      "status": "watching"
     }
   ],
   "next_session_priorities": [
+    {
+      "task": "0. URGENT: REPL PDUFA APRIL 10. Run tools/verify_event_date.py or web search to find REPL first CRL date (2023) and crash magnitude. If crash was >55% and clinical efficacy reason: d302c84b hypothesis qualifies for April 10. Set up monitoring. RCKT PDUFA MARCH 28 \u2014 5 days away. If rejected: stock already down 53%, limited crash potential from our framework.",
+      "set_by_session": "2026-03-23T01:02:45.588729"
+    },
     {
       "task": "1. MORNING CHECK: Verify GO (1cb6140f) LONG and HD (86d28864) SHORT executed at 9:30 AM ET via run.py --status. If not executed, check trade_loop.py logs.",
       "set_by_session": "2026-03-23T00:59:07.869201"
@@ -917,6 +937,16 @@
       "reasoning": "S&P 500 addition hypothesis validated with +4-10% abnormal return. Russell reconstitution is the same mechanism for small-caps. Event dates predictable (announced May, effective late June). Need: (1) historical add/delete lists from FTSE Russell, (2) backtest 1d/3d/5d abnormal returns for additions, (3) compare magnitude to S&P 500 effect.",
       "status": "pending",
       "created": "2026-03-23T00:58:12.838668",
+      "depends_on": null
+    },
+    {
+      "id": "repl_crl_history_check",
+      "category": "event_monitoring",
+      "question": "REPL (Replimune): What was the stock reaction to the FIRST CRL in 2023? Find the exact date and crash magnitude. This tells us the baseline for our d302c84b continuation short criteria (>55% crash needed). Also: what was the reason for the first CRL \u2014 clinical efficacy concerns or CMC/manufacturing?",
+      "priority": 1,
+      "reasoning": "PDUFA April 10, 2026 \u2014 18 days away. Need to know if d302c84b applies: (1) crash >55%? (2) clinical efficacy reason? If both YES: activate short on crash day. Also check ALDX precedent for second-CRL behavior.",
+      "status": "pending",
+      "created": "2026-03-23T01:02:45.587996",
       "depends_on": null
     }
   ],

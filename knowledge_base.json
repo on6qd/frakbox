@@ -319,24 +319,19 @@
       "last_updated": "2026-03-21T21:39:26.008578"
     },
     "fda_crl_clinical_short": {
-      "finding": "Repeat CRL rejections are NOT tradeable with the standard first-time-CRL short hypothesis",
-      "counterexamples": [
-        {
-          "symbol": "ALDX",
-          "date": "2026-03-17",
-          "crl_number": 3,
-          "abnormal_1d": "+19.73%"
-        },
-        {
-          "symbol": "ATRA",
-          "date": "2026-01-10",
-          "crl_number": 2,
-          "abnormal_1d": "+4.47%"
-        }
-      ],
-      "recommendation": "Add screening criterion: exclude repeat CRLs (CRL #2 or higher). Only first-time clinical efficacy failures qualify.",
-      "date_verified": "2026-03-22",
-      "last_updated": "2026-03-22T01:22:01.002942"
+      "REPL_crash_history": {
+        "ticker": "REPL",
+        "first_crl_date": "2023-12-05",
+        "first_crl_crash": -45.2,
+        "first_crl_note": "BELOW d302c84b threshold of >55%. Does NOT qualify for continuation short.",
+        "second_crash_2025_07_22": -77.2,
+        "second_crash_note": "July 2025 mystery crash (likely another negative clinical event). Stock fell to $2.81.",
+        "52w_low": 2.68,
+        "current_price_march_2026": 6.98,
+        "pdufa_april_10_2026": "CRL resubmission. If rejected, crash likely 50-70% (stock ran from $2.68 to $6.98 = +160% in anticipation). Second rejection = more definitive 'no'. Expected crash MIGHT exceed 55% threshold \u2014 monitor and decide AFTER crash occurs.",
+        "strategy": "DO NOT pre-position. If rejected April 10: (1) measure crash magnitude, (2) if >55% AND clinical efficacy reason \u2192 activate d302c84b short at next-day open, (3) if <55% \u2192 skip."
+      },
+      "last_updated": "2026-03-23T01:03:35.514856"
     },
     "fda_clinical_rejection_short": {
       "finding": "Repeat CRL rejections (2nd or 3rd) behave differently from first-time CRLs",
