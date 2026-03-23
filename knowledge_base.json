@@ -678,6 +678,19 @@
       "caution": "Signal weaker for highly desirable SpinCos (GXO +1.8%, GEV -5.7%). Strongest for out-of-favor industries (KD -18.6%, BLCO -9.1%, REZI -7.9%). Hard-to-borrow may limit tradability in first days.",
       "upcoming": "HONA (Honeywell Aerospace) expected Q3 2026 - may not qualify (desired business). Watch for less popular spincos.",
       "last_updated": "2026-03-23T04:40:51.160096"
+    },
+    "edgar_efts_display_names_fix": {
+      "summary": "EDGAR EFTS search-index API display_names field contains ticker symbol in parentheses",
+      "detail": "Field name: display_names (NOT entity_name which is always empty). Format: \"Company Name (TICK) (CIK XXXXXXX)\". Parse with: re.findall(r\"\\(([A-Z]{1,5})\\)\", dn). URL: https://efts.sec.gov/LATEST/search-index?q=PHRASE&forms=8-K&dateRange=custom&startdt=YYYY-MM-DD&enddt=YYYY-MM-DD",
+      "unlocks": [
+        "activist 13D",
+        "spin-off announcements",
+        "strategic alternatives",
+        "SEO events",
+        "any EDGAR 8-K event research"
+      ],
+      "example": "Searching exploring+strategic+alternatives returned 267 hits, 84 parseable tickers. Large-cap events include DVN, PEG, EMR, HRI",
+      "last_updated": "2026-03-23T05:12:06.156545"
     }
   },
   "dead_ends": [

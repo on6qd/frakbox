@@ -202,6 +202,31 @@ closes = get_close_prices(["AAPL", "SPY"], start="2024-01-01")     # columns: AA
 - **Tiingo**: Fallback for delisted tickers (free tier, 500 req/day, needs `TIINGO_API_KEY` in `.env`)
 - **SEC EDGAR**: Form 4 bulk data for insider transactions (free, no key needed)
 
+## EDGAR EFTS API — Ticker Lookup Fix
+
+**CRITICAL**: The `entity_name` field in EDGAR EFTS responses is always null/empty. Use `display_names` instead.
+
+```python
+import requests, re
+
+url = 'https://efts.sec.gov/LATEST/search-index?q=%22PHRASE%22&forms=8-K&dateRange=custom&startdt=2021-01-01&enddt=2024-12-31'
+resp = requests.get(url, headers={'User-Agent': 'research@example.com'})
+hits = resp.json()['hits']['hits']
+
+for h in hits:
+    display_names = h['_source'].get('display_names', [])
+    file_date = h['_source'].get('file_date', '')[:10]
+    for dn in display_names:
+        # Format: "Company Name (TICK) (CIK XXXXXXXX)"
+        matches = re.findall(r'\(([A-Z]{1,5})\)', dn)
+        ticker = matches[0] if matches else None  # first match is usually the target ticker
+        if ticker:
+            print(f"{file_date} | {ticker} | {dn}")
+            break
+```
+
+Also works for SC 13D, SC 13G, DEF 14A, and other EDGAR form types. The `display_names` array contains both the target company (first) and the filer (second) for dual-party filings.
+
 ## Alpaca Paper Trading
 Cash: $100,000 | Fractional shares | Shorting enabled | $5,000 per experiment
 
