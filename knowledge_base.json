@@ -771,15 +771,11 @@
       "last_updated": "2026-03-23T05:41:22.336682"
     },
     "first_ig_credit_upgrade": {
-      "finding": "DATA QUALITY CORRECTION: MSCI 2024-05-13 (Moody's Baa3) in hypothesis f86dcb4e was misclassified. Moody's was the THIRD agency to upgrade MSCI: Fitch first (~2021), S&P second (Feb 27 2023), Moody's third (May 13 2024). MSCI should be excluded from first-IG dataset. Without MSCI (n=11): avg 3d=+2.76%, 81.8% positive, p=0.0071, bootstrap CI=[1.30%,4.31%] excludes zero. Signal STRENGTHENED after correction.",
-      "corrected_n": 11,
-      "corrected_avg_3d": 2.76,
-      "corrected_p_value": 0.0071,
-      "corrected_positive_rate": 81.8,
-      "correction_date": "2026-03-23",
-      "note": "Cannot modify pre-registered hypothesis f86dcb4e without violating research integrity. This finding should inform next hypothesis registration. The corrected dataset is n=11 events with stronger signal.",
-      "also_note": "2025 OOS additions: CCL Oct 1 2025 +1.61% 3d (correct), LADR May 21 2025 +0.49% 3d (correct). Both are genuine first IG events. N grows to 13 if MSCI excluded and CCL/LADR added. Strong signal confirmed.",
-      "last_updated": "2026-03-23T08:03:10.844705"
+      "finding_2": "SECOND DATA QUALITY CORRECTION: ALLY 2021-08-27 (Moody's Baa3) in hypothesis f86dcb4e was also misclassified. Fitch upgraded ALLY to BBB- first on August 19, 2019. Moody's Aug 27 2021 was a ~24-month follow-on. However, the actual Fitch ALLY Aug 19 2019 event was confounded by August 2019 yield-curve panic/trade-war selloff (SPY dropped -3% on Aug 14, then volatile). ALLY Aug 2019 shows -1.33% 3d - confound likely explains negative result.",
+      "correction_status": "Hypothesis f86dcb4e has 2 misclassified events: MSCI (3rd agency) and ALLY (Moody's follow-on). Cannot modify pre-registered hypothesis. For future hypotheses, build systematic agency order verification.",
+      "corrected_first_ig_n": "True first-IG dataset: DAL, CNO, TECK, TMUS, ALLY(2019-confound), NFLX, FCX, M, F, DAL(2024), UBER = 11 events excluding MSCI and excluding ALLY2021. Or 10 clean events if ALLY2019 also excluded for confound.",
+      "next_hypothesis_note": "Future first-IG hypothesis (v2) should use n=10-11 events, exclude MSCI and ALLY 2021. Expected stats: avg 3d ~+2.5-3.0%, 80-90% positive, p<0.01.",
+      "last_updated": "2026-03-23T08:05:21.278706"
     },
     "follow_on_ig_upgrade_timing": {
       "finding": "Follow-on IG upgrades (2nd/3rd agency upgrading same company) show gap-dependent returns. SHORT gap (<180 days): avg 3d=-1.62%, 1/3 positive. LONG gap (>=180 days): avg 3d=+2.15%, 3/3 positive. Spearman rho=0.657 (gap vs return), Mann-Whitney p=0.050. n=6 events (underpowered).",

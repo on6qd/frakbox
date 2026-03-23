@@ -966,50 +966,37 @@
   ],
   "next_session_priorities": [
     {
-      "task": "URGENT March 26: Close GO trade (python tools/close_go_trade.py). Record entry price, compute 3d abnormal return vs 1cb6140f prediction.",
-      "set_by_session": "2026-03-23T07:28:43.355560"
+      "task": "TRADE MONITORING: GO trade should trigger at 9:30 AM ET March 23 (today). Check execution via python run.py --status. Close at 3d (March 26).",
+      "set_by_session": "2026-03-23T08:05:47.460443"
     },
     {
-      "task": "March 26: Check V (Visa) 5d OOS return (entered ~March 23, exits ~March 26). V was 52w-low short signal (86d28864). Run python run.py --status to see exit.",
-      "set_by_session": "2026-03-23T07:28:43.355566"
+      "task": "TRADE MONITORING: HD trade should trigger at 9:30 AM ET March 23 (today). Check execution. Close at 5d (March 28).",
+      "set_by_session": "2026-03-23T08:05:47.460448"
     },
     {
-      "task": "March 27: Close HD trade (python tools/close_hd_trade.py). Record 3d abnormal return vs 86d28864 prediction.",
-      "set_by_session": "2026-03-23T07:28:43.355567"
+      "task": "TRADE MONITORING: VGNT SHORT trigger set for April 1 16:00. Monitor when-issued March 27-31.",
+      "set_by_session": "2026-03-23T08:05:47.460449"
     },
     {
-      "task": "April 1: VGNT first trading day close - trade_loop.py auto-executes SHORT at 4pm close. Monitor VGNT when-issued price March 27-31 to calibrate expectations.",
-      "set_by_session": "2026-03-23T07:28:43.355568"
+      "task": "DATA QUALITY: Verify ALLY first IG classification. ALLY Fitch Aug 19 2019 was actual first IG (confounded by Aug 2019 panic). ALLY 2021-08-27 in hypothesis is Moody follow-on. Also verify M Macys Feb 2022 was truly first IG.",
+      "set_by_session": "2026-03-23T08:05:47.460450"
     },
     {
-      "task": "April 8: Close VGNT SpinCo trade (5 trading days after April 1 entry). Run close script or set trigger.",
-      "set_by_session": "2026-03-23T07:28:43.355569"
+      "task": "RESEARCH: Follow-on IG timing signal (n=7, p=0.029). Find 3+ more events. Check TECK S&P/Moody follow-on date, NFLX Moody follow-on date. Build to n=10+ for hypothesis formation.",
+      "set_by_session": "2026-03-23T08:05:47.460451"
     },
     {
-      "task": "ONGOING: Monitor CCL S&P upgrade to BBB- (sources: bondblox.com, businesswire credit alerts). When fired: set f86dcb4e expected_symbol=CCL, trigger=next_market_open.",
-      "set_by_session": "2026-03-23T07:28:43.355569"
-    },
-    {
-      "task": "RESEARCH: Test follow-on IG upgrade timing effect (>6 month gap between first and second agency IG). Find 5+ examples with known gap sizes.",
-      "set_by_session": "2026-03-23T07:28:43.355570"
-    },
-    {
-      "task": "RESEARCH: PR (Permian Resources) Fitch first IG July 2025 - find exact date (check BondBlox PR page, Q2 earnings call transcript mentioning upgrade).",
-      "set_by_session": "2026-03-23T07:28:43.355571"
+      "task": "RESEARCH: CCL S&P upgrade monitor (expected H2 2026, LONG gap test).",
+      "set_by_session": "2026-03-23T08:05:47.460451"
     }
   ],
   "session_handoff": {
-    "active_trades": {
-      "GO (1cb6140f)": "Entered March 23 open via trade_loop. Exit: March 26 close.",
-      "HD (86d28864)": "Entered March 23 open via trade_loop. Exit: March 27 close.",
-      "VGNT (2d94ac68)": "Trigger set 2026-04-01T16:00 (close of first trading day). Exit: April 8."
-    },
-    "pending_hypotheses": "f86dcb4e (credit upgrade, TBD) awaiting next qualifying event (CCL S&P). All others TBD symbols.",
-    "key_insight": "PR March 17 2026 S&P follow-on upgrade (8 months after Fitch first IG) gave +4.37% 3d, potentially invalidating our negative control hypothesis about follow-on upgrades. Need to test this with more data points.",
-    "vix_context": "VIX 26.78 (Tier 3, elevated). Only n=6-9 insider clusters are tradeable. n=3-5 has negative EV. Watch for VIX dropping below 25.",
-    "upcoming_catalyst": "REPL PDUFA April 10 - watch but do NOT trade (repeat CRL, not first clinical failure).",
-    "session_blockers": "Credit upgrade exact dates often unavailable without Bloomberg. PR Fitch July 2025 date unconfirmed.",
-    "written_at": "2026-03-23T07:28:43.355572"
+    "session_date": "2026-03-23",
+    "what_investigated": "Credit upgrade signal data quality audit + follow-on IG timing effect",
+    "key_findings": "1. MSCI May 2024 in hypothesis f86dcb4e is MISCLASSIFIED (3rd agency, not first IG). 2. ALLY Aug 2021 in hypothesis is MISCLASSIFIED (Moody follow-on after Fitch Aug 2019 first IG). 3. Follow-on IG timing effect: short gap (<180d) = -1.62% avg 3d, long gap (>=180d) = +1.96% avg 3d, Mann-Whitney p=0.029, n=7.",
+    "blocked_by": "Cannot modify pre-registered hypothesis f86dcb4e. Need more follow-on events for robust hypothesis.",
+    "next_exact_step": "1. Check if GO/HD trades executed at 9:30 AM open. 2. Find TECK Moody/S&P second IG date to add follow-on data point. 3. Find NFLX Moody's IG upgrade date (was Ba1 before Oct 2021 S&P first IG). 4. Decide whether to register 'first-IG v2' hypothesis with corrected dataset.",
+    "written_at": "2026-03-23T08:05:47.460453"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
