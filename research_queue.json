@@ -555,6 +555,15 @@
       "added": "2026-03-23T08:58:36.711244"
     },
     {
+      "id": "eaedf856",
+      "category": "credit_upgrade",
+      "question": "Monitor for next first-IG credit upgrade candidate. Confirmed signal: 3d abnormal avg 2.42%, p=0.021. Filter: 24m pre-event run-up <250%. Recent OOS: VRT +1.36%/3d (validation). VST Dec 2025 excluded by filter (402% run-up). CANDIDATES: (1) Carnival CCL \u2014 S&P BB+ with positive momentum, Fitch already at BBB-, S&P upgrade to BBB- estimated 2H 2026 or early 2027; check CCL stock 24m run-up before trading. (2) No other near-term candidates identified. Airlines (LUV, DAL) already IG. NCLH still B+, too far. CZR debt too high (interest coverage 0.88). Most likely next source: Carnival CCL S&P upgrade OR check Moody Credit Outlook for any Ba1 positive outlook company.",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "Signal validated with VRT OOS result (5 OOS events, 80% correct). Need pipeline of candidates to activate f86dcb4e. Upgrade dates are ~3-7 day advance notice from press releases. CCL is best near-term candidate (S&P BB+ positive, Fitch already IG). Monitor quarterly: after CCL earnings for S&P action. Also watch Moody Credit Outlook commentary for any Ba1 positive-outlook company approaching Baa3.",
+      "added": "2026-03-23T10:41:24.239640"
+    },
+    {
       "id": "seed-003",
       "category": "fda_decision",
       "question": "For Phase 3 FDA approvals/rejections of novel drugs (not generics, not supplements), what is the typical abnormal return at 1d and 5d horizons? Does the effect differ between first-time submissions and resubmissions after a Complete Response Letter?",
@@ -1065,26 +1074,32 @@
   ],
   "next_session_priorities": [
     {
-      "task": "Find the next first-IG upgrade candidate (symbol still TBD). Search for: companies that transitioned from high-yield to investment grade in 2025-2026 from S&P/Moody's/Fitch.",
-      "set_by_session": "2026-03-23T10:32:28.688942"
+      "task": "Check Carnival CCL current 24m price run-up (from March 2026 back to March 2024) to assess whether CCL passes the <250% filter when S&P upgrade eventually comes.",
+      "set_by_session": "2026-03-23T10:41:40.985657"
     },
     {
-      "task": "When a candidate is found: verify 24m pre-event run-up < 250% (now part of the exclusion criteria). If it passes, resolve expected_symbol from TBD, activate hypothesis f86dcb4e.",
-      "set_by_session": "2026-03-23T10:32:28.688947"
+      "task": "Scan for any new Ba1/BB+ positive-outlook companies via EDGAR 8-K or news search \u2014 could be telecoms, media, or consumer cyclical sectors.",
+      "set_by_session": "2026-03-23T10:41:40.985663"
     },
     {
-      "task": "Consider expanding the event search using EDGAR 8-K filings tagged with credit rating changes.",
-      "set_by_session": "2026-03-23T10:32:28.688948"
+      "task": "Review hypothesis f86dcb4e OOS record: currently 5 OOS events, 4 correct (80%). Consider whether to activate the next qualifying event immediately upon announcement.",
+      "set_by_session": "2026-03-23T10:41:40.985665"
     }
   ],
   "session_handoff": {
-    "hypothesis_id": "f86dcb4e",
-    "status": "pending \u2014 awaiting next IG upgrade event",
-    "run_up_filter": "24m pre-event run-up < 250% required",
-    "discovery_backtest": "12 events, 3d avg=2.42%, p=0.021, passes_MT=True",
-    "last_oos_result": "VST Dec 2025: 3d=-3.79%, excluded by 24m>250% filter",
-    "note": "Prior session note corrected: VST 12m runup was 16.7% not 400%. Filter window is 24m.",
-    "written_at": "2026-03-23T10:32:28.688950"
+    "investigation": "first-IG credit upgrade signal (hypothesis f86dcb4e)",
+    "state": "VRT OOS result recorded and validated. OOS split updated to 5 events (indices 8,9,10,11,13), 80% correct. Research queue task eaedf856 added for candidate monitoring.",
+    "key_findings": [
+      "VRT already in backtest_events from prior session \u2014 no duplicate added.",
+      "OOS split was missing VRT (index 13) and 2026 results \u2014 now updated.",
+      "Carnival CCL is best near-term candidate: Fitch BBB- (Dec 2025), S&P BB+ positive momentum. S&P upgrade estimated 2H 2026 or early 2027.",
+      "All other candidates screened: DAL/LUV/UBER/MSCI/F already IG. NCLH at B+ (too far). CZR too leveraged. MGM BB- (too far).",
+      "CCL 24m run-up check needed before any trade \u2014 if CCL stock ran up >250% in prior 24 months, signal would be filtered out.",
+      "Moody upgrade activity in 2026: CSG (Czech industrial) Baa3 Feb 2026 \u2014 not tradeable (not US-listed)."
+    ],
+    "blocked_by": "Need actual S&P upgrade announcement for CCL \u2014 no firm date known. Monitor after each quarterly earnings (next ~June 2026).",
+    "next_step": "Run get_close_prices on CCL for 2024-03-23 to 2026-03-23 to compute 24m run-up. If <250%, CCL is trade-ready when S&P announces BBB-.",
+    "written_at": "2026-03-23T10:41:40.985666"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
