@@ -255,10 +255,14 @@ def show_context():
     completed_tasks = [t for t in rq.get("queue", []) if t.get("status") == "completed"]
 
     print(f"\n--- QUEUE ({len(pending_tasks)} pending, {len(completed_tasks)} completed) ---")
-    if handoff.get("next_step"):
-        print(f"  Handoff: {handoff['next_step']}")
-    if handoff.get("blockers"):
-        print(f"  BLOCKED: {handoff['blockers']}")
+    if isinstance(handoff, str):
+        if handoff.strip():
+            print(f"  Handoff: {handoff.strip()[:300]}")
+    elif isinstance(handoff, dict):
+        if handoff.get("next_step"):
+            print(f"  Handoff: {handoff['next_step']}")
+        if handoff.get("blockers"):
+            print(f"  BLOCKED: {handoff['blockers']}")
     if priorities:
         print("  Priorities:")
         for i, p in enumerate(priorities[:5], 1):
