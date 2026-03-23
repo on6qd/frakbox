@@ -238,6 +238,18 @@
       ],
       "gaps": "No free machine-readable historical add/delete list for 2019-2024. Deletions side less studied and potentially more persistent. Semi-annual reconstitution from 2026 changes structural dynamics.",
       "recorded": "2026-03-23T01:04:50.520100"
+    },
+    "spinco_institutional_selling_short": {
+      "summary": "SpinCo entities underperform in first 30-90 days after separation due to forced institutional selling. Index funds and large institutions that receive SpinCo shares often sell immediately (SpinCo too small for mandate, or different sector). Creates predictable downward price pressure.",
+      "known_magnitude": "Median SpinCo underperforms S&P by ~6% at 30 days, ~12% at 18 months (Houlihan Lokey 2022)",
+      "known_timeframe": "30-90 days post-separation date (when SpinCo begins independent trading)",
+      "sources": [
+        "Cusatis, Miles & Woolridge (1993) JFE - long-run spinco data",
+        "Houlihan Lokey 2022 Spin-Off Transaction Study - practitioner data",
+        "S&P Global 2017 Capital Market Implications of Spinoffs"
+      ],
+      "gaps": "Need to identify exact SpinCo first-trading dates and test systematically. Shorting newly-public SpinCo may have high borrow costs. Need to verify borrow availability for test cases.",
+      "recorded": "2026-03-23T03:53:13.860319"
     }
   },
   "known_effects": {
@@ -653,6 +665,16 @@
         "note": "2026 first year of semi-annual reconstitution (adds November reconstitution) \u2014 may reduce June seasonal magnitude"
       },
       "last_updated": "2026-03-23T01:04:50.519189"
+    },
+    "spinoff_announcement_long_parent": {
+      "direction": "long",
+      "magnitude": "3-4% average, 5-6% for focus-increasing conglomerate busts",
+      "timing": "OVERNIGHT GAP: announcement close to next-day open \u2014 not tradeable at open",
+      "source": "Cusatis et al 1993 JFE, Desai & Jain 1999, confirmed through 2024",
+      "key_filter": "Focus-increasing only (NOT spin-merges, NOT asset-dumping)",
+      "negative_cases": "spin-merges (AT&T, PFE), asset dumps (MRK), pre-telegraphed (DHR) all negative",
+      "data_limitation": "Need Bloomberg/Refinitiv for correct press release timestamps",
+      "last_updated": "2026-03-23T03:53:13.859364"
     }
   },
   "dead_ends": [
@@ -925,6 +947,11 @@
       "event_type": "insider_cluster_near_earnings_boost",
       "reason": "Tested whether insider buying clusters within 30 days of next earnings release show stronger abnormal returns than clusters >30 days from earnings. N=17 near (0-30d) vs N=106 far (>30d), t-test p=0.87. No signal. Key limitation: yfinance earnings_dates only provides UPCOMING earnings, not historical, so for 2021-2024 clusters the matched earnings dates are 2026 (showing many years in future). True historical earnings dates would be needed to test properly. Additionally, positive_rate was 47% for near vs 46% for far - essentially identical.",
       "recorded": "2026-03-23T03:16:51.109764"
+    },
+    {
+      "event_type": "spinoff_announcement_long_parent",
+      "reason": "EDGAR 8-K filing dates lag actual press release/announcement dates by days to weeks. When using correct announcement dates (verified via web research for IBM 10/08, GE 11/09, MMM 7/26), the return is concentrated in the OVERNIGHT GAP (close-of-announcement-day to next-day open, avg +5.5% for focus-increasing events). By the time we enter at market open, the entire return is already priced in. Backtest with EDGAR dates (n=18 firm phrase events): avg abnormal 1d=+0.13%, p=0.79 \u2014 essentially noise. Backtest with curated correct dates (n=13): avg 1d=+0.23%, p=0.75 \u2014 still noise because we enter at open post-gap. Gap decomposition: avg overnight gap = +0.01%, avg intraday = +0.62% (high variance). DATA FIX NEEDED: Press release dates from Bloomberg/Refinitiv API. ALTERNATIVE: Test SpinCo institutional selling pressure as SHORT signal in first 30-90 days after SpinCo begins trading (different, potentially testable strategy). SIGNAL IS REAL (IBM +5.1%, GE +2.98%, MMM +6.12% abnormal on announcement day close-to-close), but not tradeable at next-day open with our current data access.",
+      "recorded": "2026-03-23T03:53:13.858014"
     }
   ]
 }
