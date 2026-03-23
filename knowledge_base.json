@@ -753,12 +753,16 @@
       "last_updated": "2026-03-23T05:41:22.336682"
     },
     "first_ig_credit_upgrade": {
-      "effect": "First junk-to-IG credit upgrade causes +2.42% abnormal 3d return, 75% positive rate",
-      "sample": "n=12, 2016-2024, diverse sectors",
-      "key_distinction": "FIRST IG upgrade only -- follow-on upgrades show NEGATIVE returns",
-      "hypothesis_id": "f86dcb4e",
-      "confidence": 7,
-      "last_updated": "2026-03-23T06:57:02.913112"
+      "finding": "2025 OOS data points: CCL (Fitch first IG Oct 2 2025) +1.61% 3d, LADR (Fitch first IG May 21 2025) +0.49% 3d. Both directionally correct. Average 3d across N=14 (original 12 + CCL + LADR) = +2.23%, 78.6% positive. Signal maintained.",
+      "excluded_events": [
+        "VRT April 23 2025 (Fitch first IG): EXCLUDED - concurrent with Q1 2025 earnings miss (-10.3% 1d)",
+        "WDC Jan 30 2026 (Moody Baa3 first IG): EXCLUDED - concurrent with Q2 FY2026 earnings (sell-the-news -9.77% 1d)",
+        "PR March 17 2026 (S&P BBB-): FOLLOW-ON (Fitch already gave IG July 2025): +4.37% 3d (interesting but follow-on)"
+      ],
+      "follow_on_observation": "PR March 17 2026 S&P BBB- (follow-on after Fitch IG July 2025) gave +4.37% 3d. This contradicts our backtest negative control for follow-ons. May be company-specific or sector-specific (energy during tariff uncertainty).",
+      "live_candidates": "CCL: S&P still BB+ positive outlook (Fitch already IG). S&P upgrade expected 2026 H2. Would be first-ever S&P IG for CCL. Qualifies IF we treat each agency separately. Moody still Ba2 (two notches away).",
+      "date": "2026-03-23",
+      "last_updated": "2026-03-23T07:24:19.230198"
     }
   },
   "dead_ends": [
