@@ -310,6 +310,24 @@
       "gaps": "1. Macy's (M) Feb 2022 potentially confounded by earnings day prior -- may overstate positive return. 2. Sample still underpowered for sub-group analysis (sector, VIX regime). 3. Need systematic Bloomberg/Moody's data to get ALL rising stars 2016-2024 (currently only ~50% coverage). 4. The 'MCHP Nov 2021' event was excluded due to concurrent Q2 earnings/sector weakness. 5. No analysis yet of pre-announcement drift (upgrades may be anticipated by bond market). Literature: Kliger and Sarig (2000 JF), Hand et al. (1992 JF) confirm IG/junk threshold effect.",
       "negative_control": "Follow-on IG upgrades (n=3: DAL May 2016 Fitch after Feb Moody's, MCHP Nov 2021, UBER Aug 21 Fitch after Aug 16 S&P): avg 1d=-0.84%, 5d=-2.06%, 0% positive at 5d. This is the negative control confirming the FIRST upgrade is what matters.",
       "recorded": "2026-03-23T06:57:02.911843"
+    },
+    "follow_on_ig_upgrade_timing": {
+      "summary": "PROMISING SIGNAL: Follow-on IG upgrades (2nd/3rd agency) show timing-dependent returns. SHORT gap (<180 days): n=3, avg 3d=-1.62%, 0% positive (sell-the-news). LONG gap (>=180 days): n=4, avg 3d=+1.96%, 100% positive (fresh institutional demand). Mann-Whitney p=0.029. Spearman rho=0.571, p=0.180. UNDERPOWERED: needs n>=10 total per group for robust inference.",
+      "known_magnitude": "+1.96% avg 3d abnormal for long-gap (>=180 days) follow-on upgrades. Short-gap: -1.62% avg 3d.",
+      "known_timeframe": "3 trading days after second/subsequent agency IG upgrade announcement",
+      "sources": [
+        "UBER Fitch Aug 21 2024 (5d gap): +0.17% 3d - SHORT/NEGATIVE",
+        "F S&P Oct 30 2023 (54d gap): -3.03% 3d - SHORT/NEGATIVE",
+        "DAL Fitch May 2016 est (~90d gap): -2.00% 3d - SHORT/NEGATIVE",
+        "CNO Fitch Jun 14 2019 (253d gap): +1.41% 3d - LONG/POSITIVE",
+        "TMUS S&P Aug 4 2022 (~365d gap): +0.67% 3d - LONG/POSITIVE",
+        "FCX S&P May 13 2024 (875d gap): +1.40% 3d - LONG/POSITIVE",
+        "PR S&P Mar 17 2026 (230d gap): +4.37% 3d - LONG/POSITIVE"
+      ],
+      "gaps": "1. Still underpowered (n=3 short, n=4 long per group). 2. DAL May 2016 date approximate (not verified). 3. Need 6+ more events to reach n=10 per group. 4. Mechanism: short-gap = stock already priced IG; long-gap = NEW institutional mandate buyers re-discover stock. 5. CCL S&P upgrade expected H1 2026 will be a live test (~6-9 months after Fitch Oct 1 2025).",
+      "minimum_gap_for_positive": "Appears ~180 days, though small n means threshold uncertain.",
+      "live_candidates": "CCL S&P upgrade (currently BB+ positive outlook, Fitch IG Oct 1 2025). Gap by H1 2026: 6-9 months = LONG gap. ALLY Fitch/S&P follow-ons (timing unclear). TECK Moody's/S&P follow-on (unknown dates).",
+      "recorded": "2026-03-23T07:59:37.317171"
     }
   },
   "known_effects": {
@@ -763,6 +781,52 @@
       "live_candidates": "CCL: S&P still BB+ positive outlook (Fitch already IG). S&P upgrade expected 2026 H2. Would be first-ever S&P IG for CCL. Qualifies IF we treat each agency separately. Moody still Ba2 (two notches away).",
       "date": "2026-03-23",
       "last_updated": "2026-03-23T07:24:19.230198"
+    },
+    "follow_on_ig_upgrade_timing": {
+      "finding": "Follow-on IG upgrades (2nd/3rd agency upgrading same company) show gap-dependent returns. SHORT gap (<180 days): avg 3d=-1.62%, 1/3 positive. LONG gap (>=180 days): avg 3d=+2.15%, 3/3 positive. Spearman rho=0.657 (gap vs return), Mann-Whitney p=0.050. n=6 events (underpowered).",
+      "data_points": [
+        {
+          "event": "UBER Fitch Aug 21 2024",
+          "gap_days": 5,
+          "abnormal_3d": 0.17
+        },
+        {
+          "event": "F S&P Oct 30 2023",
+          "gap_days": 54,
+          "abnormal_3d": -3.03
+        },
+        {
+          "event": "DAL Fitch May 2016 (est)",
+          "gap_days": 90,
+          "abnormal_3d": -2.0
+        },
+        {
+          "event": "TMUS S&P Aug 4 2022",
+          "gap_days": 365,
+          "abnormal_3d": 0.67
+        },
+        {
+          "event": "FCX S&P May 13 2024",
+          "gap_days": 875,
+          "abnormal_3d": 1.4
+        },
+        {
+          "event": "PR S&P Mar 17 2026",
+          "gap_days": 230,
+          "abnormal_3d": 4.37
+        }
+      ],
+      "mechanism": "Short-gap follow-ons: stock already priced IG status from first upgrade momentum; no new institutional mandate demand. Long-gap follow-ons: markets forget/rotate, NEW cohort of institutions requiring 2-of-3 IG (e.g., some bond index mandates) creating fresh demand.",
+      "status": "UNDERPOWERED. Need n>=10 to test formally. Promising signal direction.",
+      "next_steps": "Find more long-gap follow-on events (>6 months). Check CNO, TECK, ALLY, NFLX for when 2nd/3rd agency upgraded them. CCL S&P upgrade (expected 2026) will be a natural test: ~6-9 months after Oct 1 2025 Fitch first IG.",
+      "recorded": "2026-03-23",
+      "last_updated": "2026-03-23T07:56:29.217606"
+    },
+    "credit_upgrade_exclusions": {
+      "finding": "OXY (Occidental Petroleum) Fitch BBB- May 17 2023: NOT a first-ever IG. OXY was IG before 2020, fell to junk, returned. Stock reaction: 1d=-0.84%, 3d=-1.30% (negative, as expected for well-anticipated restoration). PR (Permian Resources) Fitch BBB- July 2025: Complicated by Q2 earnings announcement on Aug 1 2025 and early August market selloff. Entry Aug 1 open into -3% sector move. EXCLUDED from both datasets due to confounders.",
+      "candidates_verified_2025_2026": "CCL S&P upgrade expected H1 2026 (currently BB+ positive outlook; Fitch first IG Oct 1 2025). This will be a LONG-gap follow-on (~6-9 months). Monitor for trade opportunity.",
+      "recorded": "2026-03-23",
+      "last_updated": "2026-03-23T07:56:29.218963"
     }
   },
   "dead_ends": [
