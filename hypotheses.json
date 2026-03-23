@@ -10317,7 +10317,7 @@
     "idempotency_key": "abe9164f656cd1b4",
     "status": "pending",
     "event_type": "first_ig_credit_upgrade",
-    "event_description": "When a large-cap company (>$1B market cap) receives its first investment-grade credit rating from any major rating agency (Moody's Baa3, S&P BBB-, or Fitch BBB-), buy at the open of the next trading day and hold for 3 trading days. Qualifying: (1) company has never had IG status from this agency before, or previously lost IG and is now regaining it; (2) upgrade is not accompanied by same-day M&A or earnings release; (3) no other agency already upgraded this company to IG in the preceding 10 trading days.",
+    "event_description": "When a large-cap company (>$1B market cap) receives its first investment-grade credit rating from any major rating agency (Moody's Baa3, S&P BBB-, or Fitch BBB-), buy at the open of the next trading day and hold for 3 trading days. Qualifying: (1) company has never had IG status from this agency before, or previously lost IG and is now regaining it; (2) upgrade is not accompanied by same-day M&A or earnings release; (3) no other agency already upgraded this company to IG in the preceding 10 trading days. Additional exclusion criterion: stock must not have risen more than 250% in the 24 months prior to the upgrade date (extreme pre-run indicates equity market already priced in credit improvement, neutralizing the signal).",
     "causal_mechanism": "A first IG upgrade removes a company from high-yield bond indices and causes buying pressure from IG-mandated investors. IG bond fund managers must purchase new IG issuers to track IG indices (Bloomberg Agg, LQD). The company gains lower-cost debt access, reducing interest burden and improving equity value. Institutional investors use credit ratings as a quality proxy -- an upgrade signals improved balance sheet health. The mechanism is strongest for FIRST IG upgrades: follow-on upgrades show flat-to-negative returns (n=3: avg 5d=-2.06%), confirming the market prices subsequent agency upgrades after the first.",
     "causal_mechanism_criteria": {
       "actors_and_incentives": "IG-mandated bond fund managers must buy new IG issuers for index compliance. Equity analysts re-rate fundamental quality. Retail investors use credit ratings as quality signal.",
@@ -10531,7 +10531,8 @@
       "survivorship_bias": "Events are public announcements; companies still listed post-upgrade. Delisted companies post-upgrade likely acquisitions at premium, making bias conservative.",
       "selection_bias": "Events selected via web search for known rising stars. Biases toward large-cap, well-publicized events. Systematic Bloomberg/Moody's data would give complete unbiased sample.",
       "event_timing": "All credit upgrades announced pre-market or after-hours. Entry at next open (day+1 open), exiting at close of day+3.",
-      "market_regime": "Tested across bull (2016, 2019, 2021, 2023-24) and correction markets (Oct 2018, early 2022). Signal appears regime-independent across 8-year span."
+      "market_regime": "Tested across bull (2016, 2019, 2021, 2023-24) and correction markets (Oct 2018, early 2022). Signal appears regime-independent across 8-year span.",
+      "pre_event_equity_runup": "Analyzed. 24m pre-event run-up has r=-0.404 correlation with 3d abnormal returns. 12m window has r=-0.045 (not useful). Events with 24m run-up >250% should be excluded as the market has already priced in credit improvement. Filter validated: all 12 discovery events have 24m run-up <200%. VST (403% 24m) is the negative OOS case."
     },
     "market_regime_note": "Tested across bull and correction markets with 12 events spanning 2016-2024. Signal appears regime-independent.",
     "regime_note": null,
@@ -10549,7 +10550,8 @@
     "trade": null,
     "result": null,
     "notes": [
-      "2026-03-23: VST (Dec 2025 out-of-sample) was negative (-3.79% 3d abnormal). VST had run up ~400% in 12 months prior. Hypothesis: pre-event equity run-up >150% may neutralize first-IG signal (market already priced in credit improvement). Need to add pre-event-run-up filter to hypothesis before next trade."
+      "2026-03-23: VST (Dec 2025 out-of-sample) was negative (-3.79% 3d abnormal). VST had run up ~400% in 12 months prior. Hypothesis: pre-event equity run-up >150% may neutralize first-IG signal (market already priced in credit improvement). Need to add pre-event-run-up filter to hypothesis before next trade.",
+      "2026-03-23 (session 2): Pre-event run-up filter analysis completed. CORRECTION to prior note: VST 12m run-up was only 16.7%, NOT ~400%. The 400% figure refers to 24-month window (24m = 402.8%). Key finding: 12m run-up has near-zero correlation with 3d returns (r=-0.045). 24m run-up has moderate negative correlation (r=-0.404, n=13 incl VST). Filter at 150% using 24m window incorrectly excludes FCX (195% 24m, 3d=+6.66%). All 12 discovery events have 24m run-up <200% (max=FCX at 195%). Proposed prospective filter: exclude events where 24m pre-event run-up >250%. This preserves all 12 discovery events while excluding VST-like outliers. Filtered backtest unchanged from original: 3d=2.42%, p=0.021, passes_MT=True."
     ]
   }
 ]

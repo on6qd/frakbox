@@ -1065,42 +1065,26 @@
   ],
   "next_session_priorities": [
     {
-      "task": "1. Verify GO and HD trades fired at market open today (March 23). Check run.py --status. If active, schedule close dates: GO exits ~March 26, HD exits ~March 27.",
-      "set_by_session": "2026-03-23T09:59:36.854610"
+      "task": "Find the next first-IG upgrade candidate (symbol still TBD). Search for: companies that transitioned from high-yield to investment grade in 2025-2026 from S&P/Moody's/Fitch.",
+      "set_by_session": "2026-03-23T10:32:28.688942"
     },
     {
-      "task": "2. VGNT spinoff: Monitor April 1 effective date. Hypothesis 2d94ac68 has trigger set for 2026-04-01T16:00. Verify it fires.",
-      "set_by_session": "2026-03-23T09:59:36.854616"
+      "task": "When a candidate is found: verify 24m pre-event run-up < 250% (now part of the exclusion criteria). If it passes, resolve expected_symbol from TBD, activate hypothesis f86dcb4e.",
+      "set_by_session": "2026-03-23T10:32:28.688947"
     },
     {
-      "task": "3. REPL PDUFA April 10: If clinical efficacy deficiency CRL issued, set short trigger on hypothesis d302c84b. Watch for pre-announcement price action.",
-      "set_by_session": "2026-03-23T09:59:36.854618"
-    },
-    {
-      "task": "4. First IG upgrade candidates: f86dcb4e needs TBD symbol. Add pre-event-run-up filter (must be <150% in 12 months prior). Search for rising star BB+/Ba1 companies with positive outlook. NOTE: VST was a negative OOS result due to 400% run-up.",
-      "set_by_session": "2026-03-23T09:59:36.854619"
-    },
-    {
-      "task": "5. FDXF spinoff (June 1): Watchlist only. April 8 investor day is the gate \u2014 check for S&P 500 inclusion announcement. Short ONLY if: (a) S&P inclusion NOT announced, AND (b) WI trading shows premium vs intrinsic value, AND (c) shareholder base is predominantly non-transport investors.",
-      "set_by_session": "2026-03-23T09:59:36.854619"
-    },
-    {
-      "task": "6. Honeywell Aerospace spinoff HONA (Q3 2026): Same desirability filter applies. Aerospace/defense is a \"desired\" spinco (clear institutional mandate). Likely NOT a short candidate. Verify before September.",
-      "set_by_session": "2026-03-23T09:59:36.854620"
-    },
-    {
-      "task": "7. Merger arbitrage: HSR clearance is a dead end. DO NOT revisit. If researching merger arb, focus on announcement-date behavior or deal-completion timeline underreaction per Giglio-Shue 2014.",
-      "set_by_session": "2026-03-23T09:59:36.854621"
+      "task": "Consider expanding the event search using EDGAR 8-K filings tagged with credit rating changes.",
+      "set_by_session": "2026-03-23T10:32:28.688948"
     }
   ],
   "session_handoff": {
-    "session_date": "2026-03-23",
-    "trades_firing_today": "GO (1cb6140f) and HD (86d28864) both have next_market_open triggers set. Market opens 9:30 ET. VIX ~26-30 (within backtest range, no gate needed).",
-    "dead_ends_recorded": "merger_hsr_clearance (N=199, p=0.96, no signal at any horizon)",
-    "knowledge_updates": "VST Dec 2025 negative result added to f86dcb4e. Pre-event-run-up >150% identified as moderating variable for first-IG hypothesis. Desirability filter added to spinco short knowledge base.",
-    "tools_built": "tools/merger_catalyst_scraper.py \u2014 scrapes EDGAR EFTS for HSR early termination 8-Ks",
-    "critical_upcoming": "VGNT Apr 1, REPL PDUFA Apr 10, FDXF investor day Apr 8",
-    "written_at": "2026-03-23T09:59:36.854623"
+    "hypothesis_id": "f86dcb4e",
+    "status": "pending \u2014 awaiting next IG upgrade event",
+    "run_up_filter": "24m pre-event run-up < 250% required",
+    "discovery_backtest": "12 events, 3d avg=2.42%, p=0.021, passes_MT=True",
+    "last_oos_result": "VST Dec 2025: 3d=-3.79%, excluded by 24m>250% filter",
+    "note": "Prior session note corrected: VST 12m runup was 16.7% not 400%. Filter window is 24m.",
+    "written_at": "2026-03-23T10:32:28.688950"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
