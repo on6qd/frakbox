@@ -537,6 +537,15 @@
       "added": "2026-03-23T07:28:18.042495"
     },
     {
+      "id": "5b7f12e8",
+      "category": "merger_arbitrage",
+      "question": "Does buying a target stock after confirmed M&A deal announcement (not \"strategic alternatives\") generate positive abnormal returns over 20d hold? The mechanism: deal spread compression as probability of completion rises. Test on 2020-2025 acquisitions of >$1B targets announced at >10% premium. Key discriminator vs strategic alternatives: deal PRICE is stated.",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "Strategic alternatives dead end showed 43% base rate of completed deals and high heterogeneity. Confirmed deal announcements have stated prices - the signal is known deal spread, not uncertainty. Literature: risk arbitrage literature (Karolyi & Shannon 1999) shows 4-8% abnormal returns to target shareholders over the deal completion period. This is a well-documented effect that may still be exploitable for 3-5 day holds.",
+      "added": "2026-03-23T08:58:36.711244"
+    },
+    {
       "id": "seed-003",
       "category": "fda_decision",
       "question": "For Phase 3 FDA approvals/rejections of novel drugs (not generics, not supplements), what is the typical abnormal return at 1d and 5d horizons? Does the effect differ between first-time submissions and resubmissions after a Complete Response Letter?",
@@ -983,32 +992,47 @@
   ],
   "next_session_priorities": [
     {
-      "task": "Monitor GO and HD trades - both have next_market_open triggers, will execute when market opens tomorrow. Check P&L and set exit criteria.",
-      "set_by_session": "2026-03-23T08:56:07.971965"
+      "task": "1. CLOSE GO and HD trades (GO exits March 26, HD exits whenever stop/profit hit) - run close scripts",
+      "set_by_session": "2026-03-23T08:59:11.572761"
     },
     {
-      "task": "VGNT short trigger is set for 2026-04-01T16:00 - verify the spinoff date is still correct and VGNT is trading.",
-      "set_by_session": "2026-03-23T08:56:07.971968"
+      "task": "2. Monitor REPL April 10 PDUFA - if CRL issued and it is a clinical efficacy deficiency, set short trigger on d302c84b",
+      "set_by_session": "2026-03-23T08:59:11.572766"
     },
     {
-      "task": "Investigate merger arbitrage spread compression on confirmed deal announcements (see new task in queue).",
-      "set_by_session": "2026-03-23T08:56:07.971969"
+      "task": "3. Research merger arbitrage spread compression signal (new task added this session)",
+      "set_by_session": "2026-03-23T08:59:11.572767"
     },
     {
-      "task": "Consider expanding insider buying cluster sample: hypothesis 0a093c90 (TBD) and 416556df (TBD) both have TBD symbols - find next cluster opportunity from scanner.",
-      "set_by_session": "2026-03-23T08:56:07.971970"
+      "task": "4. VGNT spinoff trade: effective April 1 - confirm stock starts trading, verify short trigger fires via trade_loop",
+      "set_by_session": "2026-03-23T08:59:11.572767"
+    },
+    {
+      "task": "5. CEO departure scanner: check daily for qualifying events",
+      "set_by_session": "2026-03-23T08:59:11.572768"
     }
   ],
   "session_handoff": {
-    "trade_status": "GO (1cb6140f) and HD (86d28864) both have trigger=next_market_open, will execute at 9:30 ET next market day. VGNT (2d94ac68) trigger=2026-04-01T16:00 for spinoff short. No positions currently open.",
-    "research_completed": [
-      "Russell 2000 reconstitution: dead end recorded (data access + conflated dataset)",
-      "Strategic alternatives announcement: dead end recorded (high heterogeneity, n=5 after filter, all p-values >0.28)",
-      "58 unique EDGAR 8-K strategic alternatives filers identified for 2024-2025"
+    "session_date": "2026-03-23",
+    "active_triggers": {
+      "GO_1cb6140f": "next_market_open long $5000 - fires 9:30 AM ET March 23",
+      "HD_86d28864": "next_market_open short $5000 - fires 9:30 AM ET March 23",
+      "VGNT_2d94ac68": "2026-04-01T16:00 short $5000 - spinoff effective April 1"
+    },
+    "watching": {
+      "REPL": "PDUFA April 10 2026 - second CRL would trigger d302c84b clinical failure short",
+      "CEO_departure": "ceo_departure_daily_scan.py running - alert fires to logs/ceo_departure_alerts.jsonl",
+      "CCL_credit_upgrade": "watching for BBB- upgrade from S&P, H2 2026"
+    },
+    "dead_ends_this_session": [
+      "russell_2000_reconstitution: data access limitation, no free constituent lists",
+      "strategic_alternatives_announcement: high heterogeneity, distress vs auction cases indistinguishable"
     ],
-    "key_finding": "Strategic alternatives base rate is 43% leading to acquisition (3/7 in 2024), but the announcement itself is not a clean entry signal due to distress contamination. Merger arb AFTER deal announcement is the cleaner opportunity.",
-    "next_step": "Check trade execution status at next session open. Then test merger arb spread compression using confirmed 2023-2025 deal announcements from SEC EDGAR merger filings (S-4 or SC TO-T forms).",
-    "written_at": "2026-03-23T08:56:07.971971"
+    "new_signal_to_research": "merger_arbitrage: confirmed deal announcement (stated price) => spread compression => 20d hold",
+    "vix_note": "WD trade (76678219) blocked by VIX gate - n=3 insiders + VIX=26.78 = negative EV. Re-evaluate when VIX<25",
+    "GO_close_date": "March 26 close (3 trading days from March 23 open entry)",
+    "friction_fix_done": "realtime_insider_scanner.py --max-check flag added (commit c0f1d65)",
+    "written_at": "2026-03-23T08:59:11.572769"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
