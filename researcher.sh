@@ -1,7 +1,12 @@
 #!/bin/bash
-# Daemon — runs a research session every hour.
-# Usage: ./run.sh          (foreground)
-#        nohup ./run.sh &  (background)
+# Unified daemon — research sessions, trade execution, and health monitoring.
+# Usage: ./researcher.sh          (foreground)
+#        nohup ./researcher.sh &  (background)
+#
+# Runs three tasks on different intervals from a single process:
+#   - Trade loop:    every 2 min  (stop-losses, triggers, reconciliation)
+#   - Health check:  every 10 min (watchdog, alerts, auto-restart)
+#   - Research:      every 15 min (LLM sessions, 50 min each)
 
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -9,11 +14,24 @@ cd "$(dirname "$0")"
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 LOCKFILE="${TMPDIR:-/tmp}/research_bot_$(id -u).lock"
-INTERVAL=900
+SESSION_INTERVAL=900       # 15 min between research sessions
+TRADE_INTERVAL=120         # 2 min between trade loop runs
+HEALTH_INTERVAL=600        # 10 min between health checks
+TICK=60                    # main loop tick (1 min)
 MAX_SESSIONS_PER_DAY=64
+RESEARCH_START_HOUR=21     # LLM sessions start at 9 PM local
+RESEARCH_END_HOUR=7        # LLM sessions stop at 7 AM local
 
 set -a; source .env; set +a
 source venv/bin/activate 2>/dev/null || true
+
+# Timestamps for interval tracking
+last_trade=0
+last_health=0
+last_session=0
+digest_sent=0
+
+now() { date +%s; }
 
 check_daily_limit() {
   local count_file="${TMPDIR:-/tmp}/research_sessions_$(date +%Y%m%d)_$(id -u).count"
@@ -27,6 +45,14 @@ check_daily_limit() {
   fi
   echo $((count + 1)) > "$count_file"
   return 0
+}
+
+run_trade_loop() {
+  python3 trade_loop.py >> logs/trade_loop.log 2>&1 || true
+}
+
+run_health_check() {
+  python3 health_check.py >> logs/health_check.log 2>&1 || true
 }
 
 run_session() {
@@ -46,7 +72,7 @@ run_session() {
     return
   fi
 
-  echo "=== Session started $(date) ===" | tee "$logfile"
+  echo "=== Session started $(date) ===" | tee -a logs/daemon.log | tee "$logfile"
 
   local prompt
   prompt=$(cat <<'PROMPT'
@@ -102,6 +128,7 @@ PROMPT
     -p "$prompt" < /dev/null >>"$logfile" 2>&1 || exit_code=$?
 
   echo "=== Session finished $(date) (exit code: $exit_code) ===" >> "$logfile"
+  echo "=== Session finished $(date) (exit code: $exit_code) ===" >> logs/daemon.log
 
   # Determine session status from exit code
   local status="completed"
@@ -111,13 +138,50 @@ PROMPT
     status="crashed"
   fi
 
-  # Send email report with actual status
-  python3 email_report.py --session research "$status" "$logfile" "" 2>>"$logfile" || true
+  # Log status (daily digest sent at end of research window instead)
+  echo "Session $status: $logfile" >> logs/daemon.log
 }
 
-echo "Research daemon started. Running every ${INTERVAL}s. Max ${MAX_SESSIONS_PER_DAY} sessions/day."
+# ---- Main loop ----
+
+echo "Daemon started. Research every ${SESSION_INTERVAL}s, trades every ${TRADE_INTERVAL}s, health every ${HEALTH_INTERVAL}s." | tee -a logs/daemon.log
+
 while true; do
-  run_session
-  echo "Next session in ~1h"
-  sleep $INTERVAL
+  current=$(now)
+
+  # Trade loop — every 2 min (fast, lightweight)
+  if (( current - last_trade >= TRADE_INTERVAL )); then
+    run_trade_loop
+    last_trade=$(now)
+  fi
+
+  # Health check — every 10 min
+  if (( current - last_health >= HEALTH_INTERVAL )); then
+    run_health_check
+    last_health=$(now)
+  fi
+
+  # Research session — every 15 min, only during night window (9 PM – 7 AM)
+  local hour=$(date +%H)
+  local in_window=0
+  if (( hour >= RESEARCH_START_HOUR || hour < RESEARCH_END_HOUR )); then
+    in_window=1
+    if (( current - last_session >= SESSION_INTERVAL )); then
+      run_session &
+      last_session=$(now)
+    fi
+  fi
+
+  # Daily digest — send once when research window closes
+  if (( in_window == 0 && digest_sent == 0 )); then
+    echo "Sending daily digest..." >> logs/daemon.log
+    python3 -c "from email_report import send_report; send_report()" >> logs/daemon.log 2>&1 || true
+    digest_sent=1
+  fi
+  # Reset digest flag when window opens again
+  if (( in_window == 1 )); then
+    digest_sent=0
+  fi
+
+  sleep $TICK
 done

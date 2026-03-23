@@ -558,9 +558,11 @@ def save_queue(q):
     conn.execute("DELETE FROM session_priorities")
     for p in q.get("next_session_priorities", []):
         if isinstance(p, dict):
+            task_str = str(p.get("task", ""))
+            session_str = str(p.get("set_by_session", "")) or None
             conn.execute(
                 "INSERT INTO session_priorities (task, set_by_session) VALUES (?, ?)",
-                (p.get("task", str(p)), p.get("set_by_session")),
+                (task_str, session_str),
             )
         else:
             conn.execute(

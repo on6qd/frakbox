@@ -3,7 +3,7 @@ cd "$(dirname "$0")"
 source venv/bin/activate 2>/dev/null || true
 
 # Running?
-PIDS=$(pgrep -f "run.sh")
+PIDS=$(pgrep -f "researcher.sh")
 if [ -n "$PIDS" ]; then
   echo "RUNNING (pid $PIDS)"
 else

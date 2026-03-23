@@ -42,10 +42,10 @@ def _save_state(state):
 
 
 def _daemon_is_alive():
-    """Check if run.sh is running."""
+    """Check if researcher.sh is running."""
     try:
         result = subprocess.run(
-            ["pgrep", "-f", "run.sh"],
+            ["pgrep", "-f", "researcher.sh"],
             capture_output=True, text=True, timeout=5,
         )
         return result.returncode == 0
@@ -100,7 +100,7 @@ def _restart_daemon():
             f.write(f"\n=== Daemon restarted by health_check.py at {datetime.now()} ===\n")
 
         subprocess.Popen(
-            ["nohup", str(BASE_DIR / "run.sh")],
+            ["nohup", str(BASE_DIR / "researcher.sh")],
             stdout=open(DAEMON_LOG, "a"),
             stderr=subprocess.STDOUT,
             stdin=subprocess.DEVNULL,
@@ -169,7 +169,7 @@ def run_health_check():
 
     # Check 1: Is daemon process alive?
     if not alive:
-        issues.append(f"Daemon process (run.sh) is not running.")
+        issues.append(f"Daemon process (researcher.sh) is not running.")
         if has_positions:
             issues.append(f"Active positions exist — restarting daemon.")
             if _restart_daemon():

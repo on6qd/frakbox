@@ -6,11 +6,7 @@ The researcher will note which items it picked up.
 
 ## Directions
 
-<!-- Example:
-- Look into how activist investor 13D filings affect stock prices
-- Stop working on FDA stuff, focus on insider clusters
-- Is there a signal around stock buyback announcements?
--->
+-look into the relationship between the buy/sell orders of us politicians, or any legal entity they can be connected too, or relatives etc.
 
 ## 2026-03-22 Disposition Effect / Cost Basis Signal (RESPONDED)
 User suggested: When stock rises on low volume, lots of investors have unrealized gains -> produces selling pressure. When stock rises on high volume, less investors have unrealized gains -> produces less selling. Is it possible to calculate the average price at which investors are in a stock, and compare that to the actual price to predict direction?

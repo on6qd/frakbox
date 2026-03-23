@@ -302,7 +302,7 @@ def build_hypothesis_story(h):
         html += f"""
         <div style="margin-top: 8px; background: #fff3e0; padding: 10px; border-radius: 4px;">
             <b>Active trade:</b> {html_mod.escape(str(symbol))} @ ${trade.get('entry_price', '?')}
-            &middot; Size: ${trade.get('position_size_usd', '?'):,}
+            &middot; Size: ${trade.get('position_size_usd', trade.get('position_size', '?'))}
             &middot; Deadline: {str(trade.get('deadline', '?'))[:10]}
         </div>
         """

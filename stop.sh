@@ -1,5 +1,5 @@
 #!/bin/bash
-PIDS=$(pgrep -f "run.sh" 2>/dev/null)
+PIDS=$(pgrep -f "researcher.sh" 2>/dev/null)
 CLAUDE_PIDS=$(pgrep -f "claude --agent financial-researcher" 2>/dev/null)
 
 if [ -z "$PIDS" ] && [ -z "$CLAUDE_PIDS" ]; then
