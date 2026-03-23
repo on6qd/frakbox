@@ -461,9 +461,11 @@
       "category": "signal_discovery",
       "question": "Test accelerated share repurchase (ASR) announcement effect. When companies execute ASR programs (upfront share buyback paid immediately to investment bank), delta-hedging by the bank creates predictable selling pressure on the stock over 3-10 days. Academic literature (Gallagher, Grundy, Lepone 2017; Bonaim\u00e9 & Stulz): -1.5% to -3% 10d drift vs announcement day. Test using EDGAR 8-K full-text search for \"accelerated share repurchase\" announcements 2020-2024, measure abnormal returns. Expected: SHORT signal at open after ASR announcement, 5-10d hold. Key filter: announcement without concurrent earnings (pure ASR signal).",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "ASR creates MECHANICAL selling pressure (delta hedge) unlike regular buybacks (support buying). This is the one buyback sub-type that should SHORT, not LONG. Has not been tested. Free data source: EDGAR 8-K full-text search. Market cap: focus on S&P 500 (>5B) for liquidity. Hypothesis would be OPPOSITE to regular buyback (short).",
-      "added": "2026-03-23T01:41:06.455056"
+      "added": "2026-03-23T01:41:06.455056",
+      "completed": "2026-03-23T04:21:27.411970",
+      "findings": "DEAD END. ASR announcement SHORT signal tested: N=79 EDGAR 8-K events 2020-2024. 1d avg=+0.67% (wrong direction - POSITIVE not negative), p=0.185. Direction inconsistent. Recorded as dead end."
     },
     {
       "id": "seed-003",

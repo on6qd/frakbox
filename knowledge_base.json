@@ -950,6 +950,11 @@
       "event_type": "finra_short_volume_spike",
       "reason": "FINRA REGSHO daily short volume ratio (SVR) spike detection tested on 30 large-cap S&P 500 stocks (2023-H2). N=111 spike events (z > 2.0 above 20d rolling mean). Results: mean next-day abnormal = -0.009%, % negative = 49.5%, p=0.9639. High spikes only (z>3, n=10): mean = -0.387% (too few events for significance). Academic paper (Boehmer et al 2008 JFE 'Which Shorts Are Informed?') found short volume IS predictive, but effect is concentrated in SMALLER stocks where shorts have informational advantage. Large-cap short sellers are mostly HFT/hedging, not informed directional bets. Conclusion: test on micro/small-cap universe might show different results, but those stocks have execution risk and liquidity issues. Dead end for large-cap focus.",
       "recorded": "2026-03-23T04:03:16.039574"
+    },
+    {
+      "event_type": "guidance_raise_announcement",
+      "reason": "Guidance raise 8-K filings (phrase: raises full-year guidance, N=52, 2021-2024) show no signal: avg 1d abnormal=+0.32% (p=0.59), 3d=+0.41% (p=0.95), 5d=+0.07% (p=0.73). passes_multiple_testing=False. Root cause: guidance raises are almost always at quarterly earnings release dates, so the signal is fully confounded by the earnings beat effect. There is no independent mid-quarter guidance raise signal separable from EDGAR 8-K free-text search alone. A cleaner test would require identifying guidance raises OUTSIDE earnings season which needs a specialized dataset.",
+      "recorded": "2026-03-23T04:23:36.371518"
     }
   ]
 }
