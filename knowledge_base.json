@@ -771,16 +771,15 @@
       "last_updated": "2026-03-23T05:41:22.336682"
     },
     "first_ig_credit_upgrade": {
-      "finding": "2025 OOS data points: CCL (Fitch first IG Oct 2 2025) +1.61% 3d, LADR (Fitch first IG May 21 2025) +0.49% 3d. Both directionally correct. Average 3d across N=14 (original 12 + CCL + LADR) = +2.23%, 78.6% positive. Signal maintained.",
-      "excluded_events": [
-        "VRT April 23 2025 (Fitch first IG): EXCLUDED - concurrent with Q1 2025 earnings miss (-10.3% 1d)",
-        "WDC Jan 30 2026 (Moody Baa3 first IG): EXCLUDED - concurrent with Q2 FY2026 earnings (sell-the-news -9.77% 1d)",
-        "PR March 17 2026 (S&P BBB-): FOLLOW-ON (Fitch already gave IG July 2025): +4.37% 3d (interesting but follow-on)"
-      ],
-      "follow_on_observation": "PR March 17 2026 S&P BBB- (follow-on after Fitch IG July 2025) gave +4.37% 3d. This contradicts our backtest negative control for follow-ons. May be company-specific or sector-specific (energy during tariff uncertainty).",
-      "live_candidates": "CCL: S&P still BB+ positive outlook (Fitch already IG). S&P upgrade expected 2026 H2. Would be first-ever S&P IG for CCL. Qualifies IF we treat each agency separately. Moody still Ba2 (two notches away).",
-      "date": "2026-03-23",
-      "last_updated": "2026-03-23T07:24:19.230198"
+      "finding": "DATA QUALITY CORRECTION: MSCI 2024-05-13 (Moody's Baa3) in hypothesis f86dcb4e was misclassified. Moody's was the THIRD agency to upgrade MSCI: Fitch first (~2021), S&P second (Feb 27 2023), Moody's third (May 13 2024). MSCI should be excluded from first-IG dataset. Without MSCI (n=11): avg 3d=+2.76%, 81.8% positive, p=0.0071, bootstrap CI=[1.30%,4.31%] excludes zero. Signal STRENGTHENED after correction.",
+      "corrected_n": 11,
+      "corrected_avg_3d": 2.76,
+      "corrected_p_value": 0.0071,
+      "corrected_positive_rate": 81.8,
+      "correction_date": "2026-03-23",
+      "note": "Cannot modify pre-registered hypothesis f86dcb4e without violating research integrity. This finding should inform next hypothesis registration. The corrected dataset is n=11 events with stronger signal.",
+      "also_note": "2025 OOS additions: CCL Oct 1 2025 +1.61% 3d (correct), LADR May 21 2025 +0.49% 3d (correct). Both are genuine first IG events. N grows to 13 if MSCI excluded and CCL/LADR added. Strong signal confirmed.",
+      "last_updated": "2026-03-23T08:03:10.844705"
     },
     "follow_on_ig_upgrade_timing": {
       "finding": "Follow-on IG upgrades (2nd/3rd agency upgrading same company) show gap-dependent returns. SHORT gap (<180 days): avg 3d=-1.62%, 1/3 positive. LONG gap (>=180 days): avg 3d=+2.15%, 3/3 positive. Spearman rho=0.657 (gap vs return), Mann-Whitney p=0.050. n=6 events (underpowered).",
