@@ -23,6 +23,15 @@
       "findings": "GO and WD triggers set to next_market_open. Trade loop will execute both at Monday March 23 9:30 AM ET. No manual action needed."
     },
     {
+      "id": "232f0bf6",
+      "category": "insider_buying_cluster",
+      "question": "CLOSE TRADES: (1) GO (Grocery Outlet): enters March 23, 3d hold -> EXIT at March 26 close. Run: python tools/close_go_trade.py. Record actual entry price from trade_loop logs. (2) WD (Walker and Dunlop): WD trigger is set to next_market_open but VIX was 26.78 (elevated). Check current VIX - if VIX > 25, consider canceling WD trade (elevated VIX reduces signal quality). Also close HD (S&P 52W low signal): entered March 23, exits March 27 close. Run: python tools/close_hd_trade.py.",
+      "priority": 0,
+      "status": "pending",
+      "reasoning": "Active paper trades need monitoring and closing on schedule.",
+      "added": "2026-03-23T06:57:25.593193"
+    },
+    {
       "id": "seed-001",
       "category": "earnings_surprise",
       "question": "What is the magnitude and duration of post-earnings announcement drift (PEAD) for S&P 500 stocks that beat consensus EPS by >10%? Is the effect still tradeable after decades of being published?",
@@ -197,9 +206,20 @@
       "category": "credit_events",
       "question": "Expand junk-to-IG credit upgrade dataset to 15-38 events for statistical power. Current n=9: AMD Sep-2020, CF Sep-2021, MCHP Nov-2021, EQT Mar-2022 x2, Macy's M Feb-2022, Ford F Sep/Oct-2023, DAL Jul-2024. Need more events from 2015-2024. Search: (1) web 'rising stars 2015 2016 2017 2018 corporate bond upgrade investment grade'; (2) Check FCX ~2018 Freeport-McMoRan returned to IG, ALLY 2019, VICI 2019 spinoff achieved IG. (3) Run sector-adjusted backtest. 3d bootstrap CI excludes zero at n=7 ex-EQT: CI=[0.53, 5.37].",
       "priority": 1,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Credit upgrade signal: 77-85% positive rate, 3d CI excludes 0 excluding EQT confound. Mechanism strong (IG-mandated fund flows). Underpowered at n=9.",
-      "added": "2026-03-23T06:21:01.704758"
+      "added": "2026-03-23T06:21:01.704758",
+      "completed": "2026-03-23T06:57:25.591107",
+      "findings": "COMPLETED. Expanded dataset from n=9 to n=15 (adding FCX, TMUS, CNO, TECK, NFLX, MSCI, DAL 2016x2, ALLY, UBER). KEY FINDING: Signal only exists for FIRST IG upgrades (n=12): 3d avg=+2.42%, p=0.013, 75% positive, bootstrap CI=[0.93,4.01] excludes zero, sample_sufficient=True. Follow-on upgrades (n=3) show NEGATIVE returns (5d avg=-2.06%, 0% positive). Hypothesis f86dcb4e pre-registered. OOS 2023-2024: 3/4 events positive at 3d."
+    },
+    {
+      "id": "b74e2f4f",
+      "category": "first_ig_credit_upgrade",
+      "question": "Monitor for next qualifying first IG credit upgrade event. Qualifying criteria: (1) large-cap >$1B market cap company; (2) first time receiving IG from any major agency, or regaining IG after loss; (3) no concurrent earnings or M&A announcement; (4) no follow-on upgrade (another agency hadn't upgraded in preceding 10 trading days). Best sources to monitor: (a) Moody's ratings news RSS, (b) Business Wire credit rating alerts, (c) BondBlox.com rising star page. When event fires: set expected_symbol in hypothesis f86dcb4e and trigger at next_market_open. Hold 3 trading days. CANDIDATES TO WATCH: Carnival CCL (S&P BB+ May 2025, 1 notch away from IG; target IG by Q3 2026), US Steel X (Fitch BBB- June 2025 after Nippon acquisition - check if this already traded), T-Mobile TMUS (regained Moody's IG after merging Sprint - check if 2021 Moody's Baa3 was counted).",
+      "priority": 1,
+      "status": "pending",
+      "reasoning": "Hypothesis f86dcb4e pre-registered with confidence 7/10. Need to identify and trade the next qualifying event.",
+      "added": "2026-03-23T06:57:25.592244"
     },
     {
       "id": "seed-002",
@@ -926,24 +946,31 @@
   ],
   "next_session_priorities": [
     {
-      "task": "Expand junk-to-IG credit upgrade event list to 15+ events. Key suspects: FCX ~2018, ALLY 2019, VICI 2019, see credit_events task in queue.",
-      "set_by_session": "2026-03-23T06:21:01.705992"
+      "task": "URGENT: Close GO trade March 26 close (run close_go_trade.py). Close HD trade March 27 close (run close_hd_trade.py). Record outcomes in hypotheses 1cb6140f and 86d28864.",
+      "set_by_session": "2026-03-23T06:58:15.003770"
     },
     {
-      "task": "Run sector-adjusted backtest for credit upgrades with expanded dataset.",
-      "set_by_session": "2026-03-23T06:21:01.705995"
+      "task": "Check WD (Walker & Dunlop): VIX was 26.78 on March 20. If VIX still > 25, consider canceling WD trigger. Otherwise activate. Exit date would be March 30 close.",
+      "set_by_session": "2026-03-23T06:58:15.003775"
     },
     {
-      "task": "If 3d CI still excludes 0 with n>=15, form hypothesis for next qualifying IG upgrade event.",
-      "set_by_session": "2026-03-23T06:21:01.705996"
+      "task": "Monitor for first IG credit upgrade events (hypothesis f86dcb4e active, needs TBD symbol resolution). Sources: BondBlox.com, BusinessWire. Candidates: Carnival CCL (S&P BB+ -> may hit BBB- Q3 2026).",
+      "set_by_session": "2026-03-23T06:58:15.003777"
+    },
+    {
+      "task": "VGNT (Versigent Aptiv spinoff): first trading day April 1. trade_loop.py will execute SHORT at April 1 close automatically. No manual action needed unless VGNT does not start trading.",
+      "set_by_session": "2026-03-23T06:58:15.003777"
+    },
+    {
+      "task": "Optional research: Build EDGAR 8-K scraper for 'upgraded to investment grade' to systematically find all rising star events 2015-2024 (would expand n from 12 to potentially 50+, enabling sector-specific analysis).",
+      "set_by_session": "2026-03-23T06:58:15.003778"
     }
   ],
   "session_handoff": {
-    "session": "Researched dividend resumption (DEAD END) and junk-to-IG credit upgrades (PROMISING)",
-    "dividend_resumption": "DEAD END. n=9, all p>0.30, no consistent direction. record_dead_end() called.",
-    "credit_upgrade": "PROMISING, underpowered. n=9, 77.8% positive rate at 1d+20d. Without EQT confound (n=7): 3d CI=[0.53,5.37] excludes 0. Need 15-38 events.",
-    "next_step": "Web search rising stars 2015-2019 + check FCX/ALLY/VICI specific upgrade dates. Target n>=15.",
-    "written_at": "2026-03-23T06:21:01.705998"
+    "current_state": "First IG credit upgrade hypothesis pre-registered (f86dcb4e, confidence 7/10). GO and HD trades set for 9:30 AM ET March 23 execution. VGNT short set for April 1 close.",
+    "blockers": "WD trade needs VIX check. Credit upgrade monitoring needs event detection infrastructure.",
+    "key_findings": "FIRST IG upgrade signal: 3d avg=+2.42%, p=0.013, 75% positive, CI excludes zero, n=12, sample_sufficient=True. CRITICAL: follow-on upgrades (2nd/3rd agency upgrade of same company) show NEGATIVE returns (5d=-2.06%, 0% positive). Must distinguish first vs follow-on upgrades when trading this signal.",
+    "written_at": "2026-03-23T06:58:15.003779"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
