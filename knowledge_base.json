@@ -897,6 +897,16 @@
       "event_type": "russell_2000_reconstitution",
       "reason": "Russell 2000 annual reconstitution as a trading signal: CONDITIONAL DEAD END (data acquisition blocker). Academic literature well-established (Madhavan 2003, Chen et al 2006, Greenwood & Sammon 2023): effect was +8.3% cumulative in 2000s \u2192 +3.1% in 2010s \u2192 near-zero in 2020-2022 (only 8% of 2021-2022 additions positive per Seeking Alpha 2022). PRIMARY BARRIER: No free machine-readable list of Russell 2000 adds/deletes for 2019-2024. Manual compilation from FTSE Russell PDFs required. Small-cap yfinance failures would corrupt backtest (same population that frequently delists). STRUCTURAL CHANGE: 2026 adds a November semi-annual reconstitution, diluting the June 'big bang' effect. ONE EXCEPTION: IWM seasonal (buy IWM close late June, sell early July): +1.34%, 75% win rate, 6-day hold \u2014 but doesn't meet 1.5% abnormal return threshold. June 26, 2026 is the effective date for 2026 reconstitution (preliminary list ~May 22). CONCLUSION: Do not backtest. If a free Russell constituent change dataset surfaces, test deletions side first (more persistent effect, less crowded short side).",
       "recorded": "2026-03-23T01:04:50.518006"
+    },
+    {
+      "event_type": "sp500_52w_high_momentum_long",
+      "reason": "Tested 52-week high breakout momentum (first-touch new 52w high, debounced 45 days) for 30 large-cap S&P 500 stocks, 2021-2024. N=100 sampled events. Results: 1d avg=+0.01% p=0.848, 3d avg=-0.08% p=0.555, 5d avg=-0.27% p=0.337. All horizons fail multiple testing. 50/50 positive rate at all horizons. Signal is pure noise for large-cap stocks - consistent with efficient market hypothesis. Momentum is already priced in before the 52w high breach. Dead end.",
+      "recorded": "2026-03-23T01:36:40.703305"
+    },
+    {
+      "event_type": "accelerated_share_repurchase_short",
+      "reason": "Tested accelerated share repurchase (ASR) announcement as SHORT signal. Academic hypothesis: bank delta-hedging creates systematic selling pressure over 5-10 days. N=79 EDGAR 8-K ASR announcements 2020-2024 (excluding concurrent earnings). Results: 1d avg=+0.67% p=0.185, 3d avg=+0.49% p=0.511, 5d avg=+0.40% p=0.648, 10d avg=+0.05% p=0.858. All positive (WRONG direction) but not significant. Fails multiple testing. Conclusion: delta-hedging pressure is either too small, already priced in, or the market interprets ASR as a positive signal (management confidence). Dead end. Data limitation: EDGAR full-text search found only 80 events, may miss ASRs announced in press releases without 8-K filing.",
+      "recorded": "2026-03-23T01:42:45.400530"
     }
   ]
 }

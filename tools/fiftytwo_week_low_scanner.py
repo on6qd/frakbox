@@ -35,11 +35,11 @@ import pandas as pd
 UNIVERSE = [
     'AAPL', 'MSFT', 'NVDA', 'GOOGL', 'META', 'INTC', 'AMD', 'QCOM', 'TXN', 'AVGO',
     'IBM', 'CSCO', 'ORCL', 'CRM', 'NOW', 'ADBE',
-    'JPM', 'BAC', 'WFC', 'GS', 'MS', 'C', 'USB', 'PNC', 'TFC', 'AXP',
+    'JPM', 'BAC', 'WFC', 'GS', 'MS', 'C', 'USB', 'PNC', 'TFC', 'AXP', 'V', 'MA', 'COF',
     'JNJ', 'PFE', 'MRK', 'ABT', 'BMY', 'ABBV', 'LLY', 'MDT', 'UNH',
     'AMZN', 'WMT', 'TGT', 'HD', 'LOW', 'NKE', 'MCD', 'SBUX', 'KO', 'PEP',
     'XOM', 'CVX', 'COP', 'SLB', 'EOG',
-    'BA', 'GE', 'MMM', 'CAT', 'HON', 'LMT', 'RTX', 'UPS', 'FDX',
+    'BA', 'GE', 'MMM', 'CAT', 'HON', 'LMT', 'RTX', 'UPS', 'FDX', 'ACN', 'TSLA', 'AMGN',
     'VZ', 'T', 'CMCSA', 'DIS',
     'FCX', 'NUE', 'DD',
 ]

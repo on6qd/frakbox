@@ -450,9 +450,20 @@
       "category": "sp500_52w_low",
       "question": "ABT (Abbott) also breached 52-week low on March 20 (-0.6%). Did NOT trade due to capacity. Check ABT performance on March 23-27 as additional OOS validation data point for hypothesis 86d28864. Also run fiftytwo_week_low_scanner.py --dry-run weekly to catch new signals.",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Second concurrent signal validates the scanner works. ABT outcome is free data for hypothesis 86d28864 even if we didnt trade it.",
-      "added": "2026-03-22T14:58:01.622136"
+      "added": "2026-03-22T14:58:01.622136",
+      "completed": "2026-03-23T01:41:24.868413",
+      "findings": "ABT 52w low signal fired March 20 (close=105.46, first touch after 35-day gap). Entry at Monday March 23 open. 5d hold exits March 27. WILL MEASURE March 27. Also found: V (Visa) touched 52w low March 18 ($299.02) - NOT in scanner universe (fixed: added V/MA/COF to scanner). V will be tracked as additional OOS data point. Regime analysis of 86d28864 shows signal is consistent across ALL VIX regimes (calm p=0.005, elevated p=0.002, crisis p=0.012). Validation 2024-2025 (n=74) shows IMPROVING performance: -2.23% avg, 69% neg rate, p=0.0004. Current confidence=6 is appropriate but signal is strengthening."
+    },
+    {
+      "id": "b9b8b3c0",
+      "category": "signal_discovery",
+      "question": "Test accelerated share repurchase (ASR) announcement effect. When companies execute ASR programs (upfront share buyback paid immediately to investment bank), delta-hedging by the bank creates predictable selling pressure on the stock over 3-10 days. Academic literature (Gallagher, Grundy, Lepone 2017; Bonaim\u00e9 & Stulz): -1.5% to -3% 10d drift vs announcement day. Test using EDGAR 8-K full-text search for \"accelerated share repurchase\" announcements 2020-2024, measure abnormal returns. Expected: SHORT signal at open after ASR announcement, 5-10d hold. Key filter: announcement without concurrent earnings (pure ASR signal).",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "ASR creates MECHANICAL selling pressure (delta hedge) unlike regular buybacks (support buying). This is the one buyback sub-type that should SHORT, not LONG. Has not been tested. Free data source: EDGAR 8-K full-text search. Market cap: focus on S&P 500 (>5B) for liquidity. Hypothesis would be OPPOSITE to regular buyback (short).",
+      "added": "2026-03-23T01:41:06.455056"
     },
     {
       "id": "seed-003",
@@ -568,9 +579,11 @@
       "category": "insider_selling_cluster",
       "question": "Re-test insider selling cluster with large-cap filter (market_cap >5B) using tools/largecap_filter.py. Hypothesis: smaller companies have noisier insider selling (routine diversification), while large-cap insider sells are more likely to be informative. Use same 2021 discovery / 2022-2024 OOS structure. Also: try to filter out 10b5-1 plans by excluding insiders who filed within 90 days of a new 10b5-1 Rule plan (Form 4 footnotes).",
       "priority": 3,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "All-ticker selling cluster shows regime dependence and fails MT in 2023-24 bull market. Large-cap filter reduces micro-cap noise and may sharpen signal. 10b5-1 exclusion is the key to isolating strategic vs routine sells per Cohen et al (2012).",
-      "added": "2026-03-22T15:37:56.931766"
+      "added": "2026-03-22T15:37:56.931766",
+      "completed": "2026-03-23T01:41:16.348677",
+      "findings": "ALREADY COMPLETED in prior session. Large-cap insider selling cluster (>5B market cap, 2+ insiders, 30d window) tested on N=80 events: avg abnormal 20d=+0.01%, positive_rate=48%, p=0.53. No signal. Dead end recorded as insider_selling_cluster_largecap in knowledge_base.json."
     },
     {
       "id": "d288c2b8",
@@ -664,7 +677,8 @@
       "symbol": "DNTH",
       "hypothesis_template": "d302c84b",
       "added": "2026-03-21T18:04:39.809517",
-      "status": "watching"
+      "status": "disqualified",
+      "note": "EARLY GO DECISION March 9, 2026: CAPTIVATE Phase 3 got early GO signal (20 confirmed responders in open-label Part A). Positive outcome - NOT a clinical failure. Full Part B results expected H2 2026. Disqualified as a potential d302c84b trade target for 2026."
     },
     {
       "event": "Large-cap CEO performance failure departure (>B cap, forced out after earnings misses)",
@@ -819,52 +833,64 @@
       "hypothesis_template": "No current hypothesis. If approved and stock sells off >5% in 5d, research sell-the-news signal.",
       "added": "2026-03-23T01:02:01.581445",
       "status": "watching"
+    },
+    {
+      "event": "GRCE (Grace Therapeutics) PDUFA April 23, 2026 for GTx-104 (IV nimodipine, aneurysmal subarachnoid hemorrhage). Micro-cap ~$68M. Multi-pipeline (GTx-101, GTx-102 also in development). NDA is 505(b)(2) reformulation of approved drug. CRL risk would be CMC/manufacturing, NOT clinical efficacy. DISQUALIFIED for d302c84b. Monitor for approval/rejection outcome data only.",
+      "expected_date": "2026-04-23",
+      "symbol": "GRCE",
+      "hypothesis_template": null,
+      "added": "2026-03-23T01:33:43.732115",
+      "status": "watching"
+    },
+    {
+      "event": "V (Visa) 52-week low first touch March 18, 2026 ($299.02). NOT traded (V not in scanner universe before this session). Track 5-day return as OOS validation for hypothesis 86d28864. Entry=March 19 open (day after signal). Exit=March 26 close (5d hold). V was added to scanner universe on March 23.",
+      "expected_date": "2026-03-26",
+      "symbol": "V",
+      "hypothesis_template": "86d28864",
+      "added": "2026-03-23T01:41:06.453926",
+      "status": "watching"
     }
   ],
   "next_session_priorities": [
     {
-      "task": "0. URGENT: REPL PDUFA APRIL 10. Run tools/verify_event_date.py or web search to find REPL first CRL date (2023) and crash magnitude. If crash was >55% and clinical efficacy reason: d302c84b hypothesis qualifies for April 10. Set up monitoring. RCKT PDUFA MARCH 28 \u2014 5 days away. If rejected: stock already down 53%, limited crash potential from our framework.",
-      "set_by_session": "2026-03-23T01:02:45.588729"
+      "task": "MORNING CHECK (March 23): Verify GO (1cb6140f) LONG and HD (86d28864) SHORT executed at 9:30 AM ET. Check run.py --status and trade_loop.py logs.",
+      "set_by_session": "2026-03-23T01:40:46.034245"
     },
     {
-      "task": "1. MORNING CHECK: Verify GO (1cb6140f) LONG and HD (86d28864) SHORT executed at 9:30 AM ET via run.py --status. If not executed, check trade_loop.py logs.",
-      "set_by_session": "2026-03-23T00:59:07.869201"
+      "task": "MARCH 26 (Wednesday): Close GO trade via tools/close_go_trade.py. Record outcome in hypothesis 1cb6140f. Expected: +2-4% given n=6 insiders, elevated VIX tier (lower conviction). VIX gate for n=6 is to TRADE (not block).",
+      "set_by_session": "2026-03-23T01:40:46.034256"
     },
     {
-      "task": "2. VIX GATE: Check current VIX. If < 25, activate WD (76678219) by setting trigger=next_market_open. AMRZ entry window expired (no action).",
-      "set_by_session": "2026-03-23T00:59:07.869206"
+      "task": "MARCH 27 (Thursday): Close HD trade via tools/close_hd_trade.py. Compute ABT 5d OOS return (entry=March 23 open, exit=March 27 close). Get V (Visa) March 18 5d return for OOS tracking.",
+      "set_by_session": "2026-03-23T01:40:46.034260"
     },
     {
-      "task": "3. BAX CRITICAL: BAX is AT its 52w low ($16.15). Post-Vantive spinoff ($8.31B, may be removed from S&P 500). NOT in scanner. Monitor daily: if BAX closes below $16.15, record as OOS data point for 86d28864 with post-spinoff caveat. Do NOT set trade trigger (out-of-distribution from backtest universe).",
-      "set_by_session": "2026-03-23T00:59:07.869206"
+      "task": "NKE EARNINGS MARCH 31: NKE at 52w low \\.97 (currently \\.37, only \\/bin/zsh.40 away). Any negative earnings reaction will trigger 52w-low signal. Scanner will auto-detect at 8PM ET March 31. If triggered: SHORT NKE at April 1 open under hypothesis 86d28864.",
+      "set_by_session": "2026-03-23T01:40:46.034261"
     },
     {
-      "task": "4. NKE EARNINGS MARCH 31: NKE is 0.78% above 52w low ($51.97). Earnings after-close March 31. Scanner will auto-detect if close < $51.97 on March 31 or April 1. If triggered, SHORT NKE at April 1 open via trade_loop trigger on hypothesis 86d28864 (new instance needed or track as OOS).",
-      "set_by_session": "2026-03-23T00:59:07.869207"
+      "task": "VIX WATCH: Current VIX=26.78 (Tier 3). WD (76678219) requires VIX<25 for n=3 cluster. Check daily. If VIX drops below 25 AND WD still fresh (entry window = filing date + 7 days): set trigger on 76678219.",
+      "set_by_session": "2026-03-23T01:40:46.034262"
     },
     {
-      "task": "5. MARCH 26: Close GO trade via tools/close_go_trade.py",
-      "set_by_session": "2026-03-23T00:59:07.869208"
+      "task": "RCKT PDUFA MARCH 28: Monitor outcome. RCKT disqualified from d302c84b (multi-pipeline) but outcome data is valuable. If CRL: record as data point for pipeline-risk hypothesis. Stock at \\.14, down 53% from 52w high.",
+      "set_by_session": "2026-03-23T01:40:46.034262"
     },
     {
-      "task": "6. MARCH 27: Close HD trade via tools/close_hd_trade.py. Compute ABT 5d OOS return (entry=March 23 open, exit=March 27 close). Record in hypothesis 86d28864 notes.",
-      "set_by_session": "2026-03-23T00:59:07.869209"
+      "task": "V (Visa) 52w low OOS tracking: V touched 52w low March 18 (\\.02). Not in scanner (now fixed: V/MA/COF added to universe). Track 5d outcome for OOS data for 86d28864. Entry=March 19 open.",
+      "set_by_session": "2026-03-23T01:40:46.034263"
     },
     {
-      "task": "7. ABT OOS: ABT signal fired March 20 (close=$105.46=52w low). Entry March 23 open. 5d window closes March 27. Get ABT close on March 27 and compute abnormal return vs SPY same period.",
-      "set_by_session": "2026-03-23T00:59:07.869209"
+      "task": "NEW SIGNAL RESEARCH: Explore accelerated share repurchases (ASR) announcements - delta-hedging pressure creates predictable negative drift. Can find via EDGAR 8-K search for company press releases. Alternative: test management guidance RAISE during earnings (beat+raise) vs beat-no-raise drift differential.",
+      "set_by_session": "2026-03-23T01:40:46.034264"
     },
     {
-      "task": "8. RUSSELL RECONSTITUTION: Background agent researching academic literature (still running at session end). Read results and decide whether to start historical data collection. Key: preliminary list typically released late May 2026. Need to build database before then.",
-      "set_by_session": "2026-03-23T00:59:07.869210"
+      "task": "DNTH WATCHLIST UPDATE: DNTH Phase 3 CAPTIVATE got an early GO decision March 9, 2026. NOT a failure event. Update DNTH watchlist entry status to disqualified. New full Phase 3 data expected H2 2026.",
+      "set_by_session": "2026-03-23T01:40:46.034264"
     },
     {
-      "task": "9. POOL WATCH: POOL (Pool Corp $7.4B) is AT its 52w low ($200.34). Has 3x insider cluster (trade date March 13). CONFLICTING SIGNALS: insider=bullish, 52w-low=bearish. Analysis shows combined signal is ambiguous (3.33% vs 4.63% return, p=0.495). VIX elevated (26.78). DO NOT TRADE POOL. Track for OOS data if VIX drops and n=3 signal improves.",
-      "set_by_session": "2026-03-23T00:59:07.869211"
-    },
-    {
-      "task": "10. PDUFA DATES: RCKT March 28 (gene therapy LAD-I, $449M, down 53% from 1y high). REPL April 10 (melanoma combo, $576M, down 47%). Monitor for rejection \u2192 potential short continuation. GRCE ($68M) and CING ($81M) are too small. If RCKT/REPL rejected, check against clinical_efficacy_failure_short criteria.",
-      "set_by_session": "2026-03-23T00:59:07.869211"
+      "task": "INSIDER SELLING LARGE-CAP: Task f5857b08 already completed (dead end). No action needed.",
+      "set_by_session": "2026-03-23T01:40:46.034265"
     }
   ],
   "session_handoff": {
