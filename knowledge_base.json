@@ -273,6 +273,21 @@
       ],
       "gaps": "Complete historical Russell constituent lists require paid CRSP or Bloomberg data. Annual preliminary list dates: 2020=May 8, 2021=June 4, 2022=June 3, 2023=May 19, 2024=May 24. Effective dates: 2020=June 26, 2021=June 25, 2022=June 24, 2023=June 23, 2024=June 28.",
       "recorded": "2026-03-23T06:00:41.826730"
+    },
+    "credit_upgrade_junk_to_ig": {
+      "summary": "Tested 9 confirmed junk-to-investment-grade credit upgrades from 2019-2024. Events: AMD (Sep 2020), CF Industries (Sep 2021), MCHP (Nov 2021), EQT x2 (Mar 2022), Macy's (Feb 2022), Ford x2 (Sep/Oct 2023), Delta (Jul 2024). Positive directional tendency (77.8% positive at 1d, 77.8% at 20d) but sample insufficient. 1d: avg=+0.70%, p=0.13. 3d: avg=+2.26%, CI barely includes 0. 10d: avg=+6.90%, CI=[1.11, 13.72] excludes zero -- but driven by EQT energy sector spike (Russia/Ukraine). Without EQT: 3d avg=+2.83%, CI=[0.53, 5.37] excludes zero (n=7). All sample_sufficient flags False. Need 15-38 events depending on horizon.",
+      "known_magnitude": "+0.70% to +2.83% abnormal at 1-3d; may be larger at 10-20d but confounded",
+      "known_timeframe": "Signal appears at 1-3d after upgrade announcement, unclear beyond",
+      "sources": [
+        "AMD IR press release 2020-09-11 (Moody's Baa3 from Ba3)",
+        "EQT PR Newswire 2022-03-10 (Fitch BBB-) and 2022-03-28 (S&P BBB-)",
+        "MCHP GlobeNewswire 2021-11-15 (Moody's+Fitch IG)",
+        "Ford Authority 2023-09-06 (Fitch BBB-) and Bloomberg 2023-10-30 (S&P BBB-)",
+        "Macy's BondBlox 2022-02-22 (Fitch BBB-)",
+        "Delta News Hub 2024-07-16 (Fitch BBB-)"
+      ],
+      "gaps": "Need 15-38 events for statistical power. Must sector-adjust EQT for Russia/Ukraine confound. Consider looking at all 3 agency upgrades separately vs. first-agency upgrade. Mechanism: IG-mandated funds must buy when issuer achieves IG -- stock benefits from reduced cost of capital and fund flows.",
+      "recorded": "2026-03-23T06:19:56.795124"
     }
   },
   "known_effects": {
@@ -1012,6 +1027,11 @@
       "event_type": "strategic_alternatives_announcement",
       "reason": "Tested 51 large-cap (>$500M) 8-K filings mentioning 'strategic alternatives' (2019-2024). \n    \n    RESULT: Signal does not pass statistical tests as a tradable strategy.\n    \n    Full dataset (n=51), open entry (realistic post-AH announcement):\n    - avg_abnormal_1d: +0.76%, p=0.26, bootstrap CI [-0.42%, +2.12%] (does not exclude zero)\n    - avg_abnormal_3d: +1.70%, p=0.22\n    - passes_multiple_testing: False\n    - Transaction cost: 0.34% round-trip\n    - Net expected: +0.42% (below 1.0% minimum threshold)\n    \n    Full dataset (n=51), close entry (hypothetical - assumes prediction of announcement):\n    - avg_abnormal_1d: +1.56%, p=0.10 (marginally better but conceptually invalid)\n    - Skewness=1.45, Kurtosis=2.23 (heavy outliers, not systematic effect)\n    \n    Core problem: 'Exploring strategic alternatives' has at least 3 distinct contexts:\n    1. Company announcing itself as M&A target (positive: +5% to +20% moves)\n    2. Company restructuring / selling division (mixed: +2% to -5%)\n    3. Distressed company announcing review (negative: -5% to -20%)\n    Without reading the 8-K text, these cannot be distinguished in advance.\n    \n    Subset analysis showed positive-only events (n=25) had p=0.02 at close entry - but this \n    subset was selected using the OUTCOME (>3% move near announcement), making it circular.\n    \n    What would be needed to make this work:\n    - NLP classification of 8-K text to identify 'acquisition target' vs 'restructuring' framing\n    - Activist investor cross-reference (13D/13G filed recently)\n    - Pre-announcement rumor/news detection\n    None of these are currently available in our toolkit.\n    \n    Events tested (51): ACHC, ACI, ATGE, AUPH, AXTA, BAX, BHC, BLFS, CCO, CMI, CSV, CVI, \n    DLTR, DXC, ECVT, ED, EHAB, EHC, EMR, GFF, GNW, HAS, HI, HRI, KN, KSS, LAUR, LII, MAS, \n    MATW, MDRX, MOD, MRCY, NVRI, PEG, PFG, PINC, PLTK, PSIX, QNST, RIG, RYAM, SNDA, SWX, \n    TGLS, THS, TPB, TXT, UGI, VSEC, WDC.",
       "recorded": "2026-03-23T05:41:22.335272"
+    },
+    {
+      "event_type": "dividend_resumption",
+      "reason": "Tested 9 EDGAR-confirmed dividend resumption events (8-K filings with 'reinstated' or 'resumed dividend' language) from 2020-2024. Found no consistent signal: 1d abnormal return avg=-1.37% (pos_rate=22.2%), 3d avg=-0.75%, 5d avg=-3.51% with large variance. All p-values >0.30, passes_multiple_testing=False. Key issue: The 2020 event cluster (OHI, DKS, FL, YUMC, CHH) occurred during COVID recovery when companies resumed dividends after pandemic cuts -- but this was a period of enormous concurrent news flow. IVT (-20.4% 5d) and OHI (-13.1% 5d) dragged down averages significantly. The signal is inconsistent and underpowered (only 9 qualifying large-cap events found in EDGAR 2019-2024). Note: dividend_initiation was already a dead end (see prior research). Dividend resumption similarly shows no effect.",
+      "recorded": "2026-03-23T06:19:56.793894"
     }
   ]
 }
