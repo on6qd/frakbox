@@ -85,11 +85,9 @@ def _last_session_time():
 
 def _has_active_positions():
     """Check if there are active hypotheses with open trades."""
-    hyp_path = BASE_DIR / "hypotheses.json"
     try:
-        with open(hyp_path) as f:
-            hypotheses = json.load(f)
-        return any(h.get("status") == "active" for h in hypotheses)
+        import db as _db
+        return _db.count_hypotheses_by_status("active") > 0
     except Exception:
         return False
 
@@ -242,14 +240,8 @@ def run_health_check():
 
 
 if __name__ == "__main__":
-    # Load .env
-    env_file = BASE_DIR / ".env"
-    if env_file.exists():
-        for line in env_file.read_text().splitlines():
-            line = line.strip()
-            if line and not line.startswith("#") and "=" in line:
-                k, v = line.split("=", 1)
-                os.environ.setdefault(k.strip(), v.strip().strip("'\""))
+    from config import load_env
+    load_env()
 
     issues = run_health_check()
     if issues:

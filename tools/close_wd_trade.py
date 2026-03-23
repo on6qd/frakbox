@@ -73,9 +73,8 @@ def main():
     print()
 
     # Load hypothesis to get entry details
-    with open('/Users/frakbox/Bots/financial_researcher/hypotheses.json') as f:
-        hyps = json.load(f)
-
+    import db as _db
+    hyps = _db.load_hypotheses()
     h = next((h for h in hyps if h['id'] == '76678219'), None)
     if not h:
         print("ERROR: Hypothesis 76678219 not found")

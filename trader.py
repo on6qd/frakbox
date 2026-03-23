@@ -16,14 +16,13 @@ import sys
 from datetime import datetime
 
 import alpaca_trade_api as tradeapi
-from config import ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_BASE_URL, MAX_POSITION_PCT, require_alpaca
+import db as _db
+from config import (
+    ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_BASE_URL,
+    MAX_POSITION_PCT, DEFAULT_STOP_LOSS_PCT, DEFAULT_TAKE_PROFIT_PCT,
+    MAX_PORTFOLIO_DRAWDOWN_PCT, require_alpaca,
+)
 
-# Default risk limits
-DEFAULT_STOP_LOSS_PCT = 10.0        # close if position loses more than 10%
-DEFAULT_TAKE_PROFIT_PCT = None      # no take-profit by default (let winners run to deadline)
-MAX_PORTFOLIO_DRAWDOWN_PCT = 15.0   # halt new trades if portfolio drops 15% from peak
-
-_HYPOTHESES_PATH = os.path.join(os.path.dirname(__file__), "hypotheses.json")
 _PEAK_EQUITY_PATH = os.path.join(os.path.dirname(__file__), "logs", "peak_equity.json")
 
 
@@ -150,21 +149,13 @@ def get_current_price(symbol):
 
 
 def _load_hypotheses():
-    """Load hypotheses directly (avoids circular import with research.py)."""
-    try:
-        with open(_HYPOTHESES_PATH) as f:
-            return json.load(f)
-    except Exception:
-        return []
+    """Load hypotheses from SQLite database."""
+    return _db.load_hypotheses()
 
 
 def _save_hypotheses(hypotheses):
-    """Save hypotheses directly."""
-    import tempfile
-    tmp = _HYPOTHESES_PATH + ".tmp"
-    with open(tmp, "w") as f:
-        json.dump(hypotheses, f, indent=2)
-    os.replace(tmp, _HYPOTHESES_PATH)
+    """Save hypotheses to SQLite database."""
+    _db.save_hypotheses(hypotheses)
 
 
 def _update_peak_equity(current_equity):

@@ -142,18 +142,14 @@ def run_bootstrap_review(completed_hypotheses):
         report["findings"].append(f"Average magnitude ratio: {avg_mag:.2f}x")
 
     # Check 4: Is research queue advancing?
-    import os
-    queue_file = os.path.join(os.path.dirname(__file__), "research_queue.json")
-    if os.path.exists(queue_file):
-        import json
-        with open(queue_file) as f:
-            rq = json.load(f)
-        completed_tasks = sum(1 for t in rq.get("queue", []) if t.get("status") == "completed")
-        if completed_tasks == 0:
-            report["warnings"].append(
-                "No research tasks marked as completed yet. "
-                "Are sessions completing tasks via complete_research_task()?"
-            )
+    import db as _db
+    rq = _db.load_queue()
+    completed_tasks = sum(1 for t in rq.get("queue", []) if t.get("status") == "completed")
+    if completed_tasks == 0:
+        report["warnings"].append(
+            "No research tasks marked as completed yet. "
+            "Are sessions completing tasks via complete_research_task()?"
+        )
 
     # Mark bootstrap as done
     m["bootstrap_review_completed"] = True
@@ -513,12 +509,8 @@ def check_knowledge_decay():
     Check the knowledge base for effects that haven't been revalidated recently.
     Returns a list of event types that need revalidation.
     """
-    KNOWLEDGE_FILE = os.path.join(os.path.dirname(__file__), "knowledge_base.json")
-    if not os.path.exists(KNOWLEDGE_FILE):
-        return []
-
-    with open(KNOWLEDGE_FILE) as f:
-        kb = json.load(f)
+    import db as _db
+    kb = _db.load_knowledge()
 
     m = load_methodology()
     max_months = m["defaults"].get("knowledge_revalidation_months", 12)
@@ -622,11 +614,8 @@ def run_weekly_research_diagnostic():
 
     Returns a report dict.
     """
-    import os
+    import db as _db
 
-    KNOWLEDGE_FILE = os.path.join(os.path.dirname(__file__), "knowledge_base.json")
-    HYPOTHESES_FILE = os.path.join(os.path.dirname(__file__), "hypotheses.json")
-    QUEUE_FILE = os.path.join(os.path.dirname(__file__), "research_queue.json")
     SESSIONS_LOG = os.path.join(os.path.dirname(__file__), "logs", "sessions.jsonl")
 
     report = {
@@ -637,66 +626,59 @@ def run_weekly_research_diagnostic():
     }
 
     # Knowledge base growth
-    if os.path.exists(KNOWLEDGE_FILE):
-        with open(KNOWLEDGE_FILE) as f:
-            kb = json.load(f)
-        lit_count = len(kb.get("literature", {}))
-        effects_count = len(kb.get("known_effects", {}))
-        dead_ends_count = len(kb.get("dead_ends", []))
-        report["findings"].append(
-            f"Knowledge base: {lit_count} literature entries, {effects_count} known effects, "
-            f"{dead_ends_count} dead ends."
+    kb = _db.load_knowledge()
+    lit_count = len(kb.get("literature", {}))
+    effects_count = len(kb.get("known_effects", {}))
+    dead_ends_count = len(kb.get("dead_ends", []))
+    report["findings"].append(
+        f"Knowledge base: {lit_count} literature entries, {effects_count} known effects, "
+        f"{dead_ends_count} dead ends."
+    )
+    if lit_count == 0:
+        report["recommendations"].append(
+            "No literature reviews recorded yet. Start with well-studied effects "
+            "(PEAD, index inclusion) to calibrate methodology."
         )
-        if lit_count == 0:
-            report["recommendations"].append(
-                "No literature reviews recorded yet. Start with well-studied effects "
-                "(PEAD, index inclusion) to calibrate methodology."
-            )
-        if dead_ends_count == 0 and lit_count > 3:
-            report["recommendations"].append(
-                "No dead ends recorded. Are we recording negative results? "
-                "Every research category should eventually produce dead ends."
-            )
+    if dead_ends_count == 0 and lit_count > 3:
+        report["recommendations"].append(
+            "No dead ends recorded. Are we recording negative results? "
+            "Every research category should eventually produce dead ends."
+        )
 
     # Research queue throughput
-    if os.path.exists(QUEUE_FILE):
-        with open(QUEUE_FILE) as f:
-            rq = json.load(f)
-        pending = sum(1 for t in rq.get("queue", []) if t.get("status") == "pending")
-        completed = sum(1 for t in rq.get("queue", []) if t.get("status") == "completed")
-        total = len(rq.get("queue", []))
-        report["findings"].append(
-            f"Research queue: {pending} pending, {completed} completed out of {total} total."
+    rq = _db.load_queue()
+    pending = sum(1 for t in rq.get("queue", []) if t.get("status") == "pending")
+    completed = sum(1 for t in rq.get("queue", []) if t.get("status") == "completed")
+    total = len(rq.get("queue", []))
+    report["findings"].append(
+        f"Research queue: {pending} pending, {completed} completed out of {total} total."
+    )
+    if pending > 10:
+        report["recommendations"].append(
+            f"Research queue has {pending} pending tasks. Consider prioritizing or dropping low-value ones."
         )
-        if pending > 10:
-            report["recommendations"].append(
-                f"Research queue has {pending} pending tasks. Consider prioritizing or dropping low-value ones."
-            )
 
     # Hypothesis rigor trend + staleness check (single load)
-    hyps = []
-    if os.path.exists(HYPOTHESES_FILE):
-        with open(HYPOTHESES_FILE) as f:
-            hyps = json.load(f)
-        if hyps:
-            # Sort by creation date, check if confidence is trending up
-            sorted_hyps = sorted(hyps, key=lambda h: h.get("created", ""))
-            confidences = [h.get("confidence", 0) for h in sorted_hyps]
-            if len(confidences) >= 6:
-                first_half = confidences[:len(confidences)//2]
-                second_half = confidences[len(confidences)//2:]
-                avg_first = sum(first_half) / len(first_half)
-                avg_second = sum(second_half) / len(second_half)
-                if avg_second > avg_first + 0.5:
-                    report["findings"].append(
-                        f"Confidence trending up: {avg_first:.1f} → {avg_second:.1f}. "
-                        f"Research quality may be improving."
-                    )
-                elif avg_second < avg_first - 0.5:
-                    report["recommendations"].append(
-                        f"Confidence trending down: {avg_first:.1f} → {avg_second:.1f}. "
-                        f"Are we lowering our standards or exploring harder categories?"
-                    )
+    hyps = _db.load_hypotheses()
+    if hyps:
+        # Sort by creation date, check if confidence is trending up
+        sorted_hyps = sorted(hyps, key=lambda h: h.get("created", ""))
+        confidences = [h.get("confidence", 0) for h in sorted_hyps]
+        if len(confidences) >= 6:
+            first_half = confidences[:len(confidences)//2]
+            second_half = confidences[len(confidences)//2:]
+            avg_first = sum(first_half) / len(first_half)
+            avg_second = sum(second_half) / len(second_half)
+            if avg_second > avg_first + 0.5:
+                report["findings"].append(
+                    f"Confidence trending up: {avg_first:.1f} → {avg_second:.1f}. "
+                    f"Research quality may be improving."
+                )
+            elif avg_second < avg_first - 0.5:
+                report["recommendations"].append(
+                    f"Confidence trending down: {avg_first:.1f} → {avg_second:.1f}. "
+                    f"Are we lowering our standards or exploring harder categories?"
+                )
 
     # Session health (from structured session log)
     if os.path.exists(SESSIONS_LOG):

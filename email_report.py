@@ -18,6 +18,32 @@ from research import (
 )
 from trader import get_account_summary
 
+# ---------------------------------------------------------------------------
+# HTML Template constants — keep layout separate from logic
+# ---------------------------------------------------------------------------
+
+_PAGE_OPEN = (
+    '<html><body style="font-family: -apple-system, Arial, sans-serif; '
+    'max-width: 700px; margin: 0 auto; color: #333;">'
+)
+
+_PAGE_CLOSE = (
+    '<hr style="margin-top: 20px;">'
+    '<p style="color: #aaa; font-size: 11px;">Stock Market Causal Research</p>'
+    '</body></html>'
+)
+
+_STAT_CELL = (
+    '<td style="padding: 8px 20px; text-align: center;">'
+    '<div style="font-size: 24px; font-weight: bold;">{value}</div>'
+    '<div style="color: #888; font-size: 12px;">{label}</div></td>'
+)
+
+_STATUS_COLORS = {
+    "pending": "#1565c0", "active": "#e65100",
+    "completed": "#2e7d32", "retired": "#888",
+}
+
 
 def build_daily_report():
     """Build the daily research report as HTML."""
@@ -31,19 +57,15 @@ def build_daily_report():
     known_count = len(knowledge.get("known_effects", {}))
     dead_count = len(knowledge.get("dead_ends", []))
 
-    html = f"""
-    <html><body style="font-family: -apple-system, Arial, sans-serif; max-width: 700px; margin: 0 auto; color: #333;">
+    html = _PAGE_OPEN + f"""
     <h2>Daily Research Report</h2>
     <p style="color: #888;">{datetime.now().strftime('%A, %B %d %Y')}</p>
-
-    <table style="border-collapse: collapse; margin: 16px 0;">
-        <tr>
-            <td style="padding: 8px 20px; text-align: center;"><div style="font-size: 24px; font-weight: bold;">${summary['equity']:,.0f}</div><div style="color: #888; font-size: 12px;">Equity</div></td>
-            <td style="padding: 8px 20px; text-align: center;"><div style="font-size: 24px; font-weight: bold;">{known_count}</div><div style="color: #888; font-size: 12px;">Signals found</div></td>
-            <td style="padding: 8px 20px; text-align: center;"><div style="font-size: 24px; font-weight: bold;">{dead_count}</div><div style="color: #888; font-size: 12px;">Dead ends</div></td>
-            <td style="padding: 8px 20px; text-align: center;"><div style="font-size: 24px; font-weight: bold;">{research['total_hypotheses']}</div><div style="color: #888; font-size: 12px;">Hypotheses</div></td>
-        </tr>
-    </table>
+    <table style="border-collapse: collapse; margin: 16px 0;"><tr>
+    {_STAT_CELL.format(value=f"${summary['equity']:,.0f}", label="Equity")}
+    {_STAT_CELL.format(value=known_count, label="Signals found")}
+    {_STAT_CELL.format(value=dead_count, label="Dead ends")}
+    {_STAT_CELL.format(value=research['total_hypotheses'], label="Hypotheses")}
+    </tr></table>
     """
 
     # All hypotheses as stories
@@ -60,16 +82,8 @@ def build_daily_report():
     html += build_literature_section(knowledge)
 
     # Watchlist
-    import json
-    import os
-    rq = {}
-    try:
-        rq_path = os.path.join(os.path.dirname(__file__), "research_queue.json")
-        with open(rq_path) as f:
-            rq = json.load(f)
-    except Exception:
-        pass
-
+    import db as _db
+    rq = _db.load_queue()
     watchlist = rq.get("event_watchlist", [])
     if watchlist:
         html += '<h3>Watching for</h3><ul>'
@@ -77,11 +91,7 @@ def build_daily_report():
             html += f'<li><b>{w.get("event", "?")}</b> — expected {w.get("expected_date", "?")}</li>'
         html += '</ul>'
 
-    html += """
-    <hr style="margin-top: 20px;">
-    <p style="color: #aaa; font-size: 11px;">Stock Market Causal Research</p>
-    </body></html>
-    """
+    html += _PAGE_CLOSE
     return html
 
 
@@ -222,11 +232,7 @@ def build_hypothesis_story(h):
     n = h.get("backtest_events", h.get("sample_size", "?"))
 
     # Status styling
-    status_colors = {
-        "pending": "#1565c0", "active": "#e65100",
-        "completed": "#2e7d32", "retired": "#888",
-    }
-    color = status_colors.get(status, "#333")
+    color = _STATUS_COLORS.get(status, "#333")
 
     # The idea (what and why)
     desc = _to_str(h.get("event_description", ""))
@@ -408,13 +414,8 @@ def send_session_report(session_type, status, log_file, validation_warnings=""):
     knowledge = load_knowledge()
 
     # Read research_queue for priorities and handoff
-    rq = {}
-    try:
-        rq_path = os.path.join(os.path.dirname(__file__), "research_queue.json")
-        with open(rq_path) as f:
-            rq = json.load(f)
-    except Exception:
-        pass
+    import db as _db
+    rq = _db.load_queue()
 
     handoff = rq.get("session_handoff", {})
     next_priorities = rq.get("next_session_priorities", [])
@@ -527,12 +528,7 @@ def send_session_report(session_type, status, log_file, validation_warnings=""):
     </p>
     """
 
-    html += """
-    <hr style="margin-top: 20px;">
-    <p style="color: #aaa; font-size: 11px;">Stock Market Causal Research</p>
-    </body></html>
-    """
-
+    html += _PAGE_CLOSE
     send_email(subject, html)
 
 
