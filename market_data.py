@@ -21,14 +21,26 @@ from config import TIINGO_API_KEY
 
 # --- Tiingo fallback for delisted tickers ---
 
+# In-process daily counter still tracked so callers can inspect it, but the
+# primary rate-limit defence is now the disk cache in tools/tiingo_cache.py.
 _tiingo_request_count = 0
 _tiingo_request_date = None
+
+try:
+    from tools.tiingo_cache import get_tiingo_cached as _get_tiingo_cached
+    _TIINGO_CACHE_AVAILABLE = True
+except ImportError:
+    _TIINGO_CACHE_AVAILABLE = False
 
 
 def _fetch_history_tiingo(symbol, start_str, end_str):
     """
     Fetch historical OHLCV from Tiingo. Used as fallback when yfinance returns
     empty data (common for delisted tickers).
+
+    Results are transparently cached on disk via tools/tiingo_cache.py
+    (~/.tiingo_cache/) to avoid 429 rate-limit errors during rapid backtests.
+    TTL: 30 days for real data, 7 days for empty/missing tickers.
 
     Returns a DataFrame with the same structure as yfinance output (DatetimeIndex,
     Open/High/Low/Close/Volume columns), or an empty DataFrame on failure.
@@ -38,7 +50,26 @@ def _fetch_history_tiingo(symbol, start_str, end_str):
     if not TIINGO_API_KEY:
         return pd.DataFrame()
 
-    # Daily rate limit guard (free tier: 500/day)
+    # Delegate to caching layer when available
+    if _TIINGO_CACHE_AVAILABLE:
+        # Update in-process counter only on actual network calls.
+        # The cache prints HIT/MISS to stderr itself.
+        today = datetime.now().date()
+        if _tiingo_request_date != today:
+            _tiingo_request_count = 0
+            _tiingo_request_date = today
+        if _tiingo_request_count >= 490:
+            print(f"[tiingo] Rate limit approaching ({_tiingo_request_count}/500), skipping", file=sys.stderr)
+            return pd.DataFrame()
+
+        df = _get_tiingo_cached(symbol, start_str, end_str)
+        # Count as a request only when a real network call was made (cache miss).
+        # We detect this heuristically: if the cache printed MISS it fetched;
+        # we always increment to stay conservative (worst case: over-counts hits).
+        _tiingo_request_count += 1
+        return df
+
+    # --- Fallback: direct fetch (no cache) ---
     today = datetime.now().date()
     if _tiingo_request_date != today:
         _tiingo_request_count = 0
