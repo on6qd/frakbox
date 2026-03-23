@@ -176,6 +176,7 @@ result['avg_estimated_cost_pct']     # avg round-trip cost (when estimate_costs=
 | `close_wd_trade.py` | Close WD paper trade and complete hypothesis |
 | `cluster_auto_scanner.py` | Daily auto-scanner for fresh insider clusters (runs via launchd 9:15 PM ET) |
 | `edgar_clinical_failure_scanner.py` | Scan EDGAR 8-K filings for Phase 2/3 clinical failures |
+| `yfinance_utils.py` | **Use this for all yfinance downloads** — `safe_download()`, `get_close_prices()`, `get_current_price()` all guarantee flat columns (avoids MultiIndex bug) |
 
 **Standard backtest workflow:**
 ```python
@@ -189,6 +190,11 @@ events = filter_to_largecap(events, min_market_cap=500_000_000)
 
 # 3. Always use entry_price="open" for after-hours events
 result = market_data.measure_event_impact(event_dates=[...], entry_price="open")
+
+# 4. ALWAYS use safe_download (not raw yf.download) — avoids MultiIndex column bugs
+from tools.yfinance_utils import safe_download, get_close_prices
+hist = safe_download("AAPL", start="2024-01-01", end="2024-06-01")  # flat columns guaranteed
+closes = get_close_prices(["AAPL", "SPY"], start="2024-01-01")     # columns: AAPL, SPY
 ```
 
 ## Data Sources
