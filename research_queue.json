@@ -217,9 +217,20 @@
       "category": "first_ig_credit_upgrade",
       "question": "Monitor for next qualifying first IG credit upgrade event. Qualifying criteria: (1) large-cap >$1B market cap company; (2) first time receiving IG from any major agency, or regaining IG after loss; (3) no concurrent earnings or M&A announcement; (4) no follow-on upgrade (another agency hadn't upgraded in preceding 10 trading days). Best sources to monitor: (a) Moody's ratings news RSS, (b) Business Wire credit rating alerts, (c) BondBlox.com rising star page. When event fires: set expected_symbol in hypothesis f86dcb4e and trigger at next_market_open. Hold 3 trading days. CANDIDATES TO WATCH: Carnival CCL (S&P BB+ May 2025, 1 notch away from IG; target IG by Q3 2026), US Steel X (Fitch BBB- June 2025 after Nippon acquisition - check if this already traded), T-Mobile TMUS (regained Moody's IG after merging Sprint - check if 2021 Moody's Baa3 was counted).",
       "priority": 1,
-      "status": "pending",
+      "status": "completed",
       "reasoning": "Hypothesis f86dcb4e pre-registered with confidence 7/10. Need to identify and trade the next qualifying event.",
-      "added": "2026-03-23T06:57:25.592244"
+      "added": "2026-03-23T06:57:25.592244",
+      "completed": "2026-03-23T07:27:53.545245",
+      "findings": "PARTIAL COMPLETION - 2025-2026 OOS events catalogued:\nQUALIFIES: CCL (Carnival) Oct 2 2025 Fitch first IG: 3d=+1.61% (correct direction)\nQUALIFIES: LADR (Ladder Capital) May 21 2025 Fitch first IG: 3d=+0.49% (correct direction, weak)\nEXCLUDED: VRT April 23 2025 (Fitch first IG concurrent with Q1 earnings miss -10.3% 1d)\nEXCLUDED: WDC Jan 30 2026 (Moody's first IG concurrent with Q2 FY2026 earnings, sell-the-news -9.77% 1d)\nFOLLOW-ON OBSERVATION: PR March 17 2026 S&P BBB- (follow-on, Fitch gave first IG July 2025) gave +4.37% 3d - suggests delayed second-agency upgrades may also be tradeable.\nUPCOMING CANDIDATES: CCL S&P upgrade expected H2 2026 (currently BB+ positive outlook, Fitch already IG). This would be first S&P IG ever for CCL. Primary candidate to watch.\nPR Fitch first IG in July 2025 - exact date unconfirmed (likely July 28-31), cannot cleanly add to backtest without verification."
+    },
+    {
+      "id": "993db45c",
+      "category": "first_ig_credit_upgrade",
+      "question": "LIVE TRADE MONITOR: Watch for CCL (Carnival) S&P upgrade to BBB- investment grade (expected H2 2026).\n    Current S&P rating: BB+ with positive outlook. Already has Fitch BBB- (Oct 2, 2025).\n    Qualifying criteria: S&P upgrading CCL to BBB- would be FIRST S&P IG for CCL (was IG before 2020, then downgraded).\n    Source to monitor: S&P Global press releases, bondblox.com/rising-stars, Business Wire credit alerts.\n    When event fires: update expected_symbol=CCL in hypothesis f86dcb4e, set trigger=next_market_open, hold 3 days.\n    Also watch: Other BB+ positive outlook companies from BondBlox. Candidates Feb-March 2026: none found beyond CCL.\n    IMPORTANT: Verify no concurrent earnings (WDC lesson) before activating.",
+      "priority": 1,
+      "status": "pending",
+      "reasoning": "CCL S&P upgrade is the most likely near-term qualifying event for hypothesis f86dcb4e. Signal validated with 14 events, 78.6% positive 3d. Expected return +2.23% vs 0.1% round-trip cost.",
+      "added": "2026-03-23T07:28:18.041354"
     },
     {
       "id": "seed-002",
@@ -515,6 +526,15 @@
       "status": "pending",
       "reasoning": "Strategic alternatives full dataset: p=0.26, dead end. But the 'acquisition target' subset may have p<0.05 if we can identify it using text keywords without look-ahead bias. Would need to download and parse ~51 8-K filing documents from EDGAR.",
       "added": "2026-03-23T05:41:41.828941"
+    },
+    {
+      "id": "7b031ca7",
+      "category": "first_ig_credit_upgrade",
+      "question": "REFINEMENT: Test whether second-agency IG upgrades are tradeable when there is a long time gap (>6 months) from first IG.\n    Observation: PR March 17 2026 (S&P BBB-, Fitch first IG was July 2025 = 8 months earlier) gave +4.37% 3d.\n    Our backtest negative control had n=3 follow-on events (DAL x2 close together, another), but those were short gaps.\n    Hypothesis to test: Follow-on IG upgrades with >6 month gap from first IG behave like first IG (institutions that couldn't buy on first upgrade wait for second agency confirmation).\n    Events to find: DAL 2024 S&P upgrade (July 2024, Moody's first IG was Feb 2016 = 8 years!), F Oct 2023 (Moody's first IG Sep 2023 = 1 month gap -- our backtest event).\n    If confirmed: expand f86dcb4e or create separate hypothesis for delayed follow-on upgrades.",
+      "priority": 2,
+      "status": "pending",
+      "reasoning": "PR March 2026 follow-on showed strong signal (+4.37% 3d). If this pattern holds, it would expand our trading universe significantly for the credit upgrade signal.",
+      "added": "2026-03-23T07:28:18.042495"
     },
     {
       "id": "seed-003",
@@ -946,31 +966,50 @@
   ],
   "next_session_priorities": [
     {
-      "task": "URGENT: Close GO trade March 26 close (run close_go_trade.py). Close HD trade March 27 close (run close_hd_trade.py). Record outcomes in hypotheses 1cb6140f and 86d28864.",
-      "set_by_session": "2026-03-23T06:58:15.003770"
+      "task": "URGENT March 26: Close GO trade (python tools/close_go_trade.py). Record entry price, compute 3d abnormal return vs 1cb6140f prediction.",
+      "set_by_session": "2026-03-23T07:28:43.355560"
     },
     {
-      "task": "Check WD (Walker & Dunlop): VIX was 26.78 on March 20. If VIX still > 25, consider canceling WD trigger. Otherwise activate. Exit date would be March 30 close.",
-      "set_by_session": "2026-03-23T06:58:15.003775"
+      "task": "March 26: Check V (Visa) 5d OOS return (entered ~March 23, exits ~March 26). V was 52w-low short signal (86d28864). Run python run.py --status to see exit.",
+      "set_by_session": "2026-03-23T07:28:43.355566"
     },
     {
-      "task": "Monitor for first IG credit upgrade events (hypothesis f86dcb4e active, needs TBD symbol resolution). Sources: BondBlox.com, BusinessWire. Candidates: Carnival CCL (S&P BB+ -> may hit BBB- Q3 2026).",
-      "set_by_session": "2026-03-23T06:58:15.003777"
+      "task": "March 27: Close HD trade (python tools/close_hd_trade.py). Record 3d abnormal return vs 86d28864 prediction.",
+      "set_by_session": "2026-03-23T07:28:43.355567"
     },
     {
-      "task": "VGNT (Versigent Aptiv spinoff): first trading day April 1. trade_loop.py will execute SHORT at April 1 close automatically. No manual action needed unless VGNT does not start trading.",
-      "set_by_session": "2026-03-23T06:58:15.003777"
+      "task": "April 1: VGNT first trading day close - trade_loop.py auto-executes SHORT at 4pm close. Monitor VGNT when-issued price March 27-31 to calibrate expectations.",
+      "set_by_session": "2026-03-23T07:28:43.355568"
     },
     {
-      "task": "Optional research: Build EDGAR 8-K scraper for 'upgraded to investment grade' to systematically find all rising star events 2015-2024 (would expand n from 12 to potentially 50+, enabling sector-specific analysis).",
-      "set_by_session": "2026-03-23T06:58:15.003778"
+      "task": "April 8: Close VGNT SpinCo trade (5 trading days after April 1 entry). Run close script or set trigger.",
+      "set_by_session": "2026-03-23T07:28:43.355569"
+    },
+    {
+      "task": "ONGOING: Monitor CCL S&P upgrade to BBB- (sources: bondblox.com, businesswire credit alerts). When fired: set f86dcb4e expected_symbol=CCL, trigger=next_market_open.",
+      "set_by_session": "2026-03-23T07:28:43.355569"
+    },
+    {
+      "task": "RESEARCH: Test follow-on IG upgrade timing effect (>6 month gap between first and second agency IG). Find 5+ examples with known gap sizes.",
+      "set_by_session": "2026-03-23T07:28:43.355570"
+    },
+    {
+      "task": "RESEARCH: PR (Permian Resources) Fitch first IG July 2025 - find exact date (check BondBlox PR page, Q2 earnings call transcript mentioning upgrade).",
+      "set_by_session": "2026-03-23T07:28:43.355571"
     }
   ],
   "session_handoff": {
-    "current_state": "First IG credit upgrade hypothesis pre-registered (f86dcb4e, confidence 7/10). GO and HD trades set for 9:30 AM ET March 23 execution. VGNT short set for April 1 close.",
-    "blockers": "WD trade needs VIX check. Credit upgrade monitoring needs event detection infrastructure.",
-    "key_findings": "FIRST IG upgrade signal: 3d avg=+2.42%, p=0.013, 75% positive, CI excludes zero, n=12, sample_sufficient=True. CRITICAL: follow-on upgrades (2nd/3rd agency upgrade of same company) show NEGATIVE returns (5d=-2.06%, 0% positive). Must distinguish first vs follow-on upgrades when trading this signal.",
-    "written_at": "2026-03-23T06:58:15.003779"
+    "active_trades": {
+      "GO (1cb6140f)": "Entered March 23 open via trade_loop. Exit: March 26 close.",
+      "HD (86d28864)": "Entered March 23 open via trade_loop. Exit: March 27 close.",
+      "VGNT (2d94ac68)": "Trigger set 2026-04-01T16:00 (close of first trading day). Exit: April 8."
+    },
+    "pending_hypotheses": "f86dcb4e (credit upgrade, TBD) awaiting next qualifying event (CCL S&P). All others TBD symbols.",
+    "key_insight": "PR March 17 2026 S&P follow-on upgrade (8 months after Fitch first IG) gave +4.37% 3d, potentially invalidating our negative control hypothesis about follow-on upgrades. Need to test this with more data points.",
+    "vix_context": "VIX 26.78 (Tier 3, elevated). Only n=6-9 insider clusters are tradeable. n=3-5 has negative EV. Watch for VIX dropping below 25.",
+    "upcoming_catalyst": "REPL PDUFA April 10 - watch but do NOT trade (repeat CRL, not first clinical failure).",
+    "session_blockers": "Credit upgrade exact dates often unavailable without Bloomberg. PR Fitch July 2025 date unconfirmed.",
+    "written_at": "2026-03-23T07:28:43.355572"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
