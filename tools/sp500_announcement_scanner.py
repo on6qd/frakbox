@@ -181,7 +181,7 @@ def date_from_url(url: str) -> str:
 # Source 1: press.spglobal.com archive page
 # ------------------------------------------------------------------
 
-def check_press_archive(days_back=45):
+def check_press_archive(days_back=90):
     """
     Scrape the press.spglobal.com archive page for S&P 500 addition announcements.
     Returns (list_of_items, error_string_or_None).
@@ -499,7 +499,7 @@ def build_signals(announcements: list) -> list:
 # Main scan
 # ------------------------------------------------------------------
 
-def run_scan(verbose=True, days_back=45) -> list:
+def run_scan(verbose=True, days_back=90) -> list:
     """
     Run full scan. Returns list of actionable signal dicts.
     Signals with days_until_effective >= 0 (or None) represent open trading windows.
