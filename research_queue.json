@@ -853,90 +853,74 @@
   ],
   "next_session_priorities": [
     {
-      "task": "MORNING CHECK (March 23): Verify GO (1cb6140f) LONG and HD (86d28864) SHORT executed at 9:30 AM ET. Check run.py --status and trade_loop.py logs.",
-      "set_by_session": "2026-03-23T01:40:46.034245"
+      "task": {
+        "task": "MONDAY MARCH 23 (9:30 AM ET): Verify GO (1cb6140f) LONG and HD (86d28864) SHORT actually executed. Run python run.py --status to confirm active positions.",
+        "urgency": "critical",
+        "deadline": "2026-03-23 09:30 ET"
+      },
+      "set_by_session": "2026-03-23T02:32:45.775062"
     },
     {
-      "task": "MARCH 26 (Wednesday): Close GO trade via tools/close_go_trade.py. Record outcome in hypothesis 1cb6140f. Expected: +2-4% given n=6 insiders, elevated VIX tier (lower conviction). VIX gate for n=6 is to TRADE (not block).",
-      "set_by_session": "2026-03-23T01:40:46.034256"
+      "task": {
+        "task": "WEDNESDAY MARCH 26: Close GO trade. Run python tools/close_go_trade.py. Expected 3d return from entry price.",
+        "urgency": "high",
+        "deadline": "2026-03-26"
+      },
+      "set_by_session": "2026-03-23T02:32:45.775067"
     },
     {
-      "task": "MARCH 27 (Thursday): Close HD trade via tools/close_hd_trade.py. Compute ABT 5d OOS return (entry=March 23 open, exit=March 27 close). Get V (Visa) March 18 5d return for OOS tracking.",
-      "set_by_session": "2026-03-23T01:40:46.034260"
+      "task": {
+        "task": "THURSDAY MARCH 27: Close HD trade. Run python tools/close_hd_trade.py. Also check V (Visa) 5d return (entry Mar 19 open, exit Mar 25 close) for 86d28864 OOS tracking.",
+        "urgency": "high",
+        "deadline": "2026-03-27"
+      },
+      "set_by_session": "2026-03-23T02:32:45.775069"
     },
     {
-      "task": "NKE EARNINGS MARCH 31: NKE at 52w low \\.97 (currently \\.37, only \\/bin/zsh.40 away). Any negative earnings reaction will trigger 52w-low signal. Scanner will auto-detect at 8PM ET March 31. If triggered: SHORT NKE at April 1 open under hypothesis 86d28864.",
-      "set_by_session": "2026-03-23T01:40:46.034261"
+      "task": {
+        "task": "APRIL 10 (RCKT PDUFA): Monitor REPL outcome. REPL prior CRL was -45.2% (Dec 2023) - DOES NOT qualify for d302c84b (need -55%). Track outcome as clinical failure database data point ONLY. Do not trade.",
+        "urgency": "medium",
+        "deadline": "2026-04-10"
+      },
+      "set_by_session": "2026-03-23T02:32:45.775069"
     },
     {
-      "task": "VIX WATCH: Current VIX=26.78 (Tier 3). WD (76678219) requires VIX<25 for n=3 cluster. Check daily. If VIX drops below 25 AND WD still fresh (entry window = filing date + 7 days): set trigger on 76678219.",
-      "set_by_session": "2026-03-23T01:40:46.034262"
+      "task": {
+        "task": "VIX MONITORING: WD (76678219) needs VIX<25 for n=3 cluster. Check daily. Current VIX ~26-27 (elevated). If VIX drops: verify WD filing still fresh (within 7 days).",
+        "urgency": "medium",
+        "deadline": "ongoing"
+      },
+      "set_by_session": "2026-03-23T02:32:45.775070"
     },
     {
-      "task": "RCKT PDUFA MARCH 28: Monitor outcome. RCKT disqualified from d302c84b (multi-pipeline) but outcome data is valuable. If CRL: record as data point for pipeline-risk hypothesis. Stock at \\.14, down 53% from 52w high.",
-      "set_by_session": "2026-03-23T01:40:46.034262"
+      "task": {
+        "task": "NEW SIGNAL: Management guidance raise signal (beat+raise vs beat-no-raise). Guidance data not in yfinance - need external source. Options: (1) NLP on earnings call transcripts from SEC EDGAR EX-99.1 filings, (2) scrape Zacks or Estimize for guidance data. PEAD for large beats DEAD END (failed OOS 2024-2025).",
+        "urgency": "low",
+        "deadline": "next session"
+      },
+      "set_by_session": "2026-03-23T02:32:45.775071"
     },
     {
-      "task": "V (Visa) 52w low OOS tracking: V touched 52w low March 18 (\\.02). Not in scanner (now fixed: V/MA/COF added to universe). Track 5d outcome for OOS data for 86d28864. Entry=March 19 open.",
-      "set_by_session": "2026-03-23T01:40:46.034263"
-    },
-    {
-      "task": "NEW SIGNAL RESEARCH: Explore accelerated share repurchases (ASR) announcements - delta-hedging pressure creates predictable negative drift. Can find via EDGAR 8-K search for company press releases. Alternative: test management guidance RAISE during earnings (beat+raise) vs beat-no-raise drift differential.",
-      "set_by_session": "2026-03-23T01:40:46.034264"
-    },
-    {
-      "task": "DNTH WATCHLIST UPDATE: DNTH Phase 3 CAPTIVATE got an early GO decision March 9, 2026. NOT a failure event. Update DNTH watchlist entry status to disqualified. New full Phase 3 data expected H2 2026.",
-      "set_by_session": "2026-03-23T01:40:46.034264"
-    },
-    {
-      "task": "INSIDER SELLING LARGE-CAP: Task f5857b08 already completed (dead end). No action needed.",
-      "set_by_session": "2026-03-23T01:40:46.034265"
+      "task": {
+        "task": "CEO/CFO CLUSTER HYPOTHESIS (2bbe0f04): Already wired into cluster_auto_scanner.py. No action needed. Scanner will flag CEO/CFO presence in future clusters.",
+        "urgency": "none",
+        "deadline": "automated"
+      },
+      "set_by_session": "2026-03-23T02:32:45.775071"
     }
   ],
   "session_handoff": {
-    "current_investigation": "S&P 500 52w-low momentum short (86d28864) in live testing. HD executing Monday March 23. ABT passive OOS tracking.",
-    "scanner_fix": "Fixed fiftytwo_week_low_scanner.py to log all signals and prioritize by market cap. Committed.",
-    "vix_status": "VIX=26.78 (elevated). WD (n=3) and AMRZ (n=4) blocked. POOL (n=3, $7.4B) blocked.",
-    "new_52w_low_candidates": {
-      "BAX": {
-        "pct_above": 0.4,
-        "mcap_B": 8.3,
-        "note": "CRITICAL - essentially at 52w low now"
-      },
-      "SYK": {
-        "pct_above": 2.7,
-        "mcap_B": 128.5,
-        "note": "Large cap healthcare"
-      },
-      "NKE": {
-        "pct_above": 2.7,
-        "mcap_B": 77.5,
-        "note": "Already being watched"
-      },
-      "ZBH": {
-        "pct_above": 3.9,
-        "mcap_B": 17.4,
-        "note": "Zimmer Biomet - healthcare"
-      },
-      "LULU": {
-        "pct_above": 3.9,
-        "mcap_B": 19.1,
-        "note": "Lululemon - retail"
-      },
-      "RH": {
-        "pct_above": 3.8,
-        "mcap_B": 2.4,
-        "note": "RH Inc - retail (smaller cap)"
-      },
-      "PODD": {
-        "pct_above": 4.9,
-        "mcap_B": 16.0,
-        "note": "Insulet - healthcare"
-      }
-    },
-    "what_blocked": "VIX gate blocking multiple cluster trades. Market stress environment.",
-    "next_step": "Post-market March 23: verify trade execution. March 26: close GO. March 27: close HD, compute ABT OOS return. Watch BAX daily.",
-    "written_at": "2026-03-23T00:26:08.817215"
+    "investigating": "PEAD (post-earnings announcement drift) for large-cap S&P 500 stocks. Finding: reverse-PEAD exists in 2021-2023 (-0.75% 5d abnormal, p=0.005) but FAILS out-of-sample in 2024-2025 (-0.16%, p=0.62). Dead end for current market conditions. Regime-specific.",
+    "intermediate_findings": [
+      "REPL first CRL (Dec 5, 2023): -45.2% close-to-close. Does NOT qualify for d302c84b (-55% threshold). Second CRL April 10 expected -30-50%. Do not trade.",
+      "AMRZ (1f3ac0ec) abandoned: cluster filing March 11-16, hypothesis created March 22. Window expired. Hypothetical return would have been -5.1%.",
+      "52w-low scanner expanded from 66 to 174 stocks. All GICS sectors now covered.",
+      "V (Visa) 52w low OOS: entered March 19 at .04. 2d return = +2.21% abnormal (against short hypothesis). 5d result pending March 25.",
+      "Mid-cap PEAD also no signal (n=268, p=0.59). PEAD as strategy does not work on available universe."
+    ],
+    "blocked_by": "PEAD signal requires guidance data (beat+raise vs beat-only) not available in yfinance.",
+    "next_step": "Wait for GO and HD to close (March 26-27). Then evaluate signal quality for next research round. Consider: earnings call NLP for guidance signal, or FINRA short volume spike as short-squeeze precursor.",
+    "written_at": "2026-03-23T02:32:45.775073"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
