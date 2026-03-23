@@ -1147,9 +1147,11 @@
       "question": "REPL (Replimune): What was the stock reaction to the FIRST CRL in 2023? Find the exact date and crash magnitude. This tells us the baseline for our d302c84b continuation short criteria (>55% crash needed). Also: what was the reason for the first CRL \u2014 clinical efficacy concerns or CMC/manufacturing?",
       "priority": 1,
       "reasoning": "PDUFA April 10, 2026 \u2014 18 days away. Need to know if d302c84b applies: (1) crash >55%? (2) clinical efficacy reason? If both YES: activate short on crash day. Also check ALDX precedent for second-CRL behavior.",
-      "status": "pending",
+      "status": "completed",
       "created": "2026-03-23T01:02:45.587996",
-      "depends_on": null
+      "depends_on": null,
+      "completed": "2026-03-23T06:30:00",
+      "findings": "REPL had ONE CRL (July 22, 2025, not 2023). Crash was -77.4% ($12.40->$2.805). Clinical efficacy reason (IGNYTE not adequate/well-controlled). REPL does NOT qualify for d302c84b: multi-pipeline (RP2/RP3 active), mktcap ~$630M (>$500M limit), has stated path forward (IGNYTE-3 ongoing). No trade action for REPL."
     }
   ],
   "next_session": {

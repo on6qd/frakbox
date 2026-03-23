@@ -711,15 +711,26 @@
       "last_updated": "2026-03-22T13:46:08.253612"
     },
     "sp500_52w_low_momentum_short": {
-      "direction": "short",
-      "avg_abnormal_5d": -1.68,
-      "consistency_pct": 62.2,
-      "n_events": 209,
-      "p_value": 0.0001,
-      "time_period": "2021-2025",
-      "regime": "all_vix_regimes",
-      "note": "First touch of 52-week low predicts continued decline, not bounce. Signal is SHORT at next-day open. Hypothesis pre-registered as 86d28864.",
-      "last_updated": "2026-03-22T14:55:22.573637"
+      "return_front_loading": true,
+      "return_profile": {
+        "1d": {
+          "mean": -1.279,
+          "accuracy": 63.6,
+          "t_stat": 8.956
+        },
+        "5d": {
+          "mean": -1.682,
+          "accuracy": 58.4,
+          "t_stat": 4.947
+        },
+        "10d": {
+          "mean": -1.468,
+          "accuracy": 54.1,
+          "t_stat": 3.518
+        }
+      },
+      "note": "Return is front-loaded: 75% of 5d return occurs on day 1. Signal accuracy: 63.6% at 1d vs 58.4% at 5d. Reversal begins day 6-10 (10d avg -1.47% < 5d avg -1.68%). Optimal hold is 3-5 days. Do not extend beyond 10d.",
+      "last_updated": "2026-03-23T11:30:55.082684"
     },
     "insider_selling_cluster": {
       "summary": "Insider selling clusters (3+ insiders, 30-day window, K+ each) show regime-dependent negative abnormal returns.\n    FULL RESULTS BY PERIOD:\n    - 2021 (bull peak): 10d=-0.95% p<0.0001, 20d=-2.86% p<0.0001; N=420\n    - 2022 (bear market): 10d=-1.57% p=0.001, 20d=-2.30% p=0.002; N=347, passes MT\n    - 2023-24 (bull market): 10d=-0.92% p=0.002, 20d=-1.11% p=0.03; N=361, FAILS MT\n    - n>=6 filter 2021: 10d=-1.80% p=0.002, 20d=-2.63% p=0.003\n    - n>=6 filter 2022: 10d=-0.20% p=0.44, FAILS OOS (regime confound)\n    \n    VERDICT: Signal is real but regime-dependent. 20d hold exceeds 1.5% threshold in 2021-2022 but not 2023-24.\n    The 2021 result may be confounded by insiders selling ahead of the 2022 crash (hindsight bias risk).\n    n>=6 does NOT improve OOS stability; failed in 2022 bear market.\n    NOT FORMABLE as hypothesis due to: (1) regime dependence, (2) 20d hold too long for clean causal testing,\n    (3) n>=6 OOS failure, (4) 5d magnitude below 1.5% threshold in all periods.\n    Potential follow-up: test with large-cap filter (>5B market cap) to reduce micro-cap noise.",
@@ -866,6 +877,32 @@
       "candidates_verified_2025_2026": "CCL S&P upgrade expected H1 2026 (currently BB+ positive outlook; Fitch first IG Oct 1 2025). This will be a LONG-gap follow-on (~6-9 months). Monitor for trade opportunity.",
       "recorded": "2026-03-23",
       "last_updated": "2026-03-23T07:56:29.218963"
+    },
+    "vix_spike_above_30_spy_recovery": {
+      "finding": "When VIX first crosses above 30 (after 30+ days below 30), SPY tends to recover over 5d. N=12 events 2015-2026.",
+      "results": {
+        "5d": {
+          "avg": 1.43,
+          "positive_rate": 75.0,
+          "p_one_tailed": 0.046,
+          "stdev": 2.57
+        },
+        "10d": {
+          "avg": 1.3,
+          "positive_rate": 75.0,
+          "p_one_tailed": 0.234,
+          "stdev": 5.72
+        },
+        "20d": {
+          "avg": 2.4,
+          "positive_rate": 66.0,
+          "p_one_tailed": 0.085,
+          "stdev": 5.41
+        }
+      },
+      "verdict": "Borderline signal at 5d (p=0.046) but fails multiple testing correction (only 1 horizon). N=12 too small. Notable exception: April 2025 tariff shock (VIX=30, 5d=+0.2% barely positive). NOT actionable yet. Need 15+ events or stronger p-values. Current event (March 23, 2026, VIX=30.3) would be event #13.",
+      "current_event": "2026-03-23: VIX=30.3 (tariff selloff). Entry would be next day SPY long. Expected 5d=+1.4% with 75% historical positive rate, but only 1 prior tariff-regime event (April 2025) showed near-zero return.",
+      "last_updated": "2026-03-23T11:32:59.214496"
     }
   },
   "dead_ends": [
