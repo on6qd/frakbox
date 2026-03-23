@@ -52,8 +52,8 @@ USER_AGENT = os.environ.get("SEC_USER_AGENT", "Financial Research Bot contact@ex
 CACHE_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "realtime_cache")
 BASE_ARCHIVE = "https://www.sec.gov/Archives/edgar"
 
-# SEC EDGAR rate limit: ~10 requests/second is safe; we'll do 3/second with retry
-SEC_REQUEST_DELAY = 0.35   # seconds between requests
+# SEC EDGAR rate limit: ~10 requests/second is safe; we'll do ~3/second with retry
+SEC_REQUEST_DELAY = 0.3    # seconds between requests (reduced from 0.35)
 SEC_MAX_RETRIES = 3
 SEC_RETRY_BACKOFF = 2.0    # exponential backoff multiplier
 
@@ -87,7 +87,7 @@ def get_current_quarter():
     return now.year, q
 
 
-def download_form_idx(year, quarter, cache=True):
+def download_form_idx(year, quarter, cache=True, quiet=False):
     """Download and parse the EDGAR form.idx for a given quarter.
 
     Returns list of dicts: {date, cik, path, form_type}
@@ -102,12 +102,14 @@ def download_form_idx(year, quarter, cache=True):
                 return pickle.load(f)
 
     url = f"{BASE_ARCHIVE}/full-index/{year}/QTR{quarter}/form.idx"
-    print(f"Downloading EDGAR form.idx {year}Q{quarter}...")
+    if not quiet:
+        print(f"Downloading EDGAR form.idx {year}Q{quarter}...")
     headers = {"User-Agent": USER_AGENT}
     resp = requests.get(url, headers=headers, timeout=120)  # Large file — long timeout, no retry
 
     if resp is None or resp.status_code == 404:
-        print(f"  {year}Q{quarter} form.idx not found (404)")
+        if not quiet:
+            print(f"  {year}Q{quarter} form.idx not found (404)")
         return []
 
     resp.raise_for_status()
@@ -131,7 +133,8 @@ def download_form_idx(year, quarter, cache=True):
                 'form_type': parts[0],
             })
 
-    print(f"  Parsed {len(entries)} Form 4 entries")
+    if not quiet:
+        print(f"  Parsed {len(entries)} Form 4 entries")
 
     with open(cache_path, "wb") as f:
         pickle.dump(entries, f)
@@ -223,8 +226,9 @@ def find_clusters(
     lookback_days=30,
     min_insiders=3,
     min_purchase_value=50000,
-    max_to_check=500,
+    max_to_check=100,
     filter_10b5=True,
+    quiet=False,
 ):
     """Find insider purchase clusters in the current quarter's EDGAR data.
 
@@ -232,23 +236,28 @@ def find_clusters(
         lookback_days: How many days back to search for Form 4 filings
         min_insiders: Minimum number of unique insiders for a cluster
         min_purchase_value: Minimum purchase value per insider ($)
-        max_to_check: Maximum number of CIK clusters to parse (speed limit)
+        max_to_check: Maximum number of CIK clusters to parse (speed limit, default 100)
         filter_10b5: If True, exclude 10b5-1 pre-planned trades
+        quiet: If True, suppress all progress output
 
     Returns:
         List of cluster dicts: {ticker, company, cluster_date, n_insiders,
                                  total_value, purchases: [...]}
     """
+    def log(*args, **kwargs):
+        if not quiet:
+            print(*args, **kwargs)
+
     year, quarter = get_current_quarter()
     cutoff_date = (datetime.now() - timedelta(days=lookback_days)).strftime('%Y-%m-%d')
     today = datetime.now().strftime('%Y-%m-%d')
 
-    print(f"Scanning EDGAR {year}Q{quarter} for insider clusters...")
-    print(f"  Period: {cutoff_date} to {today}")
-    print(f"  Min insiders: {min_insiders}, Min value: ${min_purchase_value:,}")
+    log(f"Scanning EDGAR {year}Q{quarter} for insider clusters...")
+    log(f"  Period: {cutoff_date} to {today}")
+    log(f"  Min insiders: {min_insiders}, Min value: ${min_purchase_value:,}")
 
     # Download quarterly index
-    entries = download_form_idx(year, quarter)
+    entries = download_form_idx(year, quarter, quiet=quiet)
     if not entries:
         # Try previous quarter if current not available
         prev_q = quarter - 1
@@ -256,12 +265,12 @@ def find_clusters(
         if prev_q == 0:
             prev_q = 4
             prev_y -= 1
-        print(f"Trying previous quarter {prev_y}Q{prev_q}...")
-        entries = download_form_idx(prev_y, prev_q)
+        log(f"Trying previous quarter {prev_y}Q{prev_q}...")
+        entries = download_form_idx(prev_y, prev_q, quiet=quiet)
 
     # Filter to recent filings
     recent = [e for e in entries if e['date'] >= cutoff_date]
-    print(f"  Recent Form 4 filings: {len(recent)}")
+    log(f"  Recent Form 4 filings: {len(recent)}")
 
     # Group by CIK (issuing company)
     cik_filings = defaultdict(list)
@@ -273,13 +282,13 @@ def find_clusters(
         cik: filings for cik, filings in cik_filings.items()
         if len(filings) >= min_insiders
     }
-    print(f"  CIKs with {min_insiders}+ Form 4 filings: {len(potential_ciks)}")
+    log(f"  CIKs with {min_insiders}+ Form 4 filings: {len(potential_ciks)}")
 
     # Sort by filing count (most filings first = most likely cluster)
     sorted_ciks = sorted(potential_ciks.items(), key=lambda x: -len(x[1]))
 
     # Parse XML for each potential cluster
-    print(f"\nParsing Form 4 XML files (checking up to {max_to_check} CIKs)...")
+    log(f"\nParsing Form 4 XML files (checking up to {max_to_check} CIKs)...")
 
     cik_purchases = defaultdict(list)  # cik -> list of purchase dicts
     checked = 0
@@ -296,10 +305,10 @@ def find_clusters(
                 })
 
         checked += 1
-        if checked % 50 == 0:
+        if not quiet and checked % 50 == 0:
             print(f"  Checked {checked}/{min(max_to_check, len(sorted_ciks))}...", end='\r')
 
-    print(f"\n  Checked {checked} CIKs")
+    log(f"\n  Checked {checked} CIKs")
 
     # Find clusters (2+ unique insiders in the window)
     clusters = []
@@ -339,7 +348,7 @@ def find_clusters(
     # Sort by most recent cluster date, then by n_insiders
     clusters.sort(key=lambda x: (-len(x['cluster_date']), -x['n_insiders']))
 
-    print(f"\nClusters found ({min_insiders}+ insiders): {len(clusters)}")
+    log(f"\nClusters found ({min_insiders}+ insiders): {len(clusters)}")
     return clusters
 
 
@@ -351,12 +360,14 @@ def main():
                        help='Lookback days (default: 30)')
     parser.add_argument('--min-value', type=float, default=50000,
                        help='Minimum purchase value per insider (default: 50000)')
-    parser.add_argument('--max-check', type=int, default=500,
-                       help='Max CIKs to check XML for (speed limit)')
+    parser.add_argument('--max-check', type=int, default=100,
+                       help='Max CIKs to check XML for (speed limit, default: 100)')
     parser.add_argument('--no-10b5-filter', action='store_true',
                        help='Do not filter 10b5-1 pre-planned trades')
     parser.add_argument('--output', type=str, default=None,
                        help='Output JSON file for cluster results')
+    parser.add_argument('--quiet', action='store_true',
+                       help='Suppress progress output (for automated scripts)')
     args = parser.parse_args()
 
     clusters = find_clusters(
@@ -365,6 +376,7 @@ def main():
         min_purchase_value=args.min_value,
         max_to_check=args.max_check,
         filter_10b5=not args.no_10b5_filter,
+        quiet=args.quiet,
     )
 
     print(f"\n{'='*60}")

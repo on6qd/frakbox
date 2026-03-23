@@ -962,41 +962,35 @@
       "hypothesis_template": "2d94ac68",
       "added": "2026-03-23T05:15:42.256387",
       "status": "watching"
+    },
+    {
+      "event": "Replimune (REPL) PDUFA decision: FDA decides on RP1 (vusolimogene oderparepvec + nivolumab) BLA resubmission for advanced melanoma. Prior CRL was July 2025 (inadequate trial design, clinical deficiency). If second CRL issued -> short signal applies. Check: is this a clinical/efficacy deficiency (not CMC)?",
+      "expected_date": "2026-04-10",
+      "symbol": "REPL",
+      "hypothesis_template": "d302c84b",
+      "added": "2026-03-23T08:37:16.550274",
+      "status": "watching"
     }
   ],
   "next_session_priorities": [
     {
-      "task": "TRADE MONITORING: GO trade should trigger at 9:30 AM ET March 23 (today). Check execution via python run.py --status. Close at 3d (March 26).",
-      "set_by_session": "2026-03-23T08:05:47.460443"
+      "task": "1. Complete repl_crl_history_check: find exact date and magnitude of first REPL CRL (2023), confirm clinical efficacy reason. PDUFA April 10 is 18 days away.",
+      "set_by_session": "2026-03-23T08:38:03.656957"
     },
     {
-      "task": "TRADE MONITORING: HD trade should trigger at 9:30 AM ET March 23 (today). Check execution. Close at 5d (March 28).",
-      "set_by_session": "2026-03-23T08:05:47.460448"
+      "task": "2. Monitor POOL cluster: VIX gate at <25 for n=3 cluster to qualify. Check VIX level.",
+      "set_by_session": "2026-03-23T08:38:03.656963"
     },
     {
-      "task": "TRADE MONITORING: VGNT SHORT trigger set for April 1 16:00. Monitor when-issued March 27-31.",
-      "set_by_session": "2026-03-23T08:05:47.460449"
-    },
-    {
-      "task": "DATA QUALITY: Verify ALLY first IG classification. ALLY Fitch Aug 19 2019 was actual first IG (confounded by Aug 2019 panic). ALLY 2021-08-27 in hypothesis is Moody follow-on. Also verify M Macys Feb 2022 was truly first IG.",
-      "set_by_session": "2026-03-23T08:05:47.460450"
-    },
-    {
-      "task": "RESEARCH: Follow-on IG timing signal (n=7, p=0.029). Find 3+ more events. Check TECK S&P/Moody follow-on date, NFLX Moody follow-on date. Build to n=10+ for hypothesis formation.",
-      "set_by_session": "2026-03-23T08:05:47.460451"
-    },
-    {
-      "task": "RESEARCH: CCL S&P upgrade monitor (expected H2 2026, LONG gap test).",
-      "set_by_session": "2026-03-23T08:05:47.460451"
+      "task": "3. Russell 2000 reconstitution research (late June 2026): start backtest on small-cap addition effect.",
+      "set_by_session": "2026-03-23T08:38:03.656965"
     }
   ],
   "session_handoff": {
-    "session_date": "2026-03-23",
-    "what_investigated": "Credit upgrade signal data quality audit + follow-on IG timing effect",
-    "key_findings": "1. MSCI May 2024 in hypothesis f86dcb4e is MISCLASSIFIED (3rd agency, not first IG). 2. ALLY Aug 2021 in hypothesis is MISCLASSIFIED (Moody follow-on after Fitch Aug 2019 first IG). 3. Follow-on IG timing effect: short gap (<180d) = -1.62% avg 3d, long gap (>=180d) = +1.96% avg 3d, Mann-Whitney p=0.029, n=7.",
-    "blocked_by": "Cannot modify pre-registered hypothesis f86dcb4e. Need more follow-on events for robust hypothesis.",
-    "next_exact_step": "1. Check if GO/HD trades executed at 9:30 AM open. 2. Find TECK Moody/S&P second IG date to add follow-on data point. 3. Find NFLX Moody's IG upgrade date (was Ba1 before Oct 2021 S&P first IG). 4. Decide whether to register 'first-IG v2' hypothesis with corrected dataset.",
-    "written_at": "2026-03-23T08:05:47.460453"
+    "current_state": "realtime_insider_scanner.py fixed (--max-check, --quiet, sleep 0.3s). REPL added to watchlist (note: already disqualified as multi-pipeline in prior entry). REPL price $6.98, approaching April 10 PDUFA.",
+    "blocked_by": "None currently",
+    "next_action": "Run repl_crl_history_check to determine if second CRL would trigger d302c84b short. Use yfinance to find 2023 REPL crash date and magnitude.",
+    "written_at": "2026-03-23T08:38:03.656966"
   },
   "handoff": {
     "notes": "Session 5 (March 21): FDA CRL N=4 finding (all show continuation, avg 3d -14.4%). WD (Walker & Dunlop) identified as secondary trade. Scripts ready for Monday.",
