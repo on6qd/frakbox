@@ -160,7 +160,20 @@ def execute_pending_triggers():
     from config import DEFAULT_STOP_LOSS_PCT, DEFAULT_TAKE_PROFIT_PCT, MIN_STOP_LOSS_PCT, MAX_CONCURRENT_EXPERIMENTS
 
     hypotheses = _load_hypotheses()
-    active_count = sum(1 for h in hypotheses if h.get("status") == "active")
+    hyp_active_count = sum(1 for h in hypotheses if h.get("status") == "active")
+
+    # Also count actual Alpaca positions (catches untracked positions like CTAS)
+    # Take the max to prevent silent capacity overflow
+    try:
+        from trader import get_api
+        alpaca_positions = get_api().list_positions()
+        alpaca_count = len(alpaca_positions)
+    except Exception:
+        alpaca_count = 0
+    active_count = max(hyp_active_count, alpaca_count)
+    if alpaca_count > hyp_active_count:
+        print(f"[TRADE LOOP] WARNING: Alpaca has {alpaca_count} positions but only {hyp_active_count} active in hypothesis DB — untracked positions detected. Using {active_count} for capacity check.")
+
     actions = []
 
     for h in hypotheses:
