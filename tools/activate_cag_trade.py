@@ -15,6 +15,12 @@ TRADE DETAILS:
   Stop loss: 8%
   Take profit: 15%
 
+EARNINGS CONSENSUS (Q3 FY2026, research 2026-03-24):
+  - Consensus EPS: $0.40 (non-GAAP adjusted)
+  - 10% beat threshold: $0.44
+  - Previous Q2 FY2026 actual revenue: $2.98B (vs $3.0B estimate — miss)
+  - PEAD long: activate only if EPS >= $0.44 AND VIX < 20 (skip in tariff volatility)
+
 CONTEXT:
   - CAG declined 16% (18.08->15.46) from March 10-23; near 52w low
   - Q3 FY2026 (Dec-Feb quarter) under pressure from tariffs + consumer slowdown
