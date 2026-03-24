@@ -435,6 +435,8 @@ def load_knowledge():
 
     for row in conn.execute("SELECT * FROM known_effects").fetchall():
         data = json.loads(row["data"])
+        if isinstance(data, str):
+            data = {"description": data}
         data["last_updated"] = row["last_updated"]
         kb["known_effects"][row["event_type"]] = data
 
