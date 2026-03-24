@@ -690,20 +690,21 @@ def invalidate_hypothesis(hypothesis_id, reason):
 
 
 def _update_pattern(completed_hypothesis):
-    """Update the pattern library with results from a completed experiment."""
+    """Update the pattern library with results from a completed experiment.
+
+    patterns is a dict keyed by event_type (per db.load_patterns / db.save_patterns).
+    """
     patterns = load_patterns()
+    # Ensure patterns is a dict (db.load_patterns returns dict, not list)
+    if isinstance(patterns, list):
+        # Migrate list format to dict format
+        patterns = {p["event_type"]: p for p in patterns}
     h = completed_hypothesis
     event_type = h["event_type"]
 
     # Find or create pattern entry for this event type
-    pattern = None
-    for p in patterns:
-        if p["event_type"] == event_type:
-            pattern = p
-            break
-
-    if pattern is None:
-        pattern = {
+    if event_type not in patterns:
+        patterns[event_type] = {
             "event_type": event_type,
             "experiments": [],
             "total_tests": 0,
@@ -714,7 +715,11 @@ def _update_pattern(completed_hypothesis):
             "notes": "",
             "last_updated": datetime.now().isoformat(),
         }
-        patterns.append(pattern)
+
+    pattern = patterns[event_type]
+    # Ensure experiments is a list
+    if not isinstance(pattern.get("experiments"), list):
+        pattern["experiments"] = []
 
     pattern["experiments"].append({
         "hypothesis_id": h["id"],
