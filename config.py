@@ -17,6 +17,9 @@ ALPACA_BASE_URL = os.environ.get("ALPACA_BASE_URL", "https://paper-api.alpaca.ma
 # Tiingo (fallback for delisted tickers — free tier, 500 req/day)
 TIINGO_API_KEY = os.environ.get("TIINGO_API_KEY", "")
 
+# FRED (macro data — free, 120 req/min)
+FRED_API_KEY = os.environ.get("FRED_API_KEY", "")
+
 # Email reporting
 GMAIL_ADDRESS = os.environ.get("GMAIL_ADDRESS", "")
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
@@ -68,6 +71,15 @@ def require_gmail():
     if not GMAIL_ADDRESS or not GMAIL_APP_PASSWORD:
         raise RuntimeError(
             "GMAIL_ADDRESS and GMAIL_APP_PASSWORD must be set in .env or environment."
+        )
+
+
+def require_fred():
+    """Raise if FRED API key is missing. Call at point-of-use, not import time."""
+    if not FRED_API_KEY:
+        raise RuntimeError(
+            "FRED_API_KEY must be set in .env or environment. "
+            "Get a free key at https://fred.stlouisfed.org/docs/api/api_key.html"
         )
 
 

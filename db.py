@@ -251,6 +251,14 @@ CREATE TABLE IF NOT EXISTS scanner_signals (
     timestamp TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_scanner_name ON scanner_signals(scanner);
+
+CREATE TABLE IF NOT EXISTS nav_snapshots (
+    date TEXT PRIMARY KEY,
+    equity REAL NOT NULL,
+    cash REAL NOT NULL,
+    position_count INTEGER DEFAULT 0,
+    snapshot_time TEXT NOT NULL
+);
 """
 
 # ---------------------------------------------------------------------------
@@ -1395,3 +1403,29 @@ def migrate_logs(base_dir=None):
 
     conn.commit()
     return summary
+
+
+# ---------------------------------------------------------------------------
+# NAV Snapshots
+# ---------------------------------------------------------------------------
+
+def snapshot_nav(date, equity, cash, position_count=0):
+    """Upsert today's NAV into nav_snapshots. Idempotent per date."""
+    conn = get_db()
+    init_db()
+    conn.execute(
+        "INSERT OR REPLACE INTO nav_snapshots (date, equity, cash, position_count, snapshot_time) "
+        "VALUES (?, ?, ?, ?, ?)",
+        (date, equity, cash, position_count, datetime.now().isoformat()),
+    )
+    conn.commit()
+
+
+def get_nav_history():
+    """Return all NAV snapshots ordered by date."""
+    conn = get_db()
+    init_db()
+    rows = conn.execute(
+        "SELECT date, equity, cash, position_count FROM nav_snapshots ORDER BY date"
+    ).fetchall()
+    return [dict(r) for r in rows]

@@ -333,7 +333,8 @@ def get_price_around_date(symbol, event_date, days_before=5, days_after=20,
 
 def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_etf=None,
                          event_timing="unknown", known_events=None, regime_filter=None,
-                         entry_price="close", estimate_costs=False, event_type=None):
+                         entry_price="close", estimate_costs=False, event_type=None,
+                         check_factors=False, check_seasonal=False):
     """
     Measure abnormal price impact across multiple instances of the same event type.
 
@@ -351,7 +352,8 @@ def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_
         sector_etf: Optional sector ETF (e.g., XLV for healthcare, XLF for financials)
         event_timing: Default timing if event_dates are strings (not dicts)
         known_events: Optional list of {"symbol", "date"} dicts for contamination checking
-        regime_filter: Optional VIX regime filter — "calm", "elevated", or "crisis"
+        regime_filter: VIX regime filter string ("calm", "elevated", "crisis") or dict
+                    for multi-filter: {"vix": "calm", "yield_curve": "inverted", "rate": "hiking"}
         entry_price: "close" (default) or "open". "open" uses next-day open as entry —
                     more realistic for after-hours events.
         estimate_costs: If True, estimate per-event transaction costs using volume data
@@ -365,25 +367,67 @@ def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_
     symbols_seen = set()
     regime_filtered_count = 0
 
-    # Pre-fetch VIX data if regime filtering is requested
+    # Normalize regime_filter to dict format (backward compatible)
+    regime_filter_dict = None
+    if isinstance(regime_filter, str):
+        regime_filter_dict = {"vix": regime_filter}
+    elif isinstance(regime_filter, dict):
+        regime_filter_dict = regime_filter
+
+    # Pre-fetch filter data for all active regime filters
     vix_by_date = {}
-    if regime_filter:
-        regime_thresholds = {"calm": (0, 20), "elevated": (20, 30), "crisis": (30, 999)}
-        if regime_filter not in regime_thresholds:
-            return {"error": f"Invalid regime_filter '{regime_filter}'. Use 'calm', 'elevated', or 'crisis'."}
-        # Determine date range for VIX fetch
+    vix_thresholds = {"calm": (0, 20), "elevated": (20, 30), "crisis": (30, 999)}
+    yc_spread_by_date = {}
+    yc_thresholds = {"normal": (0.5, 999), "flat": (-0.5, 0.5), "inverted": (-999, -0.5)}
+    rate_regime_by_date = {}
+
+    if regime_filter_dict:
+        # Collect all event dates for range calculation
         all_dates = []
         for de in event_dates:
             d = de["date"] if isinstance(de, dict) else de
             all_dates.append(d)
-        if all_dates:
-            min_date = min(all_dates)
-            max_date = max(all_dates)
-            vix_start = (datetime.strptime(min_date, "%Y-%m-%d") - timedelta(days=10)).strftime("%Y-%m-%d")
-            vix_end = (datetime.strptime(max_date, "%Y-%m-%d") + timedelta(days=5)).strftime("%Y-%m-%d")
-            vix_df = yf.Ticker("^VIX").history(start=vix_start, end=vix_end, interval="1d")
+
+        if not all_dates:
+            regime_filter_dict = None
+
+    if regime_filter_dict and all_dates:
+        min_date = min(all_dates)
+        max_date = max(all_dates)
+        range_start = (datetime.strptime(min_date, "%Y-%m-%d") - timedelta(days=10)).strftime("%Y-%m-%d")
+        range_end = (datetime.strptime(max_date, "%Y-%m-%d") + timedelta(days=5)).strftime("%Y-%m-%d")
+
+        # VIX filter (existing logic)
+        if "vix" in regime_filter_dict:
+            if regime_filter_dict["vix"] not in vix_thresholds:
+                return {"error": f"Invalid vix regime '{regime_filter_dict['vix']}'. Use 'calm', 'elevated', or 'crisis'."}
+            vix_df = yf.Ticker("^VIX").history(start=range_start, end=range_end, interval="1d")
             if not vix_df.empty:
                 vix_by_date = {d.strftime("%Y-%m-%d"): round(row["Close"], 2) for d, row in vix_df.iterrows()}
+
+        # Yield curve filter (requires tools/fred_data.py)
+        if "yield_curve" in regime_filter_dict:
+            if regime_filter_dict["yield_curve"] not in yc_thresholds:
+                return {"error": f"Invalid yield_curve regime '{regime_filter_dict['yield_curve']}'. Use 'normal', 'flat', or 'inverted'."}
+            try:
+                from tools.fred_data import get_yield_curve_spread
+                spread = get_yield_curve_spread(range_start, range_end)
+                if not spread.empty:
+                    yc_spread_by_date = {d.strftime("%Y-%m-%d"): round(v, 4) for d, v in spread.items()}
+            except (ImportError, Exception) as e:
+                print(f"[regime_filter] yield_curve filter unavailable: {e}", file=sys.stderr)
+
+        # Rate regime filter (requires tools/fred_data.py)
+        if "rate" in regime_filter_dict:
+            if regime_filter_dict["rate"] not in ("hiking", "cutting", "holding"):
+                return {"error": f"Invalid rate regime '{regime_filter_dict['rate']}'. Use 'hiking', 'cutting', or 'holding'."}
+            try:
+                from tools.fred_data import get_rate_regime
+                # Compute rate regime for each unique event date
+                for d in set(all_dates):
+                    rate_regime_by_date[d] = get_rate_regime(d)
+            except (ImportError, Exception) as e:
+                print(f"[regime_filter] rate filter unavailable: {e}", file=sys.stderr)
 
     for date_entry in event_dates:
         # Resolve symbol and date from the entry
@@ -403,19 +447,43 @@ def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_
             errors.append({"date": date, "error": "No symbol specified"})
             continue
 
-        # Regime filter: skip events outside the specified VIX regime
-        if regime_filter and vix_by_date:
-            vix_val = vix_by_date.get(date)
-            # If exact date not found, try nearest prior date
-            if vix_val is None:
-                prior_dates = [d for d in sorted(vix_by_date.keys()) if d <= date]
-                if prior_dates:
-                    vix_val = vix_by_date[prior_dates[-1]]
-            if vix_val is not None:
-                lo, hi = regime_thresholds[regime_filter]
-                if not (lo <= vix_val < hi):
-                    regime_filtered_count += 1
-                    continue
+        # Regime filter: skip events outside ALL specified regime conditions
+        if regime_filter_dict:
+            skip_event = False
+
+            # VIX check
+            if "vix" in regime_filter_dict and vix_by_date:
+                vix_val = vix_by_date.get(date)
+                if vix_val is None:
+                    prior_dates = [d for d in sorted(vix_by_date.keys()) if d <= date]
+                    if prior_dates:
+                        vix_val = vix_by_date[prior_dates[-1]]
+                if vix_val is not None:
+                    lo, hi = vix_thresholds[regime_filter_dict["vix"]]
+                    if not (lo <= vix_val < hi):
+                        skip_event = True
+
+            # Yield curve check
+            if "yield_curve" in regime_filter_dict and yc_spread_by_date and not skip_event:
+                spread_val = yc_spread_by_date.get(date)
+                if spread_val is None:
+                    prior_dates = [d for d in sorted(yc_spread_by_date.keys()) if d <= date]
+                    if prior_dates:
+                        spread_val = yc_spread_by_date[prior_dates[-1]]
+                if spread_val is not None:
+                    lo, hi = yc_thresholds[regime_filter_dict["yield_curve"]]
+                    if not (lo <= spread_val <= hi):
+                        skip_event = True
+
+            # Rate regime check
+            if "rate" in regime_filter_dict and rate_regime_by_date and not skip_event:
+                rate = rate_regime_by_date.get(date)
+                if rate is not None and rate != regime_filter_dict["rate"]:
+                    skip_event = True
+
+            if skip_event:
+                regime_filtered_count += 1
+                continue
 
         symbols_seen.add(event_symbol)
 
@@ -494,8 +562,8 @@ def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_
         "benchmark": benchmark,
         "sector_etf": sector_etf,
         "event_timing": event_timing,
-        "regime_filter": regime_filter,
-        "regime_filtered_count": regime_filtered_count if regime_filter else None,
+        "regime_filter": regime_filter_dict,
+        "regime_filtered_count": regime_filtered_count if regime_filter_dict else None,
         "events_measured": len(impacts),
         "events_attempted": len(event_dates),
         "events_failed": len(errors),
@@ -632,6 +700,71 @@ def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_
         )
         if contamination:
             stats["contamination_warnings"] = contamination
+
+    # Factor exposure check — is the "alpha" just a known factor in disguise?
+    if check_factors and len(symbols_seen) <= 5 and impacts:
+        try:
+            from tools.fama_french_data import compute_factor_exposure
+            all_dates_list = [i["event_date"] for i in impacts]
+            date_min = min(all_dates_list)
+            date_max = max(all_dates_list)
+            factor_exposures = {}
+            for sym in sorted(symbols_seen):
+                exp = compute_factor_exposure(sym, date_min, date_max)
+                if "error" not in exp:
+                    factor_exposures[sym] = exp
+            if factor_exposures:
+                stats["factor_exposures"] = factor_exposures
+                # Warn if alpha looks like a known factor
+                warnings = []
+                for sym, exp in factor_exposures.items():
+                    if abs(exp.get("smb_beta", 0)) > 0.4:
+                        warnings.append(f"{sym}: high size exposure (SMB beta {exp['smb_beta']})")
+                    if abs(exp.get("hml_beta", 0)) > 0.4:
+                        warnings.append(f"{sym}: high value exposure (HML beta {exp['hml_beta']})")
+                    if abs(exp.get("mom_beta", 0) or 0) > 0.4:
+                        warnings.append(f"{sym}: high momentum exposure (Mom beta {exp['mom_beta']})")
+                if warnings:
+                    stats["factor_warning"] = (
+                        "Alpha may be explained by known factors: " + "; ".join(warnings)
+                    )
+        except (ImportError, Exception) as e:
+            print(f"[measure_event_impact] factor check unavailable: {e}", file=sys.stderr)
+
+    # Seasonal headwind warning — does the trade fight historical seasonal patterns?
+    if check_seasonal and impacts:
+        try:
+            from tools.seasonal_analyzer import monthly_seasonality
+            # Check the most common event month
+            event_months = [datetime.strptime(i["event_date"], "%Y-%m-%d").month for i in impacts]
+            from collections import Counter
+            common_month = Counter(event_months).most_common(1)[0][0]
+            check_sym = symbol if symbol else sorted(symbols_seen)[0]
+            season = monthly_seasonality(check_sym, years=15)
+            if not season.empty:
+                month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+                month_name = month_names[common_month - 1]
+                row = season.loc[month_name]
+                if row["p_value"] is not None and row["p_value"] < 0.05:
+                    avg = row["mean_pct"]
+                    stats["seasonal_context"] = {
+                        "month": month_name,
+                        "historical_avg_pct": avg,
+                        "p_value": row["p_value"],
+                    }
+                    # Warn if trading against a significant seasonal pattern
+                    avg_abnormal = stats.get("avg_abnormal_5d") or stats.get("avg_abnormal_1d")
+                    if avg_abnormal is not None:
+                        trade_dir = "long" if avg_abnormal > 0 else "short"
+                        seasonal_dir = "bullish" if avg > 0 else "bearish"
+                        if (trade_dir == "long" and avg < -1) or (trade_dir == "short" and avg > 1):
+                            stats["seasonal_warning"] = (
+                                f"Trade is {trade_dir} but {month_name} is historically "
+                                f"{seasonal_dir} for {check_sym} ({avg:+.1f}%, p={row['p_value']:.3f})"
+                            )
+        except (ImportError, Exception) as e:
+            print(f"[measure_event_impact] seasonal check unavailable: {e}", file=sys.stderr)
 
     return stats
 

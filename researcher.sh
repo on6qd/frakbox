@@ -17,6 +17,7 @@ LOCKFILE="${TMPDIR:-/tmp}/research_bot_$(id -u).lock"
 SESSION_INTERVAL=900       # 15 min between research sessions
 TRADE_INTERVAL=120         # 2 min between trade loop runs
 HEALTH_INTERVAL=600        # 10 min between health checks
+EXPORT_INTERVAL=3600       # 1 hour between dashboard exports
 TICK=60                    # main loop tick (1 min)
 
 set -a; source .env; set +a
@@ -27,6 +28,7 @@ source venv/bin/activate 2>/dev/null || true
 last_trade=0
 last_health=0
 last_session=0
+last_export=0
 digest_sent=0
 
 now() { date +%s; }
@@ -164,6 +166,12 @@ while true; do
   if (( current - last_session >= SESSION_INTERVAL )); then
     run_session &
     last_session=$(now)
+  fi
+
+  # Dashboard export — every hour
+  if (( current - last_export >= EXPORT_INTERVAL )); then
+    python3 dashboard/export.py >> logs/daemon.log 2>&1 || true
+    last_export=$(now)
   fi
 
   # Daily digest — send once at 7 AM

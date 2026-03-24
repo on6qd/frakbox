@@ -10,3 +10,4 @@ data/sec_form4_cache/*.zip
 research.db
 research.db-wal
 research.db-shm
+dashboard/data/

@@ -461,6 +461,25 @@ def create_hypothesis(
         "result": None,
     }
 
+    # Auto-attach market context: macro + geopolitical + news themes (cached 12hr)
+    try:
+        from tools.market_context import get_market_context
+        ctx = get_market_context(datetime.now().strftime("%Y-%m-%d"))
+        hypothesis["market_context"] = {
+            "narrative": ctx.get("narrative"),
+            "themes": ctx.get("themes_detected"),
+            "gpr": ctx.get("gpr"),
+            "macro": ctx.get("macro"),
+        }
+        # Enrich market_regime_note with full context narrative
+        if ctx.get("narrative"):
+            hypothesis["market_regime_note"] = (
+                f"{market_regime_note} | {ctx['narrative']}"
+            )
+    except Exception as e:
+        import sys
+        print(f"[research] market context unavailable: {e}", file=sys.stderr)
+
     # Pre-registration: log prediction to SQLite BEFORE any trade
     _log_pre_registration(hypothesis)
 

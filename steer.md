@@ -7,7 +7,7 @@ The researcher will note which items it picked up.
 ## Directions
 
 ## 2026-03-23 Politician Trading Signal (RESPONDED)
-User asked: look into the relationship between the buy/sell orders of us politicians, or any legal entity they can be connected too, or relatives etc.
+User asked: look into the relationship between the buy/sell orders of us politicians, oCr any legal entity they can be connected too, or relatives etc.
 
 EXHAUSTIVELY TESTED (5 approaches, all dead ends):
 1. 2023-2026 Capitol Trades (25,493 records, all large-cap purchases): +0.20% avg, direction=44%. Effect too small, below 0.5% threshold.
