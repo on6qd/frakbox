@@ -801,7 +801,7 @@ def get_research_summary():
     direction_correct = sum(1 for h in completed if h["result"]["direction_correct"]) if completed else 0
 
     # Find best and worst performing patterns
-    reliable_patterns = [p for p in patterns if p["total_tests"] >= 3]
+    reliable_patterns = [p for p in patterns.values() if p.get("total_tests", 0) >= 3]
     reliable_patterns.sort(key=lambda p: p["reliability_score"], reverse=True)
 
     return {
