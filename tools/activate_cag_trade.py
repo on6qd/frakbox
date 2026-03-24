@@ -16,15 +16,21 @@ TRADE DETAILS:
   Take profit: 15%
 
 EARNINGS CONSENSUS (Q3 FY2026, research 2026-03-24):
-  - Consensus EPS: $0.40 (non-GAAP adjusted)
-  - 10% beat threshold: $0.44
-  - Previous Q2 FY2026 actual revenue: $2.98B (vs $3.0B estimate — miss)
-  - PEAD long: activate only if EPS >= $0.44 AND VIX < 20 (skip in tariff volatility)
+  - Consensus EPS: $0.40 (non-GAAP adjusted) | Beat threshold (+10%): $0.44
+  - Historical beat/miss (last 4Q): 50% beat rate (2/4)
+    * Q3 FY2025 (SAME QUARTER LAST YEAR): MISSED by -3.8%  ← key signal
+    * Q4 FY2025: MISSED by -6.7%
+    * Q1 FY2026: Beat +18.2%
+    * Q2 FY2026: Beat +2.3% (but revenue missed $2.98B vs $3.0B estimate)
+  - Analyst consensus: REDUCE (1 buy, 10 hold, 3 SELL). Goldman Sachs: SELL, PT=$16.
+  - FY2026 EPS guidance: $1.70-$1.85 (already cut from prior range)
+  - PEAD long: skip (analyst sentiment bearish, 50% beat rate, revenue declining)
 
 CONTEXT:
-  - CAG declined 16% (18.08->15.46) from March 10-23; near 52w low
+  - CAG fell from ~$18 post-Q2 (Dec 2025) to $15.46 now — additional 14% decline
   - Q3 FY2026 (Dec-Feb quarter) under pressure from tariffs + consumer slowdown
   - Consumer staples sector broadly weak in tariff environment
+  - Revenue declining organically -3.0% YoY; Ardent Mills JV guidance cut
   - CAG has high exposure to commodity/tariff costs
 
 WHY THIS IS STRONG:
