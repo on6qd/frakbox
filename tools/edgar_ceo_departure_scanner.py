@@ -35,7 +35,7 @@ EDGAR_SUBMISSIONS_URL = "https://data.sec.gov/submissions"
 EDGAR_COMPANY_FACTS_URL = "https://data.sec.gov/api/xbrl/companyfacts"
 
 HEADERS = {
-    "User-Agent": "financial-research-bot contact@example.com",
+    "User-Agent": "FinancialResearcher researcher@financialresearch.com",
     "Accept": "application/json"
 }
 
@@ -95,12 +95,16 @@ def search_8k_item502(start_date: str, end_date: str, max_results: int = 200) ->
                     continue
                 seen_accessions.add(accession)
 
+                # EDGAR EFTS returns display_names not entity_name
+                display_names = src.get("display_names", [])
+                company = display_names[0] if display_names else src.get("entity_name", "")
                 results.append({
-                    "company": src.get("entity_name", ""),
+                    "company": company,
                     "cik": src.get("ciks", [""])[0] if src.get("ciks") else "",
                     "filing_date": src.get("file_date", ""),
                     "accession": accession,
-                    "form_type": src.get("form_type", "8-K"),
+                    "form_type": src.get("root_forms", ["8-K"])[0] if src.get("root_forms") else "8-K",
+                    "items": src.get("items", []),
                 })
 
             time.sleep(0.5)  # Rate limiting
