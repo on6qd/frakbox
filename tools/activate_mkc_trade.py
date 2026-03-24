@@ -53,8 +53,26 @@ import trader
 import db
 
 
-MKC_52W_LOW = 53.23    # 52-week low close as of March 23, 2026
-MKC_PRIOR_CLOSE = 53.25  # Approximate prior close (March 23); update before running
+MKC_52W_LOW_HARDCODED = 52.63  # 52-week low as of March 24, 2026 (updated from 53.23)
+MKC_PRIOR_CLOSE = 53.23  # Prior close (March 23, 2026); update before running
+
+
+def get_mkc_52w_low():
+    """Fetch live 52w low dynamically; fall back to hardcoded if unavailable."""
+    try:
+        import yfinance as yf
+        info = yf.Ticker('MKC').info
+        live = info.get('fiftyTwoWeekLow')
+        if live:
+            low = min(float(live), MKC_52W_LOW_HARDCODED)
+            print(f"  52w low (live={live:.2f} hardcoded={MKC_52W_LOW_HARDCODED:.2f}) → using {low:.2f}")
+            return low
+    except Exception as e:
+        print(f"  Warning: could not fetch live 52w low: {e}")
+    return MKC_52W_LOW_HARDCODED
+
+
+MKC_52W_LOW = MKC_52W_LOW_HARDCODED  # Will be overridden at runtime by get_mkc_52w_low()
 HYPOTHESIS_ID = '85d8718c'
 POSITION_SIZE = 5000
 MIN_CATALYST_DROP_PCT = 2.0    # Minimum gap-down % from prior close (absolute, not abnormal)
@@ -125,6 +143,10 @@ def main():
     parser.add_argument('--yes', action='store_true',
                         help='Skip confirmation prompt')
     args = parser.parse_args()
+
+    # Fetch live 52w low at runtime
+    global MKC_52W_LOW
+    MKC_52W_LOW = get_mkc_52w_low()
 
     print("=" * 65)
     print("MKC EARNINGS + 52W LOW CATALYST SHORT ACTIVATION")

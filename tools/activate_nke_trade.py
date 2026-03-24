@@ -43,9 +43,27 @@ import trader
 import db
 
 
-NKE_52W_LOW = 51.97   # 52-week low close (April 8, 2025)
+NKE_52W_LOW_HARDCODED = 51.97  # 52-week low close (April 8, 2025 — within 52w window)
 HYPOTHESIS_ID = '0bc8ec49'
 POSITION_SIZE = 5000
+
+
+def get_nke_52w_low():
+    """Fetch live 52w low dynamically; use min(live, hardcoded) to always get lowest."""
+    try:
+        import yfinance as yf
+        info = yf.Ticker('NKE').info
+        live = info.get('fiftyTwoWeekLow')
+        if live:
+            low = min(float(live), NKE_52W_LOW_HARDCODED)
+            print(f"  52w low (live={live:.2f} hardcoded={NKE_52W_LOW_HARDCODED:.2f}) → using {low:.2f}")
+            return low
+    except Exception as e:
+        print(f"  Warning: could not fetch live 52w low: {e}")
+    return NKE_52W_LOW_HARDCODED
+
+
+NKE_52W_LOW = NKE_52W_LOW_HARDCODED  # Will be overridden at runtime
 
 
 def get_nke_price():
@@ -95,6 +113,10 @@ def main():
     parser.add_argument('--yes', action='store_true',
                         help='Skip confirmation prompt')
     args = parser.parse_args()
+
+    # Fetch live 52w low at runtime
+    global NKE_52W_LOW
+    NKE_52W_LOW = get_nke_52w_low()
 
     print("=" * 65)
     print("NKE EARNINGS + 52W LOW CATALYST SHORT ACTIVATION")

@@ -45,12 +45,30 @@ import trader
 import db
 
 
-CAG_52W_LOW = 15.16
-CAG_PRIOR_CLOSE = 15.46  # Update to actual March 31 close before running
+CAG_52W_LOW_HARDCODED = 15.07  # 52-week low as of March 24, 2026 (updated from 15.16)
+CAG_PRIOR_CLOSE = 15.46  # Update to actual prior close before running
 HYPOTHESIS_ID = 'f48d6a66'
 POSITION_SIZE = 5000
 MIN_CATALYST_DROP_PCT = 2.0
 MAX_CATASTROPHIC_DROP_PCT = 15.0
+
+
+def get_cag_52w_low():
+    """Fetch live 52w low dynamically; use min(live, hardcoded) to always get lowest."""
+    try:
+        import yfinance as yf
+        info = yf.Ticker('CAG').info
+        live = info.get('fiftyTwoWeekLow')
+        if live:
+            low = min(float(live), CAG_52W_LOW_HARDCODED)
+            print(f"  52w low (live={live:.2f} hardcoded={CAG_52W_LOW_HARDCODED:.2f}) → using {low:.2f}")
+            return low
+    except Exception as e:
+        print(f"  Warning: could not fetch live 52w low: {e}")
+    return CAG_52W_LOW_HARDCODED
+
+
+CAG_52W_LOW = CAG_52W_LOW_HARDCODED  # Will be overridden at runtime
 
 
 def get_cag_price():
@@ -111,6 +129,10 @@ def main():
     parser.add_argument('--prior-close', type=float, default=CAG_PRIOR_CLOSE)
     parser.add_argument('--yes', action='store_true')
     args = parser.parse_args()
+
+    # Fetch live 52w low at runtime
+    global CAG_52W_LOW
+    CAG_52W_LOW = get_cag_52w_low()
 
     print("=" * 65)
     print("CAG EARNINGS + 52W LOW CATALYST SHORT ACTIVATION")
