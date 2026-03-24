@@ -51,14 +51,14 @@ def _daemon_is_alive():
 
 
 def _last_session_time():
-    """Parse daemon.log for the most recent session start time."""
+    """Parse daemon.log for the most recent session start or heartbeat time."""
     if not DAEMON_LOG.exists():
         return None
     try:
         text = DAEMON_LOG.read_text()
-        # Match: === Session started Sat Mar 21 18:23:25 CET 2026 ===
+        # Match session starts and heartbeats (both prove daemon is active)
         matches = re.findall(
-            r"=== Session started (.+?) ===", text
+            r"=== (?:Session started|Heartbeat) (.+?) ===", text
         )
         if not matches:
             return None

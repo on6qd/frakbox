@@ -18,11 +18,9 @@ SESSION_INTERVAL=900       # 15 min between research sessions
 TRADE_INTERVAL=120         # 2 min between trade loop runs
 HEALTH_INTERVAL=600        # 10 min between health checks
 TICK=60                    # main loop tick (1 min)
-MAX_SESSIONS_PER_DAY=64
-RESEARCH_START_HOUR=21     # LLM sessions start at 9 PM local
-RESEARCH_END_HOUR=7        # LLM sessions stop at 7 AM local
 
 set -a; source .env; set +a
+MAX_SESSIONS_PER_DAY="${MAX_SESSIONS_PER_DAY:-10}"  # from .env
 source venv/bin/activate 2>/dev/null || true
 
 # Timestamps for interval tracking
@@ -69,6 +67,7 @@ run_session() {
 
   # Check daily session limit (only after acquiring lock; trap ensures cleanup)
   if ! check_daily_limit; then
+    echo "=== Heartbeat $(date) ===" >> logs/daemon.log
     return
   fi
 
@@ -161,25 +160,21 @@ while true; do
     last_health=$(now)
   fi
 
-  # Research session — every 15 min, only during night window (9 PM – 7 AM)
-  hour=$(date +%H)
-  in_window=0
-  if (( hour >= RESEARCH_START_HOUR || hour < RESEARCH_END_HOUR )); then
-    in_window=1
-    if (( current - last_session >= SESSION_INTERVAL )); then
-      run_session &
-      last_session=$(now)
-    fi
+  # Research session — every 15 min (daily limit enforced inside run_session)
+  if (( current - last_session >= SESSION_INTERVAL )); then
+    run_session &
+    last_session=$(now)
   fi
 
-  # Daily digest — send once when research window closes
-  if (( in_window == 0 && digest_sent == 0 )); then
+  # Daily digest — send once at 7 AM
+  hour=$((10#$(date +%H)))
+  if (( hour >= 7 && hour < 8 && digest_sent == 0 )); then
     echo "Sending daily digest..." >> logs/daemon.log
     python3 -c "from email_report import send_report; send_report()" >> logs/daemon.log 2>&1 || true
     digest_sent=1
   fi
-  # Reset digest flag when window opens again
-  if (( in_window == 1 )); then
+  # Reset digest flag after the window
+  if (( hour >= 8 )); then
     digest_sent=0
   fi
 
