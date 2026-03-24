@@ -93,11 +93,25 @@ def get_spy_change_pct():
 
 
 def check_capacity():
-    """Check current number of active trades."""
+    """Check active trades — uses MAX of hypothesis DB and Alpaca positions.
+
+    Bug fix: Some positions may be in Alpaca but not in hypothesis DB (e.g., CTAS).
+    Taking the max prevents silent capacity overflow.
+    """
     db.init_db()
     hypotheses = db.load_hypotheses()
-    active = [h for h in hypotheses if h.get('status') == 'active']
-    return len(active)
+    hyp_active = [h for h in hypotheses if h.get('status') == 'active']
+    hyp_count = len(hyp_active)
+    try:
+        api = trader.get_api()
+        alpaca_positions = api.list_positions()
+        alpaca_count = len(alpaca_positions)
+    except Exception:
+        alpaca_count = 0
+    count = max(hyp_count, alpaca_count)
+    if alpaca_count > hyp_count:
+        print(f'  [WARNING] Alpaca has {alpaca_count} positions but only {hyp_count} in hypothesis DB!')
+    return count
 
 
 def main():

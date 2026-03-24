@@ -66,11 +66,28 @@ def get_syk_current_price():
 
 
 def check_capacity():
-    """Check current number of active trades."""
+    """Check current number of active trades — uses MAX of hypothesis DB and Alpaca positions.
+
+    Bug fix: CTAS was in Alpaca but not in hypothesis DB, causing silent overflow.
+    We take the max to catch untracked Alpaca positions.
+    """
     db.init_db()
     hypotheses = db.load_hypotheses()
-    active = [h for h in hypotheses if h.get('status') == 'active']
-    return len(active)
+    hyp_active = [h for h in hypotheses if h.get('status') == 'active']
+    hyp_count = len(hyp_active)
+
+    # Also check actual Alpaca positions
+    try:
+        api = trader.get_api()
+        alpaca_positions = api.list_positions()
+        alpaca_count = len(alpaca_positions)
+    except Exception:
+        alpaca_count = 0
+
+    count = max(hyp_count, alpaca_count)
+    if alpaca_count > hyp_count:
+        print(f"  [WARNING] Alpaca has {alpaca_count} positions but only {hyp_count} in hypothesis DB — untracked positions detected!")
+    return count
 
 
 def main():
