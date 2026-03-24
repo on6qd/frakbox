@@ -87,6 +87,28 @@ def _extended_hours_is_available():
     return after_hours_start <= now_et <= after_hours_end
 
 
+def _trading_deadline(n_trading_days: int) -> datetime:
+    """
+    Compute the deadline as the close of market on the N-th trading day from now.
+    Uses calendar days but skips weekends so deadline doesn't fall on Sat/Sun.
+    Deadline is set to 15:55 ET on the target trading day (5 min before close).
+    """
+    ET = ZoneInfo("America/New_York")
+    now_et = datetime.now(ET)
+    trading_days = 0
+    candidate = now_et
+
+    while trading_days < n_trading_days:
+        candidate = candidate + timedelta(days=1)
+        # Skip weekends (0=Monday, 6=Sunday)
+        if candidate.weekday() < 5:
+            trading_days += 1
+
+    # Set to 15:55 ET on the target day (5 minutes before close)
+    deadline = candidate.replace(hour=15, minute=55, second=0, microsecond=0)
+    return deadline
+
+
 def _trigger_is_ready(trigger):
     """
     Check if a trigger condition is met.
@@ -246,7 +268,7 @@ def execute_pending_triggers():
                 "position_size": position_size,
                 "entry_time": datetime.now().isoformat(),
                 "order_id": result.get("order_id"),
-                "deadline": (datetime.now() + timedelta(days=h.get("expected_timeframe_days", 5))).isoformat(),
+                "deadline": _trading_deadline(h.get("expected_timeframe_days", 5)).isoformat(),
                 "stop_loss_pct": stop_loss,
                 "take_profit_pct": h.get("trigger_take_profit_pct", DEFAULT_TAKE_PROFIT_PCT),
                 "spy_at_entry": spy_price,
