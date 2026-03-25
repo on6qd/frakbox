@@ -1,37 +1,37 @@
 """
 AMT (American Tower Corp) 52-Week Low Short Trade Activation Script
 ===============================================================
-Run this at market open the day AFTER AMT first closes below $1,152.50.
+Run this at market open the day AFTER AMT first closes below $168.51.
 
 TRADE DETAILS:
   Hypothesis: db974b61 (sp500_52w_low_momentum_short, 5d hold)
-  Signal: AMT first-ever 52w low (0 crossings in 2yr history). 52w low = $1,152.50.
-  Current (March 25): $1,162.78 (+0.89% above barrier)
-  Entry: Next market open AFTER AMT closes below $1,152.50 for the first time
+  Signal: AMT first-ever 52w low (0 crossings in 2yr history). 52w low = $168.51.
+  Current (March 25): $170.36 (+1.1% above barrier)
+  Entry: Next market open AFTER AMT closes below $168.51 for the first time
   Exit: 5 trading days after entry (trade_loop auto-closes at deadline)
   Position: $5,000
   Stop loss: 8% (trade_loop enforces)
   Take profit: 10% (optional)
-  Earnings: May 5 2026 (no conflict with 5d hold)
+  Earnings: April 28 2026 (no conflict with 5d hold if entered before April 21)
 
 EXECUTION:
-  1. Monitor AMT daily closing price vs $1,152.50
-  2. When AMT closes below $1,152.50 for first time:
-     a. Run: python tools/activate_tdg_trade.py
+  1. Monitor AMT daily closing price vs $168.51
+  2. When AMT closes below $168.51 for first time:
+     a. Run: python tools/activate_amt_trade.py
      b. Script verifies AMT still below barrier at open
      c. Checks portfolio capacity < 5/5
      d. Calls research.activate_hypothesis() to record entry
      e. Places $5,000 market short order via Alpaca
 
 ABORT CONDITIONS (do NOT trade if any are true):
-  - AMT has recovered above $1,152.50 by next open (signal invalidated)
+  - AMT has recovered above $168.51 by next open (signal invalidated)
   - Portfolio at 5/5 capacity
   - Major news announced after-hours changing fundamental picture
   - Market circuit-breaker halted (VIX > 60)
   - Earnings announcement within 5 days (check for early/special reports)
 
 Usage:
-  python tools/activate_tdg_trade.py [--dry-run]
+  python tools/activate_amt_trade.py [--dry-run]
 """
 
 import sys
