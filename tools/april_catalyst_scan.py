@@ -28,7 +28,7 @@ def scan_near_lows_with_earnings(pct_threshold=5.0, earnings_months=('2026-04', 
         if ticker in ACTIVE_OR_WATCHED:
             continue
         try:
-            hist = safe_download(ticker, period='1y', interval='1d', auto_adjust=True)
+            hist = yf.Ticker(ticker).history(period='1y')
             if hist is None or len(hist) < 200:
                 continue
             close = hist['Close'].dropna()
