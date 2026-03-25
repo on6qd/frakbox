@@ -16,6 +16,7 @@ Usage:
 """
 
 import sys
+import json
 import argparse
 from pathlib import Path
 from datetime import datetime, timedelta
@@ -26,8 +27,23 @@ warnings.filterwarnings('ignore')
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-# Full S&P 500 proxy universe - major large-caps
-UNIVERSE = [
+
+def _load_full_universe():
+    """Load full S&P 500 universe from data/sp500_universe.json, with fallback."""
+    cache_file = Path(__file__).parent.parent / 'data' / 'sp500_universe.json'
+    try:
+        with open(cache_file) as f:
+            data = json.load(f)
+        tickers = data.get('tickers', [])
+        if len(tickers) >= 200:
+            return tickers
+    except Exception:
+        pass
+    return None  # Fall back to UNIVERSE constant below
+
+
+# Fallback hardcoded universe (used only if JSON file unavailable)
+_FALLBACK_UNIVERSE = [
     # Consumer Discretionary
     'HD', 'MCD', 'NKE', 'AMZN', 'TSLA', 'TGT', 'DPZ', 'CMG', 'YUM', 'HLT', 'MAR', 'LVS',
     # Consumer Staples
@@ -57,7 +73,9 @@ UNIVERSE = [
 ]
 
 # Remove duplicates
-UNIVERSE = list(dict.fromkeys(UNIVERSE))
+_FALLBACK_UNIVERSE = list(dict.fromkeys(_FALLBACK_UNIVERSE))
+# Use full universe if available, otherwise fallback
+UNIVERSE = _load_full_universe() or _FALLBACK_UNIVERSE
 
 
 def get_spy_return(date_str=None):

@@ -212,40 +212,29 @@ def main():
             print("Aborted.")
             return 0
 
-    # Activate hypothesis
-    result = research.activate_hypothesis(
+    # Step 1: Activate hypothesis (pre-registers entry price and stop)
+    research.activate_hypothesis(
         HYPOTHESIS_ID,
-        symbol='SPY',
         entry_price=entry_price,
         position_size=POSITION_SIZE,
+        vix_level=vix_close,
         stop_loss_pct=STOP_LOSS_PCT,
         take_profit_pct=TAKE_PROFIT_PCT,
-        exit_deadline=exit_date
     )
-    
-    if not result:
-        print("ERROR: activate_hypothesis() failed!")
-        return 1
-    
-    # Place order
-    api = trader.get_api()
-    shares = int(POSITION_SIZE / entry_price)
-    order = api.submit_order(
+    print(f"  Hypothesis {HYPOTHESIS_ID} activated at ${entry_price:.2f}")
+
+    # Step 2: Place order via trader.py
+    result = trader.place_experiment(
         symbol='SPY',
-        qty=shares,
-        side='buy',
-        type='market',
-        time_in_force='day'
+        direction='long',
+        notional_amount=POSITION_SIZE,
     )
-    print(f"\n✓ Order placed: BUY {shares} SPY @ market")
-    print(f"  Order ID: {order.id}")
-    print(f"  Hypothesis: {HYPOTHESIS_ID} activated")
-    
-    # Update hypothesis with exit deadline
-    db.update_hypothesis_fields(HYPOTHESIS_ID,
-        exit_deadline=exit_date,
-        stop_loss_pct=STOP_LOSS_PCT
-    )
+    if not result.get('success'):
+        print(f"ERROR placing order: {result.get('error')}")
+        print("Hypothesis was activated but order FAILED. Check Alpaca manually.")
+        return 1
+    print(f"\n✓ Order placed: BUY SPY @ market (${POSITION_SIZE:,})")
+    print(f"  Order result: {result}")
     
     return 0
 
