@@ -1,5 +1,9 @@
 const DATA = 'data/';
 let navChart = null;
+let journalData = [];
+let journalFilter = 'all';
+let journalPage = 0;
+const JOURNAL_PER_PAGE = 10;
 
 async function fetchJSON(file) {
     try {
@@ -34,6 +38,15 @@ function timeAgo(iso) {
 
 function el(id) { return document.getElementById(id); }
 
+function esc(s) {
+    if (!s) return '';
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+}
+
+// --- Renderers ---
+
 function renderMeta(meta) {
     if (!meta) return;
     el('last-updated').textContent = 'Updated ' + timeAgo(meta.exported_at);
@@ -43,20 +56,23 @@ function renderMeta(meta) {
     dot.title = meta.alpaca_connected ? 'Alpaca connected' : 'Alpaca disconnected';
 }
 
-function renderFund(fund) {
+function renderFund(fund, research) {
     if (!fund) return;
 
     // Hero metrics
-    const eq = fund.current?.equity;
-    el('nav-value').textContent = fmt$(eq);
+    el('nav-value').textContent = fmt$(fund.current?.equity);
 
     const ret = fund.performance?.total_return_pct;
     const retEl = el('total-return');
     retEl.textContent = ret != null ? fmtPct(ret) : '--';
     if (ret != null) retEl.className = 'metric-value ' + (ret >= 0 ? 'positive' : 'negative');
 
-    const dd = fund.performance?.max_drawdown_pct;
-    el('max-drawdown').textContent = dd != null ? dd.toFixed(1) + '%' : '--';
+    // Hypotheses tested = signals + dead ends
+    const k = research?.knowledge;
+    if (k) {
+        const tested = (k.signal_count || 0) + (k.dead_end_count || 0);
+        el('hypotheses-tested').textContent = tested;
+    }
 
     const wr = fund.performance?.win_rate_pct;
     el('win-rate').textContent = wr != null ? wr.toFixed(0) + '%' : '--';
@@ -87,12 +103,10 @@ function renderFund(fund) {
 function renderChart(history) {
     if (!history.length) return;
     const ctx = el('nav-chart').getContext('2d');
-
     const labels = history.map(p => p.date);
     const data = history.map(p => p.equity);
 
     if (navChart) navChart.destroy();
-
     navChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -113,11 +127,7 @@ function renderChart(history) {
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: ctx => '$' + ctx.parsed.y.toLocaleString(),
-                    }
-                }
+                tooltip: { callbacks: { label: ctx => '$' + ctx.parsed.y.toLocaleString() } }
             },
             scales: {
                 x: {
@@ -127,8 +137,7 @@ function renderChart(history) {
                 y: {
                     grid: { color: 'rgba(255,255,255,0.04)' },
                     ticks: {
-                        color: '#6b6b80',
-                        font: { size: 11 },
+                        color: '#6b6b80', font: { size: 11 },
                         callback: v => '$' + (v / 1000).toFixed(0) + 'k'
                     }
                 }
@@ -137,12 +146,51 @@ function renderChart(history) {
     });
 }
 
-function renderPositions(pos) {
-    if (!pos) return;
+function renderKnowledge(res) {
+    if (!res) return;
+    const k = res.knowledge || {};
 
-    // Active
+    el('k-signals').textContent = k.signal_count ?? 0;
+    el('k-dead-ends').textContent = k.dead_end_count ?? 0;
+    el('k-literature').textContent = k.literature_count ?? 0;
+
+    // Working signals
+    const sigEl = el('signals-list');
+    if (k.signals?.length) {
+        sigEl.innerHTML = k.signals.map(s => `
+            <div class="knowledge-item">
+                <div class="name">${esc(s.name.replace(/_/g, ' '))}</div>
+                <div class="detail">${s.magnitude_pct != null ? fmtPct(s.magnitude_pct) + ' avg' : s.status}</div>
+            </div>
+        `).join('');
+    } else {
+        sigEl.innerHTML = '<p class="muted">None yet</p>';
+    }
+
+    // Dead ends — show last 8
+    const deEl = el('dead-ends-list');
+    if (k.dead_ends?.length) {
+        const recent = k.dead_ends.slice(-8);
+        const remaining = k.dead_ends.length - recent.length;
+        let html = recent.map(d => `
+            <div class="knowledge-item">
+                <div class="name">${esc(d.name.replace(/_/g, ' '))}</div>
+                <div class="detail">${esc(d.reason)}</div>
+            </div>
+        `).join('');
+        if (remaining > 0) {
+            html += `<p class="muted">+ ${remaining} more</p>`;
+        }
+        deEl.innerHTML = html;
+    } else {
+        deEl.innerHTML = '<p class="muted">None yet</p>';
+    }
+}
+
+function renderActiveNow(pos, res) {
+    // Active positions
     const activeEl = el('active-positions');
-    if (!pos.active?.length) {
+    if (!pos?.active?.length) {
         activeEl.innerHTML = '<p class="muted">No active positions</p>';
     } else {
         activeEl.innerHTML = pos.active.map(p => `
@@ -154,9 +202,72 @@ function renderPositions(pos) {
         `).join('');
     }
 
-    // Recent closed
+    // Today's research — most recent journal entries from today
+    const todayEl = el('todays-research');
+    const today = new Date().toISOString().slice(0, 10);
+    const todayEntries = (res?.journal || []).filter(j => j.date === today);
+    if (todayEntries.length) {
+        const latest = todayEntries[todayEntries.length - 1];
+        todayEl.innerHTML = `
+            <div class="today-focus">
+                <div class="today-investigated">${esc(latest.investigated)}</div>
+                <div class="today-findings">${esc(latest.findings)}</div>
+            </div>
+            <div class="muted" style="margin-top:6px">${todayEntries.length} session${todayEntries.length > 1 ? 's' : ''} today</div>
+        `;
+    } else {
+        todayEl.innerHTML = '<p class="muted">No sessions today</p>';
+    }
+}
+
+function renderPipeline(res) {
+    const p = res?.pipeline;
+    if (!p) return;
+
+    // Watchlist
+    const wEl = el('watchlist');
+    if (p.watchlist?.length) {
+        wEl.innerHTML = p.watchlist.map(w => `
+            <div class="pipeline-item">
+                <span class="pip-date">${esc(w.date)}</span>
+                <span class="pip-symbol">${esc(w.symbol)}</span>
+                <span class="pip-desc">${esc(w.event.slice(0, 80))}</span>
+            </div>
+        `).join('');
+    } else {
+        wEl.innerHTML = '<p class="muted">Nothing on watch</p>';
+    }
+
+    // Pending triggers
+    const tEl = el('pending-triggers');
+    if (p.pending_triggers?.length) {
+        tEl.innerHTML = p.pending_triggers.map(t => `
+            <div class="pipeline-item">
+                <span class="pip-symbol">${esc(t.symbol)}</span>
+                <span class="direction ${t.direction}">${t.direction}</span>
+                <span class="pip-desc">${esc(t.event_type)}</span>
+            </div>
+        `).join('');
+    } else {
+        tEl.innerHTML = '<p class="muted">No queued trades</p>';
+    }
+
+    // Research queue
+    const rEl = el('research-queue');
+    if (p.research_queue?.length) {
+        rEl.innerHTML = p.research_queue.map(q => `
+            <div class="pipeline-item">
+                <span class="pip-desc">${esc(q.question.slice(0, 120))}</span>
+            </div>
+        `).join('');
+    } else {
+        rEl.innerHTML = '<p class="muted">Queue empty</p>';
+    }
+}
+
+function renderRecentTrades(pos) {
     const closedEl = el('recent-trades');
-    if (!pos.recent_closed?.length) {
+    if (!pos?.recent_closed?.length) {
         closedEl.innerHTML = '<p class="muted">No completed trades</p>';
     } else {
         closedEl.innerHTML = pos.recent_closed.map(p => {
@@ -174,66 +285,86 @@ function renderPositions(pos) {
     }
 }
 
-function renderResearch(res) {
-    if (!res) return;
+// --- Journal with pagination and filters ---
 
-    const s = res.summary || {};
-    el('res-hypotheses').textContent = s.total_hypotheses ?? '--';
-    el('res-active').textContent = s.active ?? '--';
-    el('res-completed').textContent = s.completed ?? '--';
+const TAG_LABELS = {
+    discovery: 'Discovery',
+    dead_end: 'Dead End',
+    validation: 'Validation',
+    exploration: 'Exploration',
+    operational: 'Operational',
+    infrastructure: 'Infrastructure',
+};
+const TAG_CLASSES = {
+    discovery: 'tag-discovery',
+    dead_end: 'tag-dead-end',
+    validation: 'tag-validation',
+    exploration: 'tag-exploration',
+    operational: 'tag-operational',
+    infrastructure: 'tag-infrastructure',
+};
 
-    const k = res.knowledge || {};
-    el('res-signals').textContent = k.signal_count ?? '--';
-    el('res-dead-ends').textContent = k.dead_end_count ?? '--';
-    el('res-sessions').textContent = res.activity?.sessions_today ?? '--';
+function getFilteredJournal() {
+    if (journalFilter === 'all') return journalData;
+    return journalData.filter(j => j.tag === journalFilter);
+}
 
-    // Signals list
-    const sigEl = el('signals-list');
-    if (k.signals?.length) {
-        sigEl.innerHTML = k.signals.map(s => `
-            <div class="knowledge-item">
-                <div class="name">${esc(s.name.replace(/_/g, ' '))}</div>
-                <div class="detail">${s.magnitude_pct != null ? fmtPct(s.magnitude_pct) + ' avg' : s.status}</div>
-            </div>
-        `).join('');
-    } else {
-        sigEl.innerHTML = '<p class="muted">None yet</p>';
-    }
-
-    // Dead ends list
-    const deEl = el('dead-ends-list');
-    if (k.dead_ends?.length) {
-        deEl.innerHTML = k.dead_ends.map(d => `
-            <div class="knowledge-item">
-                <div class="name">${esc(d.name.replace(/_/g, ' '))}</div>
-                <div class="detail">${esc(d.reason)}</div>
-            </div>
-        `).join('');
-    } else {
-        deEl.innerHTML = '<p class="muted">None yet</p>';
-    }
-
-    // Journal
+function renderJournalPage() {
+    const filtered = getFilteredJournal();
     const jEl = el('journal-list');
-    if (res.journal?.length) {
-        jEl.innerHTML = res.journal.map(j => `
-            <div class="journal-entry">
-                <div class="date">${esc(j.date)}</div>
-                <div class="investigated">${esc(j.investigated)}</div>
-                <div class="findings">${esc(j.findings)}</div>
-            </div>
-        `).join('');
+    const total = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(total / JOURNAL_PER_PAGE));
+    journalPage = Math.min(journalPage, totalPages - 1);
+    const start = journalPage * JOURNAL_PER_PAGE;
+    const page = filtered.slice(start, start + JOURNAL_PER_PAGE);
+
+    if (!total) {
+        jEl.innerHTML = '<p class="muted">No entries match this filter</p>';
     } else {
-        jEl.innerHTML = '<p class="muted">No journal entries</p>';
+        jEl.innerHTML = page.map(j => {
+            const tag = j.tag || 'exploration';
+            const borderClass = TAG_CLASSES[tag] || 'tag-exploration';
+            return `
+                <div class="journal-entry ${borderClass}">
+                    <div class="journal-header">
+                        <span class="date">${esc(j.date)}</span>
+                        <span class="tag-badge ${borderClass}">${TAG_LABELS[tag] || tag}</span>
+                    </div>
+                    <div class="investigated">${esc(j.investigated)}</div>
+                    <div class="findings">${esc(j.findings)}</div>
+                </div>
+            `;
+        }).join('');
     }
+
+    el('journal-prev').disabled = journalPage <= 0;
+    el('journal-next').disabled = journalPage >= totalPages - 1;
+    el('journal-page-info').textContent = `Page ${journalPage + 1} of ${totalPages} (${total} entries)`;
 }
 
-function esc(s) {
-    if (!s) return '';
-    const d = document.createElement('div');
-    d.textContent = s;
-    return d.innerHTML;
+function initJournal(res) {
+    journalData = (res?.journal || []).slice().reverse();  // newest first
+    journalPage = 0;
+    journalFilter = 'all';
+    renderJournalPage();
+
+    // Pagination buttons
+    el('journal-prev').onclick = () => { journalPage--; renderJournalPage(); };
+    el('journal-next').onclick = () => { journalPage++; renderJournalPage(); };
+
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            journalFilter = btn.dataset.filter;
+            journalPage = 0;
+            renderJournalPage();
+        });
+    });
 }
+
+// --- Load ---
 
 async function load() {
     const [fund, positions, research, meta] = await Promise.all([
@@ -244,9 +375,12 @@ async function load() {
     ]);
 
     renderMeta(meta);
-    renderFund(fund);
-    renderPositions(positions);
-    renderResearch(research);
+    renderFund(fund, research);
+    renderKnowledge(research);
+    renderActiveNow(positions, research);
+    renderPipeline(research);
+    renderRecentTrades(positions);
+    initJournal(research);
 }
 
 // Initial load + auto-refresh every 5 min

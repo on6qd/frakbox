@@ -3,9 +3,12 @@
 
 import json
 import os
+import shutil
+import subprocess
 import sys
 import tempfile
 from datetime import datetime, timedelta
+from pathlib import Path
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -165,8 +168,75 @@ def export_positions():
     _atomic_write(os.path.join(DATA_DIR, "positions.json"), data)
 
 
+def _classify_journal_entry(j):
+    """Classify a journal entry by what the session accomplished.
+
+    Tags reflect the research lifecycle:
+    - discovery:      found a new tradeable signal
+    - dead_end:       conclusively rejected a hypothesis
+    - validation:     OOS or live validation of existing signal
+    - exploration:    early investigation, data gathering, literature
+    - operational:    trade execution, monitoring, scanner checks
+    - infrastructure: tool building, bug fixes, methodology improvements
+    """
+    findings = (j.get("findings") or "").upper()
+    public = (j.get("public_summary") or "").upper()
+    text = findings + " " + public
+    session = (j.get("session_type") or "").lower()
+
+    dead_markers = ["DEAD END", "DEAD_END", "NO SIGNAL", "NULL RESULT",
+                    "FAILS MULTIPLE TESTING", "NO EDGE"]
+
+    discovery_markers = ["HYPOTHESIS CREATED", "FORMALIZED",
+                         "SIGNAL VALIDATED", "PASSES MULTIPLE TESTING"]
+
+    validation_markers = ["OOS PASS", "LIVE VALIDATION", "OOS CONFIRMED",
+                          "OOS VALIDATION"]
+    validation_sessions = ["backtest_validation", "oos_validation",
+                           "signal_validation", "oos_measurement",
+                           "oos_tracking_setup"]
+
+    exploration_sessions = ["feasibility_study", "literature_review",
+                            "signal_discovery", "exploratory_research",
+                            "data_collection", "signal_research",
+                            "signal_testing", "hypothesis_testing",
+                            "regime_analysis", "backtest", "backtest_expansion",
+                            "mechanism_testing", "signal_investigation"]
+
+    infra_sessions = ["infrastructure", "tool_build", "maintenance",
+                      "friction_fix"]
+
+    ops_sessions = ["trade_management", "trade_monitoring", "monitoring",
+                    "status_check", "operational_scan", "trade_setup",
+                    "trade_status"]
+
+    has_dead = any(m in text for m in dead_markers)
+    has_discovery = any(m in text for m in discovery_markers)
+    has_validation = (any(m in text for m in validation_markers)
+                      or any(s in session for s in validation_sessions))
+    is_exploration = any(s in session for s in exploration_sessions)
+    is_infra = any(s in session for s in infra_sessions)
+    is_ops = any(s in session for s in ops_sessions)
+
+    # Priority: dead_end > discovery > validation > ops > infra > exploration
+    if has_dead and not has_discovery:
+        return "dead_end"
+    if has_discovery and not has_dead:
+        return "discovery"
+    if has_validation and not has_dead:
+        return "validation"
+    if is_ops:
+        return "operational"
+    if is_infra:
+        return "infrastructure"
+    if is_exploration:
+        return "exploration"
+    # Default: most sessions are exploration
+    return "exploration"
+
+
 def export_research():
-    """Build research.json: hypothesis stats, knowledge, journal, activity."""
+    """Build research.json: hypothesis stats, knowledge, journal, activity, pipeline."""
     import research
 
     data = {}
@@ -174,15 +244,18 @@ def export_research():
     # Summary stats
     data["summary"] = research.get_research_summary()
 
-    # Knowledge base — names and counts only
+    # Knowledge base — filter to meaningful signals only
     kb = db.load_knowledge()
     signals = []
     for name, effect in kb.get("known_effects", {}).items():
-        signals.append({
-            "name": name,
-            "status": effect.get("status", "unknown"),
-            "magnitude_pct": effect.get("avg_magnitude_pct"),
-        })
+        status = effect.get("status", "unknown")
+        mag = effect.get("avg_magnitude_pct")
+        if status in ("strong", "moderate") or mag is not None:
+            signals.append({
+                "name": name,
+                "status": status,
+                "magnitude_pct": mag,
+            })
     dead_ends = []
     for de in kb.get("dead_ends", []):
         dead_ends.append({
@@ -215,18 +288,86 @@ def export_research():
         "sessions_by_day": sessions_by_day,
     }
 
-    # Journal — last 10 entries
-    journal = db.get_recent_journal(10)
+    # Journal — all entries, using public_summary when available
+    journal = db.get_recent_journal(9999)
     data["journal"] = [
         {
             "date": j.get("date", ""),
             "investigated": j.get("investigated", ""),
-            "findings": j.get("findings", ""),
+            "findings": j.get("public_summary") or j.get("findings", "")[:200],
+            "tag": _classify_journal_entry(j),
         }
         for j in journal
     ]
 
+    # Pipeline — what's coming next
+    data["pipeline"] = _build_pipeline()
+
     _atomic_write(os.path.join(DATA_DIR, "research.json"), data)
+
+
+def _build_pipeline():
+    """Build the pipeline section: watchlist events, pending triggers, research queue."""
+    conn = db.get_db()
+    pipeline = {}
+
+    # Upcoming watchlist events (next 30 days, sorted by date)
+    cutoff = (datetime.now() + timedelta(days=30)).strftime("%Y-%m-%d")
+    rows = conn.execute(
+        "SELECT event, expected_date, symbol, status FROM event_watchlist "
+        "WHERE status = 'watching' AND expected_date <= ? "
+        "ORDER BY expected_date LIMIT 15",
+        (cutoff,)
+    ).fetchall()
+    pipeline["watchlist"] = [
+        {"event": r[0][:120], "date": r[1], "symbol": r[2]}
+        for r in rows
+    ]
+
+    # Pending triggers — trades queued to auto-execute
+    pending_with_triggers = [
+        h for h in db.get_hypotheses_by_status("pending")
+        if h.get("trigger")
+    ]
+    pipeline["pending_triggers"] = [
+        {
+            "symbol": h.get("expected_symbol", ""),
+            "direction": h.get("expected_direction", ""),
+            "trigger": h.get("trigger", ""),
+            "event_type": (h.get("event_type") or "").replace("_", " "),
+        }
+        for h in pending_with_triggers[:10]
+    ]
+
+    # Top research questions
+    rows = conn.execute(
+        "SELECT question, priority, category FROM research_queue "
+        "WHERE status = 'pending' ORDER BY priority DESC LIMIT 5"
+    ).fetchall()
+    pipeline["research_queue"] = [
+        {"question": r[0][:150], "priority": r[1], "category": r[2]}
+        for r in rows
+    ]
+
+    # Session handoff — agent's own "what to do next"
+    row = conn.execute(
+        "SELECT data FROM session_handoff ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    if row:
+        handoff_raw = row[0]
+        # Extract key upcoming dates section if present
+        try:
+            handoff = json.loads(handoff_raw) if handoff_raw.startswith("{") else handoff_raw
+        except (json.JSONDecodeError, AttributeError):
+            handoff = handoff_raw
+        if isinstance(handoff, str) and len(handoff) > 500:
+            # Trim to the most useful part
+            handoff = handoff[:500]
+        pipeline["handoff"] = handoff
+    else:
+        pipeline["handoff"] = None
+
+    return pipeline
 
 
 def export_meta(alpaca_ok):
@@ -234,9 +375,59 @@ def export_meta(alpaca_ok):
     data = {
         "exported_at": datetime.now().isoformat(),
         "alpaca_connected": alpaca_ok,
-        "export_version": 1,
+        "export_version": 2,
     }
     _atomic_write(os.path.join(DATA_DIR, "meta.json"), data)
+
+
+PUBLIC_REPO = Path.home() / "Bots" / "frakbox.io"
+DASHBOARD_DIR = Path(__file__).parent
+
+
+def sync_to_public_repo():
+    """Copy static files + data to the public GitHub Pages repo and push."""
+    if not PUBLIC_REPO.exists():
+        print("[export] Public repo not found at {PUBLIC_REPO}, skipping sync", file=sys.stderr)
+        return
+    try:
+        # Static files (only if changed)
+        for f in ("index.html", "style.css", "app.js"):
+            src = DASHBOARD_DIR / f
+            dst = PUBLIC_REPO / f
+            if src.exists():
+                shutil.copy2(src, dst)
+
+        # Data files
+        dst_data = PUBLIC_REPO / "data"
+        dst_data.mkdir(exist_ok=True)
+        for f in Path(DATA_DIR).glob("*.json"):
+            shutil.copy2(f, dst_data / f.name)
+
+        # CNAME for custom domain
+        cname = PUBLIC_REPO / "CNAME"
+        if not cname.exists():
+            cname.write_text("dashboard.frakbox.io\n")
+
+        # Git add, commit, push (skip if nothing changed)
+        subprocess.run(["git", "add", "-A"], cwd=PUBLIC_REPO, capture_output=True)
+        result = subprocess.run(
+            ["git", "diff", "--cached", "--quiet"],
+            cwd=PUBLIC_REPO, capture_output=True,
+        )
+        if result.returncode != 0:  # there are staged changes
+            subprocess.run(
+                ["git", "commit", "-m", f"data update {datetime.now().strftime('%Y-%m-%d %H:%M')}"],
+                cwd=PUBLIC_REPO, capture_output=True,
+            )
+            subprocess.run(
+                ["git", "push"],
+                cwd=PUBLIC_REPO, capture_output=True, timeout=30,
+            )
+            print("[export] Pushed to public repo")
+        else:
+            print("[export] No changes to push")
+    except Exception as e:
+        print(f"[export] Sync failed: {e}", file=sys.stderr)
 
 
 def backfill_nav():
@@ -279,6 +470,7 @@ def main():
         print(f"[export] research.json failed: {e}", file=sys.stderr)
 
     export_meta(alpaca_ok)
+    sync_to_public_repo()
     print(f"[export] Done at {datetime.now().strftime('%H:%M:%S')}")
 
 

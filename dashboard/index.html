@@ -31,8 +31,8 @@
                 <div class="metric-value" id="total-return">--</div>
             </div>
             <div class="metric-card">
-                <div class="metric-label">Max Drawdown</div>
-                <div class="metric-value" id="max-drawdown">--</div>
+                <div class="metric-label">Hypotheses Tested</div>
+                <div class="metric-value" id="hypotheses-tested">--</div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Win Rate</div>
@@ -46,7 +46,83 @@
             <canvas id="nav-chart"></canvas>
         </section>
 
-        <!-- Two-column: Risk + Performance -->
+        <!-- What the Agent Knows -->
+        <section class="card">
+            <h2>What it Knows</h2>
+            <div class="knowledge-stats" id="knowledge-stats">
+                <span class="knowledge-stat"><strong id="k-signals">--</strong> working signals</span>
+                <span class="knowledge-stat"><strong id="k-dead-ends">--</strong> dead ends</span>
+                <span class="knowledge-stat"><strong id="k-literature">--</strong> papers reviewed</span>
+            </div>
+            <div class="two-col-inner">
+                <div>
+                    <h3>Working Signals</h3>
+                    <div id="signals-list" class="knowledge-list">
+                        <p class="muted">Loading...</p>
+                    </div>
+                </div>
+                <div>
+                    <h3>Recent Dead Ends</h3>
+                    <div id="dead-ends-list" class="knowledge-list">
+                        <p class="muted">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- What It's Doing Now -->
+        <section class="card">
+            <h2>What it's Doing Now</h2>
+            <div class="now-grid">
+                <div>
+                    <h3>Active Trades</h3>
+                    <div id="active-positions" class="position-list">
+                        <p class="muted">Loading...</p>
+                    </div>
+                </div>
+                <div>
+                    <h3>Today's Research</h3>
+                    <div id="todays-research" class="muted">
+                        Loading...
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- What's Coming Next -->
+        <section class="card">
+            <h2>What's Next</h2>
+            <div class="pipeline-grid">
+                <div>
+                    <h3>Upcoming Events</h3>
+                    <div id="watchlist" class="pipeline-list">
+                        <p class="muted">Loading...</p>
+                    </div>
+                </div>
+                <div>
+                    <h3>Queued Trades</h3>
+                    <div id="pending-triggers" class="pipeline-list">
+                        <p class="muted">Loading...</p>
+                    </div>
+                </div>
+                <div>
+                    <h3>Research Queue</h3>
+                    <div id="research-queue" class="pipeline-list">
+                        <p class="muted">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Trades -->
+        <section class="card">
+            <h2>Recent Trades</h2>
+            <div id="recent-trades" class="position-list">
+                <p class="muted">Loading...</p>
+            </div>
+        </section>
+
+        <!-- Risk + Performance -->
         <section class="two-col">
             <div class="card">
                 <h2>Risk Status</h2>
@@ -68,55 +144,24 @@
             </div>
         </section>
 
-        <!-- Positions -->
-        <section class="card">
-            <h2>Current Positions</h2>
-            <div id="active-positions" class="position-list">
-                <p class="muted">Loading...</p>
-            </div>
-        </section>
-
-        <section class="card">
-            <h2>Recent Trades</h2>
-            <div id="recent-trades" class="position-list">
-                <p class="muted">Loading...</p>
-            </div>
-        </section>
-
-        <!-- Research Activity -->
-        <section class="card">
-            <h2>Research Activity</h2>
-            <div class="stat-grid wide" id="research-stats">
-                <div class="stat"><span class="stat-label">Hypotheses</span><span class="stat-value" id="res-hypotheses">--</span></div>
-                <div class="stat"><span class="stat-label">Active</span><span class="stat-value" id="res-active">--</span></div>
-                <div class="stat"><span class="stat-label">Completed</span><span class="stat-value" id="res-completed">--</span></div>
-                <div class="stat"><span class="stat-label">Signals</span><span class="stat-value" id="res-signals">--</span></div>
-                <div class="stat"><span class="stat-label">Dead Ends</span><span class="stat-value" id="res-dead-ends">--</span></div>
-                <div class="stat"><span class="stat-label">Sessions Today</span><span class="stat-value" id="res-sessions">--</span></div>
-            </div>
-        </section>
-
-        <!-- Knowledge Base -->
-        <section class="two-col">
-            <div class="card">
-                <h2>Validated Signals</h2>
-                <div id="signals-list" class="knowledge-list">
-                    <p class="muted">Loading...</p>
-                </div>
-            </div>
-            <div class="card">
-                <h2>Dead Ends</h2>
-                <div id="dead-ends-list" class="knowledge-list">
-                    <p class="muted">Loading...</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Journal -->
+        <!-- Research Journal -->
         <section class="card">
             <h2>Research Journal</h2>
+            <div class="journal-filters" id="journal-filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="discovery">Discoveries</button>
+                <button class="filter-btn" data-filter="dead_end">Dead Ends</button>
+                <button class="filter-btn" data-filter="validation">Validation</button>
+                <button class="filter-btn" data-filter="exploration">Exploration</button>
+                <button class="filter-btn" data-filter="operational">Operational</button>
+            </div>
             <div id="journal-list" class="journal">
                 <p class="muted">Loading...</p>
+            </div>
+            <div class="journal-pagination" id="journal-pagination">
+                <button id="journal-prev" disabled>&laquo; Previous</button>
+                <span id="journal-page-info" class="muted"></span>
+                <button id="journal-next" disabled>Next &raquo;</button>
             </div>
         </section>
     </main>
