@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+"""Activate OTIS catalyst_short when OTIS closes below 52w low ($77.80) and earnings miss.
+Pre-registered hypothesis: dbedf16e
+Trigger: OTIS closes below $77.80 AND abnormal return < -2% on earnings day (April 22)
+"""
+import sys
+sys.path.insert(0, '/Users/frakbox/Bots/financial_researcher')
+import db
+import trader
+
+db.init_db()
+
+hypothesis_id = 'dbedf16e'
+symbol = 'OTIS'
+entry_52w_low = 77.80
+
+# Set trigger fields
+db.update_hypothesis_fields(hypothesis_id,
+    trigger="next_market_open",
+    trigger_position_size=5000,
+    trigger_stop_loss_pct=8,
+    trigger_take_profit_pct=None,
+    trigger_notes=f"OTIS closed below 52w low ({entry_52w_low}) AND earnings miss (>2% abnormal decline). Signal: sp500_52w_low_catalyst_short. Deadline: 5 trading days from activation."
+)
+
+print(f"Trigger set for OTIS ({hypothesis_id}). Running activation...")
+result = trader.activate_hypothesis(hypothesis_id)
+print("Result:", result)
