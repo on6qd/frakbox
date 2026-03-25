@@ -88,7 +88,7 @@ You have ~50 minutes. Commit to git after each significant finding.
 
 Do the work. When done:
 1. Update research_queue with handoff for the next session
-2. Log journal entry: db.append_journal_entry(date, type, investigated, findings, surprised_by, next_step)
+2. Log journal entry: db.append_journal_entry(date, type, investigated, findings, surprised_by, next_step, public_summary="1-2 plain-English sentences summarizing what you found, for a public audience. No jargon, no IDs, no filenames.")
 3. Commit to git
 PROMPT
   )

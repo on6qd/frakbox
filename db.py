@@ -181,7 +181,8 @@ CREATE TABLE IF NOT EXISTS research_journal (
     findings TEXT,
     surprised_by TEXT,
     next_step TEXT,
-    category TEXT
+    category TEXT,
+    public_summary TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_journal_date ON research_journal(date);
 
@@ -940,14 +941,22 @@ def migrate_from_json(base_dir=None):
 # ---------------------------------------------------------------------------
 
 def append_journal_entry(date, session_type, investigated, findings,
-                         surprised_by=None, next_step=None, category=None):
-    """Append one research journal entry. Returns the row id."""
+                         surprised_by=None, next_step=None, category=None,
+                         public_summary=None):
+    """Append one research journal entry. Returns the row id.
+
+    Args:
+        public_summary: 1-2 sentence plain-English summary for the public dashboard.
+            Should be jargon-free, no IDs, no file names, no ALL CAPS labels.
+    """
     conn = get_db()
     init_db()
     cur = conn.execute(
-        "INSERT INTO research_journal (date, session_type, investigated, findings, surprised_by, next_step, category) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?)",
-        (date, session_type, investigated, findings, surprised_by, next_step, category),
+        "INSERT INTO research_journal (date, session_type, investigated, findings, "
+        "surprised_by, next_step, category, public_summary) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (date, session_type, investigated, findings, surprised_by, next_step,
+         category, public_summary),
     )
     conn.commit()
     return cur.lastrowid

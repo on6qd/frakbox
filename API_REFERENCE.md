@@ -132,7 +132,7 @@ self_review.compute_confidence_score(sample_size, consistency_pct, avg_return, s
 db.update_hypothesis_fields(hypothesis_id, trigger="next_market_open", trigger_stop_loss_pct=10)
 
 # Journal and friction (all data is in SQLite — no JSONL files)
-db.append_journal_entry(date, session_type, investigated, findings, surprised_by, next_step)
+db.append_journal_entry(date, session_type, investigated, findings, surprised_by, next_step, public_summary="1-2 plain-English sentences for dashboard")
 db.append_friction(date, category, description, turns_wasted=0, potential_fix=None)
 db.get_recent_journal(n=5)         # list of dicts, chronological
 db.get_friction_summary(top_n=3)   # [{category, count, latest_description}]
