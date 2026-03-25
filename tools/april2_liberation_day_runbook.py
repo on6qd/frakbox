@@ -158,6 +158,31 @@ def check_conditions():
         if vix_close:
             print(f"\n✗ VIX long NOT triggered (VIX={vix_close:.1f}, need >30)")
 
+    # --- WFC Tariff Short (NEW 2026-03-26) ---
+    print()
+    print("=" * 70)
+    print("WFC TARIFF BANK SHORT SIGNAL (hypothesis b73efac3)")
+    print("=" * 70)
+    print("Signal: WFC underperforms SPY -2.39% avg over 5 days after major tariff events")
+    print("  n=8, direction=88%, p=0.0045. Validated 2018-2025.")
+    print()
+    wfc_condition = spy_condition  # tariff shock = SPY down
+    if spy_pct is not None:
+        large_tariff = True  # Set manually based on news: is announcement >15% reciprocal?
+        print(f"  SPY return today: {spy_pct:.2f}%")
+        print(f"  SPY down condition: {'✓' if spy_condition else '✗'}")
+    print()
+    print("  CHECK MANUALLY: Was tariff announcement >15% universal/reciprocal?")
+    print("  ONE MISS: 2025-02-01 (+0.5% abnormal when market rallied after announcement)")
+    print("  → If SPY is UP: probably don't activate (market not pricing shock)")
+    print()
+    if spy_condition:
+        print("  ✓ SPY is DOWN → Conditions favor WFC short activation")
+        print("  → Run April 3 at market open:")
+        print("     python tools/activate_wfc_tariff_trade.py --yes")
+    else:
+        print("  ✗ SPY is UP → Caution: WFC short may not work (see 2025-02-01 miss)")
+
     # --- Other Pending Signals ---
     print()
     print("=" * 70)
