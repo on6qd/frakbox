@@ -117,15 +117,27 @@ def check_conditions():
         print("🚨 SYSTEMIC 52W LOW SHORT SIGNAL FIRES!")
         print("   → Run tomorrow morning (April 3) at 9:30 AM:")
         print()
+        print("   PRE-REGISTERED CANDIDATES (use these first):")
+        print("   1. ADBE ($98B, hypothesis f93527a2) — PRIMARY CANDIDATE")
+        print("      python tools/activate_adbe_trade.py --yes")
+        print("   2. Any other large-cap at 52w low (hypothesis f055dc19):")
         # Sort by market cap (rough proxy: just list all)
-        n_to_trade = min(available_slots, len(stocks_at_low))
-        print(f"   Short top {n_to_trade} stocks (by market cap, check before running):")
-        for ticker in stocks_at_low[:n_to_trade]:
-            print(f"   python tools/activate_systemic_short.py --ticker {ticker} --yes")
+        candidates = ['GIS', 'SBAC', 'DPZ', 'OTIS', 'BSX', 'TAP']
+        if stocks_at_low:
+            # Show scanner results + known candidates
+            combined = list(dict.fromkeys(stocks_at_low + candidates))
+        else:
+            combined = candidates
+        n_to_trade = min(available_slots - 1, len(combined))  # -1 because ADBE takes one slot
+        print(f"      python tools/activate_systemic_short.py --ticker <TICKER> --yes")
+        print(f"      Best candidates (pre-screened, verify still at 52w low):")
+        for ticker in combined[:n_to_trade]:
+            print(f"      - {ticker}")
         print()
         print("   Expected: -1.88% abnormal over 5 days each")
-        print("   IMPORTANT: Check that each stock is LARGE-CAP (>$2B) and liquid")
+        print("   IMPORTANT: Check each stock is STILL at/below 52w low at April 3 open")
         print("   NOTE: Can short multiple stocks if portfolio capacity allows")
+        print("   CAPACITY CHECK: If MKC+NKE+CAG+VGNT all active = 4/5. Can add ADBE only.")
     else:
         print("✗ Systemic short signal NOT triggered")
         if not spy_condition:
