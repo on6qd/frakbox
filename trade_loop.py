@@ -341,10 +341,23 @@ def reconcile_positions():
         if symbol not in positions:
             warnings.append(f"Orphan hypothesis: {hyp_id[:8]} expects {symbol} but no Alpaca position found")
 
-    # Positions with no matching hypothesis
+    # Positions with no matching hypothesis — auto-close when market is open
     for symbol in positions:
         if symbol not in active_symbols:
-            warnings.append(f"Orphan position: {symbol} in Alpaca but no active hypothesis tracks it")
+            if _market_is_open():
+                # Auto-close orphan positions to prevent capacity blockage
+                print(f"[RECONCILE] Auto-closing orphan position: {symbol}")
+                try:
+                    from trader import close_position
+                    result = close_position(symbol)
+                    if result.get("success"):
+                        warnings.append(f"AUTO-CLOSED orphan position: {symbol} (no active hypothesis tracking it)")
+                    else:
+                        warnings.append(f"FAILED to close orphan position: {symbol} — {result.get('error', 'unknown')}")
+                except Exception as e:
+                    warnings.append(f"ERROR closing orphan {symbol}: {e}")
+            else:
+                warnings.append(f"Orphan position: {symbol} in Alpaca but no active hypothesis tracks it (will auto-close at next market open)")
 
     return warnings
 
