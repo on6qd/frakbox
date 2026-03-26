@@ -190,6 +190,24 @@ def check_conditions():
     else:
         print("  ✗ SPY is UP → Caution: WFC short may not work (see 2025-02-01 miss)")
 
+    # --- COST Tariff Defensive Long (NEW 2026-03-26) ---
+    print()
+    print("=" * 70)
+    print("COST TARIFF DEFENSIVE RETAIL LONG SIGNAL (hypothesis 8c2f8cbb)")
+    print("=" * 70)
+    print("Signal: COST outperforms SPY +3.57% avg over 5 days after major tariff events")
+    print("  n=21 (COST+WMT+XLP x 7 events), direction=86%, MT PASSES (5 horizons p<0.05)")
+    print("  OOS validation: 6/6 positive (100%) in 2025 events")
+    print("  TRIGGER: UNCONDITIONAL - fires regardless of SPY direction")
+    print()
+    print("  ✓ COST trigger already set: 2026-04-07T09:30 (April 7 open)")
+    print("  → COST hypothesis pre-registered, trade_loop WILL fire automatically")
+    print("  → No manual action needed UNLESS portfolio >5/5 capacity on April 7")
+    print()
+    print("  Also validated: WMT (+3.97% 10d, p=0.0356), XLP (+2.40% 10d, p=0.0329)")
+    print("  → If COST capacity issue: can use WMT or XLP instead")
+    print()
+
     # --- Other Pending Signals ---
     print()
     print("=" * 70)
