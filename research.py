@@ -228,6 +228,7 @@ def create_hypothesis(
     out_of_sample_split,
     survivorship_bias_note,
     selection_bias_note,
+    success_criteria,
     literature_reference=None,
     event_timing="unknown",
     regime_note=None,
@@ -272,6 +273,10 @@ def create_hypothesis(
             Pattern must hold in BOTH sets.
         survivorship_bias_note: REQUIRED. How survivorship bias was addressed.
         selection_bias_note: REQUIRED. How selection bias was addressed.
+        success_criteria: REQUIRED. Concrete thresholds that define "valid" BEFORE testing.
+            e.g., "abnormal return > 2%, p < 0.05, consistent in 60%+ of instances,
+            pattern holds in OOS validation set". Locked at creation — cannot be changed
+            after seeing results.
         literature_reference: Academic or established research supporting this
         event_timing: "pre_market", "intraday", "after_hours", or "unknown"
         regime_note: Whether effect is regime-dependent (from regime conditioning)
@@ -323,6 +328,14 @@ def create_hypothesis(
         raise ValueError("survivorship_bias_note is required. Explain how survivorship bias was addressed.")
     if not selection_bias_note:
         raise ValueError("selection_bias_note is required. Explain how selection bias was addressed.")
+
+    # Validate success criteria (Step 3 of investigation method)
+    if not success_criteria:
+        raise ValueError(
+            "success_criteria is required. Define what 'valid' looks like BEFORE running the test. "
+            "Use concrete thresholds (e.g., 'abnormal return > 2%, p < 0.05, consistent in 60%+ "
+            "of instances, holds in OOS validation'). This prevents moving the goalposts."
+        )
 
     # Validate out-of-sample split
     if not out_of_sample_split or not out_of_sample_split.get("validation_indices"):
@@ -447,6 +460,7 @@ def create_hypothesis(
         "literature_reference": literature_reference,
         "survivorship_bias_note": survivorship_bias_note,
         "selection_bias_note": selection_bias_note,
+        "success_criteria": success_criteria,
         "passes_multiple_testing": passes_multiple_testing,
         "multiple_testing_warning": multiple_testing_warning,
 
@@ -687,7 +701,19 @@ def complete_hypothesis(hypothesis_id, exit_price, actual_return_pct, post_morte
             }
             log_result(h)
             _update_pattern(h)
-            break
+
+            # Auto-generate investigation report and store it
+            try:
+                _db.save_hypothesis(h)  # save first so report can read it
+                report = generate_investigation_report(hypothesis_id)
+                _db.update_hypothesis_fields(hypothesis_id, extra={
+                    **(h.get("extra") or {}),
+                    "investigation_report": report,
+                })
+            except Exception:
+                _db.save_hypothesis(h)  # ensure save even if report fails
+
+            return h
     if not found:
         raise ValueError(f"Hypothesis {hypothesis_id} not found.")
     _db.save_hypothesis(h)
@@ -856,6 +882,539 @@ def _group_accuracy_by_type(completed):
         }
         for t, v in types.items()
     }
+
+
+# --- Investigation Report ---
+
+def _fmt_pct(val):
+    """Format a percentage value, handling None and non-numeric gracefully."""
+    if val is None:
+        return "N/A"
+    try:
+        return f"{float(val):+.2f}%"
+    except (TypeError, ValueError):
+        return str(val)
+
+
+def _wrap(text, width=78, indent=""):
+    """Wrap text to width with indent prefix on continuation lines."""
+    import textwrap
+    return textwrap.fill(text, width=width, initial_indent=indent,
+                         subsequent_indent=indent)
+
+
+def _is_substantive(text):
+    """Check whether a free-text field contains real content vs junk."""
+    if not text or not isinstance(text, str):
+        return False
+    stripped = text.strip()
+    # Filter out pure numbers, single characters, "N/A", "none", etc.
+    if len(stripped) < 5:
+        return False
+    if stripped.lower() in ("n/a", "none", "unknown", "null", "tbd"):
+        return False
+    return True
+
+
+def _post_mortem_contradicts_numbers(post_mortem, direction_correct):
+    """Detect if the post-mortem narrative contradicts the numerical verdict."""
+    if not _is_substantive(post_mortem):
+        return False
+    pm_lower = post_mortem.lower()
+    contradiction_phrases = [
+        "direction wrong", "opposite direction", "did not hold",
+        "failed", "does not work", "signal insufficient",
+        "no meaningful", "bounced", "stabilized", "reversed",
+    ]
+    confirmation_phrases = [
+        "as predicted", "confirmed", "as expected", "signal works",
+        "hypothesis validated", "effect held",
+    ]
+    has_negative = any(phrase in pm_lower for phrase in contradiction_phrases)
+    has_positive = any(phrase in pm_lower for phrase in confirmation_phrases)
+    # Contradiction: numbers say correct but narrative says wrong (or vice versa)
+    if direction_correct and has_negative and not has_positive:
+        return True
+    if not direction_correct and has_positive and not has_negative:
+        return True
+    return False
+
+
+def _summarize_dead_end(text):
+    """Extract a one-sentence summary from a verbose dead-end warning."""
+    if not text:
+        return text
+    # Take up to the first period that ends a sentence (after at least 40 chars)
+    # to get the core finding without the full data dump
+    sentences = re.split(r'(?<=[.!])\s+', text)
+    # The first sentence is usually "Related dead end: X — description"
+    # Grab 1-2 sentences that capture the conclusion
+    summary_parts = []
+    chars = 0
+    for s in sentences:
+        summary_parts.append(s)
+        chars += len(s)
+        if chars > 80:
+            break
+    result = " ".join(summary_parts)
+    # If we truncated, add ellipsis
+    if len(result) < len(text) - 10:
+        result = result.rstrip(".") + "."
+    return result
+
+
+def generate_investigation_report(hypothesis_id):
+    """
+    Generate a human-readable narrative report for a hypothesis, structured
+    around the 6-step investigation method.
+
+    Reads like a research memo. Works at any hypothesis stage.
+    Returns a plain-text report string.
+    """
+    hypotheses = load_hypotheses()
+    h = None
+    for hyp in hypotheses:
+        if hyp["id"] == hypothesis_id:
+            h = hyp
+            break
+    if h is None:
+        raise ValueError(f"Hypothesis {hypothesis_id} not found.")
+
+    result = h.get("result") or {}
+    trade = h.get("trade") or {}
+    oos = h.get("out_of_sample_split") or {}
+    confounders = h.get("confounders") or {}
+
+    direction_word = "rise" if h["expected_direction"] == "long" else "fall"
+    symbol = h["expected_symbol"]
+
+    sections = []
+
+    # --- Header ---
+    sections.append(f"Investigation Report: {h['id']}")
+    sections.append(f"{'=' * 60}")
+    sections.append(f"Status: {h['status']}  —  Created {h['created'][:10]}")
+    sections.append("")
+
+    # =================================================================
+    # Step 1: Hypothesis — Given/When/Then
+    # =================================================================
+    sections.append("1. Hypothesis")
+    sections.append("-" * 60)
+
+    event_desc = h.get("event_description", "").strip()
+    mechanism = h.get("causal_mechanism", "")
+
+    # Build a clean Given/When/Then from the structured fields
+    event_type_readable = h["event_type"].replace("_", " ")
+    sections.append(_wrap(
+        f"Given that {event_type_readable} events have historically produced "
+        f"abnormal returns in affected stocks,"
+    ))
+    # Normalize: strip leading "when" since we provide it
+    desc = event_desc.rstrip(".")
+    if desc.lower().startswith("when "):
+        desc = desc[5:]
+    sections.append(_wrap(f"when {desc.lower()},"))
+    sections.append(_wrap(
+        f"then {symbol} should {direction_word} by approximately "
+        f"{h['expected_magnitude_pct']}% within "
+        f"{h['expected_timeframe_days']} trading days."
+    ))
+    sections.append("")
+
+    if mechanism:
+        sections.append(_wrap(
+            f"The proposed causal mechanism: {mechanism}"
+        ))
+        sections.append("")
+
+    criteria = h.get("causal_mechanism_criteria") or []
+    if isinstance(criteria, dict):
+        criteria_items = criteria
+    elif isinstance(criteria, list):
+        criteria_items = {c: None for c in criteria}
+    else:
+        criteria_items = {}
+
+    if criteria_items:
+        sections.append("Mechanism evidence:")
+        for c, explanation in criteria_items.items():
+            label = c.replace("_", " ").capitalize()
+            if _is_substantive(explanation):
+                sections.append(_wrap(f"  - {label}: {explanation}"))
+            else:
+                sections.append(f"  - {label}")
+        sections.append("")
+
+    # =================================================================
+    # Step 2: Test Design
+    # =================================================================
+    sections.append("2. Test Design")
+    sections.append("-" * 60)
+
+    sample = h.get("sample_size", 0)
+    bt_symbols = h.get("backtest_symbols") or []
+    if isinstance(bt_symbols, list) and bt_symbols:
+        symbols_str = ", ".join(bt_symbols[:8])
+        if len(bt_symbols) > 8:
+            symbols_str += f" and {len(bt_symbols) - 8} others"
+        sections.append(_wrap(
+            f"The backtest covered {sample} historical events across "
+            f"{len(bt_symbols)} stocks ({symbols_str}). All returns are "
+            f"measured as abnormal returns against SPY to isolate the event "
+            f"effect from broad market moves."
+        ))
+    else:
+        sections.append(_wrap(
+            f"The backtest studied {sample} historical instances. All returns "
+            f"are measured as abnormal returns against SPY."
+        ))
+    sections.append("")
+
+    # Out-of-sample
+    disc_n = oos.get("discovery_count", 0)
+    val_n = oos.get("validation_count", 0)
+    if disc_n and val_n:
+        sections.append(_wrap(
+            f"Data was split temporally: {disc_n} earlier events for pattern "
+            f"discovery, {val_n} later events for out-of-sample validation."
+        ))
+        sections.append("")
+
+    # Bias controls — separate paragraphs for readability
+    surv = h.get("survivorship_bias_note")
+    if _is_substantive(surv):
+        sections.append(_wrap(f"Survivorship bias control: {surv}"))
+        sections.append("")
+    sel = h.get("selection_bias_note")
+    if _is_substantive(sel):
+        sections.append(_wrap(f"Selection bias control: {sel}"))
+        sections.append("")
+
+    # Confounders
+    if confounders:
+        confounder_summary = []
+        for k, v in confounders.items():
+            if _is_substantive(str(v)):
+                confounder_summary.append(f"{k.replace('_', ' ')}: {v}")
+        if confounder_summary:
+            sections.append("Confounders recorded at entry:")
+            for cs in confounder_summary:
+                sections.append(_wrap(cs, indent="  "))
+            sections.append("")
+
+    # =================================================================
+    # Step 3: Success Criteria
+    # =================================================================
+    sections.append("3. Success Criteria (locked before testing)")
+    sections.append("-" * 60)
+
+    sc = h.get("success_criteria")
+    if sc:
+        sections.append(_wrap(sc))
+    else:
+        # Reconstruct from available fields for older hypotheses
+        parts = []
+        cons = h.get("consistency_pct")
+        if cons:
+            parts.append(f"effect appears in at least {cons:.0f}% of instances")
+        parts.append(
+            f"abnormal return exceeds {h['expected_magnitude_pct']}%"
+        )
+        mt = h.get("passes_multiple_testing")
+        if mt is not None:
+            parts.append(
+                "significance survives multiple testing correction"
+                if mt else
+                "WARNING: did not pass multiple testing correction"
+            )
+        sections.append(_wrap(
+            f"To count as valid: {'; '.join(parts)}."
+        ))
+    sections.append("")
+    sections.append(
+        f"Confidence: {h.get('confidence', '?')}/10  |  "
+        f"Pre-registration: {h.get('prediction_hash', 'N/A')}"
+    )
+    sections.append("")
+
+    # =================================================================
+    # Step 4: Outcome — facts only, no interpretation
+    # =================================================================
+    sections.append("4. Outcome")
+    sections.append("-" * 60)
+
+    if h["status"] == "invalidated":
+        reason = result.get("reason", "No reason recorded.")
+        sections.append(_wrap(
+            f"This hypothesis was invalidated before testing. {reason}"
+        ))
+
+    elif h["status"] == "completed" and result:
+        raw = result.get("raw_return_pct")
+        spy = result.get("spy_return_pct")
+        abn = result.get("abnormal_return_pct")
+        mag = result.get("magnitude_ratio")
+        direction_correct = result.get("direction_correct", False)
+
+        # Raw numbers — no editorializing
+        sections.append(f"  Stock return:     {_fmt_pct(raw)}")
+        sections.append(f"  SPY return:       {_fmt_pct(spy)}")
+        sections.append(f"  Abnormal return:  {_fmt_pct(abn)}")
+        sections.append(
+            f"  Direction:        "
+            f"{'correct' if direction_correct else 'WRONG'}"
+        )
+        if mag is not None:
+            sections.append(
+                f"  Magnitude ratio:  {mag:.2f}x of predicted"
+            )
+        timing = result.get("timing_accuracy")
+        if _is_substantive(timing):
+            sections.append(f"  Timing:           {timing}")
+
+        # Note early exit or special conditions
+        post_mortem = result.get("post_mortem", "")
+        if "early" in post_mortem.lower() or "closed early" in post_mortem.lower():
+            sections.append("")
+            # Extract the early-exit reason
+            for sentence in re.split(r'(?<=[.!])\s+', post_mortem):
+                if "early" in sentence.lower() or "closed" in sentence.lower():
+                    sections.append(_wrap(f"Note: {sentence}"))
+                    break
+
+    elif h["status"] == "active":
+        entry_time = trade.get("entry_time", "")[:10]
+        entry_price = trade.get("entry_price")
+        deadline = trade.get("deadline", "")[:10]
+        stop = trade.get("stop_loss_pct")
+        sections.append(f"  Entry:    {entry_time} at ${entry_price}")
+        sections.append(f"  Deadline: {deadline}")
+        if stop:
+            sections.append(f"  Stop:     {stop}%")
+        sections.append("")
+        sections.append("Trade is active. No outcome yet.")
+
+    else:
+        sections.append("Not yet tested.")
+
+    sections.append("")
+
+    # =================================================================
+    # Step 5: Conclusion — reconcile numbers with narrative
+    # =================================================================
+    sections.append("5. Conclusion")
+    sections.append("-" * 60)
+
+    if h["status"] == "completed" and result:
+        direction_correct = result.get("direction_correct", False)
+        mag = result.get("magnitude_ratio", 0) or 0
+        mech = result.get("mechanism_validated")
+        attr = result.get("confounder_attribution")
+        surprise = result.get("surprise_factor")
+        post_mortem = result.get("post_mortem", "")
+
+        # Detect contradiction between numbers and narrative
+        has_contradiction = _post_mortem_contradicts_numbers(
+            post_mortem, direction_correct
+        )
+
+        if has_contradiction:
+            # The post-mortem disagrees with the numerical verdict.
+            # The narrative wins — numbers can be technically correct
+            # but misleading (e.g., early exit, confounders, etc.)
+            sections.append(_wrap(
+                "CONTRADICTORY RESULT. The numerical outcome and the "
+                "qualitative analysis disagree."
+            ))
+            sections.append("")
+            if direction_correct:
+                sections.append(_wrap(
+                    f"The numbers say the direction was correct with "
+                    f"{mag:.0%} of expected magnitude. However, the "
+                    f"post-mortem analysis tells a different story:"
+                ))
+            else:
+                sections.append(_wrap(
+                    f"The numbers say the direction was wrong. However, "
+                    f"the post-mortem analysis suggests otherwise:"
+                ))
+            sections.append("")
+            sections.append(_wrap(post_mortem, indent="  "))
+            sections.append("")
+            sections.append(_wrap(
+                "When numbers and narrative disagree, investigate the "
+                "narrative. The numbers may reflect an early exit, a "
+                "confounder, or a technicality rather than the true "
+                "outcome of the hypothesis."
+            ))
+        else:
+            # No contradiction — straightforward verdict
+            if direction_correct and mag >= 0.5:
+                sections.append(_wrap(
+                    f"The hypothesis is supported. The predicted direction "
+                    f"was correct and the move reached {mag:.0%} of the "
+                    f"expected magnitude."
+                ))
+            elif direction_correct and mag >= 0.25:
+                sections.append(_wrap(
+                    f"The hypothesis is weakly supported. The direction was "
+                    f"correct but the move reached only {mag:.0%} of "
+                    f"expected magnitude — the effect may be real but "
+                    f"smaller than hypothesized."
+                ))
+            elif direction_correct:
+                sections.append(_wrap(
+                    f"The hypothesis is not supported. The direction was "
+                    f"technically correct but the magnitude ({mag:.0%} of "
+                    f"expected) is indistinguishable from noise."
+                ))
+            else:
+                sections.append(_wrap(
+                    "The hypothesis is not supported. The stock moved in "
+                    "the opposite direction from what was predicted."
+                ))
+
+            # Mechanism validation — the most important qualitative check
+            if _is_substantive(mech):
+                sections.append("")
+                sections.append(_wrap(f"Mechanism check: {mech}"))
+
+            # Attribution
+            if _is_substantive(attr):
+                sections.append("")
+                sections.append(_wrap(f"Attribution: {attr}"))
+
+            # Surprise — only if it's real content
+            if _is_substantive(surprise):
+                sections.append("")
+                sections.append(_wrap(f"What was unexpected: {surprise}"))
+
+            # Post-mortem as the full narrative
+            if _is_substantive(post_mortem):
+                sections.append("")
+                sections.append(_wrap(post_mortem, indent="  "))
+
+        sections.append("")
+
+    elif h["status"] == "invalidated":
+        reason = result.get("reason", "")
+        sections.append(_wrap(
+            f"No conclusion — invalidated before testing. "
+            f"{reason if _is_substantive(reason) else ''}"
+        ))
+        sections.append("")
+
+    else:
+        sections.append("Awaiting outcome.")
+        sections.append("")
+
+    # =================================================================
+    # Step 6: What Comes Next — derived from the ACTUAL conclusion
+    # =================================================================
+    sections.append("6. What Comes Next")
+    sections.append("-" * 60)
+
+    if h["status"] == "completed" and result:
+        direction_correct = result.get("direction_correct", False)
+        mag = result.get("magnitude_ratio", 0) or 0
+        post_mortem = result.get("post_mortem", "")
+        has_contradiction = _post_mortem_contradicts_numbers(
+            post_mortem, direction_correct
+        )
+
+        if has_contradiction:
+            # The conclusion was ambiguous — don't pretend we know
+            sections.append(_wrap(
+                "The result is ambiguous. Before moving forward, resolve "
+                "the contradiction between the numbers and the narrative. "
+                "Was this an early exit? A confounder? A flawed test "
+                "design? The answer determines whether to retry the same "
+                "hypothesis under cleaner conditions, refine it, or "
+                "abandon the line of inquiry."
+            ))
+        elif direction_correct and mag >= 0.5:
+            sections.append(_wrap(
+                "The signal held. Next: stress-test across different "
+                "market regimes, time periods, or related assets. If it "
+                "survives, promote to a known effect."
+            ))
+        elif direction_correct:
+            sections.append(_wrap(
+                "The direction was right but the effect was weak. Possible "
+                "next steps: tighten entry conditions, control for the "
+                "dominant confounder, or accept that the effect is smaller "
+                "than originally hypothesized and re-evaluate whether it's "
+                "still worth trading after costs."
+            ))
+        else:
+            # Failed — but derive next step from the post-mortem if possible
+            if _is_substantive(post_mortem):
+                # Look for the agent's own suggestion in the post-mortem
+                pm_lower = post_mortem.lower()
+                has_refined = any(
+                    phrase in pm_lower for phrase in
+                    ["improved signal", "refined", "better signal",
+                     "should instead", "alternative"]
+                )
+                if has_refined:
+                    sections.append(_wrap(
+                        "The hypothesis failed, but the post-mortem "
+                        "identified a refined approach. The next hypothesis "
+                        "should test that specific refinement — not a "
+                        "parameter tweak, but the new condition that the "
+                        "failure revealed."
+                    ))
+                else:
+                    sections.append(_wrap(
+                        "The hypothesis failed. Before generating a new one: "
+                        "can you explain WHY it failed? Was the causal "
+                        "mechanism wrong, or did a specific condition "
+                        "invalidate it? A new hypothesis is only warranted "
+                        "if the failure produced a specific, testable "
+                        "insight."
+                    ))
+            else:
+                sections.append(_wrap(
+                    "The hypothesis failed and no post-mortem was recorded. "
+                    "Without understanding why it failed, generating a new "
+                    "hypothesis risks repeating the same mistake. Write the "
+                    "post-mortem first."
+                ))
+
+    elif h["status"] == "invalidated":
+        sections.append(_wrap(
+            "Invalidated before testing. If the reason points to a "
+            "fixable flaw in the test design, revise and retry. If "
+            "conditions changed, move to a different question."
+        ))
+    else:
+        sections.append("Complete the current investigation first.")
+
+    sections.append("")
+
+    # =================================================================
+    # Warnings — summarized, not dumped
+    # =================================================================
+    raw_warnings = []
+    if h.get("dead_end_warnings"):
+        w = h["dead_end_warnings"]
+        raw_warnings.extend(w if isinstance(w, list) else [w])
+    if h.get("symbol_warnings"):
+        w = h["symbol_warnings"]
+        raw_warnings.extend(w if isinstance(w, list) else [w])
+    if h.get("multiple_testing_warning"):
+        raw_warnings.append(h["multiple_testing_warning"])
+
+    if raw_warnings:
+        sections.append("Warnings")
+        sections.append("-" * 60)
+        for w in raw_warnings:
+            sections.append(_wrap(f"- {_summarize_dead_end(w)}"))
+        sections.append("")
+
+    return "\n".join(sections)
 
 
 # --- Knowledge Base ---

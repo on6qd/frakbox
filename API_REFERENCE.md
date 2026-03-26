@@ -81,6 +81,7 @@ research.create_hypothesis(
     },
     survivorship_bias_note="...",
     selection_bias_note="...",
+    success_criteria="abnormal return > 2%, p < 0.05, consistent in 60%+ of instances, holds in OOS",  # REQUIRED — locked before testing
     literature_reference=None,                # optional
     event_timing="after_hours",              # optional
     passes_multiple_testing=True,            # optional
@@ -96,6 +97,15 @@ research.create_hypothesis(
 - Historical evidence needs real data (not placeholders)
 - Causal mechanism must satisfy 2 of 3 criteria
 - `out_of_sample_split.validation_indices` >= 3 entries
+- `success_criteria` must be non-empty (concrete thresholds, locked before testing)
+
+## Investigation Report
+
+```python
+# Generate a human-readable 6-step report for any hypothesis
+report = research.generate_investigation_report(hypothesis_id)
+print(report)  # plain text, ~60-80 lines
+```
 
 ## Other API
 

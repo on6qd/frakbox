@@ -38,9 +38,9 @@ MIN_STOP_LOSS_PCT = 1.0               # absolute minimum — every trade MUST ha
 DEFAULT_TAKE_PROFIT_PCT = None         # no take-profit by default (hold to deadline)
 DEFAULT_POSITION_SIZE_USD = 5000       # default trade size in dollars
 
-# Portfolio-level limits
-MAX_PORTFOLIO_DRAWDOWN_PCT = 15.0      # halt new trades if portfolio drops 15% from peak
-MAX_CONCURRENT_EXPERIMENTS = 5         # max active positions (also in methodology.json)
+# Portfolio-level limits (paper account — optimized for research throughput)
+MAX_PORTFOLIO_DRAWDOWN_PCT = 30.0      # paper account — don't halt research over paper losses
+MAX_CONCURRENT_EXPERIMENTS = 10        # more concurrent experiments = faster signal validation
 
 # Transaction cost assumptions
 ESTIMATED_ROUND_TRIP_COST_PCT = 0.10   # default round-trip cost (spread + impact)

@@ -306,6 +306,75 @@ def export_research():
     _atomic_write(os.path.join(DATA_DIR, "research.json"), data)
 
 
+def export_hypotheses():
+    """Build hypotheses.json: all hypotheses with investigation reports."""
+    import research
+
+    all_hyps = db.load_hypotheses()
+    # Sort: active first, then pending, completed, invalidated — newest first within each
+    status_order = {"active": 0, "pending": 1, "completed": 2, "invalidated": 3}
+    all_hyps.sort(key=lambda h: (status_order.get(h["status"], 9), h.get("created", "")),
+                  reverse=False)
+    # Within each status group, sort newest first
+    all_hyps.sort(key=lambda h: (status_order.get(h["status"], 9),))
+
+    hypotheses = []
+    for h in all_hyps:
+        # Generate report
+        try:
+            report = research.generate_investigation_report(h["id"])
+        except Exception:
+            report = None
+
+        result = h.get("result") or {}
+        trade = h.get("trade") or {}
+
+        entry = {
+            "id": h["id"],
+            "status": h["status"],
+            "created": (h.get("created") or "")[:10],
+            "event_type": (h.get("event_type") or "").replace("_", " "),
+            "symbol": h.get("expected_symbol", ""),
+            "direction": h.get("expected_direction", ""),
+            "magnitude_pct": h.get("expected_magnitude_pct"),
+            "timeframe_days": h.get("expected_timeframe_days"),
+            "confidence": h.get("confidence"),
+            "thesis": (h.get("event_description") or "")[:150],
+            "report": report,
+        }
+
+        # Add outcome fields for completed hypotheses
+        if h["status"] == "completed" and result:
+            entry["result_pct"] = result.get("raw_return_pct")
+            entry["abnormal_pct"] = result.get("abnormal_return_pct")
+            entry["direction_correct"] = result.get("direction_correct")
+            entry["magnitude_ratio"] = result.get("magnitude_ratio")
+            entry["closed_date"] = (result.get("exit_time") or "")[:10]
+
+        # Add trade info for active hypotheses
+        if h["status"] == "active" and trade:
+            entry["entry_date"] = (trade.get("entry_time") or "")[:10]
+            entry["deadline"] = (trade.get("deadline") or "")[:10]
+
+        # Add invalidation reason
+        if h["status"] == "invalidated" and result:
+            entry["invalidation_reason"] = (result.get("reason") or "")[:200]
+
+        hypotheses.append(entry)
+
+    data = {
+        "hypotheses": hypotheses,
+        "counts": {
+            "total": len(hypotheses),
+            "active": sum(1 for h in hypotheses if h["status"] == "active"),
+            "pending": sum(1 for h in hypotheses if h["status"] == "pending"),
+            "completed": sum(1 for h in hypotheses if h["status"] == "completed"),
+            "invalidated": sum(1 for h in hypotheses if h["status"] == "invalidated"),
+        },
+    }
+    _atomic_write(os.path.join(DATA_DIR, "hypotheses.json"), data)
+
+
 def _build_pipeline():
     """Build the pipeline section: watchlist events, pending triggers, research queue."""
     conn = db.get_db()
@@ -468,6 +537,11 @@ def main():
         export_research()
     except Exception as e:
         print(f"[export] research.json failed: {e}", file=sys.stderr)
+
+    try:
+        export_hypotheses()
+    except Exception as e:
+        print(f"[export] hypotheses.json failed: {e}", file=sys.stderr)
 
     export_meta(alpaca_ok)
     sync_to_public_repo()

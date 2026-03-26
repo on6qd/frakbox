@@ -44,6 +44,17 @@ def init_db():
     conn = get_db()
     conn.executescript(_SCHEMA)
     conn.commit()
+    _run_migrations(conn)
+
+
+def _run_migrations(conn):
+    """Run incremental schema migrations for existing databases."""
+    # Migration 1: add success_criteria column to hypotheses
+    try:
+        conn.execute("SELECT success_criteria FROM hypotheses LIMIT 1")
+    except sqlite3.OperationalError:
+        conn.execute("ALTER TABLE hypotheses ADD COLUMN success_criteria TEXT")
+        conn.commit()
 
 
 # ---------------------------------------------------------------------------
@@ -85,6 +96,7 @@ CREATE TABLE IF NOT EXISTS hypotheses (
     literature_reference TEXT,
     survivorship_bias_note TEXT,
     selection_bias_note TEXT,
+    success_criteria TEXT,             -- pre-registered: what "valid" looks like (thresholds, benchmarks)
     passes_multiple_testing INTEGER,  -- boolean
     multiple_testing_warning TEXT,
 
@@ -282,7 +294,8 @@ _HYPOTHESIS_COLUMNS = {
     "backtest_symbols", "backtest_events", "historical_evidence",
     "sample_size", "consistency_pct", "out_of_sample_split", "confounders",
     "market_regime_note", "regime_note", "confidence", "literature_reference",
-    "survivorship_bias_note", "selection_bias_note", "passes_multiple_testing",
+    "survivorship_bias_note", "selection_bias_note", "success_criteria",
+    "passes_multiple_testing",
     "multiple_testing_warning", "confounder_warnings", "symbol_warnings",
     "dead_end_warnings", "trade", "result",
     "trigger", "trigger_position_size", "trigger_stop_loss_pct",

@@ -114,6 +114,38 @@
             </div>
         </section>
 
+        <!-- Investigations -->
+        <section class="card">
+            <h2>Investigations</h2>
+            <div class="hyp-stats" id="hyp-stats"></div>
+            <div class="journal-filters" id="hyp-filters">
+                <button class="filter-btn active" data-hyp-filter="all">All</button>
+                <button class="filter-btn" data-hyp-filter="active">Active</button>
+                <button class="filter-btn" data-hyp-filter="pending">Pending</button>
+                <button class="filter-btn" data-hyp-filter="completed">Completed</button>
+                <button class="filter-btn" data-hyp-filter="invalidated">Invalidated</button>
+            </div>
+            <div id="hyp-list" class="hyp-list">
+                <p class="muted">Loading...</p>
+            </div>
+            <div class="journal-pagination" id="hyp-pagination">
+                <button id="hyp-prev" disabled>&laquo; Previous</button>
+                <span id="hyp-page-info" class="muted"></span>
+                <button id="hyp-next" disabled>Next &raquo;</button>
+            </div>
+        </section>
+
+        <!-- Report Modal -->
+        <div id="report-modal" class="modal-overlay" style="display:none">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2 id="modal-title">Investigation Report</h2>
+                    <button class="modal-close" id="modal-close">&times;</button>
+                </div>
+                <pre class="modal-body" id="modal-body"></pre>
+            </div>
+        </div>
+
         <!-- Recent Trades -->
         <section class="card">
             <h2>Recent Trades</h2>

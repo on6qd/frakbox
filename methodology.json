@@ -21,7 +21,7 @@
       10,
       20
     ],
-    "max_concurrent_experiments": 5,
+    "max_concurrent_experiments": 10,
     "knowledge_revalidation_months": 12,
     "min_direction_threshold_pct": 0.5,
     "estimated_round_trip_cost_pct": 0.1,

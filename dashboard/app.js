@@ -364,14 +364,132 @@ function initJournal(res) {
     });
 }
 
+// --- Investigations (hypotheses with reports) ---
+
+let hypData = [];
+let hypFilter = 'all';
+let hypPage = 0;
+const HYP_PER_PAGE = 10;
+
+const STATUS_LABELS = {
+    active: 'Active',
+    pending: 'Pending',
+    completed: 'Completed',
+    invalidated: 'Invalidated',
+};
+
+function getFilteredHyps() {
+    if (hypFilter === 'all') return hypData;
+    return hypData.filter(h => h.status === hypFilter);
+}
+
+function renderHypPage() {
+    const filtered = getFilteredHyps();
+    const listEl = el('hyp-list');
+    const total = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(total / HYP_PER_PAGE));
+    hypPage = Math.min(hypPage, totalPages - 1);
+    const start = hypPage * HYP_PER_PAGE;
+    const page = filtered.slice(start, start + HYP_PER_PAGE);
+
+    if (!total) {
+        listEl.innerHTML = '<p class="muted">No hypotheses match this filter</p>';
+    } else {
+        listEl.innerHTML = page.map(h => {
+            let resultHtml = '';
+            if (h.status === 'completed' && h.result_pct != null) {
+                const cls = h.direction_correct ? 'positive' : 'negative';
+                resultHtml = `<span class="hyp-result ${cls}">${fmtPct(h.abnormal_pct || h.result_pct)}</span>`;
+            } else if (h.status === 'active') {
+                resultHtml = '<span class="hyp-result muted">open</span>';
+            } else if (h.status === 'invalidated') {
+                resultHtml = '<span class="hyp-result muted">—</span>';
+            } else {
+                resultHtml = '<span class="hyp-result muted">—</span>';
+            }
+
+            return `
+                <div class="hyp-item status-border-${h.status}" data-hyp-id="${esc(h.id)}" onclick="openReport('${esc(h.id)}')">
+                    <span class="status-badge status-${h.status}">${STATUS_LABELS[h.status] || h.status}</span>
+                    <span class="hyp-symbol">${esc(h.symbol)}</span>
+                    <span class="direction ${h.direction}">${h.direction}</span>
+                    <span class="hyp-thesis">${esc(h.thesis)}</span>
+                    ${resultHtml}
+                    <span class="hyp-confidence">${h.confidence != null ? h.confidence + '/10' : ''}</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    el('hyp-prev').disabled = hypPage <= 0;
+    el('hyp-next').disabled = hypPage >= totalPages - 1;
+    el('hyp-page-info').textContent = `Page ${hypPage + 1} of ${totalPages} (${total} hypotheses)`;
+}
+
+function openReport(id) {
+    const h = hypData.find(h => h.id === id);
+    if (!h || !h.report) return;
+    el('modal-title').textContent = `Report: ${h.id} — ${h.symbol} ${h.direction}`;
+    el('modal-body').textContent = h.report;
+    el('report-modal').style.display = 'flex';
+}
+
+function closeModal() {
+    el('report-modal').style.display = 'none';
+}
+
+function initHypotheses(data) {
+    if (!data) return;
+    hypData = data.hypotheses || [];
+    hypPage = 0;
+    hypFilter = 'all';
+
+    // Stats bar
+    const c = data.counts || {};
+    el('hyp-stats').innerHTML = [
+        `<span><span class="hyp-count">${c.total || 0}</span> total</span>`,
+        `<span><span class="hyp-count">${c.active || 0}</span> active</span>`,
+        `<span><span class="hyp-count">${c.pending || 0}</span> pending</span>`,
+        `<span><span class="hyp-count">${c.completed || 0}</span> completed</span>`,
+        `<span><span class="hyp-count">${c.invalidated || 0}</span> invalidated</span>`,
+    ].join('');
+
+    renderHypPage();
+
+    // Pagination
+    el('hyp-prev').onclick = () => { hypPage--; renderHypPage(); };
+    el('hyp-next').onclick = () => { hypPage++; renderHypPage(); };
+
+    // Filters
+    document.querySelectorAll('[data-hyp-filter]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-hyp-filter]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            hypFilter = btn.dataset.hypFilter;
+            hypPage = 0;
+            renderHypPage();
+        });
+    });
+
+    // Modal close
+    el('modal-close').onclick = closeModal;
+    el('report-modal').onclick = (e) => {
+        if (e.target === el('report-modal')) closeModal();
+    };
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+    });
+}
+
 // --- Load ---
 
 async function load() {
-    const [fund, positions, research, meta] = await Promise.all([
+    const [fund, positions, research, meta, hypotheses] = await Promise.all([
         fetchJSON('fund.json'),
         fetchJSON('positions.json'),
         fetchJSON('research.json'),
         fetchJSON('meta.json'),
+        fetchJSON('hypotheses.json'),
     ]);
 
     renderMeta(meta);
@@ -379,6 +497,7 @@ async function load() {
     renderKnowledge(research);
     renderActiveNow(positions, research);
     renderPipeline(research);
+    initHypotheses(hypotheses);
     renderRecentTrades(positions);
     initJournal(research);
 }
