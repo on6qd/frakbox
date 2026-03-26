@@ -5,20 +5,27 @@ US tariff announcements expected ~6:00 PM ET on April 2.
 
 After-market actions (run April 2 after close, 4:15-5:00 PM ET):
   1. Run this script to assess conditions
-  2. If conditions met, it prints exact activation commands for next morning
+  2. If conditions met, it prints exact activation commands for April 7 open
+
+CRITICAL: Good Friday April 3 = MARKET CLOSED. Next open = Monday April 7, 2026.
 
 BACKTEST EXPECTATION:
   Systemic days (SPY<-0.5%, >=5 first-touch lows): -1.88% abnormal over 5 days
   VIX close > 30: SPY recovers +1.69% over 20 days
 
 PORTFOLIO STATE on April 2 (expected):
-  - SYK: closes March 31 (5 trading days from March 26 entry)
-  - KHC: closes April 1 (5 trading days from March 27 entry)
-  - VGNT: activates April 1 16:00 (short, 5d hold = closes April 8)
-  - All other active trades (GO, HD, ABT, BAX) close by March 27
+  - GO: closes March 26 (3d from March 23 entry)
+  - HD, ABT, BAX: all close March 27
+  - SYK: closes ~April 2 (5d from March 26 entry, deadline April 2)
+  - AMT: enters March 30 at 9:30, closes ~April 6-7 (5d hold)
+  - VGNT: activates April 1 16:00 (short, 5d hold = closes ~April 8)
+  - TDG: may enter late March or early April if it crosses 52w low (hyp e25f0c6f)
 
-Available positions on April 2: Up to 4 (assuming VGNT is active)
-If VGNT not yet entered: up to 5 positions.
+Available positions on April 2: 2-3 open (SYK closing, AMT+VGNT active)
+CRITICAL: Good Friday April 3 = MARKET CLOSED. All April 3 actions → April 7.
+
+If WFC triggers: enter April 7 open (after Liberation Day announcement April 2)
+If VIX fires: also enter April 7 open
 """
 
 import sys
@@ -115,7 +122,7 @@ def check_conditions():
 
     if systemic_fires:
         print("🚨 SYSTEMIC 52W LOW SHORT SIGNAL FIRES!")
-        print("   → Run tomorrow morning (April 3) at 9:30 AM:")
+        print("   → Run Monday April 7 at 9:30 AM (GOOD FRIDAY APRIL 3 = CLOSED):")
         print()
         print("   PRE-REGISTERED CANDIDATES (use these first):")
         print("   1. ADBE ($98B, hypothesis f93527a2) — PRIMARY CANDIDATE")
@@ -135,7 +142,7 @@ def check_conditions():
             print(f"      - {ticker}")
         print()
         print("   Expected: -1.88% abnormal over 5 days each")
-        print("   IMPORTANT: Check each stock is STILL at/below 52w low at April 3 open")
+        print("   IMPORTANT: Check each stock is STILL at/below 52w low at April 7 open")
         print("   NOTE: Can short multiple stocks if portfolio capacity allows")
         print("   CAPACITY CHECK: If MKC+NKE+CAG+VGNT all active = 4/5. Can add ADBE only.")
     else:
@@ -148,7 +155,7 @@ def check_conditions():
     if vix_fires:
         print()
         print("🚨 VIX SPIKE RECOVERY SPY LONG SIGNAL FIRES!")
-        print("   → Run tomorrow morning (April 3) at 9:30 AM:")
+        print("   → Run Monday April 7 at 9:30 AM (Good Friday April 3 = CLOSED):")
         print("   python tools/activate_vix_spy_trade.py --yes")
         print()
         print("   Expected: +1.69% over 20 days (N=54, OOS validation +2.92%)")
@@ -178,7 +185,7 @@ def check_conditions():
     print()
     if spy_condition:
         print("  ✓ SPY is DOWN → Conditions favor WFC short activation")
-        print("  → Run April 3 at market open:")
+        print("  → Run April 7 at market open (Good Friday April 3 = CLOSED):")
         print("     python tools/activate_wfc_tariff_trade.py --yes")
     else:
         print("  ✗ SPY is UP → Caution: WFC short may not work (see 2025-02-01 miss)")
