@@ -59,13 +59,13 @@ def main():
 
     # Get current position
     try:
-        position = trader.get_position(SYMBOL)
+        position = next((p for p in trader.get_api().list_positions() if p.symbol == SYMBOL), None)
         if position is None:
             print(f"ERROR: No position found for {SYMBOL} in Alpaca.")
             return
-        current_price = float(position.get('current_price', 0))
-        entry_price = float(position.get('avg_entry_price', 0))
-        qty = float(position.get('qty', 0))
+        current_price = float(position.current_price)
+        entry_price = float(position.avg_entry_price)
+        qty = float(position.qty)
         print(f"Position: {qty} shares at avg ${entry_price:.2f}")
         print(f"Current price: ${current_price:.2f}")
         # For SHORT: profit when price falls

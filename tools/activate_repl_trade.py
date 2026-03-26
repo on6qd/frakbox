@@ -93,7 +93,7 @@ def get_repl_price():
 def check_portfolio_capacity():
     """Check if we have room for another position."""
     try:
-        positions = trader.get_positions()
+        positions = trader.get_api().list_positions()
         active = len([p for p in positions if p.get('qty') != 0])
         print(f"  Active positions: {active}/5")
         return active < 5
