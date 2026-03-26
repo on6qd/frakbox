@@ -50,14 +50,16 @@ def get_sp500_tickers() -> pd.DataFrame:
         headers = {"User-Agent": "Mozilla/5.0 (compatible; research-bot/1.0)"}
         resp = requests.get(url, headers=headers, timeout=15)
         resp.raise_for_status()
-        tables = pd.read_html(resp.text)
+        import io
+        tables = pd.read_html(io.StringIO(resp.text))
         df = tables[0][['Symbol', 'Security']].copy()
         df.columns = ['ticker', 'name']
         df['ticker'] = df['ticker'].str.replace('.', '-', regex=False)
         print(f"  Loaded {len(df)} tickers from Wikipedia.")
         return df
     except Exception as e:
-        print(f"  Wikipedia unavailable ({e}), falling back to local cache...")
+        err_short = str(e)[:100]  # Truncate to avoid HTML dump in logs
+        print(f"  Wikipedia unavailable ({err_short}), falling back to local cache...")
 
     # Fallback: local static cache (411 tickers, no names)
     from tools.build_sp500_universe import load_sp500_universe
