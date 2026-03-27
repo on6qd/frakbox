@@ -87,9 +87,15 @@ def measure_abnormal_return(symbol: str, event_date: str, horizon_days: int) -> 
     start = pd.Timestamp(event_date) - pd.Timedelta(days=5)
     end = pd.Timestamp(event_date) + pd.Timedelta(days=horizon_days + 10)
     
-    sym_data = safe_download(symbol, start=str(start)[:10], end=str(end)[:10])
-    spy_data = safe_download('SPY', start=str(start)[:10], end=str(end)[:10])
-    
+    try:
+        sym_data = safe_download(symbol, start=str(start)[:10], end=str(end)[:10])
+    except (ValueError, Exception):
+        return None  # Delisted or no data
+    try:
+        spy_data = safe_download('SPY', start=str(start)[:10], end=str(end)[:10])
+    except (ValueError, Exception):
+        return None
+
     if sym_data is None or spy_data is None:
         return None
     
