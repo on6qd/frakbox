@@ -252,3 +252,37 @@ if __name__ == '__main__':
         print(f"  Judgment call: if tariff announcement was large, still consider activating.")
     else:
         print("  ERROR: Could not determine SPY return")
+
+    # --- STLD Tariff Short (NEW 2026-03-27) ---
+    print()
+    print("=" * 70)
+    print("STLD DOMESTIC STEEL SHORT SIGNAL (hypothesis 907d94ec)")
+    print("=" * 70)
+    print("Signal: STLD (Steel Dynamics) underperforms SPY -2.58% in 5 days after tariff events.")
+    print("        N=10 (2018-2025), 80% SHORT direction, p=0.007. Passes multiple testing.")
+    print("        Counter-intuitive: tariff protection < demand destruction for domestic steel.")
+    print("        Discovery (2018-2019): n=6, avg=-3.37%, dir=83%")
+    print("        OOS (2025): n=4, avg=-2.22%, dir=75% — CONFIRMED")
+    print()
+    print("  CAPACITY NOTE: Only activate if portfolio has room (max 5 positions).")
+    print("  COST + KO fire unconditionally (2 slots). WFC/GLD fire if SPY<-0.5% (+2 slots).")
+    print("  VIX-SPY fires if VIX>30 (+1 slot). STLD = slot 6 if all others fire.")
+    print()
+    if spy_pct is not None and spy_pct < -0.5:
+        # Count active positions
+        hypotheses = db.load_hypotheses()
+        active = [h for h in hypotheses if h.get('status') == 'active']
+        if len(active) < 4:
+            print(f"✓ SPY down {spy_pct:+.1f}% + portfolio has room → STLD SHORT signal active")
+            print(f"  Action: python3 -c \"import db; db.init_db(); db.update_hypothesis_fields(")
+            print(f"    '907d94ec', trigger='2026-04-07T09:30', trigger_position_size=5000,")
+            print(f"    trigger_stop_loss_pct=10)\"")
+        else:
+            print(f"⚠ SPY down {spy_pct:+.1f}% but portfolio full ({len(active)}/5 active)")
+            print(f"  STLD signal valid but skipping for capacity. Wait for an existing position to close.")
+    elif spy_pct is not None:
+        print(f"  SPY return: {spy_pct:+.1f}% — Mild tariff reaction. STLD short less certain.")
+        print(f"  Note: 2025-04-02 event shows STLD +0.39% when market reacted positively.")
+        print(f"  Recommendation: Only activate STLD short if SPY is DOWN (tariff shock scenario).")
+    else:
+        print("  ERROR: Could not determine SPY return")
