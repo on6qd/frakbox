@@ -1,0 +1,407 @@
+PEAD Q1 2026 EARNINGS SEASON CANDIDATE LIST
+========================================================================
+Generated: 2026-03-27
+Hypothesis: 9e2a03ac (PEAD Long — EPS Beat >=10%, VIX<20)
+Signal: After >=10% EPS surprise, large-cap stocks drift +1.96% over 5 days when VIX<20
+Window: April 14 - May 16, 2026  (Q1 2026 earnings season)
+Current VIX: 27.4
+VIX Regime: NOT in regime (VIX >= 20) — DO NOT ACTIVATE until VIX < 20
+
+------------------------------------------------------------------------
+SECTION 1: ALL REPORTERS IN WINDOW (by date)
+(101 stocks scanned; large-cap $10B+, sectors: Healthcare, Financials, Tech, Consumer Staples)
+------------------------------------------------------------------------
+Ticker   Date         Sector             Cap $B   Beat4q%   AvgSurp4q    52w+%
+WFC      2026-04-14   Financials         244      50        +6.1%        35.3%   *
+C        2026-04-14   Financials         197      50        +7.1%        102.5%  *
+JNJ      2026-04-14   Healthcare         577      25        +26.4%       69.1%
+JPM      2026-04-14   Financials         787      25        +5.0%        44.3%
+MS       2026-04-15   Financials         259      75        +18.0%       73.0%   ***
+BAC      2026-04-15   Financials         346      50        +6.9%        45.9%   *
+PNC      2026-04-15   Financials         83       25        +8.9%        41.6%
+TRV      2026-04-16   Financials         65       100       +70.4%       26.3%   ***
+ABT      2026-04-16   Healthcare         182      0         -0.1%        2.1%    [NEAR 52wLOW - SKIP]
+USB      2026-04-16   Financials         80       0         +6.2%        46.6%
+KEY      2026-04-16   Financials         22       0         +5.0%        56.2%
+PEP      2026-04-16   Consumer Staples   206      0         +1.5%        18.2%
+TFC      2026-04-17   Financials         58       0         -1.5%        34.0%
+FITB     2026-04-17   Financials         41       0         +4.4%        40.8%
+RF       2026-04-17   Financials         22       0         +3.1%        43.8%
+SYF      2026-04-21   Financials         24       50        +21.9%       64.8%   *
+DHR      2026-04-21   Healthcare         133      25        -2.7%        10.0%
+ELV      2026-04-21   Healthcare         65       25        +6.1%        7.5%
+IVZ      2026-04-21   Financials         11       25        -13.7%       107.8%
+KMB      2026-04-21   Consumer Staples   33       25        +4.3%        2.7%    [NEAR 52wLOW - SKIP]
+UNH      2026-04-21   Healthcare         243      0         -1.3%        14.3%
+ISRG     2026-04-21   Healthcare         166      75        +10.8%       10.2%   ***
+COF      2026-04-21   Financials         113      75        +22.2%       27.2%   ***
+BSX      2026-04-22   Healthcare         104      25        +5.6%        3.9%    [NEAR 52wLOW - SKIP]
+CME      2026-04-22   Financials         108      25        +5.8%        19.7%
+TMO      2026-04-22   Healthcare         182      0         +2.3%        26.8%
+PM       2026-04-22   Consumer Staples   253      0         +1.3%        14.3%
+NOW      2026-04-22   Technology         109      50        +9.2%        5.8%    *
+LRCX     2026-04-22   Technology         266      25        +6.6%        275.7%
+IBM      2026-04-22   Technology         227      0         +2.6%        12.7%
+EW       2026-04-22   Healthcare         48       0         -1.0%        24.5%
+AXP      2026-04-23   Financials         206      0         +3.4%        35.8%
+HBAN     2026-04-23   Financials         31       0         +3.8%        29.4%
+NDAQ     2026-04-23   Financials         48       0         +3.9%        29.2%
+HIG      2026-04-23   Financials         38       75        +15.7%       25.5%   ***
+INTC     2026-04-23   Technology         221      50        +1145.7%     149.6%  * [NOTE: outlier EPS recovery]
+GOOG     2026-04-23   Technology         3396     50        +19.7%       96.8%   *
+GOOGL    2026-04-23   Technology         3398     50        +19.7%       99.9%   *
+GILD     2026-04-23   Healthcare         170      25        +6.2%        46.6%
+PG       2026-04-24   Consumer Staples   333      0         +1.9%        3.5%    [NEAR 52wLOW - SKIP]
+CINF     2026-04-27   Financials         25       100       +39.4%       28.1%   ***
+CDNS     2026-04-27   Technology         77       0         +5.7%        26.7%
+CNC      2026-04-28   Healthcare         17       50        +61.2%       33.8%   *
+SPGI     2026-04-28   Financials         125      0         +3.7%        8.1%
+KO       2026-04-28   Consumer Staples   321      0         +2.4%        14.3%
+SBUX     2026-04-28   Consumer Staples   104      0         -46.3%       20.8%
+KHC      2026-04-28   Consumer Staples   26       0         +6.6%        2.5%    [NEAR 52wLOW - SKIP]
+SYY      2026-04-28   Consumer Staples   40       0         -9.4%        23.1%
+CB       2026-04-28   Financials         127      75        +22.7%       17.3%   ***
+WMT      2026-04-29   Consumer Staples   784      75        +13.7%       14.4%   ***  [NOTE: unusual q - verify]
+REGN     2026-04-29   Healthcare         55       50        +19.7%       58.8%   *
+META     2026-04-29   Technology         1649     50        +15.5%       14.1%   *
+MSFT     2026-04-29   Technology         2807     75        +9.7%        18.1%   ***
+AAPL     2026-05-01   Technology         3193     75        +7.9%        8.4%    ***  [NOTE: beat rate high but avg surprise below 10%]
+ALL      2026-04-30   Financials         50       75        +28.6%       7.6%    ***
+CAH      2026-04-30   Healthcare         21       50        +11.6%       72.1%   *
+AMGN     2026-04-30   Healthcare         156      50        +32.4%       35.1%   *
+AIG      2026-04-30   Financials         52       25        +11.1%       4.2%    [NEAR 52wLOW - SKIP]
+SYK      2026-04-30   Healthcare         134      25        +9.7%        2.4%    [NEAR 52wLOW - SKIP]
+AMZN     2026-04-30   Technology         2228     75        +17.2%       28.6%   ***
+AON      2026-05-01   Financials         70       75        +24.2%       6.3%    ***
+TSN      2026-05-04   Consumer Staples   22       75        +17.3%       24.5%   ***
+PFE      2026-05-05   Healthcare         157      100       +32.9%       31.8%   ***
+ABBV     2026-05-05   Healthcare         357      75        +20.4%       24.2%   ***
+MDT      2026-05-05   Healthcare         107      100       +14.5%       16.4%   ***  [Note: FY quarter, verify]
+MCK      2026-05-06   Healthcare         78       75        +11.8%       34.7%   ***
+MRK      2026-05-08   Healthcare         222      75        +18.0%       38.1%   ***
+BDX      2026-05-08   Healthcare         82       75        +10.7%       19.3%   ***
+HOLX     2026-05-08   Healthcare         14       75        +13.4%       26.9%   ***
+
+(*) = beat_rate 50-74%  (***) = beat_rate 75%+
+
+------------------------------------------------------------------------
+SECTION 2: STRONG PEAD CANDIDATES (beat_rate >= 75%, avg_surprise >= 10%, NOT near 52w low)
+Entry: Next-day open after earnings. Exit: 5 trading days later. Size: $5,000.
+------------------------------------------------------------------------
+
+  MS | Financials | Earnings: 2026-04-15
+    Market Cap: $259B
+    Beat Rate (4q): 75% | Avg Surprise (4q): +18.0%
+    Beat Rate (8q): 75% | Avg Surprise (8q): +11.2%
+    52w Low Distance: 73.0% above low (safe from 52w confound)
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for MS on 2026-04-16 open
+      (if MS beats EPS by >=10% on 2026-04-15)
+
+  TRV | Financials | Earnings: 2026-04-16
+    Market Cap: $65B
+    Beat Rate (4q): 100% | Avg Surprise (4q): +70.4%
+    Beat Rate (8q): 75% | Avg Surprise (8q): +44.1%
+    52w Low Distance: 26.3% above low (safe from 52w confound)
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for TRV on 2026-04-17 open
+      (if TRV beats EPS by >=10% on 2026-04-16)
+
+  ISRG | Healthcare | Earnings: 2026-04-21
+    Market Cap: $166B
+    Beat Rate (4q): 75% | Avg Surprise (4q): +10.8%
+    Beat Rate (8q): 75% | Avg Surprise (8q): +10.8%
+    52w Low Distance: 10.2% above low (safe from 52w confound)
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for ISRG on 2026-04-22 open
+      (if ISRG beats EPS by >=10% on 2026-04-21)
+
+  COF | Financials | Earnings: 2026-04-21
+    Market Cap: $113B
+    Beat Rate (4q): 75% | Avg Surprise (4q): +22.2%
+    Beat Rate (8q): 75% | Avg Surprise (8q): +14.4%
+    52w Low Distance: 27.2% above low (safe from 52w confound)
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for COF on 2026-04-22 open
+      (if COF beats EPS by >=10% on 2026-04-21)
+
+  HIG | Financials | Earnings: 2026-04-23
+    Market Cap: $38B
+    Beat Rate (4q): 75% | Avg Surprise (4q): +15.7%
+    Beat Rate (8q): 75% | Avg Surprise (8q): +15.7%
+    52w Low Distance: 25.5% above low (safe from 52w confound)
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for HIG on 2026-04-24 open
+      (if HIG beats EPS by >=10% on 2026-04-23)
+
+  CINF | Financials | Earnings: 2026-04-27
+    Market Cap: $25B
+    Beat Rate (4q): 100% | Avg Surprise (4q): +39.4%
+    Beat Rate (8q): 100% | Avg Surprise (8q): +30.7%
+    52w Low Distance: 28.1% above low (safe from 52w confound)
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for CINF on 2026-04-28 open
+      (if CINF beats EPS by >=10% on 2026-04-27)
+
+  CB | Financials | Earnings: 2026-04-28
+    Market Cap: $127B
+    Beat Rate (4q): 75% | Avg Surprise (4q): +22.7%
+    Beat Rate (8q): 75% | Avg Surprise (8q): +16.5%
+    52w Low Distance: 17.3% above low (safe from 52w confound)
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for CB on 2026-04-29 open
+      (if CB beats EPS by >=10% on 2026-04-28)
+
+  MSFT | Technology | Earnings: 2026-04-29
+    Market Cap: $2807B
+    Beat Rate (4q): 75% | Avg Surprise (4q): +9.7%
+    Beat Rate (8q): 75% | Avg Surprise (8q): +8.8%
+    52w Low Distance: 18.1% above low (safe from 52w confound)
+    NOTE: Avg surprise borderline at +9.7% (threshold is 10%). Watch for >=10% beat to qualify.
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for MSFT on 2026-04-30 open
+      (if MSFT beats EPS by >=10% on 2026-04-29)
+
+  ALL | Financials | Earnings: 2026-04-30
+    Market Cap: $50B
+    Beat Rate (4q): 75% | Avg Surprise (4q): +28.6%
+    Beat Rate (8q): 75% | Avg Surprise (8q): +21.4%
+    52w Low Distance: 7.6% above low (safe from 52w confound)
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for ALL on 2026-05-01 open
+      (if ALL beats EPS by >=10% on 2026-04-30)
+
+  AMZN | Technology | Earnings: 2026-04-30
+    Market Cap: $2228B
+    Beat Rate (4q): 75% | Avg Surprise (4q): +17.2%
+    Beat Rate (8q): 88% | Avg Surprise (8q): +20.0%
+    52w Low Distance: 28.6% above low (safe from 52w confound)
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for AMZN on 2026-05-01 open
+      (if AMZN beats EPS by >=10% on 2026-04-30)
+
+  AON | Financials | Earnings: 2026-05-01
+    Market Cap: $70B
+    Beat Rate (4q): 75% | Avg Surprise (4q): +24.2%
+    Beat Rate (8q): 50% | Avg Surprise (8q): +12.7%
+    52w Low Distance: 6.3% above low (safe from 52w confound)
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for AON on 2026-05-04 open
+      (if AON beats EPS by >=10% on 2026-05-01)
+
+  TSN | Consumer Staples | Earnings: 2026-05-04
+    Market Cap: $22B
+    Beat Rate (4q): 75% | Avg Surprise (4q): +17.3%
+    Beat Rate (8q): 88% | Avg Surprise (8q): +27.5%
+    52w Low Distance: 24.5% above low (safe from 52w confound)
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for TSN on 2026-05-05 open
+      (if TSN beats EPS by >=10% on 2026-05-04)
+
+  PFE | Healthcare | Earnings: 2026-05-05
+    Market Cap: $157B
+    Beat Rate (4q): 100% | Avg Surprise (4q): +32.9%
+    Beat Rate (8q): 100% | Avg Surprise (8q): +41.7%
+    52w Low Distance: 31.8% above low (safe from 52w confound)
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for PFE on 2026-05-06 open
+      (if PFE beats EPS by >=10% on 2026-05-05)
+
+  ABBV | Healthcare | Earnings: 2026-05-05
+    Market Cap: $357B
+    Beat Rate (4q): 75% | Avg Surprise (4q): +20.4%
+    Beat Rate (8q): 75% | Avg Surprise (8q): +17.4%
+    52w Low Distance: 24.2% above low (safe from 52w confound)
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for ABBV on 2026-05-06 open
+      (if ABBV beats EPS by >=10% on 2026-05-05)
+
+  MDT | Healthcare | Earnings: 2026-05-05
+    Market Cap: $107B
+    Beat Rate (4q): 100% | Avg Surprise (4q): +14.5%
+    Beat Rate (8q): 100% | Avg Surprise (8q): +13.6%
+    52w Low Distance: 16.4% above low (safe from 52w confound)
+    NOTE: MDT uses non-calendar fiscal year — verify Q1 2026 vs fiscal Q4.
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for MDT on 2026-05-06 open
+      (if MDT beats EPS by >=10% on 2026-05-05)
+
+  MCK | Healthcare | Earnings: 2026-05-06
+    Market Cap: $78B
+    Beat Rate (4q): 75% | Avg Surprise (4q): +11.8%
+    Beat Rate (8q): 75% | Avg Surprise (8q): +13.2%
+    52w Low Distance: 34.7% above low (safe from 52w confound)
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for MCK on 2026-05-07 open
+      (if MCK beats EPS by >=10% on 2026-05-06)
+
+  MRK | Healthcare | Earnings: 2026-05-08
+    Market Cap: $222B
+    Beat Rate (4q): 75% | Avg Surprise (4q): +18.0%
+    Beat Rate (8q): 75% | Avg Surprise (8q): +14.3%
+    52w Low Distance: 38.1% above low (safe from 52w confound)
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for MRK on 2026-05-11 open
+      (if MRK beats EPS by >=10% on 2026-05-08)
+
+  BDX | Healthcare | Earnings: 2026-05-08
+    Market Cap: $82B
+    Beat Rate (4q): 75% | Avg Surprise (4q): +10.7%
+    Beat Rate (8q): 75% | Avg Surprise (8q): +10.3%
+    52w Low Distance: 19.3% above low (safe from 52w confound)
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for BDX on 2026-05-11 open
+      (if BDX beats EPS by >=10% on 2026-05-08)
+
+  HOLX | Healthcare | Earnings: 2026-05-08
+    Market Cap: $14B
+    Beat Rate (4q): 75% | Avg Surprise (4q): +13.4%
+    Beat Rate (8q): 75% | Avg Surprise (8q): +11.8%
+    52w Low Distance: 26.9% above low (safe from 52w confound)
+    RECOMMENDED ACTION:
+      When VIX drops below 20, activate PEAD long hypothesis 9e2a03ac
+      for HOLX on 2026-05-11 open
+      (if HOLX beats EPS by >=10% on 2026-05-08)
+
+------------------------------------------------------------------------
+SECTION 3: MODERATE PEAD CANDIDATES (beat_rate 50-74%, avg_surprise >= 10%)
+------------------------------------------------------------------------
+  SYF (Financials) | 2026-04-21 | Beat 50% | AvgSurp +21.9% | 52w+: 64.8%
+    ACTION: If SYF beats >=10% and VIX<20, activate 9e2a03ac for 2026-04-22 open
+  GOOG (Technology) | 2026-04-23 | Beat 50% | AvgSurp +19.7% | 52w+: 96.8%
+    ACTION: If GOOG beats >=10% and VIX<20, activate 9e2a03ac for 2026-04-24 open
+  GOOGL (Technology) | 2026-04-23 | Beat 50% | AvgSurp +19.7% | 52w+: 99.9%
+    NOTE: Use GOOG or GOOGL (same company), not both. Prefer GOOGL (voting shares).
+    ACTION: If GOOGL beats >=10% and VIX<20, activate 9e2a03ac for 2026-04-24 open
+  CNC (Healthcare) | 2026-04-28 | Beat 50% | AvgSurp +61.2% | 52w+: 33.8%
+    ACTION: If CNC beats >=10% and VIX<20, activate 9e2a03ac for 2026-04-29 open
+  REGN (Healthcare) | 2026-04-29 | Beat 50% | AvgSurp +19.7% | 52w+: 58.8%
+    ACTION: If REGN beats >=10% and VIX<20, activate 9e2a03ac for 2026-04-30 open
+  META (Technology) | 2026-04-29 | Beat 50% | AvgSurp +15.5% | 52w+: 14.1%
+    ACTION: If META beats >=10% and VIX<20, activate 9e2a03ac for 2026-04-30 open
+  CAH (Healthcare) | 2026-04-30 | Beat 50% | AvgSurp +11.6% | 52w+: 72.1%
+    ACTION: If CAH beats >=10% and VIX<20, activate 9e2a03ac for 2026-05-01 open
+  AMGN (Healthcare) | 2026-04-30 | Beat 50% | AvgSurp +32.4% | 52w+: 35.1%
+    ACTION: If AMGN beats >=10% and VIX<20, activate 9e2a03ac for 2026-05-01 open
+
+  NOTE: INTC (beat 50%, AvgSurp +1145.7%) excluded — outlier from EPS recovery,
+        not representative of repeatable beat pattern.
+
+------------------------------------------------------------------------
+SECTION 4: NEAR 52-WEEK LOW — AVOID PEAD (confound with mean reversion signal)
+------------------------------------------------------------------------
+  ABT  (Healthcare)       | 2026-04-16 | Only 2.1% above 52w low — SKIP for PEAD
+  KMB  (Consumer Staples) | 2026-04-21 | Only 2.7% above 52w low — SKIP for PEAD
+  BSX  (Healthcare)       | 2026-04-22 | Only 3.9% above 52w low — SKIP for PEAD
+  PG   (Consumer Staples) | 2026-04-24 | Only 3.5% above 52w low — SKIP for PEAD
+  KHC  (Consumer Staples) | 2026-04-28 | Only 2.5% above 52w low — SKIP for PEAD
+  V    (Financials)       | 2026-04-28 | Only 2.9% above 52w low — SKIP for PEAD
+  AIG  (Financials)       | 2026-04-30 | Only 4.2% above 52w low — SKIP for PEAD
+  SYK  (Healthcare)       | 2026-04-30 | Only 2.4% above 52w low — SKIP for PEAD
+
+  (These may also trigger the 52w-low short hypothesis — do not layer two signals.)
+
+------------------------------------------------------------------------
+SECTION 5: VIX REGIME MONITORING & ACTIVATION PROTOCOL
+------------------------------------------------------------------------
+  Current VIX: 27.4
+  PEAD signal validated for VIX<20 regime:
+    - VIX<20: avg5d=+1.96%, p=0.024, n=63, direction=68% (VALIDATED — OOS 2024-2025)
+    - VIX 20-25: direction~45% (FAILS threshold — do not trade)
+    - VIX>25: uncertain, avoid
+
+  Liberation Day April 2 tariff shock risk:
+    - If VIX spikes above 30 on April 2-3, signal is NOT valid for early earners
+    - Monitor VIX daily April 7-14 for return toward 20
+    - If VIX still >= 20 by April 14, defer all PEAD entries until regime clears
+    - Historical pattern: post-tariff VIX spikes mean-revert within 10-20 trading days
+
+  ACTIVATION TRIGGER (execute on earnings night after close):
+    1. Confirm stock beat EPS by >= 10% (check earnings release or financial wire)
+    2. Confirm VIX < 20 at or before market close on earnings day
+    3. Set trigger for next-day open:
+         import db
+         db.update_hypothesis_fields('9e2a03ac',
+             trigger='next_market_open',
+             trigger_position_size=5000,
+             trigger_stop_loss_pct=10,
+         )
+    4. trade_loop.py picks up at next_market_open and executes entry.
+
+  PRIORITY ORDERING for Q1 2026 (if VIX < 20 by mid-April):
+    Tier 1 — Highest conviction (100% beat rate, high avg surprise):
+      TRV  (Apr 16), CINF (Apr 27), PFE  (May 05), MDT  (May 05)
+    Tier 2 — Strong (75%+ beat rate, avg surprise >= 15%):
+      MS   (Apr 15), COF  (Apr 21), HIG  (Apr 23), CB   (Apr 28)
+      AMZN (Apr 30), MRK  (May 08), ABBV (May 05), MCK  (May 06)
+    Tier 3 — Good (75% beat rate, avg surprise 10-15%):
+      ISRG (Apr 21), ALL  (Apr 30), AON  (May 01), TSN  (May 04)
+      BDX  (May 08), HOLX (May 08)
+
+------------------------------------------------------------------------
+SECTION 6: CALENDAR HEATMAP — REPORTERS BY WEEK
+------------------------------------------------------------------------
+  Week of Apr 14 (early banks/healthcare):
+    Mon Apr 14: WFC, C, JPM, JNJ
+    Tue Apr 15: MS, BAC
+    Wed Apr 16: TRV [***], ABT [SKIP-52wLow], USB, KEY, PEP
+    Thu Apr 17: TFC, FITB, RF
+
+  Week of Apr 21 (broad sector):
+    Mon Apr 21: SYF, DHR, ELV, KMB [SKIP], UNH, ISRG [***], COF [***]
+    Tue Apr 22: BSX [SKIP], CME, TMO, PM, NOW, LRCX, IBM, EW
+    Wed Apr 23: AXP, HBAN, NDAQ, HIG [***], INTC [NOTE], GOOG, GOOGL, GILD
+    Thu Apr 24: PG [SKIP]
+
+  Week of Apr 27 (mega-cap week):
+    Sun Apr 27: CINF [***]
+    Mon Apr 28: CNC, SPGI, KO, SBUX, KHC [SKIP], SYY, CB [***]
+    Tue Apr 29: WMT [***], REGN, META, MSFT [***]
+    Wed Apr 30: ALL [***], CAH, AMGN, AIG [SKIP], SYK [SKIP], AMZN [***]
+
+  Week of May 4 (late reporters):
+    Thu May 1: AAPL, AON [***]
+    Mon May 4: TSN [***]
+    Tue May 5: PFE [***], ABBV [***], MDT [***]
+    Wed May 6: MCK [***]
+    Thu May 7: (check queue)
+    Fri May 8: MRK [***], BDX [***], HOLX [***]
+
+------------------------------------------------------------------------
+SECTION 7: METHODOLOGY NOTES
+------------------------------------------------------------------------
+  - Beat history sourced from yfinance earnings_dates (past 4-8 quarters)
+  - Surprise% = (actual - estimate) / abs(estimate) * 100
+  - 52w low distance = (current_price - 52w_low) / 52w_low * 100
+  - Stocks < 5% above 52w low excluded: avoid confound with mean-reversion trades
+  - Entry: next-day open after earnings release (consistent with PEAD backtest)
+  - Exit: 5 trading days after entry (hypothesis tested at 5d horizon)
+  - Position size: $5,000 (standard experiment size), stop-loss 10%
+  - Hypothesis 9e2a03ac: PEAD Long earnings beat >=10% VIX<20
+  - OOS validation result: avg5d=+2.20%, p=0.02, n=63 (2024-2025 OOS)
+  - Discovery period (2020-2023) fails (p=0.78) — signal is RECENT regime only
+  - This recency is consistent with VIX<20 filter: 2020-2023 had frequent VIX>20 episodes
+  - Caveat: earnings date data from yfinance may have 1-2 day imprecision for future dates;
+    confirm actual release dates from company IR pages or financial calendars 1 week before entry.
+  - WMT note: WMT typically reports in February/May; the Apr 29 date may be a data artifact —
+    verify on walmart.com/ir before activating.
+  - AAPL note: reports ~May 1; beat rate 75% but avg surprise only +7.9% (borderline).
+    Only activate if actual surprise is >= 10% on the day.
