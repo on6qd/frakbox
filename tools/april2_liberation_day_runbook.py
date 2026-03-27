@@ -213,7 +213,7 @@ def check_conditions():
     print("=" * 70)
     print("UPCOMING SIGNALS TO MONITOR (April-May 2026)")
     print("=" * 70)
-    print("• VGNT: Auto-triggers April 1 16:00 (spinco institutional selling, 5d short)")
+    print("• VGNT/FDXF/HONA: ABANDONED (tickers not found in Alpaca paper trading, 2026-03-27)")
     print("• REPL: PDUFA April 10. If 2nd CRL and >40% drop → activate_repl_trade.py")
     print("  - If >40% but <55% drop: use hypothesis 5f805860 (REPL short)")
     print("  - If >55% drop: use hypothesis d302c84b (clinical efficacy failure)")
