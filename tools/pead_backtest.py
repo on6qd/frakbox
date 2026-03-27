@@ -1,277 +1,277 @@
 """
-Post-Earnings Announcement Drift (PEAD) Backtest
+PEAD (Post-Earnings Announcement Drift) Backtest
 =================================================
-Tests whether stocks that significantly beat earnings continue to drift upward
-over 1, 3, 5, and 10 trading days.
+Tests whether large-cap S&P 500 stocks that beat EPS consensus by >=10%
+show measurable positive drift (abnormal return vs SPY) over 5-10 days.
 
-Signal: EPS surprise > threshold (e.g., >5%, >10%)
-Direction: LONG for positive surprise, SHORT for negative surprise
-Benchmark: SPY abnormal return
-
-Academic: Ball & Brown (1968), Bernard & Thomas (1989) - PEAD is one of the
-most robust market anomalies in finance literature.
-
-Causal mechanism:
-1. Actors/Incentives: Institutional investors slow to rebalance, analysts revise
-   gradually, retail investors discover results over days
-2. Transmission channel: Gradual repricing as more investors read/act on results
-3. Academic: PEAD is the "anomaly of anomalies" - extensively documented
+Usage:
+  python tools/pead_backtest.py
 """
 
 import sys
+import json
+import numpy as np
+import pandas as pd
 from pathlib import Path
+from datetime import datetime, timedelta
+from scipy import stats
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import yfinance as yf
-import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
-from tools.yfinance_utils import safe_download, get_close_prices
-from tools.largecap_filter import filter_to_largecap
+from tools.yfinance_utils import safe_download
 
-def get_sp500_tickers():
-    """Load S&P 500 tickers from local file."""
+# Configuration
+MIN_SURPRISE_PCT = 10.0    # Minimum EPS beat (%)
+MAX_SURPRISE_PCT = 200.0   # Exclude likely GAAP one-time items
+MIN_MARKET_CAP_B = 10.0    # $10B+ (large-cap)
+DISCOVERY_END = '2024-01-01'  # 2020-2023 = discovery
+OOS_START = '2024-01-01'      # 2024-2025 = OOS validation
+
+# Large-cap S&P 500 stocks to test (mega-cap + large-cap, diverse sectors)
+UNIVERSE = [
+    # Tech
+    'AAPL', 'MSFT', 'NVDA', 'GOOGL', 'META', 'AMZN', 'ADBE', 'CRM', 'ORCL', 'CSCO',
+    'AMD', 'QCOM', 'INTC', 'TXN', 'AMAT', 'MU', 'KLAC', 'LRCX', 'CDNS', 'SNPS',
+    # Healthcare
+    'UNH', 'JNJ', 'LLY', 'ABBV', 'MRK', 'ABT', 'TMO', 'DHR', 'BMY', 'AMGN',
+    'GILD', 'ISRG', 'SYK', 'BSX', 'MDT', 'HCA', 'CI', 'CVS', 'ELV', 'HUM',
+    # Financials
+    'JPM', 'BAC', 'WFC', 'GS', 'MS', 'BLK', 'AXP', 'COF', 'USB', 'PNC',
+    'V', 'MA', 'PYPL', 'BRK-B', 'ICE', 'CME', 'SPGI', 'MCO', 'FIS', 'FISV',
+    # Consumer
+    'HD', 'MCD', 'NKE', 'SBUX', 'TGT', 'COST', 'WMT', 'LOW', 'TJX', 'ROST',
+    'PG', 'KO', 'PEP', 'PM', 'MO', 'KHC', 'GIS', 'K', 'CPB', 'CAG',
+    # Industrials
+    'HON', 'GE', 'CAT', 'DE', 'MMM', 'EMR', 'ETN', 'ITW', 'PH', 'ROK',
+    # Energy
+    'XOM', 'CVX', 'COP', 'EOG', 'SLB', 'HAL', 'PSX', 'VLO', 'MPC',
+    # Real Estate / Other
+    'AMT', 'PLD', 'EQIX', 'CCI', 'SPG',
+]
+
+
+def get_earnings_beats(symbol: str, min_pct: float = MIN_SURPRISE_PCT,
+                        max_pct: float = MAX_SURPRISE_PCT) -> list[dict]:
+    """Get all EPS beats >= min_pct for a symbol from yfinance."""
     try:
-        with open('tools/sp500_tickers.txt', 'r') as f:
-            return [line.strip() for line in f if line.strip()]
-    except:
-        # Fallback: use a broad ETF-based list
-        return None
-
-def collect_earnings_surprises(tickers, lookback_years=3, min_surprise_pct=5.0):
-    """Collect earnings events with significant EPS surprises."""
-    events = []
-    start_date = (datetime.now() - timedelta(days=lookback_years*365)).strftime('%Y-%m-%d')
-    end_date = datetime.now().strftime('%Y-%m-%d')
-    
-    processed = 0
-    errors = 0
-    
-    for ticker in tickers[:100]:  # Cap at 100 for speed
-        try:
-            t = yf.Ticker(ticker)
-            dates = t.earnings_dates
-            if dates is None or len(dates) == 0:
-                continue
-            
-            # Filter to historical dates (not future)
-            dates = dates[dates.index < pd.Timestamp.now(tz='America/New_York')]
-            
-            for dt, row in dates.iterrows():
-                eps_est = row.get('EPS Estimate')
-                eps_act = row.get('Reported EPS')
-                surprise_pct = row.get('Surprise(%)')
-                
-                if pd.isna(eps_est) or pd.isna(eps_act) or pd.isna(surprise_pct):
-                    continue
-                
-                # Only significant surprises
-                if abs(surprise_pct) < min_surprise_pct:
-                    continue
-                
-                # Convert tz-aware to tz-naive date string
-                event_date = dt.strftime('%Y-%m-%d')
-                if event_date < start_date:
-                    continue
-                
-                direction = 'long' if surprise_pct > 0 else 'short'
-                events.append({
-                    'ticker': ticker,
-                    'event_date': event_date,
-                    'eps_estimate': eps_est,
-                    'eps_actual': eps_act,
-                    'surprise_pct': surprise_pct,
-                    'direction': direction,
-                })
-            
-            processed += 1
-        except Exception as e:
-            errors += 1
-    
-    print(f"Processed {processed} tickers, {errors} errors, {len(events)} events found")
-    return events
-
-
-def measure_pead_returns(events, horizons=[1, 3, 5, 10]):
-    """Measure abnormal returns after each earnings event."""
-    results = []
-    
-    # Get SPY data for benchmark
-    spy = safe_download('SPY', start='2022-01-01', end=datetime.now().strftime('%Y-%m-%d'))
-    if spy is None:
-        print("ERROR: Could not get SPY data")
-        return []
-    spy_closes = spy['Close']
-    
-    for ev in events:
-        ticker = ev['ticker']
-        event_date = ev['event_date']
+        ticker = yf.Ticker(symbol)
+        ed = ticker.earnings_dates
+        if ed is None or len(ed) == 0:
+            return []
         
-        try:
-            # Get stock data
-            start = (pd.Timestamp(event_date) - timedelta(days=5)).strftime('%Y-%m-%d')
-            end = (pd.Timestamp(event_date) + timedelta(days=25)).strftime('%Y-%m-%d')
-            
-            df = safe_download(ticker, start=start, end=end)
-            if df is None or len(df) < 5:
-                continue
-            
-            df.index = pd.to_datetime(df.index).tz_localize(None)
-            
-            # Find the trading day of or after event (earnings often released pre-market)
-            event_ts = pd.Timestamp(event_date)
-            future_dates = df.index[df.index >= event_ts]
-            if len(future_dates) == 0:
-                continue
-            
-            # Use the OPEN of next trading day as entry (like a realistic trade)
-            entry_date = future_dates[0]
-            entry_idx = df.index.get_loc(entry_date)
-            
-            if entry_idx >= len(df):
-                continue
-            
-            entry_price = df['Open'].iloc[entry_idx]
-            
-            for horizon in horizons:
-                exit_idx = entry_idx + horizon
-                if exit_idx >= len(df):
-                    continue
-                
-                exit_price = df['Close'].iloc[exit_idx]
-                stock_return = (exit_price - entry_price) / entry_price
-                
-                # SPY benchmark
-                spy_filtered = spy_closes[spy_closes.index >= entry_date]
-                spy_entry = spy_filtered.iloc[0] if len(spy_filtered) > 0 else None
-                
-                if spy_entry is None:
-                    continue
-                    
-                spy_future = spy_filtered.iloc[horizon] if len(spy_filtered) > horizon else None
-                if spy_future is None:
-                    spy_return = 0
-                else:
-                    spy_return = (spy_future - spy_entry) / spy_entry
-                
-                # For short direction, flip the return
-                if ev['direction'] == 'long':
-                    abnormal = stock_return - spy_return
-                else:
-                    abnormal = -(stock_return - spy_return)
-                
-                results.append({
-                    'ticker': ticker,
-                    'event_date': event_date,
-                    'horizon': horizon,
-                    'direction': ev['direction'],
-                    'surprise_pct': ev['surprise_pct'],
-                    'stock_return': stock_return * 100,
-                    'spy_return': spy_return * 100,
-                    'abnormal_return': abnormal * 100,
-                    'direction_correct': abnormal > 0,
-                })
-        except Exception as e:
-            continue
-    
-    return results
+        # Filter: actual beats in range
+        beats = ed[
+            (ed['Surprise(%)'] >= min_pct) & 
+            (ed['Surprise(%)'] <= max_pct)
+        ].dropna(subset=['Surprise(%)', 'Reported EPS', 'EPS Estimate'])
+        
+        results = []
+        for dt, row in beats.iterrows():
+            date_str = str(dt)[:10]
+            results.append({
+                'symbol': symbol,
+                'date': date_str,
+                'surprise_pct': round(float(row['Surprise(%)']), 1),
+                'reported_eps': float(row['Reported EPS']),
+                'est_eps': float(row['EPS Estimate']),
+            })
+        return results
+    except Exception as e:
+        return []
 
 
-def analyze_results(results, min_surprise=5.0):
-    """Analyze PEAD results with statistical tests."""
-    from scipy import stats
+def measure_abnormal_return(symbol: str, event_date: str, horizon_days: int) -> float | None:
+    """Measure abnormal return vs SPY over horizon_days starting from next trading day."""
+    # Get price data for symbol and SPY around event
+    start = pd.Timestamp(event_date) - pd.Timedelta(days=5)
+    end = pd.Timestamp(event_date) + pd.Timedelta(days=horizon_days + 10)
     
-    df = pd.DataFrame(results)
-    if df.empty:
-        print("No results to analyze")
-        return
+    sym_data = safe_download(symbol, start=str(start)[:10], end=str(end)[:10])
+    spy_data = safe_download('SPY', start=str(start)[:10], end=str(end)[:10])
     
-    print(f"\n=== PEAD Backtest Results (surprise >= {min_surprise}%) ===")
-    print(f"Total observations: {len(df)}")
-    print(f"Unique tickers: {df['ticker'].nunique()}")
-    print(f"Date range: {df['event_date'].min()} to {df['event_date'].max()}")
+    if sym_data is None or spy_data is None:
+        return None
+    
+    sym_closes = sym_data['Close']
+    spy_closes = spy_data['Close']
+    
+    # Find the first trading day on or after event_date
+    event_ts = pd.Timestamp(event_date)
+    
+    sym_dates = sym_closes.index
+    spy_dates = spy_closes.index
+    
+    # Common dates only
+    common_dates = sym_dates.intersection(spy_dates)
+    common_dates = sorted([d for d in common_dates if pd.Timestamp(str(d)[:10]) >= event_ts])
+    
+    if len(common_dates) < horizon_days + 1:
+        return None
+    
+    entry_date = common_dates[0]
+    
+    # Find exit date approximately horizon_days trading days later
+    exit_idx = min(horizon_days, len(common_dates) - 1)
+    exit_date = common_dates[exit_idx]
+    
+    sym_entry = float(sym_closes.loc[entry_date]) if entry_date in sym_closes.index else None
+    sym_exit = float(sym_closes.loc[exit_date]) if exit_date in sym_closes.index else None
+    spy_entry = float(spy_closes.loc[entry_date]) if entry_date in spy_closes.index else None
+    spy_exit = float(spy_closes.loc[exit_date]) if exit_date in spy_closes.index else None
+    
+    if None in (sym_entry, sym_exit, spy_entry, spy_exit) or sym_entry == 0 or spy_entry == 0:
+        return None
+    
+    sym_return = (sym_exit / sym_entry - 1) * 100
+    spy_return = (spy_exit / spy_entry - 1) * 100
+    return round(sym_return - spy_return, 3)
+
+
+def run_pead_backtest():
+    print("=" * 70)
+    print("PEAD EARNINGS BEAT BACKTEST")
+    print("=" * 70)
+    print(f"Universe: {len(UNIVERSE)} stocks")
+    print(f"Min EPS beat: {MIN_SURPRISE_PCT}%  |  Max: {MAX_SURPRISE_PCT}% (excludes GAAP anomalies)")
+    print(f"Discovery: 2020-2023  |  OOS: 2024-2025")
     print()
     
-    for horizon in sorted(df['horizon'].unique()):
-        h_df = df[df['horizon'] == horizon]
-        n = len(h_df)
-        mean_ab = h_df['abnormal_return'].mean()
-        std_ab = h_df['abnormal_return'].std()
-        direction_pct = h_df['direction_correct'].mean() * 100
-        
-        t_stat, p_val = stats.ttest_1samp(h_df['abnormal_return'], 0)
-        
-        long_df = h_df[h_df['direction'] == 'long']
-        short_df = h_df[h_df['direction'] == 'short']
-        
-        print(f"Horizon {horizon}d: n={n} | mean={mean_ab:+.2f}% | dir={direction_pct:.0f}% | p={p_val:.3f}")
-        if len(long_df) > 0:
-            print(f"  LONG (beats): n={len(long_df)} | mean={long_df['abnormal_return'].mean():+.2f}% | dir={long_df['direction_correct'].mean()*100:.0f}%")
-        if len(short_df) > 0:
-            print(f"  SHORT (misses): n={len(short_df)} | mean={short_df['abnormal_return'].mean():+.2f}% | dir={short_df['direction_correct'].mean()*100:.0f}%")
+    all_events = []
     
-    # Test by surprise magnitude
-    print("\n=== By Surprise Magnitude (LONG events only) ===")
-    long_df = df[(df['direction'] == 'long') & (df['horizon'] == 5)]
-    for threshold in [5, 10, 15, 20]:
-        subset = long_df[long_df['surprise_pct'] >= threshold]
-        if len(subset) < 10:
-            continue
-        t_stat, p_val = stats.ttest_1samp(subset['abnormal_return'], 0)
-        print(f"  Surprise >= {threshold}%: n={len(subset)} | mean={subset['abnormal_return'].mean():+.2f}% | dir={subset['direction_correct'].mean()*100:.0f}% | p={p_val:.3f}")
+    # Step 1: Collect all earnings beats
+    print("Collecting earnings data...")
+    failed = 0
+    for i, sym in enumerate(UNIVERSE):
+        beats = get_earnings_beats(sym)
+        all_events.extend(beats)
+        if (i + 1) % 20 == 0:
+            print(f"  {i+1}/{len(UNIVERSE)}: {len(all_events)} beats found so far")
+    
+    print(f"\nTotal EPS beats found: {len(all_events)}")
+    
+    if len(all_events) < 20:
+        print("ERROR: Too few events found. Cannot run backtest.")
+        return
+    
+    # Step 2: Measure abnormal returns
+    print("\nMeasuring abnormal returns (5d and 10d)...")
+    results = []
+    for i, ev in enumerate(all_events):
+        if (i + 1) % 25 == 0:
+            print(f"  {i+1}/{len(all_events)} events processed")
+        
+        abn_5d = measure_abnormal_return(ev['symbol'], ev['date'], 5)
+        abn_10d = measure_abnormal_return(ev['symbol'], ev['date'], 10)
+        
+        if abn_5d is not None:
+            results.append({
+                **ev,
+                'abn_5d': abn_5d,
+                'abn_10d': abn_10d,
+            })
+    
+    print(f"Valid results: {len(results)}")
+    
+    if len(results) < 20:
+        print("ERROR: Too few valid results.")
+        return
+    
+    df = pd.DataFrame(results)
+    df['date'] = pd.to_datetime(df['date'])
+    
+    # Step 3: Discovery set analysis
+    disc = df[df['date'] < DISCOVERY_END].copy()
+    oos = df[df['date'] >= OOS_START].copy()
+    
+    print(f"\nDiscovery set: {len(disc)} events")
+    print(f"OOS set: {len(oos)} events")
+    
+    def analyze(data, label):
+        if len(data) < 5:
+            print(f"\n{label}: Too few events ({len(data)})")
+            return None
+        
+        a5 = data['abn_5d'].dropna()
+        avg5 = a5.mean()
+        dir5 = (a5 > 0.5).mean() * 100
+        t5, p5 = stats.ttest_1samp(a5, 0)
+        
+        a10 = data['abn_10d'].dropna()
+        avg10 = a10.mean()
+        dir10 = (a10 > 0.5).mean() * 100
+        t10, p10 = stats.ttest_1samp(a10, 0)
+        
+        print(f"\n{label} (n={len(data)}):")
+        print(f"  5d:  avg={avg5:+.2f}%, dir={dir5:.0f}%, p={p5:.4f}")
+        print(f"  10d: avg={avg10:+.2f}%, dir={dir10:.0f}%, p={p10:.4f}")
+        
+        # Multiple testing: 2+ horizons at p<0.05 or 1 at p<0.01
+        passes_mt = (p5 < 0.05 and p10 < 0.05) or (p5 < 0.01) or (p10 < 0.01)
+        print(f"  Multiple testing: {'PASS' if passes_mt else 'FAIL'}")
+        
+        # Direction threshold (>50% must exceed 0.5%)
+        dir_pass = dir5 > 50 and dir10 > 50
+        print(f"  Direction (>50% exceed 0.5%): {'PASS' if dir_pass else 'FAIL'}")
+        
+        return {'avg5': avg5, 'avg10': avg10, 'dir5': dir5, 'dir10': dir10,
+                'p5': p5, 'p10': p10, 'passes_mt': passes_mt, 'n': len(data)}
+    
+    disc_res = analyze(disc, "DISCOVERY (2020-2023)")
+    oos_res = analyze(oos, "OOS VALIDATION (2024-2025)")
+    
+    # Surprise bucket analysis
+    print("\n--- By EPS Surprise Bucket ---")
+    for lo, hi, label in [(10, 20, '10-20%'), (20, 50, '20-50%'), (50, 200, '50-200%')]:
+        bucket = df[(df['surprise_pct'] >= lo) & (df['surprise_pct'] < hi)]
+        if len(bucket) > 5:
+            a5 = bucket['abn_5d'].dropna()
+            print(f"  {label}: n={len(bucket)}, avg5d={a5.mean():+.2f}%, dir={((a5>0.5).mean()*100):.0f}%")
+    
+    # Best/worst events
+    print("\n--- Top 5 Best Events (5d abnormal) ---")
+    top = df.nlargest(5, 'abn_5d')[['symbol','date','surprise_pct','abn_5d','abn_10d']]
+    for _, row in top.iterrows():
+        print(f"  {row['symbol']} {str(row['date'])[:10]}: surprise={row['surprise_pct']:.1f}%, "
+              f"5d={row['abn_5d']:+.2f}%, 10d={row.get('abn_10d', float('nan')):+.2f}%")
+    
+    print("\n--- Top 5 Worst Events (5d abnormal) ---")
+    bot = df.nsmallest(5, 'abn_5d')[['symbol','date','surprise_pct','abn_5d','abn_10d']]
+    for _, row in bot.iterrows():
+        print(f"  {row['symbol']} {str(row['date'])[:10]}: surprise={row['surprise_pct']:.1f}%, "
+              f"5d={row['abn_5d']:+.2f}%, 10d={row.get('abn_10d', float('nan')):+.2f}%")
+    
+    # Final verdict
+    print("\n" + "=" * 70)
+    print("VERDICT")
+    print("=" * 70)
+    
+    if disc_res:
+        valid = disc_res['passes_mt'] and disc_res['avg5'] > 1.0
+        print(f"Discovery: {'VALID' if valid else 'INVALID'}")
+        print(f"  avg5d={disc_res['avg5']:+.2f}%, avg10d={disc_res['avg10']:+.2f}%")
+        print(f"  p5={disc_res['p5']:.4f}, p10={disc_res['p10']:.4f}, MT={'PASS' if disc_res['passes_mt'] else 'FAIL'}")
+    
+    if oos_res:
+        oos_valid = oos_res['avg5'] > 0.5 and oos_res['dir5'] > 50
+        print(f"OOS Validation: {'CONFIRMS' if oos_valid else 'REFUTES'}")
+        print(f"  avg5d={oos_res['avg5']:+.2f}%, avg10d={oos_res['avg10']:+.2f}%")
+    
+    # Save results
+    results_dict = {
+        'generated': datetime.now().isoformat(),
+        'n_total': len(df),
+        'n_discovery': len(disc),
+        'n_oos': len(oos),
+        'discovery': disc_res,
+        'oos': oos_res,
+        'all_events': results,
+    }
+    out_path = Path('tools/pead_backtest_results.json')
+    with open(out_path, 'w') as f:
+        json.dump(results_dict, f, indent=2, default=str)
+    print(f"\nFull results saved to {out_path}")
 
 
 if __name__ == '__main__':
-    print("=== PEAD (Post-Earnings Announcement Drift) Backtest ===")
-    print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-    print()
-    
-    # Load large-cap S&P 500 tickers
-    try:
-        sp500 = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')[0]
-        tickers = sp500['Symbol'].tolist()
-        print(f"Loaded {len(tickers)} S&P 500 tickers from Wikipedia")
-    except Exception as e:
-        print(f"Wikipedia failed ({e}), using local file...")
-        try:
-            with open('tools/sp500_tickers.txt', 'r') as f:
-                tickers = [line.strip() for line in f if line.strip()]
-            print(f"Loaded {len(tickers)} tickers from local file")
-        except:
-            # Hardcode a broad set
-            tickers = ['AAPL','MSFT','AMZN','GOOGL','META','NVDA','BRK.B','JPM','V','UNH',
-                      'HD','PG','MA','AVGO','CVX','LLY','PFE','ABBV','KO','MRK','PEP','TMO',
-                      'COST','BAC','MCD','ACN','CSCO','NKE','WMT','IBM','XOM','VZ','T','GS',
-                      'MS','C','WFC','USB','AXP','BLK','SPGI','CME','ICE','COF','TRV','MMC',
-                      'AON','MET','PRU','AFL','ALL','CB','HIG','LNC','UNM','SYF','DFS','SYK',
-                      'ABT','DHR','MDT','BSX','EW','ISRG','BDX','ZBH','HOLX','BAX','RMD','IQV']
-            print(f"Using hardcoded {len(tickers)} tickers")
-    
-    # Use tickers directly - all hardcoded ones are large-cap
-    large_cap = tickers[:80]
-    print(f"Tickers to process: {len(large_cap)}")
-    
-    # Collect earnings events
-    print("\nCollecting earnings surprises (>=5% EPS surprise)...")
-    events = collect_earnings_surprises(large_cap, lookback_years=3, min_surprise_pct=5.0)
-    
-    if not events:
-        print("No events found!")
-        sys.exit(1)
-    
-    print(f"\nFound {len(events)} earnings events")
-    beats = sum(1 for e in events if e['direction'] == 'long')
-    misses = sum(1 for e in events if e['direction'] == 'short')
-    print(f"Beats (long): {beats}, Misses (short): {misses}")
-    
-    # Measure returns
-    print("\nMeasuring abnormal returns...")
-    results = measure_pead_returns(events, horizons=[1, 3, 5, 10])
-    
-    # Analyze
-    analyze_results(results, min_surprise=5.0)
-    
-    # Save results
-    results_df = pd.DataFrame(results)
-    results_df.to_csv('tools/pead_results.csv', index=False)
-    print(f"\nResults saved to tools/pead_results.csv")
+    run_pead_backtest()
