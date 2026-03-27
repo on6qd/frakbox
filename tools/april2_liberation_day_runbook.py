@@ -22,14 +22,33 @@ UPDATED PORTFOLIO STATE (as of 2026-03-28):
   - AMT, VGNT: ABANDONED (tickers not tradeable in Alpaca paper)
   - TDG: monitoring (near 52w low but not yet crossed)
 
-PRE-SELLOFF REGIME CAVEAT (identified 2026-03-28):
-  SPY is down ~9% from recent highs going into Liberation Day.
-  Historical tariff events: SPY 20d pre-move was -1% to +4% (none > -3% presold).
-  Liberation Day 2026 is OUTSIDE the training distribution for tariff signals.
-  Risk: if tariffs already priced in → bounce scenario → defensives (GLD/KO/XLU) lag.
-  Protection: SPY<-0.5% gate on April 2 filters bounce scenarios.
-  EXTRA CAUTION: KO/XLU fire unconditionally April 7 — if SPY up on April 2, consider
-  manually canceling these (reduce trigger timestamp in db) to avoid the bounce lag risk.
+PRE-SELLOFF REGIME CAVEAT (identified 2026-03-28, updated 2026-03-28):
+  SPY is down ~7.3% over 20 days and -8.6% from 60d peak going into Liberation Day.
+  Training distribution: 20d pre-moves ranged -3.5% to +4.5% (only 2019-08-23 was worse at -5.7%).
+  Liberation Day 2026 at -7.3% pre-move is OUTSIDE the training distribution.
+
+  CRITICAL ANALOG — 2019-08-23 (most similar pre-selloff of -5.7%):
+    - Context: Trump threatened tariffs on $300B China goods (pre-selloff -5.7%)
+    - Result: OPPOSITE of signal → SPY bounced +5.2%, GLD -5.5% abnormal, KO -3.7%, KRE +5.2%
+    - Reason: Event was followed by tariff rollback, not escalation
+    - Implication: When market already sold off AND tariffs don't escalate → market BOUNCES
+
+  WHY THE SPY GATE PROTECTS US:
+    - Gate: SPY must be DOWN on April 2 close (after announcement)
+    - If announcement was a rollback/small: SPY likely UP → gate blocks defensive longs
+    - If announcement was escalation: SPY DOWN → gate allows defensive longs
+    - The 2019-08-23 analog would NOT pass the gate (SPY rallied after announcement)
+
+  RESIDUAL RISK:
+    - If tariffs are announced large AND market initially sells off at 6pm but bounces overnight
+    - We would enter April 7 at a bounce high (worst case scenario)
+    - No complete protection against this; but if tariffs are truly large, sustained selloff is likely
+
+  KO/XLU UNCONDITIONAL TRIGGERS (fire April 7 regardless of gate):
+    - Currently KO (dbe0dc29) and XLU (9184ba0f) do NOT have SPY gate
+    - If SPY is UP on April 2, these WILL fire on April 7 into a bounce → BAD
+    - RECOMMENDED ACTION: If SPY > +0.5% on April 2, manually cancel KO and XLU triggers
+    - Command: Check db.update_hypothesis_fields for dbe0dc29, 9184ba0f
 
 CAPACITY ON APRIL 7:
   - SPY long (1 slot, 20d hold from March 31)
