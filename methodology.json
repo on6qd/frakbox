@@ -1,6 +1,6 @@
 {
-  "version": 5,
-  "last_updated": "2026-03-21",
+  "version": 6,
+  "last_updated": "2026-03-27",
   "last_review_at_experiment": 0,
   "review_every_n_experiments": 10,
   "last_weekly_diagnostic": "2026-03-21T10:46:00.361519",
@@ -22,6 +22,8 @@
       20
     ],
     "max_concurrent_experiments": 10,
+    "max_active_signal_types": 3,
+    "max_concurrent_per_signal": 2,
     "knowledge_revalidation_months": 12,
     "min_direction_threshold_pct": 0.5,
     "estimated_round_trip_cost_pct": 0.1,
@@ -80,14 +82,39 @@
     },
     "requirement": "If backtesting has N>=15, subset by regime and report whether effect is regime-dependent. If regime-dependent, note which regime the hypothesis applies to."
   },
+  "focus_rules": {
+    "note": "Research without focus is just burning tokens. These rules prevent scatter.",
+    "max_active_signal_types": 3,
+    "max_concurrent_per_signal": 2,
+    "abandon_threshold": 3,
+    "abandon_note": "If 3 consecutive hypotheses on the same signal fail or are abandoned, retire the signal type.",
+    "pending_gate": "Do not start new signal types until pending queue has < 5 entries."
+  },
+  "revalidation": {
+    "note": "No signal is permanent. Markets change. Validated effects must be re-tested on fresh data periodically.",
+    "revalidation_months": 6,
+    "on_failure": "If revalidation experiment fails, downgrade from VALIDATED to EXPLORING and reset the evidence clock."
+  },
+  "experiment_independence": {
+    "note": "Correlated experiments (same signal, same week) count as one independent data point. Promotion/retirement thresholds use effective_independent_n, not raw experiment count.",
+    "window_days": 5,
+    "clustering": "Experiments within window_days trading days of each other are clustered. Each cluster's direction_correct is majority vote."
+  },
+  "pattern_states": {
+    "EXPLORING": "Not enough independent data to judge (effective_independent_n < min_live_tests)",
+    "PROMISING": "Enough data, accuracy above threshold, not yet fully validated",
+    "FAILING": "Enough data, accuracy below threshold",
+    "VALIDATED": "Meets all promotion criteria (tests, accuracy, magnitude ratio)",
+    "RETIRED": "Meets retirement criteria (enough tests, accuracy too low)"
+  },
   "promotion_criteria": {
-    "note": "When does a live-tested pattern become a 'known effect'? These are the thresholds.",
+    "note": "When does a live-tested pattern become a 'known effect'? Uses effective_independent_n (not raw experiment count).",
     "min_live_tests": 3,
     "min_live_accuracy": 0.6,
     "min_live_magnitude_ratio": 0.3,
     "retirement_min_tests": 5,
     "retirement_max_accuracy": 0.3,
-    "note2": "After min_live_tests successful live experiments with accuracy >= min_live_accuracy and avg magnitude_ratio >= min_live_magnitude_ratio, promote to known_effects in knowledge_base.json. After retirement_min_tests with accuracy <= retirement_max_accuracy, retire and record as dead end."
+    "note2": "After min_live_tests independent experiments with accuracy >= min_live_accuracy and avg magnitude_ratio >= min_live_magnitude_ratio, auto-promote to known_effects. After retirement_min_tests with accuracy <= retirement_max_accuracy, auto-retire as dead end."
   },
   "pre_registration": {
     "note": "Hypotheses are hashed at creation time. The hash covers: event_type, expected_symbol, expected_direction, expected_magnitude_pct, expected_timeframe_days. This prevents post-hoc adjustment of predictions.",
@@ -221,6 +248,12 @@
       "date": "2026-03-21",
       "changes": "Methodology audit \u2014 13 fixes: (1) cross-category BH FDR utility, (2) Wilcoxon signed-rank robustness check + skewness warnings, (3) confidence rubric SNR component reduced to max 2 (components sum to 10), (4) placeholder evidence detection blocks fake OOS validation, (5) min_abnormal_return_pct enforced in create_hypothesis, (6) direction correctness requires min 0.5% threshold, (7) confounder validation now blocking, (8) backtest_events type documented, (9) stale hypothesis detection in weekly diagnostic, (10) magnitude ratio direction-aware for shorts, (11) transaction cost model (0.1% round-trip, 1.0% min net), (12) regime_filter param for VIX-conditional backtesting, (13) prediction hash tamper check at completion.",
       "reason": "Methodology audit \u2014 statistical robustness, validation integrity, and missing enforcement"
+    },
+    {
+      "version": 6,
+      "date": "2026-03-27",
+      "changes": "Focus and discipline overhaul: (1) MAX_ACTIVE_SIGNAL_TYPES=3 \u2014 block new signal types when at capacity, (2) MAX_CONCURRENT_PER_SIGNAL=2 \u2014 correlated positions are not independent data, (3) experiment independence counting \u2014 same signal within 5 trading days clusters as 1 data point, (4) pattern lifecycle state machine (EXPLORING/PROMISING/FAILING/VALIDATED/RETIRED), (5) auto-promotion and auto-retirement when thresholds met, (6) signal revalidation every 6 months \u2014 no signal is permanent, (7) check_factors and check_seasonal now default to True in measure_event_impact, (8) honest labeling \u2014 known_effects renamed to 'research findings (backtest)' in reports, (9) daily email shows pattern state, effective independent N, and what each signal needs next, (10) focus discipline added to agent constitution.",
+      "reason": "System audit revealed 22 scattered signal types, 4% completion rate, and $690 in tokens for $50 P&L. Research needs focus, not more features."
     }
   ]
 }

@@ -280,14 +280,43 @@ def check_stop_losses():
             if result.get("success"):
                 # Mark hypothesis as completed
                 h["status"] = "completed"
+                # Compute abnormal return and direction_correct
+                raw_ret = round(unrealized_pct, 2)
+                spy_ret = None
+                abnormal_ret = raw_ret
+                try:
+                    from tools.yfinance_utils import safe_download
+                    spy_at_entry = trade.get("spy_at_entry")
+                    if spy_at_entry:
+                        spy_data = safe_download("SPY", period="5d", interval="1d")
+                        if spy_data is not None and len(spy_data) > 0:
+                            spy_now = float(spy_data["Close"].iloc[-1])
+                            spy_ret = round((spy_now / spy_at_entry - 1) * 100, 2)
+                            abnormal_ret = round(raw_ret - spy_ret, 2)
+                except Exception:
+                    pass
+
+                if direction == "long":
+                    dir_correct = abnormal_ret > 0
+                else:
+                    dir_correct = abnormal_ret < 0
                 h["result"] = {
                     "exit_price": current_price,
                     "exit_time": now.isoformat(),
-                    "raw_return_pct": round(unrealized_pct, 2),
+                    "raw_return_pct": raw_ret,
+                    "spy_return_pct": spy_ret,
+                    "abnormal_return_pct": abnormal_ret,
                     "exit_reason": reason,
                     "auto_closed": True,
                     "spy_at_entry": trade.get("spy_at_entry"),
+                    "direction_correct": dir_correct,
                 }
+                # Update pattern tracking for this signal
+                try:
+                    from research import _update_pattern
+                    _update_pattern(h)
+                except Exception:
+                    pass
                 # Save THIS hypothesis only (avoids bulk overwrite race condition)
                 _db.save_hypothesis(h)
                 actions.append({

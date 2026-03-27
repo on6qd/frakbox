@@ -21,7 +21,7 @@ EXPORT_INTERVAL=3600       # 1 hour between dashboard exports
 TICK=60                    # main loop tick (1 min)
 
 set -a; source .env; set +a
-MAX_SESSIONS_PER_DAY="${MAX_SESSIONS_PER_DAY:-10}"  # from .env
+MAX_SESSIONS_PER_DAY="${MAX_SESSIONS_PER_DAY:-6}"  # hard cap from .env
 source venv/bin/activate 2>/dev/null || true
 
 # Timestamps for interval tracking
@@ -162,9 +162,13 @@ while true; do
     last_health=$(now)
   fi
 
-  # Research session — every 15 min (daily limit enforced inside run_session)
+  # Research session — only if there's actual work to do (daily cap still enforced)
   if (( current - last_session >= SESSION_INTERVAL )); then
-    run_session &
+    if python3 should_run.py >> logs/daemon.log 2>&1; then
+      run_session &
+    else
+      echo "$(date): No actionable work — skipping session." >> logs/daemon.log
+    fi
     last_session=$(now)
   fi
 

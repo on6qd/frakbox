@@ -270,6 +270,40 @@ def export_research():
         "literature_count": len(kb.get("literature", {})),
     }
 
+    # Live signal tests — pattern lifecycle data
+    patterns = db.load_patterns()
+    live_signals = []
+    for event_type, pat in patterns.items():
+        exps = pat.get("experiments", [])
+        live_signals.append({
+            "event_type": event_type,
+            "state": pat.get("state", "EXPLORING"),
+            "total_experiments": pat.get("total_tests", 0),
+            "effective_independent_n": pat.get("effective_independent_n", pat.get("total_tests", 0)),
+            "effective_correct_n": pat.get("effective_correct_n", pat.get("direction_correct_count", 0)),
+            "last_updated": pat.get("last_updated", ""),
+            "experiments": [
+                {
+                    "symbol": e.get("symbol", ""),
+                    "correct": e.get("direction_correct", False),
+                    "return_pct": e.get("actual_pct", 0),
+                    "date": (e.get("date") or "")[:10],
+                }
+                for e in exps[-10:]
+            ],
+        })
+    data["live_signals"] = live_signals
+
+    # Focus status
+    active_types = set()
+    for h in db.get_hypotheses_by_status("active") + db.get_hypotheses_by_status("pending"):
+        active_types.add(h.get("event_type", ""))
+    data["focus"] = {
+        "active_signal_types": len(active_types),
+        "max_signal_types": config.MAX_ACTIVE_SIGNAL_TYPES,
+        "over_limit": len(active_types) > config.MAX_ACTIVE_SIGNAL_TYPES,
+    }
+
     # Activity — token usage by day (last 30 days)
     today = datetime.now()
     sessions_by_day = []

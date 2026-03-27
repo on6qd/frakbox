@@ -46,23 +46,33 @@
             <canvas id="nav-chart"></canvas>
         </section>
 
-        <!-- What the Agent Knows -->
+        <!-- Live Signal Tests -->
         <section class="card">
-            <h2>What it Knows</h2>
+            <h2>Live Signal Tests</h2>
+            <p class="muted" style="margin-bottom: 12px;">Each signal needs repeated independent experiments. A single result proves nothing.</p>
+            <div id="live-signals-list">
+                <p class="muted">Loading...</p>
+            </div>
+            <div id="focus-status" style="margin-top: 12px;"></div>
+        </section>
+
+        <!-- Research Findings -->
+        <section class="card">
+            <h2>Research Findings</h2>
             <div class="knowledge-stats" id="knowledge-stats">
-                <span class="knowledge-stat"><strong id="k-signals">--</strong> working signals</span>
+                <span class="knowledge-stat"><strong id="k-signals">--</strong> backtest findings</span>
                 <span class="knowledge-stat"><strong id="k-dead-ends">--</strong> dead ends</span>
                 <span class="knowledge-stat"><strong id="k-literature">--</strong> papers reviewed</span>
             </div>
             <div class="two-col-inner">
                 <div>
-                    <h3>Working Signals</h3>
+                    <h3>Backtest Findings</h3>
                     <div id="signals-list" class="knowledge-list">
                         <p class="muted">Loading...</p>
                     </div>
                 </div>
                 <div>
-                    <h3>Recent Dead Ends</h3>
+                    <h3>Dead Ends</h3>
                     <div id="dead-ends-list" class="knowledge-list">
                         <p class="muted">Loading...</p>
                     </div>

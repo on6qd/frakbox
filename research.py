@@ -294,6 +294,19 @@ def create_hypothesis(
         if existing.get("idempotency_key") == idempotency_key:
             return existing  # Already created — return existing
 
+    # --- Focus gate: limit scatter across too many signal types ---
+    from config import MAX_ACTIVE_SIGNAL_TYPES
+    active_types = set()
+    for h in hypotheses:
+        if h["status"] in ("pending", "active"):
+            active_types.add(h.get("event_type"))
+    if event_type not in active_types and len(active_types) >= MAX_ACTIVE_SIGNAL_TYPES:
+        raise ValueError(
+            f"Focus limit: {len(active_types)} signal types already under investigation "
+            f"(max {MAX_ACTIVE_SIGNAL_TYPES}). Complete or retire existing signals before "
+            f"starting '{event_type}'. Active types: {', '.join(sorted(active_types))}"
+        )
+
     # Validate symbol format (TBD is allowed for event-driven hypotheses)
     symbol_warnings = []
     if expected_symbol == "TBD":
@@ -559,6 +572,21 @@ def activate_hypothesis(hypothesis_id, entry_price, position_size, order_id=None
             f"Cannot activate: {active_count} active experiments already "
             f"(max {max_concurrent}). Close or invalidate existing experiments first."
         )
+
+    # Per-signal concurrency limit — correlated positions are not independent
+    from config import MAX_CONCURRENT_PER_SIGNAL
+    target_h = next((h for h in hypotheses if h["id"] == hypothesis_id), None)
+    if target_h:
+        target_type = target_h.get("event_type", "")
+        signal_active = sum(1 for h in hypotheses
+                           if h["status"] == "active" and h.get("event_type") == target_type)
+        if signal_active >= MAX_CONCURRENT_PER_SIGNAL:
+            raise ValueError(
+                f"Cannot activate: {signal_active} active experiments already on "
+                f"'{target_type}' (max {MAX_CONCURRENT_PER_SIGNAL}). "
+                f"Correlated positions in the same time window do not provide independent data."
+            )
+
     found = False
     for h in hypotheses:
         if h["id"] == hypothesis_id:
@@ -734,6 +762,171 @@ def invalidate_hypothesis(hypothesis_id, reason):
     _db.save_hypothesis(h)
 
 
+def _compute_pattern_state(pattern):
+    """Derive the lifecycle state of a signal pattern.
+
+    States:
+        EXPLORING — not enough independent data to judge
+        PROMISING — enough data, accuracy above threshold
+        FAILING — enough data, accuracy below threshold
+        VALIDATED — enough data for full validation, meets all criteria
+        RETIRED — enough data to confirm signal doesn't work
+    """
+    from self_review import load_methodology
+    m = load_methodology()
+    criteria = m.get("promotion_criteria", {})
+    min_tests = criteria.get("min_live_tests", 3)
+    min_acc = criteria.get("min_live_accuracy", 0.6)
+    min_mag = criteria.get("min_live_magnitude_ratio", 0.3)
+    retire_tests = criteria.get("retirement_min_tests", 5)
+    retire_acc = criteria.get("retirement_max_accuracy", 0.3)
+
+    total = pattern.get("effective_independent_n", pattern.get("total_tests", 0))
+    if total == 0:
+        return "EXPLORING"
+
+    correct = pattern.get("effective_correct_n", pattern.get("direction_correct_count", 0))
+    accuracy = correct / total
+
+    if total < min_tests:
+        return "EXPLORING"
+
+    # Enough data to judge
+    if total >= retire_tests and accuracy <= retire_acc:
+        return "RETIRED"
+
+    if accuracy >= min_acc:
+        # Check magnitude ratio for full validation
+        exps = pattern.get("experiments", [])
+        mag_ratios = [abs(e.get("actual_pct", 0)) / abs(e["expected_pct"])
+                      for e in exps
+                      if e.get("expected_pct", 0) != 0 and e.get("direction_correct")]
+        avg_mag = sum(mag_ratios) / len(mag_ratios) if mag_ratios else 0
+        if total >= retire_tests and avg_mag >= min_mag:
+            return "VALIDATED"
+        return "PROMISING"
+
+    return "FAILING"
+
+
+def check_revalidation_due():
+    """Check which validated signals show signs of decay.
+
+    Validated signals trade continuously. This function checks whether
+    recent experiments suggest the signal is weakening — not whether
+    enough time has passed. A signal that keeps winning doesn't need
+    special revalidation. One that starts losing does.
+    """
+    from self_review import load_methodology
+    m = load_methodology()
+    reval_months = m.get("revalidation", {}).get("revalidation_months", m.get("revalidation_months", 6))
+
+    patterns = load_patterns()
+    due = []
+    now = datetime.now()
+
+    for event_type, pat in patterns.items():
+        if pat.get("state") != "VALIDATED":
+            continue
+
+        exps = pat.get("experiments", [])
+        if len(exps) < 5:
+            continue  # not enough data to detect decay
+
+        # Check last 3 experiments — if majority wrong, signal may be decaying
+        recent = exps[-3:]
+        recent_correct = sum(1 for e in recent if e.get("direction_correct"))
+        if recent_correct <= 1:  # 0 or 1 out of 3
+            due.append({
+                "event_type": event_type,
+                "reason": f"Last 3 experiments: {recent_correct}/3 correct — signal may be decaying",
+            })
+
+        # Also flag if no experiments in a long time (signal going stale)
+        last_date = exps[-1].get("date", "") if exps else ""
+        if last_date:
+            try:
+                last_dt = datetime.fromisoformat(last_date[:19])
+                months_since = (now - last_dt).days / 30
+                if months_since >= reval_months:
+                    due.append({
+                        "event_type": event_type,
+                        "reason": f"No live test in {months_since:.0f} months",
+                    })
+            except (ValueError, TypeError):
+                pass
+
+    # Queue research tasks for decaying signals
+    for item in due:
+        all_h = load_hypotheses()
+        pipeline = [h for h in all_h
+                    if h.get("event_type") == item["event_type"]
+                    and h["status"] in ("pending", "active")]
+        if not pipeline:
+            _db.add_research_task(
+                category="signal_decay_check",
+                question=(
+                    f"Signal '{item['event_type']}' shows signs of decay: {item['reason']}. "
+                    f"Investigate whether the signal has stopped working. "
+                    f"Check for regime change, arbitrage, or structural shift."
+                ),
+                priority=9,
+                reasoning="Validated signals must be continuously monitored. Decay is caught by tracking recent performance.",
+            )
+
+    return due
+
+
+def _count_independent_experiments(experiments, window_days=5):
+    """Count independent time windows in a list of experiments.
+
+    Experiments within `window_days` trading days of each other are clustered
+    as one independent observation. 4 shorts in the same week = 1 data point.
+
+    Returns dict with:
+        count: number of independent time windows
+        correct: number of clusters where majority was direction_correct
+    """
+    if not experiments:
+        return {"count": 0, "correct": 0}
+
+    # Sort by date, filter out entries without dates
+    dated = [(e, e.get("date", "")) for e in experiments]
+    dated = [(e, d) for e, d in dated if d]
+    if not dated:
+        return {"count": len(experiments), "correct": sum(1 for e in experiments if e.get("direction_correct"))}
+
+    dated.sort(key=lambda x: x[1])
+
+    clusters = []
+    current_cluster = [dated[0][0]]
+    last_date = dated[0][1][:10]
+
+    for exp, d in dated[1:]:
+        d_str = d[:10]
+        try:
+            delta = abs((datetime.fromisoformat(d_str) - datetime.fromisoformat(last_date)).days)
+        except (ValueError, TypeError):
+            delta = window_days + 1  # treat parse failures as independent
+        if delta > window_days:
+            clusters.append(current_cluster)
+            current_cluster = [exp]
+            last_date = d_str
+        else:
+            current_cluster.append(exp)
+
+    clusters.append(current_cluster)
+
+    # Each cluster's result = majority vote of direction_correct
+    correct = 0
+    for cluster in clusters:
+        correct_count = sum(1 for e in cluster if e.get("direction_correct"))
+        if correct_count > len(cluster) / 2:
+            correct += 1
+
+    return {"count": len(clusters), "correct": correct}
+
+
 def _update_pattern(completed_hypothesis):
     """Update the pattern library with results from a completed experiment.
 
@@ -784,7 +977,140 @@ def _update_pattern(completed_hypothesis):
     pattern["avg_actual_magnitude"] = sum(abs(e["actual_pct"]) for e in exps) / len(exps)
     pattern["reliability_score"] = round(pattern["direction_correct_count"] / pattern["total_tests"], 2)
 
+    # Compute experiment independence — correlated experiments are not independent data
+    indep = _count_independent_experiments(exps)
+    pattern["effective_independent_n"] = indep["count"]
+    pattern["effective_correct_n"] = indep["correct"]
+
+    # Compute pattern state
+    pattern["state"] = _compute_pattern_state(pattern)
+
     save_patterns(patterns)
+
+    # --- Auto-promote or retire if thresholds met ---
+    try:
+        result = check_promotion_or_retirement(event_type)
+        if result["action"] == "promote":
+            record_known_effect(event_type, {
+                "description": f"Live-validated: {event_type.replace('_', ' ')}",
+                "direction": h.get("expected_direction", "unknown"),
+                "avg_magnitude_pct": pattern["avg_actual_magnitude"],
+                "timeframe_days": h.get("expected_timeframe_days"),
+                "sample_size": pattern["effective_independent_n"],
+                "reliability": pattern.get("effective_correct_n", 0) / max(pattern["effective_independent_n"], 1),
+                "our_tests": pattern["total_tests"],
+                "status": "validated_live",
+                "validated_at": datetime.now().isoformat(),
+                "next_revalidation": (datetime.now() + timedelta(days=180)).isoformat(),
+            })
+        elif result["action"] == "retire":
+            record_dead_end(event_type, result["reason"])
+    except Exception:
+        pass  # don't let promotion errors break the pattern update
+
+    # --- Feedback loop: check if this signal needs more experiments ---
+    _check_signal_continuation(event_type, pattern)
+
+
+def _check_signal_continuation(event_type, pattern):
+    """After an experiment completes, ensure the signal stays in the pipeline
+    until there's enough data to promote or retire it.
+
+    A single result — right or wrong — proves nothing. The system keeps testing
+    until promotion_criteria or retirement_criteria are met.
+    """
+    from self_review import load_methodology
+    m = load_methodology()
+    criteria = m.get("promotion_criteria", {})
+    min_tests = criteria.get("min_live_tests", 3)
+    retire_tests = criteria.get("retirement_min_tests", 5)
+    min_acc = criteria.get("min_live_accuracy", 0.6)
+    retire_acc = criteria.get("retirement_max_accuracy", 0.3)
+    total = pattern.get("effective_independent_n", pattern.get("total_tests", 0))
+    accuracy = pattern.get("reliability_score", 0) or 0
+    if total > 0 and pattern.get("effective_correct_n") is not None:
+        accuracy = pattern["effective_correct_n"] / total
+
+    # Retired signals stop testing
+    retired = total >= retire_tests and accuracy <= retire_acc
+    if retired:
+        return
+
+    # Check if there's already a pending or active hypothesis for this signal
+    all_h = load_hypotheses()
+    pipeline = [h for h in all_h
+                if h.get("event_type") == event_type
+                and h["status"] in ("pending", "active")]
+    if pipeline:
+        return  # already has experiments queued
+
+    # Check if scanners have already found opportunities for this signal
+    scanner_map = {
+        "sp500_52w_low_momentum_short": "52w_low",
+        "sp500_52w_low_catalyst_short": "52w_low",
+        "sp500_index_addition": "sp500_additions",
+        "insider_buying_cluster": "insider_cluster",
+        "ceo_performance_failure_departure_short": "ceo_departure",
+    }
+    scanner_name = scanner_map.get(event_type)
+    existing_opportunities = []
+    if scanner_name:
+        try:
+            import json as _json
+            signals = _db.get_scanner_signals(scanner_name, limit=20)
+            # Find signals from the last 7 days not already tied to a hypothesis
+            recent_cutoff = (datetime.now() - timedelta(days=7)).isoformat()
+            active_symbols = {h.get("expected_symbol") for h in all_h
+                              if h["status"] in ("pending", "active") and h.get("event_type") == event_type}
+            for s in signals:
+                data = _json.loads(s["data"]) if isinstance(s.get("data"), str) else s.get("data", {})
+                ticker = data.get("ticker", data.get("symbol", ""))
+                ts = s.get("timestamp", "")
+                if ticker and ts > recent_cutoff and ticker not in active_symbols:
+                    existing_opportunities.append(ticker)
+        except Exception:
+            pass
+
+    promoted = total >= min_tests and accuracy >= min_acc
+
+    if existing_opportunities:
+        syms = ", ".join(existing_opportunities[:5])
+        more = f" (+{len(existing_opportunities)-5} more)" if len(existing_opportunities) > 5 else ""
+        status = "Validated signal" if promoted else f"Signal under test ({pattern.get('effective_correct_n', 0)}/{total} correct)"
+        _db.add_research_task(
+            category="signal_opportunity",
+            question=(
+                f"{status} '{event_type}' — scanners found opportunities: {syms}{more}. "
+                f"Evaluate and create hypotheses for the best candidates."
+            ),
+            priority=9 if promoted else 8,
+            reasoning=f"Scanners already detected events matching this signal. Don't wait — act on existing data.",
+        )
+        return
+
+    # No scanner hits — queue a general search
+    if promoted:
+        _db.add_research_task(
+            category="signal_continuation",
+            question=(
+                f"Validated signal '{event_type}' ({pattern.get('effective_correct_n', 0)}/{total} correct). "
+                f"Scan for the next opportunity to trade this signal."
+            ),
+            priority=7,
+            reasoning="Validated signals keep trading every opportunity.",
+        )
+    else:
+        needed = max(min_tests - total, 1)
+        _db.add_research_task(
+            category="signal_retest",
+            question=(
+                f"Signal '{event_type}' has {total} independent test(s) "
+                f"({pattern.get('effective_correct_n', 0)}/{total} correct). "
+                f"Needs {needed} more. Find the next opportunity."
+            ),
+            priority=8,
+            reasoning=f"Needs {needed} more independent test(s) before promotion or retirement.",
+        )
 
 
 def get_active_hypotheses():
@@ -843,7 +1169,7 @@ def get_research_summary():
     pending = [h for h in hypotheses if h["status"] == "pending"]
     patterns = load_patterns()
 
-    direction_correct = sum(1 for h in completed if h["result"]["direction_correct"]) if completed else 0
+    direction_correct = sum(1 for h in completed if h.get("result") and h["result"].get("direction_correct")) if completed else 0
 
     # Find best and worst performing patterns
     reliable_patterns = [p for p in patterns.values() if p.get("total_tests", 0) >= 3]
@@ -873,7 +1199,7 @@ def _group_accuracy_by_type(completed):
             types[t] = {"total": 0, "correct": 0, "avg_confidence": []}
         types[t]["total"] += 1
         types[t]["avg_confidence"].append(h["confidence"])
-        if h["result"]["direction_correct"]:
+        if h.get("result") and h["result"].get("direction_correct"):
             types[t]["correct"] += 1
     return {
         t: {
@@ -1500,18 +1826,28 @@ def check_promotion_or_retirement(event_type):
     retire_acc = criteria.get("retirement_max_accuracy", 0.3)
 
     patterns = load_patterns()
-    pattern = None
-    for p in patterns:
-        if p["event_type"] == event_type:
-            pattern = p
-            break
+    if isinstance(patterns, dict):
+        pattern = patterns.get(event_type)
+    else:
+        pattern = None
+        for p in patterns:
+            if p["event_type"] == event_type:
+                pattern = p
+                break
 
     if not pattern:
         return {"action": "none", "reason": "No pattern data yet.", "stats": None}
 
-    total = pattern["total_tests"]
-    accuracy = pattern["reliability_score"] or 0
+    raw_total = pattern["total_tests"]
     experiments = pattern.get("experiments", [])
+
+    # Use effective independent experiments, not raw count
+    # Correlated experiments (same week) are one data point
+    indep = _count_independent_experiments(experiments)
+    total = indep["count"] or raw_total
+    correct = indep["correct"]
+    accuracy = correct / total if total > 0 else 0
+
     # Only count magnitude ratio for direction-correct experiments
     # For shorts, actual_pct is negative when correct — use abs() for both
     mag_ratios = []
@@ -1521,37 +1857,38 @@ def check_promotion_or_retirement(event_type):
     avg_mag_ratio = sum(mag_ratios) / len(mag_ratios) if mag_ratios else 0
 
     stats = {
-        "total_tests": total,
-        "accuracy": accuracy,
+        "total_tests": raw_total,
+        "effective_independent_n": total,
+        "accuracy": round(accuracy, 2),
         "avg_magnitude_ratio": round(avg_mag_ratio, 2),
     }
 
-    # Check promotion
+    # Check promotion (uses effective independent N)
     if total >= min_tests and accuracy >= min_acc and avg_mag_ratio >= min_mag:
         return {
             "action": "promote",
             "reason": (
-                f"Pattern qualifies for promotion: {total} live tests, "
-                f"{accuracy:.0%} accuracy, {avg_mag_ratio:.2f} avg magnitude ratio. "
-                f"Thresholds: {min_tests} tests, {min_acc:.0%} accuracy, {min_mag} magnitude."
+                f"Pattern qualifies: {total} independent tests "
+                f"({raw_total} raw), {accuracy:.0%} accuracy, "
+                f"{avg_mag_ratio:.2f} magnitude ratio."
             ),
             "stats": stats,
         }
 
-    # Check retirement
+    # Check retirement (uses effective independent N)
     if total >= retire_tests and accuracy <= retire_acc:
         return {
             "action": "retire",
             "reason": (
-                f"Pattern should be retired: {total} live tests with only "
-                f"{accuracy:.0%} accuracy (threshold: {retire_acc:.0%} over {retire_tests} tests)."
+                f"Pattern retired: {total} independent tests "
+                f"({raw_total} raw), {accuracy:.0%} accuracy."
             ),
             "stats": stats,
         }
 
     return {
         "action": "none",
-        "reason": f"Pattern has {total} tests, {accuracy:.0%} accuracy — needs more data.",
+        "reason": f"Pattern has {total} independent tests ({raw_total} raw), {accuracy:.0%} accuracy — needs more data.",
         "stats": stats,
     }
 

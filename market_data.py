@@ -334,7 +334,7 @@ def get_price_around_date(symbol, event_date, days_before=5, days_after=20,
 def measure_event_impact(symbol=None, event_dates=None, benchmark="SPY", sector_etf=None,
                          event_timing="unknown", known_events=None, regime_filter=None,
                          entry_price="close", estimate_costs=False, event_type=None,
-                         check_factors=False, check_seasonal=False):
+                         check_factors=True, check_seasonal=True):
     """
     Measure abnormal price impact across multiple instances of the same event type.
 

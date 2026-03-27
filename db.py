@@ -425,6 +425,9 @@ def update_hypothesis_fields(hypothesis_id, **fields):
     existing = get_hypothesis_by_id(hypothesis_id)
     if not existing:
         raise ValueError(f"Hypothesis {hypothesis_id} not found")
+    # Guard: don't mark completed without a result
+    if fields.get("status") == "completed" and not fields.get("result") and not existing.get("result"):
+        raise ValueError(f"Cannot mark {hypothesis_id} completed without a result")
     existing.update(fields)
     _upsert_hypothesis(existing, conn)
     conn.commit()

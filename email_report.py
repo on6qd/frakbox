@@ -46,7 +46,10 @@ _STATUS_COLORS = {
 
 
 def build_daily_report():
-    """Build the daily research report as HTML."""
+    """Build a clean, scannable daily research digest."""
+    import html as html_mod
+    import db as _db
+
     summary = get_account_summary()
     research = get_research_summary()
     active = get_active_hypotheses()
@@ -56,46 +59,267 @@ def build_daily_report():
 
     known_count = len(knowledge.get("known_effects", {}))
     dead_count = len(knowledge.get("dead_ends", []))
+    positions = summary.get("positions", [])
+    equity = summary.get("equity", 0)
+    starting_equity = 100_000
+    total_pl = equity - starting_equity
+    total_pl_pct = (total_pl / starting_equity) * 100
 
     html = _PAGE_OPEN + f"""
-    <h2>Daily Research Report</h2>
+    <h2>Daily Research Digest</h2>
     <p style="color: #888;">{datetime.now().strftime('%A, %B %d %Y')}</p>
+    """
+
+    # --- Portfolio snapshot ---
+    pl_color = "#2e7d32" if total_pl >= 0 else "#c62828"
+    html += f"""
     <table style="border-collapse: collapse; margin: 16px 0;"><tr>
-    {_STAT_CELL.format(value=f"${summary['equity']:,.0f}", label="Equity")}
-    {_STAT_CELL.format(value=known_count, label="Signals found")}
-    {_STAT_CELL.format(value=dead_count, label="Dead ends")}
-    {_STAT_CELL.format(value=research['total_hypotheses'], label="Hypotheses")}
+    {_STAT_CELL.format(value=f"${equity:,.0f}", label="Equity")}
+    {_STAT_CELL.format(value=f'<span style="color: {pl_color}">{total_pl:+,.0f}</span>', label="Total P&L")}
+    {_STAT_CELL.format(value=len(positions), label="Open positions")}
+    {_STAT_CELL.format(value=research.get('direction_accuracy', 'n/a'), label="Win rate")}
     </tr></table>
     """
 
-    # All hypotheses as stories
-    all_h = active + pending + completed
-    if all_h:
-        html += '<h3>Hypotheses</h3>'
-        for h in all_h:
-            html += build_hypothesis_story(h)
+    # --- Open positions ---
+    if positions:
+        html += '<h3>Open Positions</h3>'
+        html += '<table style="border-collapse: collapse; width: 100%;">'
+        html += '<tr style="border-bottom: 2px solid #ddd; font-size: 13px; color: #888;">'
+        html += '<td style="padding: 6px 8px;">Symbol</td><td style="padding: 6px 8px;">Side</td>'
+        html += '<td style="padding: 6px 8px;">Entry</td><td style="padding: 6px 8px;">Current</td>'
+        html += '<td style="padding: 6px 8px;">P&L</td></tr>'
+        for p in positions:
+            pl = p.get("unrealized_pl", 0)
+            pl_pct = p.get("unrealized_plpc", 0)
+            pl_c = "#2e7d32" if pl >= 0 else "#c62828"
+            html += f"""<tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 6px 8px; font-weight: bold;">{p['symbol']}</td>
+                <td style="padding: 6px 8px;">{p.get('side', '').upper()}</td>
+                <td style="padding: 6px 8px;">${p.get('entry_price', 0):.2f}</td>
+                <td style="padding: 6px 8px;">${p.get('current_price', 0):.2f}</td>
+                <td style="padding: 6px 8px; color: {pl_c};">{pl:+.0f} ({pl_pct:+.1f}%)</td>
+            </tr>"""
+        html += '</table>'
 
-    # Validated signals & dead ends
-    html += build_findings_section(knowledge)
+    # --- Live Signal Tests (the core view) ---
+    patterns = load_patterns()
+    from self_review import load_methodology
+    method = load_methodology()
+    promo_criteria = method.get("promotion_criteria", {})
+    min_tests = promo_criteria.get("min_live_tests", 3)
+    retire_tests = promo_criteria.get("retirement_min_tests", 5)
 
-    # Research areas studied
-    html += build_literature_section(knowledge)
+    if patterns:
+        html += '<h3>Live Signal Tests</h3>'
+        html += '<p style="color: #888; font-size: 13px; margin-bottom: 12px;">Each signal needs repeated independent experiments. A single result proves nothing.</p>'
+        for event_type, pat in sorted(patterns.items(), key=lambda x: x[1].get("total_tests", 0), reverse=True):
+            raw_total = pat.get("total_tests", 0)
+            eff_n = pat.get("effective_independent_n", raw_total)
+            eff_correct = pat.get("effective_correct_n", pat.get("direction_correct_count", 0))
+            state = pat.get("state", "EXPLORING")
+            title = event_type.replace("_", " ").title()
 
-    # Watchlist
-    import db as _db
+            # Count in-flight experiments
+            in_flight = sum(1 for h in active + pending if h.get("event_type") == event_type)
+
+            # State colors and labels
+            state_styles = {
+                "EXPLORING": ("#1565c0", "Exploring"),
+                "PROMISING": ("#2e7d32", "Promising"),
+                "FAILING": ("#f9a825", "Failing"),
+                "VALIDATED": ("#1b5e20", "Validated"),
+                "RETIRED": ("#888", "Retired"),
+            }
+            badge_color, badge_label = state_styles.get(state, ("#888", state))
+
+            # Experiment dots
+            exps = pat.get("experiments", [])
+            exp_dots = ""
+            for e in exps[-10:]:
+                dot_c = "#2e7d32" if e.get("direction_correct") else "#c62828"
+                sym = e.get("symbol", "?")
+                pct = e.get("actual_pct", 0)
+                exp_dots += f'<span title="{sym}: {pct:+.1f}%" style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: {dot_c}; margin: 0 2px;"></span>'
+
+            html += f"""
+            <div style="border: 1px solid #ddd; border-radius: 8px; padding: 12px 16px; margin: 10px 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: bold;">{html_mod.escape(title)}</span>
+                    <span style="background: {badge_color}; color: white; padding: 2px 10px; border-radius: 12px; font-size: 12px;">{badge_label}</span>
+                </div>
+                <div style="margin-top: 6px;">{exp_dots}</div>
+                <div style="margin-top: 6px; font-size: 13px; color: #555;">{eff_correct}/{eff_n} independent tests correct"""
+            if eff_n < raw_total:
+                html += f' <span style="color: #888;">({raw_total} experiments, {raw_total - eff_n} overlapped)</span>'
+            html += '</div>'
+
+            # What does this signal need next?
+            if state == "EXPLORING":
+                needed = max(min_tests - eff_n, 1)
+                html += f'<div style="font-size: 12px; color: #1565c0; margin-top: 4px;">Needs {needed} more independent test{"s" if needed != 1 else ""} before any judgment</div>'
+            elif state == "PROMISING":
+                needed = max(retire_tests - eff_n, 1)
+                html += f'<div style="font-size: 12px; color: #2e7d32; margin-top: 4px;">Needs {needed} more to reach validation threshold</div>'
+            elif state == "FAILING":
+                needed = max(retire_tests - eff_n, 1)
+                html += f'<div style="font-size: 12px; color: #f9a825; margin-top: 4px;">Needs {needed} more to confirm retirement</div>'
+            elif state == "VALIDATED":
+                # Show revalidation timeline
+                last_val = pat.get("last_updated", "")
+                if last_val:
+                    try:
+                        months_ago = (datetime.now() - datetime.fromisoformat(last_val[:19])).days / 30
+                        if months_ago < 3:
+                            health_c, health_t = "#2e7d32", f"Confirmed {months_ago:.0f}mo ago"
+                        elif months_ago < 6:
+                            health_c, health_t = "#f9a825", f"Revalidation due in {6 - months_ago:.0f}mo"
+                        else:
+                            health_c, health_t = "#c62828", "Revalidation overdue"
+                        html += f'<div style="font-size: 12px; color: {health_c}; margin-top: 4px;">{health_t}</div>'
+                    except (ValueError, TypeError):
+                        pass
+
+            if in_flight:
+                html += f'<div style="font-size: 12px; color: #1565c0; margin-top: 4px;">{in_flight} experiment{"s" if in_flight != 1 else ""} in pipeline</div>'
+            html += '</div>'
+
+    # --- Active experiments ---
+    if active:
+        html += '<h3>Live Experiments</h3>'
+        for h in active:
+            html += _build_compact_hypothesis(h, html_mod)
+
+    # --- Recent results ---
+    if completed:
+        recent = sorted(completed, key=lambda h: (h.get("result") or {}).get("exit_time", ""), reverse=True)[:5]
+        html += '<h3>Latest Results</h3>'
+        for h in recent:
+            html += _build_compact_hypothesis(h, html_mod)
+
+    # --- Pipeline ---
+    if pending:
+        html += f'<h3>Pipeline ({len(pending)} queued)</h3>'
+        html += '<table style="border-collapse: collapse; width: 100%;">'
+        for h in pending[:10]:
+            symbol = h.get("expected_symbol", "TBD")
+            direction = h.get("expected_direction", "?").upper()
+            event = h.get("event_type", "").replace("_", " ").title()
+            conf = h.get("confidence", "?")
+            trigger = h.get("trigger", "")
+            trigger_note = f' — triggers {trigger}' if trigger else ""
+            html += f"""<tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 4px 8px; font-weight: bold;">{html_mod.escape(symbol)}</td>
+                <td style="padding: 4px 8px;">{direction}</td>
+                <td style="padding: 4px 8px;">{html_mod.escape(event)}</td>
+                <td style="padding: 4px 8px; color: #888;">conf {conf}/10{html_mod.escape(trigger_note)}</td>
+            </tr>"""
+        if len(pending) > 10:
+            html += f'<tr><td colspan="4" style="padding: 4px 8px; color: #888;">...and {len(pending) - 10} more</td></tr>'
+        html += '</table>'
+
+    # --- Scoreboard ---
+    from config import MAX_ACTIVE_SIGNAL_TYPES
+    active_types = set()
+    for h in active + pending:
+        active_types.add(h.get("event_type"))
+    focus_label = f"{len(active_types)}/{MAX_ACTIVE_SIGNAL_TYPES}"
+    focus_color = "#2e7d32" if len(active_types) <= MAX_ACTIVE_SIGNAL_TYPES else "#c62828"
+
+    html += f"""
+    <h3>Scoreboard</h3>
+    <table style="border-collapse: collapse;">
+        <tr><td style="padding: 4px 12px;">Signals under live test</td><td style="padding: 4px 12px;"><b>{len(patterns)}</b></td></tr>
+        <tr><td style="padding: 4px 12px;">Research findings (backtest)</td><td style="padding: 4px 12px;">{known_count}</td></tr>
+        <tr><td style="padding: 4px 12px;">Dead ends</td><td style="padding: 4px 12px;">{dead_count}</td></tr>
+        <tr><td style="padding: 4px 12px;">Total experiments</td><td style="padding: 4px 12px;">{research['total_hypotheses']}</td></tr>
+        <tr><td style="padding: 4px 12px;">Focus</td><td style="padding: 4px 12px; color: {focus_color};"><b>{focus_label} signal types active</b></td></tr>
+    </table>
+    """
+
+    # --- Watchlist ---
     rq = _db.load_queue()
     watchlist = rq.get("event_watchlist", [])
     if watchlist:
-        html += '<h3>Watching for</h3><ul>'
-        for w in watchlist:
-            html += f'<li><b>{w.get("event", "?")}</b> — expected {w.get("expected_date", "?")}</li>'
+        html += '<h3>Watching For</h3><ul>'
+        for w in watchlist[:10]:
+            html += f'<li><b>{html_mod.escape(str(w.get("event", "?")))}</b> — {html_mod.escape(str(w.get("expected_date", "?")))}</li>'
         html += '</ul>'
 
-    # Token usage summary
+    # Token usage
     html += build_token_usage_section()
 
     html += _PAGE_CLOSE
     return html
+
+
+def _build_compact_hypothesis(h, html_mod):
+    """Render a single hypothesis as a compact card."""
+    direction = h.get("expected_direction", "?")
+    mag = h.get("expected_magnitude_pct", 0)
+    timeframe = h.get("expected_timeframe_days", "?")
+    symbol = h.get("expected_symbol", "TBD")
+    status = h.get("status", "?")
+    confidence = h.get("confidence", "?")
+    color = _STATUS_COLORS.get(status, "#333")
+
+    # Sample size — just the count, never raw data
+    n = h.get("sample_size") or h.get("backtest_events")
+    if isinstance(n, list):
+        n = len(n)
+
+    desc = (h.get("event_description") or "")[:150]
+    mechanism = (h.get("causal_mechanism") or "")[:150]
+
+    card = f"""
+    <div style="border: 1px solid #ddd; border-radius: 8px; padding: 12px 16px; margin: 12px 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 16px; font-weight: bold;">{html_mod.escape(symbol)} — {html_mod.escape(h.get('event_type', '').replace('_', ' ').title())}</span>
+            <span style="background: {color}; color: white; padding: 2px 10px; border-radius: 12px; font-size: 12px;">{status}</span>
+        </div>
+        <div style="margin-top: 6px; color: #555; font-size: 14px;">{html_mod.escape(desc)}</div>
+        <div style="margin-top: 6px; font-size: 13px;">
+            {direction.upper()} <b>{mag:+.1f}%</b> over {timeframe}d
+            &middot; confidence {confidence}/10
+            &middot; {n if n else '?'} events tested
+        </div>
+    """
+
+    # Trade info
+    trade = h.get("trade")
+    result = h.get("result")
+    if trade and not result:
+        card += f"""
+        <div style="margin-top: 6px; background: #fff3e0; padding: 8px 12px; border-radius: 4px; font-size: 13px;">
+            Trading {symbol} @ ${trade.get('entry_price', '?')}
+            &middot; ${trade.get('position_size_usd', trade.get('position_size', '?'))} position
+            &middot; deadline {str(trade.get('deadline', '?'))[:10]}
+        </div>
+        """
+    elif result:
+        ret = result.get("abnormal_return_pct", result.get("raw_return_pct", 0))
+        correct = result.get("direction_correct", False)
+        ret_color = "#2e7d32" if (ret or 0) > 0 else "#c62828"
+        # Frame as one data point, not a verdict
+        event_type = h.get("event_type", "")
+        pattern_context = ""
+        try:
+            patterns = load_patterns()
+            pat = patterns.get(event_type)
+            if pat and pat.get("total_tests", 0) > 0:
+                total = pat["total_tests"]
+                cor = pat.get("direction_correct_count", 0)
+                pattern_context = f" &middot; signal overall: {cor}/{total}"
+        except Exception:
+            pass
+        card += f"""
+        <div style="margin-top: 6px; background: #f5f5f5; padding: 8px 12px; border-radius: 4px; font-size: 13px;">
+            This experiment: <span style="color: {ret_color}; font-weight: bold;">{ret:+.1f}%</span> abnormal return{pattern_context}
+        </div>
+        """
+
+    card += "</div>"
+    return card
 
 
 def get_daily_token_usage(date_str=None):
@@ -265,7 +489,9 @@ def build_hypothesis_story(h):
     symbol = h.get("expected_symbol", "TBD")
     status = h.get("status", "?")
     confidence = h.get("confidence", "?")
-    n = h.get("backtest_events", h.get("sample_size", "?"))
+    n = h.get("sample_size") or h.get("backtest_events", "?")
+    if isinstance(n, list):
+        n = len(n)
 
     # Status styling
     color = _STATUS_COLORS.get(status, "#333")
@@ -344,12 +570,18 @@ def build_hypothesis_story(h):
         """
     elif result:
         ret = result.get("abnormal_return_pct", result.get("raw_return_pct", 0))
-        correct = result.get("direction_correct", False)
-        emoji = "Correct" if correct else "Wrong"
         ret_color = "#2e7d32" if ret > 0 else "#c62828"
+        event_type = h.get("event_type", "")
+        pattern_note = ""
+        try:
+            pat = load_patterns().get(event_type)
+            if pat and pat.get("total_tests", 0) > 0:
+                pattern_note = f" &middot; signal overall: {pat['direction_correct_count']}/{pat['total_tests']}"
+        except Exception:
+            pass
         html += f"""
-        <div style="margin-top: 8px; background: {'#e8f5e9' if correct else '#ffebee'}; padding: 10px; border-radius: 4px;">
-            <b>Result:</b> <span style="color: {ret_color};">{ret:+.1f}% abnormal return</span> — {emoji}
+        <div style="margin-top: 8px; background: #f5f5f5; padding: 10px; border-radius: 4px;">
+            This experiment: <span style="color: {ret_color};">{ret:+.1f}% abnormal return</span>{pattern_note}
         </div>
         """
 
@@ -414,8 +646,12 @@ def build_findings_section(knowledge):
                 stats_parts.append(f"n={n}")
             rate = effect.get("reliability") or effect.get("positive_rate") or effect.get("positive_rate_1d")
             if rate is not None:
-                pct = rate * 100 if isinstance(rate, float) and rate <= 1 else rate
-                stats_parts.append(f"{pct:.0f}% positive")
+                try:
+                    rate_f = float(rate)
+                    pct = rate_f * 100 if rate_f <= 1 else rate_f
+                    stats_parts.append(f"{pct:.0f}% positive")
+                except (ValueError, TypeError):
+                    stats_parts.append(f"{rate}% positive")
             if status:
                 stats_parts.append(status)
 

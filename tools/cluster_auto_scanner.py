@@ -565,7 +565,25 @@ def log_opportunity(cluster: dict, market_cap_m: float, position_52w: dict,
             + (f" CEO/CFO present: also tag hypothesis {CEO_CFO_HYPOTHESIS_ID}." if has_ceo_cfo else "")
         )
     )
-    print(f"  LOGGED to research queue: {ticker}" + (" [CEO/CFO cluster]" if has_ceo_cfo else ""))
+
+    # Also log to scanner_signals so the signal continuation pipeline can find it
+    import db as _db
+    _db.init_db()
+    _db.append_scanner_signal('insider_cluster', {
+        'ticker': ticker,
+        'date': filing_date,
+        'n_insiders': n_insiders,
+        'total_value_k': total_value_k,
+        'market_cap_m': market_cap_m,
+        'vix_level': vix_level,
+        'vix_label': vix_label,
+        'has_ceo_cfo': has_ceo_cfo,
+        'action': 'LONG at next market open',
+        'hold_days': 3,
+        'logged_at': datetime.now().isoformat(),
+    })
+
+    print(f"  LOGGED to research queue + scanner: {ticker}" + (" [CEO/CFO cluster]" if has_ceo_cfo else ""))
 
 
 def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[dict]:

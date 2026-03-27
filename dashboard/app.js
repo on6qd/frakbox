@@ -187,6 +187,56 @@ function renderKnowledge(res) {
     }
 }
 
+const STATE_STYLES = {
+    EXPLORING: { color: '#4fc3f7', label: 'Exploring' },
+    PROMISING: { color: '#66bb6a', label: 'Promising' },
+    FAILING: { color: '#ffa726', label: 'Failing' },
+    VALIDATED: { color: '#2e7d32', label: 'Validated' },
+    RETIRED: { color: '#888', label: 'Retired' },
+};
+
+function renderLiveSignals(res) {
+    const signals = res?.live_signals || [];
+    const listEl = el('live-signals-list');
+
+    if (!signals.length) {
+        listEl.innerHTML = '<p class="muted">No signals under live test yet</p>';
+    } else {
+        listEl.innerHTML = signals.map(s => {
+            const st = STATE_STYLES[s.state] || STATE_STYLES.EXPLORING;
+            const dots = (s.experiments || []).map(e => {
+                const c = e.correct ? '#66bb6a' : '#ef5350';
+                return `<span title="${esc(e.symbol)}: ${fmtPct(e.return_pct)}" style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${c};margin:0 2px;"></span>`;
+            }).join('');
+
+            const effN = s.effective_independent_n || 0;
+            const effCorrect = s.effective_correct_n || 0;
+            const raw = s.total_experiments || 0;
+            let overlap = '';
+            if (effN < raw) overlap = ` <span class="muted">(${raw} experiments, ${raw - effN} overlapped)</span>`;
+
+            return `
+                <div style="border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px 16px;margin:8px 0;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <strong>${esc(s.event_type.replace(/_/g, ' '))}</strong>
+                        <span style="background:${st.color};color:#fff;padding:2px 10px;border-radius:12px;font-size:12px;">${st.label}</span>
+                    </div>
+                    <div style="margin-top:6px;">${dots}</div>
+                    <div style="margin-top:6px;font-size:13px;">${effCorrect}/${effN} independent tests correct${overlap}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Focus status
+    const focus = res?.focus;
+    const focusEl = el('focus-status');
+    if (focus) {
+        const c = focus.over_limit ? '#ef5350' : '#66bb6a';
+        focusEl.innerHTML = `<span style="color:${c};font-size:13px;font-weight:bold;">${focus.active_signal_types}/${focus.max_signal_types} signal types active</span>`;
+    }
+}
+
 function renderActiveNow(pos, res) {
     // Active positions
     const activeEl = el('active-positions');
@@ -494,6 +544,7 @@ async function load() {
 
     renderMeta(meta);
     renderFund(fund, research);
+    renderLiveSignals(research);
     renderKnowledge(research);
     renderActiveNow(positions, research);
     renderPipeline(research);

@@ -725,6 +725,20 @@ def run_weekly_research_diagnostic():
                         f"Activate or invalidate it."
                     )
 
+    # Check signal revalidation
+    try:
+        from research import check_revalidation_due
+        due = check_revalidation_due()
+        if due:
+            report["revalidation_due"] = []
+            for item in due:
+                report["revalidation_due"].append(item)
+                report["warnings"].append(
+                    f"Signal '{item['event_type']}' needs revalidation: {item['reason']}"
+                )
+    except Exception:
+        pass
+
     # Update methodology with last diagnostic date
     m = load_methodology()
     m["last_weekly_diagnostic"] = datetime.now().isoformat()

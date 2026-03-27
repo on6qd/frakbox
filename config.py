@@ -42,6 +42,10 @@ DEFAULT_POSITION_SIZE_USD = 5000       # default trade size in dollars
 MAX_PORTFOLIO_DRAWDOWN_PCT = 30.0      # paper account — don't halt research over paper losses
 MAX_CONCURRENT_EXPERIMENTS = 10        # more concurrent experiments = faster signal validation
 
+# Focus discipline — prevent scatter
+MAX_ACTIVE_SIGNAL_TYPES = 3            # max distinct event_types under active investigation
+MAX_CONCURRENT_PER_SIGNAL = 2          # max positions on same signal (correlated = 1 bet)
+
 # Transaction cost assumptions
 ESTIMATED_ROUND_TRIP_COST_PCT = 0.10   # default round-trip cost (spread + impact)
 MIN_NET_RETURN_AFTER_COSTS_PCT = 1.0   # minimum expected net return to be viable
