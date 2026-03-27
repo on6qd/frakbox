@@ -230,3 +230,22 @@ def check_conditions():
 
 if __name__ == '__main__':
     check_conditions()
+
+    # --- GLD Tariff Long (NEW 2026-03-27) ---
+    print()
+    print("=" * 70)
+    print("GLD GOLD LONG SIGNAL (hypothesis b768e8d8)")
+    print("=" * 70)
+    print("Signal: GLD outperforms SPY by +3.87% avg over 20 days after tariff events.")
+    print("        N=19 events (2009-2025), 84% direction, p=0.0014 VALIDATED.")
+    print("        5-day signal is noisy (50% direction) - initial selloff/margin calls.")
+    print("        20-day effect is robust: gold recovers as inflation expectations rise.")
+    print()
+    if spy_return < -0.5:
+        print(f"✓ SPY down {spy_return:+.1f}% → Tariff shock confirmed → GLD LONG signal active")
+        print(f"  Action: Set trigger 2026-04-07T09:30 (next trading day after Good Friday)")
+        print(f"  python3 -c \"import db; db.init_db(); db.update_hypothesis_fields('b768e8d8', trigger='2026-04-07T09:30', trigger_position_size=5000, trigger_stop_loss_pct=10, trigger_take_profit_pct=15)\"")
+    else:
+        print(f"  SPY return: {spy_return:+.1f}% — Market not pricing tariff shock → GLD long uncertain")
+        print(f"  Note: GLD historically rallies 20d even in partial-shock scenarios (84% dir)")
+        print(f"  Judgment call: if tariff announcement was large, still consider activating.")
