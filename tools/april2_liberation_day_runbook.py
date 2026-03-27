@@ -286,3 +286,31 @@ if __name__ == '__main__':
         print(f"  Recommendation: Only activate STLD short if SPY is DOWN (tariff shock scenario).")
     else:
         print("  ERROR: Could not determine SPY return")
+
+    # --- KRE Regional Bank Tariff Short (NEW 2026-03-27) ---
+    print()
+    print("=" * 70)
+    print("KRE REGIONAL BANK SHORT SIGNAL (hypothesis 6e732966)")
+    print("=" * 70)
+    print("Signal: KRE underperforms SPY -3.08% avg over 20 DAYS after tariff escalation.")
+    print("        N=10 (2018-2025), 89% SHORT direction, 20d p=0.016. Passes MT.")
+    print("        10d: -2.73%, 90% direction, p=0.008 (even stronger direction)")
+    print("        5d signal weak (p=0.21) — this is a SLOW-BURN 20-day play, not a 5d play")
+    print("        Hold time: ~20 days. Entry April 7 → exit ~April 27")
+    print()
+    print("  PRIORITY NOTES:")
+    print("  - WFC fires if SPY<-0.5% (5d play). KRE is COMPLEMENTARY (20d play).")
+    print("  - If WFC is already active: KRE adds a DIFFERENT timeline/ETF short")
+    print("  - KRE has STRONGER direction consistency (89%) than WFC (~88%)")
+    print("  - But WFC has better expected 5d return (-1.94% vs -1.30% for KRE at 5d)")
+    print()
+    if spy_pct is not None and spy_pct < -0.5:
+        hypotheses = db.load_hypotheses()
+        active = [h for h in hypotheses if h.get('status') == 'active']
+        if len(active) < 4:
+            print(f"✓ SPY down {spy_pct:+.1f}% + portfolio has room → KRE SHORT signal active")
+            print(f"  Action: python tools/activate_kre_tariff_trade.py --yes")
+        else:
+            print(f"⚠ SPY down but portfolio full ({len(active)}/5). KRE valid but no capacity.")
+    else:
+        print(f"  SPY return: {spy_pct:+.1f}% — Only activate KRE short if SPY DOWN and capacity allows")
