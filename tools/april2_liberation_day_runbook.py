@@ -13,19 +13,36 @@ BACKTEST EXPECTATION:
   Systemic days (SPY<-0.5%, >=5 first-touch lows): -1.88% abnormal over 5 days
   VIX close > 30: SPY recovers +1.69% over 20 days
 
-PORTFOLIO STATE on April 2 (expected):
-  - GO: closes March 26 (3d from March 23 entry)
-  - HD, ABT, BAX: all close March 27
-  - SYK: closes ~April 2 (5d from March 26 entry, deadline April 2)
-  - AMT: enters March 30 at 9:30, closes ~April 6-7 (5d hold)
-  - VGNT: activates April 1 16:00 (short, 5d hold = closes ~April 8)
-  - TDG: may enter late March or early April if it crosses 52w low (hyp e25f0c6f)
+UPDATED PORTFOLIO STATE (as of 2026-03-28):
+  - GO: CLOSED March 26 at $6.75 (entry $6.19, +9% return)
+  - HD, ABT, BAX: CLOSED March 27 (all confirmed complete)
+  - SYK: active short until April 2 (entry $326.23, currently -0.4%)
+  - SPY LONG (b63a0168): TRIGGERED for March 31 open (VIX=31.0 on March 27!)
+    *** VIX ALREADY CROSSED 30 — DO NOT activate SPY long again on April 2 ***
+  - AMT, VGNT: ABANDONED (tickers not tradeable in Alpaca paper)
+  - TDG: monitoring (near 52w low but not yet crossed)
 
-Available positions on April 2: 2-3 open (SYK closing, AMT+VGNT active)
+PRE-SELLOFF REGIME CAVEAT (identified 2026-03-28):
+  SPY is down ~9% from recent highs going into Liberation Day.
+  Historical tariff events: SPY 20d pre-move was -1% to +4% (none > -3% presold).
+  Liberation Day 2026 is OUTSIDE the training distribution for tariff signals.
+  Risk: if tariffs already priced in → bounce scenario → defensives (GLD/KO/XLU) lag.
+  Protection: SPY<-0.5% gate on April 2 filters bounce scenarios.
+  EXTRA CAUTION: KO/XLU fire unconditionally April 7 — if SPY up on April 2, consider
+  manually canceling these (reduce trigger timestamp in db) to avoid the bounce lag risk.
+
+CAPACITY ON APRIL 7:
+  - SPY long (1 slot, 20d hold from March 31)
+  - SYK closes April 2 → frees 0 (not yet activated in system)
+  - Slots available: 4 (max 5 - SPY)
+  Priority: GLD > KO > KRE > XLU > WFC > STLD > COST (per original runbook)
+  If SPY<-0.5% on April 2: GLD+WFC fire (+2) → Total used: SPY+GLD+KO+XLU+WFC = 5/5
+  COST and STLD blocked if all 5 fill.
+
 CRITICAL: Good Friday April 3 = MARKET CLOSED. All April 3 actions → April 7.
 
 If WFC triggers: enter April 7 open (after Liberation Day announcement April 2)
-If VIX fires: also enter April 7 open
+VIX SPY long: ALREADY TRIGGERED for March 31 — do NOT fire again April 7
 """
 
 import sys
@@ -154,13 +171,16 @@ def check_conditions():
 
     if vix_fires:
         print()
-        print("🚨 VIX SPIKE RECOVERY SPY LONG SIGNAL FIRES!")
-        print("   → Run Monday April 7 at 9:30 AM (Good Friday April 3 = CLOSED):")
-        print("   python tools/activate_vix_spy_trade.py --yes")
+        print("⚠️  VIX SPIKE RECOVERY — ALREADY TRIGGERED (2026-03-27)")
+        print("   VIX closed at 31.0 on March 27 — SPY long (b63a0168) was set for March 31 open.")
+        print("   *** DO NOT ACTIVATE AGAIN — SPY long already running from March 31 entry ***")
+        print()
+        print("   If SPY long is NOT yet active (check python3 run.py --status):")
+        print("   THEN run: python tools/activate_vix_spy_trade.py --yes")
         print()
         print("   Expected: +1.69% over 20 days (N=54, OOS validation +2.92%)")
         print("   IMPORTANT: Check portfolio capacity — max 5 positions")
-        print("   NOTE: Compatible with systemic shorts (different horizons)")
+        print("   NOTE: Compatible with tariff sector plays (different horizons)")
     else:
         if vix_close:
             print(f"\n✗ VIX long NOT triggered (VIX={vix_close:.1f}, need >30)")
@@ -190,22 +210,45 @@ def check_conditions():
     else:
         print("  ✗ SPY is UP → Caution: WFC short may not work (see 2025-02-01 miss)")
 
-    # --- COST Tariff Defensive Long (NEW 2026-03-26) ---
+    # --- KO/COST/XLU Tariff Defensive Longs (CONDITIONAL as of 2026-03-28) ---
     print()
     print("=" * 70)
-    print("COST TARIFF DEFENSIVE RETAIL LONG SIGNAL (hypothesis 8c2f8cbb)")
+    print("KO/COST/XLU TARIFF DEFENSIVE LONGS (hypotheses dbe0dc29/8c2f8cbb/9184ba0f)")
     print("=" * 70)
-    print("Signal: COST outperforms SPY +3.57% avg over 5 days after major tariff events")
-    print("  n=21 (COST+WMT+XLP x 7 events), direction=86%, MT PASSES (5 horizons p<0.05)")
-    print("  OOS validation: 6/6 positive (100%) in 2025 events")
-    print("  TRIGGER: UNCONDITIONAL - fires regardless of SPY direction")
+    print("Signal: KO +4.4% 10d, COST +3.57% 5d, XLU +3.36% 20d after tariff events")
+    print("  Validated 2018-2025, but PRE-SELLOFF REGIME CAVEAT (identified 2026-03-28):")
+    print("  In pre-sold markets (SPY down >5% before event), signal is UNRELIABLE:")
+    print("  - 2018-03-01 (pre-sold -5%): COST_abn=-4.2%, GLD_abn=-1.8% (SPY bounced +2.4%)")
+    print("  - 2019-08-23 (pre-sold -5.7%): COST_abn=+5.1% but GLD_abn=-5.5%")
+    print("  Current SPY is down ~9% from highs — OUTSIDE training distribution")
+    print("  TRIGGERS CLEARED (2026-03-28): These are now CONDITIONAL on April 2 outcome")
     print()
-    print("  ✓ COST trigger already set: 2026-04-07T09:30 (April 7 open)")
-    print("  → COST hypothesis pre-registered, trade_loop WILL fire automatically")
-    print("  → No manual action needed UNLESS portfolio >5/5 capacity on April 7")
-    print()
-    print("  Also validated: WMT (+3.97% 10d, p=0.0356), XLP (+2.40% 10d, p=0.0329)")
-    print("  → If COST capacity issue: can use WMT or XLP instead")
+    if spy_condition:
+        print("  ✓ SPY DOWN on April 2 → Tariff shock confirmed → ACTIVATE DEFENSIVES")
+        print("  Run these BEFORE midnight April 6 (to fire at April 7 open):")
+        print()
+        print("  KO (hypothesis dbe0dc29, 10d hold):")
+        print("    python3 -c \"import db; db.init_db(); db.update_hypothesis_fields(")
+        print("    'dbe0dc29', trigger='2026-04-07T09:30', trigger_position_size=5000,")
+        print("    trigger_stop_loss_pct=10)\"")
+        print()
+        print("  XLU (hypothesis 9184ba0f, 20d hold):")
+        print("    python3 -c \"import db; db.init_db(); db.update_hypothesis_fields(")
+        print("    '9184ba0f', trigger='2026-04-07T09:30', trigger_position_size=5000,")
+        print("    trigger_stop_loss_pct=10)\"")
+        print()
+        print("  COST (hypothesis 8c2f8cbb, 5d hold) - lower priority, activate if capacity:")
+        print("    python3 -c \"import db; db.init_db(); db.update_hypothesis_fields(")
+        print("    '8c2f8cbb', trigger='2026-04-07T09:30', trigger_position_size=5000,")
+        print("    trigger_stop_loss_pct=10)\"")
+        print()
+        print("  Capacity check: SPY(1) + GLD(2) + KO(3) + XLU(4) + KRE or WFC(5) = FULL")
+        print("  COST blocked if at capacity. Also validated: WMT, XLP as alternatives.")
+    else:
+        print("  ✗ SPY UP on April 2 → Possible bounce/relief rally → DO NOT ACTIVATE")
+        print("  → Risk: defensive longs lag in bounce (2018-03-01: COST -4.2% abnormal)")
+        print("  → If you still want to activate, wait to see if SPY continues down April 7")
+        print("  → Check: is the market reacting poorly April 7 morning? If yes, can still set.")
     print()
 
     # --- Other Pending Signals ---
@@ -264,9 +307,11 @@ if __name__ == '__main__':
     print("        Discovery (2018-2019): n=6, avg=-3.37%, dir=83%")
     print("        OOS (2025): n=4, avg=-2.22%, dir=75% — CONFIRMED")
     print()
-    print("  CAPACITY NOTE: Only activate if portfolio has room (max 5 positions).")
-    print("  COST + KO fire unconditionally (2 slots). WFC/GLD fire if SPY<-0.5% (+2 slots).")
-    print("  VIX-SPY fires if VIX>30 (+1 slot). STLD = slot 6 if all others fire.")
+    print("  CAPACITY NOTE (UPDATED 2026-03-28): Only activate if portfolio has room (max 5).")
+    print("  SPY long fires unconditionally March 31 (1 slot).")
+    print("  If SPY<-0.5% on April 2: GLD+WFC+KRE+STLD are candidates (+4 conditional slots).")
+    print("  KO/XLU/COST also conditional. Priority: SPY(1)>GLD(2)>KO(3)>KRE(4)>XLU(5).")
+    print("  STLD = lower priority, likely blocked. Only activate if SPY>5 slots available.")
     print()
     if spy_pct is not None and spy_pct < -0.5:
         # Count active positions
