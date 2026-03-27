@@ -55,7 +55,7 @@ def check_conditions():
                       auto_adjust=True, progress=False)
     if spy.empty:
         print("ERROR: Could not fetch SPY data")
-        return
+        return None
 
     if isinstance(spy.columns, pd.MultiIndex):
         spy_close = spy['Close']['SPY'].dropna()
@@ -226,10 +226,11 @@ def check_conditions():
     print()
     print("Run: python tools/activate_systemic_short.py --ticker TICKER --yes")
     print("Run: python tools/activate_vix_spy_trade.py --yes")
+    return spy_pct
 
 
 if __name__ == '__main__':
-    check_conditions()
+    spy_pct = check_conditions()
 
     # --- GLD Tariff Long (NEW 2026-03-27) ---
     print()
@@ -241,11 +242,13 @@ if __name__ == '__main__':
     print("        5-day signal is noisy (50% direction) - initial selloff/margin calls.")
     print("        20-day effect is robust: gold recovers as inflation expectations rise.")
     print()
-    if spy_pct < -0.5:
+    if spy_pct is not None and spy_pct < -0.5:
         print(f"✓ SPY down {spy_pct:+.1f}% → Tariff shock confirmed → GLD LONG signal active")
         print(f"  Action: Set trigger 2026-04-07T09:30 (next trading day after Good Friday)")
         print(f"  python3 -c \"import db; db.init_db(); db.update_hypothesis_fields('b768e8d8', trigger='2026-04-07T09:30', trigger_position_size=5000, trigger_stop_loss_pct=10, trigger_take_profit_pct=15)\"")
-    else:
+    elif spy_pct is not None:
         print(f"  SPY return: {spy_pct:+.1f}% — Market not pricing tariff shock → GLD long uncertain")
         print(f"  Note: GLD historically rallies 20d even in partial-shock scenarios (84% dir)")
         print(f"  Judgment call: if tariff announcement was large, still consider activating.")
+    else:
+        print("  ERROR: Could not determine SPY return")
