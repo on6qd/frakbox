@@ -50,13 +50,27 @@ PRE-SELLOFF REGIME CAVEAT (identified 2026-03-28, updated 2026-03-28):
     - RECOMMENDED ACTION: If SPY > +0.5% on April 2, manually cancel KO and XLU triggers
     - Command: Check db.update_hypothesis_fields for dbe0dc29, 9184ba0f
 
-CAPACITY ON APRIL 7:
+2025 LIBERATION DAY OOS RESULTS (CRITICAL — updated 2026-03-28):
+  Analysis of 2025 Liberation Day (April 2-3 2025) as OOS validation:
+  - GLD: 5d=+4.3%, 10d=+8.8% STRONG ✓ | 20d=-1.6% FAIL (rollback April 9)
+  - WFC short: 5d=+1.6% ✓ | 20-30d reversed (rollback)
+  - KRE short: 5d=+1.5% ✓, 10d=-2.1% | reversed in rollback
+  - KO: 5d=-1.0% ✗, 20d=-7.7% ✗ FAILED — defensive lagged the bounce
+  - XLU: 5d=-2.2% ✗, 20d=-4.5% ✗ FAILED — utility lagged the bounce
+  - STLD short: 5d=-3.5% ✗ WRONG DIRECTION — rollback bullish for domestic steel
+  - COST: 5d=+2.0% ✓, 10d=+4.8% ✓ | 20d=-1.2% FAIL (rollback)
+  AMD+QCOM basket: 5d=-2.5% ✓, 10d=-5.9% ✓ — semiconductor tariff short worked!
+
+  → SKIP: KO, XLU, STLD (all failed in 2025 analog, pre-sold regime)
+  → KEEP: GLD (10d max), WFC (5d), KRE (10d), COST (if capacity)
+  → INFORMAL: AMD + QCOM basket short (no formal hypothesis yet, but strong signal)
+
+CAPACITY ON APRIL 7 (REVISED 2026-03-28):
   - SPY long (1 slot, 20d hold from March 31)
   - SYK closes April 2 → frees 0 (not yet activated in system)
   - Slots available: 4 (max 5 - SPY)
-  Priority: GLD > KO > KRE > XLU > WFC > STLD > COST (per original runbook)
-  If SPY<-0.5% on April 2: GLD+WFC fire (+2) → Total used: SPY+GLD+KO+XLU+WFC = 5/5
-  COST and STLD blocked if all 5 fill.
+  Priority (REVISED): GLD(2) > WFC(3) > KRE(4) > COST(5) [AMD/QCOM basket if slot]
+  CANCELLED: KO, XLU, STLD — failed in 2025 Liberation Day OOS
 
 CRITICAL: Good Friday April 3 = MARKET CLOSED. All April 3 actions → April 7.
 
@@ -160,27 +174,22 @@ def check_conditions():
         print("🚨 SYSTEMIC 52W LOW SHORT SIGNAL FIRES!")
         print("   → Run Monday April 7 at 9:30 AM (GOOD FRIDAY APRIL 3 = CLOSED):")
         print()
-        print("   PRE-REGISTERED CANDIDATES (use these first):")
-        print("   1. ADBE ($98B, hypothesis f93527a2) — PRIMARY CANDIDATE")
-        print("      python tools/activate_adbe_trade.py --yes")
-        print("   2. Any other large-cap at 52w low (hypothesis f055dc19):")
-        # Sort by market cap (rough proxy: just list all)
-        candidates = ['GIS', 'SBAC', 'DPZ', 'OTIS', 'BSX', 'TAP']
+        print("   NOTE: f93527a2 and f055dc19 are ABANDONED. Need new pre-registration.")
+        print("   Use activate_systemic_short.py with any large-cap at 52w low (>$10B mktcap).")
+        print()
+        candidates = ['ADBE', 'QCOM', 'SNPS']
         if stocks_at_low:
-            # Show scanner results + known candidates
             combined = list(dict.fromkeys(stocks_at_low + candidates))
         else:
             combined = candidates
-        n_to_trade = min(available_slots - 1, len(combined))  # -1 because ADBE takes one slot
-        print(f"      python tools/activate_systemic_short.py --ticker <TICKER> --yes")
-        print(f"      Best candidates (pre-screened, verify still at 52w low):")
+        n_to_trade = min(available_slots, len(combined))
+        print(f"   Best candidates from scanner (verify still at 52w low April 7):")
         for ticker in combined[:n_to_trade]:
-            print(f"      - {ticker}")
+            print(f"   - {ticker}: python tools/activate_systemic_short.py --ticker {ticker} --yes")
         print()
         print("   Expected: -1.88% abnormal over 5 days each")
-        print("   IMPORTANT: Check each stock is STILL at/below 52w low at April 7 open")
-        print("   NOTE: Can short multiple stocks if portfolio capacity allows")
-        print("   CAPACITY CHECK: If MKC+NKE+CAG+VGNT all active = 4/5. Can add ADBE only.")
+        print("   IMPORTANT: Only short stocks STILL below their 52w low at April 7 open")
+        print("   CAPACITY: SPY long uses slot 1. Systemic shorts fill remaining slots.")
     else:
         print("✗ Systemic short signal NOT triggered")
         if not spy_condition:
@@ -229,46 +238,67 @@ def check_conditions():
     else:
         print("  ✗ SPY is UP → Caution: WFC short may not work (see 2025-02-01 miss)")
 
-    # --- KO/COST/XLU Tariff Defensive Longs (CONDITIONAL as of 2026-03-28) ---
+    # --- KO/XLU/STLD: SKIPPED based on 2025 Liberation Day OOS (updated 2026-03-28) ---
     print()
     print("=" * 70)
-    print("KO/COST/XLU TARIFF DEFENSIVE LONGS (hypotheses dbe0dc29/8c2f8cbb/9184ba0f)")
+    print("KO / XLU / STLD — CANCELLED FOR LIBERATION DAY 2026 (updated 2026-03-28)")
     print("=" * 70)
-    print("Signal: KO +4.4% 10d, COST +3.57% 5d, XLU +3.36% 20d after tariff events")
-    print("  Validated 2018-2025, but PRE-SELLOFF REGIME CAVEAT (identified 2026-03-28):")
-    print("  In pre-sold markets (SPY down >5% before event), signal is UNRELIABLE:")
-    print("  - 2018-03-01 (pre-sold -5%): COST_abn=-4.2%, GLD_abn=-1.8% (SPY bounced +2.4%)")
-    print("  - 2019-08-23 (pre-sold -5.7%): COST_abn=+5.1% but GLD_abn=-5.5%")
-    print("  Current SPY is down ~9% from highs — OUTSIDE training distribution")
-    print("  TRIGGERS CLEARED (2026-03-28): These are now CONDITIONAL on April 2 outcome")
+    print("2025 Liberation Day OOS showed ALL THREE failed:")
+    print("  KO: 5d=-1.0%, 20d=-7.7% FAIL (defensive lagged the rally after rollback)")
+    print("  XLU: 5d=-2.2%, 20d=-4.5% FAIL (utility lagged the rally after rollback)")
+    print("  STLD: 5d=-3.5% WRONG DIRECTION (rollback was BULLISH for domestic steel!)")
     print()
+    print("  Pre-sold regime (SPY -7.76% over 20d pre-Liberation Day 2026) = HIGH rollback risk")
+    print("  DO NOT ACTIVATE: KO (dbe0dc29), XLU (9184ba0f), STLD (907d94ec)")
+    print()
+    print("  ALTERNATIVE: COST (8c2f8cbb, 5d) — worked at 10d in 2025 (+4.8%). Lower rollback risk.")
     if spy_condition:
-        print("  ✓ SPY DOWN on April 2 → Tariff shock confirmed → ACTIVATE DEFENSIVES")
-        print("  Run these BEFORE midnight April 6 (to fire at April 7 open):")
-        print()
-        print("  KO (hypothesis dbe0dc29, 10d hold):")
-        print("    python3 -c \"import db; db.init_db(); db.update_hypothesis_fields(")
-        print("    'dbe0dc29', trigger='2026-04-07T09:30', trigger_position_size=5000,")
-        print("    trigger_stop_loss_pct=10)\"")
-        print()
-        print("  XLU (hypothesis 9184ba0f, 20d hold):")
-        print("    python3 -c \"import db; db.init_db(); db.update_hypothesis_fields(")
-        print("    '9184ba0f', trigger='2026-04-07T09:30', trigger_position_size=5000,")
-        print("    trigger_stop_loss_pct=10)\"")
-        print()
-        print("  COST (hypothesis 8c2f8cbb, 5d hold) - lower priority, activate if capacity:")
+        print("  ✓ SPY DOWN → COST can be activated as 5th slot if capacity allows:")
         print("    python3 -c \"import db; db.init_db(); db.update_hypothesis_fields(")
         print("    '8c2f8cbb', trigger='2026-04-07T09:30', trigger_position_size=5000,")
         print("    trigger_stop_loss_pct=10)\"")
-        print()
-        print("  Capacity check: SPY(1) + GLD(2) + KO(3) + XLU(4) + KRE or WFC(5) = FULL")
-        print("  COST blocked if at capacity. Also validated: WMT, XLP as alternatives.")
     else:
-        print("  ✗ SPY UP on April 2 → Possible bounce/relief rally → DO NOT ACTIVATE")
-        print("  → Risk: defensive longs lag in bounce (2018-03-01: COST -4.2% abnormal)")
-        print("  → If you still want to activate, wait to see if SPY continues down April 7")
-        print("  → Check: is the market reacting poorly April 7 morning? If yes, can still set.")
+        print("  ✗ SPY UP → Do not activate COST either")
     print()
+
+    # --- AMD+QCOM Semiconductor Basket (Informal Monitor) ---
+    print()
+    print("=" * 70)
+    print("AMD+QCOM SEMICONDUCTOR BASKET SHORT (INFORMAL MONITOR — validated 2026-03-28)")
+    print("=" * 70)
+    print("Signal: AMD+QCOM basket underperforms SPY after tariff escalations.")
+    print("  N=8 events (2018-2025). 10d: avg=-6.16%, 8/8 direction (100%), p=0.0008.")
+    print("  5d: avg=-2.03%, 7/8 direction (87.5%), p=0.0039. PASSES multiple testing.")
+    print("  AMD ~50% China revenue, QCOM ~63% China revenue.")
+    print("  OOS: 2025-03-26 basket=-5.9% ✓, 2025-04-02 basket=-2.2% ✓ (2/2 correct).")
+    print()
+    print("  ⚠ No formal hypothesis yet (focus limit: 16 active signal types > max 3).")
+    print("  INFORMAL TRADE: If Liberation Day fires AND portfolio has 5th slot:")
+    print("    Short AMD $2,500 + Short QCOM $2,500 = $5,000 basket")
+    print("    Entry: April 7 open. Hold: 10 trading days. Stop: 10%.")
+    print()
+    if spy_condition:
+        import yfinance as yf
+        from datetime import timedelta
+        from datetime import datetime
+        recent = yf.download(['AMD', 'QCOM'], start=datetime.now()-timedelta(days=5),
+                            end=datetime.now()+timedelta(days=1), progress=False)
+        try:
+            if isinstance(recent.columns, pd.MultiIndex):
+                amd_px = float(recent['Close']['AMD'].dropna().iloc[-1])
+                qcom_px = float(recent['Close']['QCOM'].dropna().iloc[-1])
+            else:
+                amd_px = qcom_px = None
+            if amd_px:
+                print(f"  Current prices: AMD=${amd_px:.2f}, QCOM=${qcom_px:.2f}")
+        except:
+            pass
+        print("  ✓ SPY DOWN → AMD+QCOM basket conditions met. Trade if 5th slot available.")
+        print("  Manual short commands (Alpaca paper):")
+        print("    python3 -c \"import trader; trader.place_order('AMD', 'sell', dollar_amount=2500)\"")
+        print("    python3 -c \"import trader; trader.place_order('QCOM', 'sell', dollar_amount=2500)\"")
+    else:
+        print("  ✗ SPY UP → AMD/QCOM basket not worth trading (market not pricing tariff shock)")
 
     # --- Other Pending Signals ---
     print()
@@ -315,41 +345,18 @@ if __name__ == '__main__':
     else:
         print("  ERROR: Could not determine SPY return")
 
-    # --- STLD Tariff Short (NEW 2026-03-27) ---
+    # --- STLD Tariff Short — CANCELLED for Liberation Day 2026 (2026-03-28) ---
     print()
     print("=" * 70)
-    print("STLD DOMESTIC STEEL SHORT SIGNAL (hypothesis 907d94ec)")
+    print("STLD DOMESTIC STEEL SHORT — CANCELLED FOR LIBERATION DAY 2026")
     print("=" * 70)
-    print("Signal: STLD (Steel Dynamics) underperforms SPY -2.58% in 5 days after tariff events.")
-    print("        N=10 (2018-2025), 80% SHORT direction, p=0.007. Passes multiple testing.")
-    print("        Counter-intuitive: tariff protection < demand destruction for domestic steel.")
-    print("        Discovery (2018-2019): n=6, avg=-3.37%, dir=83%")
-    print("        OOS (2025): n=4, avg=-2.22%, dir=75% — CONFIRMED")
+    print("2025 Liberation Day OOS result: STLD +1.8% at 5d (WRONG DIRECTION).")
+    print("Root cause: 90-day tariff rollback was BULLISH for domestic steel (no import competition).")
+    print("Signal is valid in aggregate (n=10, 80% dir) but NOT in rollback-risk scenarios.")
+    print("Liberation Day 2026 carries HIGH rollback risk (pre-sold market, same setup as 2025).")
     print()
-    print("  CAPACITY NOTE (UPDATED 2026-03-28): Only activate if portfolio has room (max 5).")
-    print("  SPY long fires unconditionally March 31 (1 slot).")
-    print("  If SPY<-0.5% on April 2: GLD+WFC+KRE+STLD are candidates (+4 conditional slots).")
-    print("  KO/XLU/COST also conditional. Priority: SPY(1)>GLD(2)>KO(3)>KRE(4)>XLU(5).")
-    print("  STLD = lower priority, likely blocked. Only activate if SPY>5 slots available.")
-    print()
-    if spy_pct is not None and spy_pct < -0.5:
-        # Count active positions
-        hypotheses = db.load_hypotheses()
-        active = [h for h in hypotheses if h.get('status') == 'active']
-        if len(active) < 4:
-            print(f"✓ SPY down {spy_pct:+.1f}% + portfolio has room → STLD SHORT signal active")
-            print(f"  Action: python3 -c \"import db; db.init_db(); db.update_hypothesis_fields(")
-            print(f"    '907d94ec', trigger='2026-04-07T09:30', trigger_position_size=5000,")
-            print(f"    trigger_stop_loss_pct=10)\"")
-        else:
-            print(f"⚠ SPY down {spy_pct:+.1f}% but portfolio full ({len(active)}/5 active)")
-            print(f"  STLD signal valid but skipping for capacity. Wait for an existing position to close.")
-    elif spy_pct is not None:
-        print(f"  SPY return: {spy_pct:+.1f}% — Mild tariff reaction. STLD short less certain.")
-        print(f"  Note: 2025-04-02 event shows STLD +0.39% when market reacted positively.")
-        print(f"  Recommendation: Only activate STLD short if SPY is DOWN (tariff shock scenario).")
-    else:
-        print("  ERROR: Could not determine SPY return")
+    print("⛔ DO NOT ACTIVATE STLD (907d94ec) for April 7, 2026.")
+    print("   Re-evaluate after observing April 7-14 market behavior (rollback or not?).")
 
     # --- KRE Regional Bank Tariff Short (NEW 2026-03-27) ---
     print()
