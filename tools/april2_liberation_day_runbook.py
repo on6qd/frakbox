@@ -19,7 +19,11 @@ UPDATED PORTFOLIO STATE (as of 2026-03-28):
   - SYK: active short until April 2 (entry $326.23, currently -0.4%)
   - SPY LONG (b63a0168): TRIGGERED for March 31 open (VIX=31.0 on March 27!)
     *** VIX ALREADY CROSSED 30 — DO NOT activate SPY long again on April 2 ***
-  - AMT, VGNT: ABANDONED (tickers not tradeable in Alpaca paper)
+  - AMT: ABANDONED (not tradeable in Alpaca paper)
+  - VGNT (Versigent/Aptiv spinco): REINSTATED — regular trading starts April 1.
+    Run: python3 tools/check_vgnt_and_activate.py on April 1 morning.
+    If tradeable: run --yes to activate spinco short. 25% auto tariff amplifies pressure.
+    Hypothesis: 2d94ac68. Entry at market open April 1 (before Liberation Day).
   - TDG: monitoring (near 52w low but not yet crossed)
 
 PRE-SELLOFF REGIME CAVEAT (identified 2026-03-28, updated 2026-03-28):
