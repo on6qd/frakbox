@@ -24,7 +24,12 @@ UPDATED PORTFOLIO STATE (as of 2026-03-28):
     Run: python3 tools/check_vgnt_and_activate.py on April 1 morning.
     If tradeable: run --yes to activate spinco short. 25% auto tariff amplifies pressure.
     Hypothesis: 2d94ac68. Entry at market open April 1 (before Liberation Day).
-  - TDG: monitoring (near 52w low but not yet crossed)
+  - TDG: CROSSED first-ever 52w low on March 27 ($1,140 vs barrier $1,152.50)
+  - ADBE, OTIS, DPZ, QCOM + 24 others: ALL crossed first-ever 52w lows on March 27
+    (28 total first-touch 52w lows; SPY -1.71% → systemic short signal FIRED)
+  - DECISION: Systemic shorts NOT activated — Liberation Day correlation + capacity
+    (reserves slots for GLD/WFC/KRE/COST which are higher magnitude and better validated)
+    Track informally: python3 tools/amd_qcom_liberation_day_observer.py (April 8-9 for 5d)
 
 PRE-SELLOFF REGIME CAVEAT (identified 2026-03-28, updated 2026-03-28):
   SPY is down ~7.3% over 20 days and -8.6% from 60d peak going into Liberation Day.
@@ -399,3 +404,29 @@ if __name__ == '__main__':
             print(f"⚠ SPY down but portfolio full ({len(active)}/5). KRE valid but no capacity.")
     else:
         print(f"  SPY return: {spy_pct:+.1f}% — Only activate KRE short if SPY DOWN and capacity allows")
+
+    # --- AMD/QCOM Semiconductor Basket — Informal OOS Observer ---
+    print()
+    print("=" * 70)
+    print("AMD/QCOM SEMICONDUCTOR BASKET — INFORMAL OOS OBSERVATION")
+    print("=" * 70)
+    print("Signal: AMD+QCOM basket underperforms SPY -6.16% avg 10d after tariff escalations.")
+    print("        N=8 events, 100% direction at 10d, p=0.0008. 2 OOS instances confirmed.")
+    print("        CANNOT be formally pre-registered (signal type cap exceeded).")
+    print("        Capturing Liberation Day 2026 as 3rd informal OOS instance.")
+    print()
+    print("  NO FORMAL TRADE — This is an observation event only.")
+    print("  After 10 trading days from April 2 → run:")
+    print("    python3 tools/amd_qcom_liberation_day_observer.py")
+    print("  After 14-15 trading days → run:")
+    print("    python3 tools/amd_qcom_liberation_day_observer.py --record")
+    print("  If OOS3 confirmed: formally pre-register at NEXT tariff escalation event")
+    print("  (when signal type slots free up post-Liberation Day completions)")
+    print()
+    print("  APRIL 7 PORTFOLIO EXPECTED STATE:")
+    print("    Slot 1: SPY VIX long (b63a0168) — 20d hold, expires ~April 28")
+    print("    Slot 2: GLD long (b768e8d8) — 20d hold if SPY<-0.5%")
+    print("    Slot 3: WFC short (b73efac3) — 5d hold if SPY<-0.5%")
+    print("    Slot 4: KRE short (6e732966) — 20d hold if capacity")
+    print("    Slot 5: COST long (8c2f8cbb) — 5d hold if capacity")
+    print("    VGNT closes ~April 8 (5d from April 1 entry)")
