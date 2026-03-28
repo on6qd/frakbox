@@ -573,6 +573,8 @@ def get_known_effect(event_type):
     ).fetchone()
     if row:
         data = json.loads(row["data"])
+        if isinstance(data, str):
+            data = {"description": data}
         data["last_updated"] = row["last_updated"]
         return data
     return None
