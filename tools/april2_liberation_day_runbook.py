@@ -181,7 +181,17 @@ def check_conditions():
         print("   NOTE: f93527a2 and f055dc19 are ABANDONED. Need new pre-registration.")
         print("   Use activate_systemic_short.py with any large-cap at 52w low (>$10B mktcap).")
         print()
-        candidates = ['ADBE', 'QCOM', 'SNPS']
+        # Updated 2026-03-28: current 52w low proximity data (as of March 27 close)
+        # TDG ($1140, 0% above, first touch 2026-03-26) - BEST: most recent, $41B cap
+        # HD ($322, 0.28% above, first touch 2026-03-20) - HOME DEPOT $316B cap
+        # SBAC ($167, 0.1% above, never crossed) - SBA Communications $26B
+        # OTIS ($76, 0.2% above, never crossed) - Otis Worldwide $31B
+        # DPZ ($360, 0.1% above, never crossed) - Dominos $13B (borderline cap)
+        # ADBE ($238, 0.6% above, approaching first touch) - $35B cap (not crossed yet)
+        # BSX ($69, 1.5% above, first touch 2026-01-16) - Boston Scientific $101B
+        # PANW ($147, 3.78% above, first touch 2026-02-18) - $50B cap
+        # NOTE: Only short stocks STILL at their 52w low on April 7 (verify with scanner)
+        candidates = ['TDG', 'HD', 'SBAC', 'OTIS', 'ADBE', 'BSX', 'PANW']
         if stocks_at_low:
             combined = list(dict.fromkeys(stocks_at_low + candidates))
         else:

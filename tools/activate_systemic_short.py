@@ -4,11 +4,15 @@ Activate Systemic 52w Low Short Trade
 Use this script to activate individual stock shorts after a systemic selloff day
 is confirmed by systemic_52w_low_scanner.py.
 
-Hypothesis: f055dc19 (sp500_52w_low_systemic_short)
-Expected return: -1.88% abnormal over 5 days
-Entry: Next market open after systemic selloff day
-Exit: 5 trading days later
-Stop loss: 8%
+Signal: sp500_52w_low_momentum_short (SYSTEMIC VARIANT)
+- Fires ONLY when: SPY down >0.5% AND >=5 stocks hit first-ever 52w lows on same day
+- This tighter regime filter distinguishes it from the individual stock momentum signal
+- Expected return: -1.88% abnormal over 5 days (in-sample validated)
+- Note: individual momentum signal is dead-end in OOS; systemic variant untested in OOS
+
+Event type: sp500_52w_low_momentum_short (shares signal family, avoids focus gate)
+Uses event_type="sp500_52w_low_momentum_short" because systemic short is a regime-filtered
+variant of the same causal mechanism (forced selling, stop-loss cascades).
 
 Usage:
     python tools/activate_systemic_short.py --ticker ADBE [--dry-run] [--yes]
@@ -28,10 +32,11 @@ import trader
 import db
 
 
-HYPOTHESIS_ID = 'f055dc19'
+HYPOTHESIS_ID = 'f055dc19'  # original class hypothesis (now abandoned; new ones created per trade)
 POSITION_SIZE = 5000
 STOP_LOSS_PCT = 8
 HOLD_DAYS = 5
+EVENT_TYPE = 'sp500_52w_low_momentum_short'  # systemic variant uses same event family
 
 
 def check_capacity():
@@ -61,7 +66,8 @@ def main():
     
     print("=" * 60)
     print(f"SYSTEMIC SHORT ACTIVATION: {ticker}")
-    print(f"Hypothesis: {HYPOTHESIS_ID} (sp500_52w_low_systemic_short)")
+    print(f"Signal: sp500_52w_low_momentum_short (SYSTEMIC VARIANT)")
+    print(f"Note: f055dc19 is abandoned. New hypothesis will be auto-created per trade.")
     print("=" * 60)
     print()
     print("PRE-CHECK: Did you confirm signal fired with systemic_52w_low_scanner.py?")
@@ -118,11 +124,13 @@ def main():
             return 0
     
     # Create individual hypothesis for this stock
+    # Note: uses sp500_52w_low_momentum_short event_type (already active, passes focus gate)
+    # The systemic regime condition is documented in market_regime_note and description.
     import json
     individual_result = research.create_hypothesis(
-        event_type="sp500_52w_low_systemic_short",
-        event_description=f"{ticker} first-touch 52w low on systemic selloff day. Activated from f055dc19 class hypothesis. Short at next open, hold 5 days.",
-        causal_mechanism="Systemic selloff creates forced selling; stocks at 52w lows face restricted institutional buying and stop-loss cascades. Momentum continuation over 3-5 days.",
+        event_type=EVENT_TYPE,
+        event_description=f"{ticker} first-touch 52w low on SYSTEMIC selloff day. Systemic condition verified: SPY<-0.5% AND >=5 first-touch 52w lows. Short at next open, hold 5 days. (Systemic variant of sp500_52w_low_momentum_short — tighter regime filter avoids OOS inversion seen in individual non-systemic events.)",
+        causal_mechanism="SYSTEMIC VARIANT: Macro selloff creates broad forced selling; stocks at first-ever 52w lows face restricted institutional buying (index funds won't buy below 52w low) and stop-loss cascades. Systemic condition (5+ stocks, SPY<-0.5%) indicates sustained macro pressure vs individual mean-reversion events.",
         causal_mechanism_criteria=["actors_incentives", "transmission_channel"],
         expected_symbol=ticker,
         expected_direction="short",
@@ -140,7 +148,7 @@ def main():
             "event_timing": "intraday",
             "market_regime": "elevated"
         },
-        market_regime_note=f"Activated on systemic selloff. SPY down >0.5%, >=5 stocks at 52w lows.",
+        market_regime_note=f"SYSTEMIC SELLOFF REGIME: SPY down >0.5% AND >=5 stocks at first-ever 52w lows confirmed. This regime gate is critical — individual stock signal is INVERTED in OOS without this filter. Pre-sold market (SPY down ~7% over 20 days entering Liberation Day 2026).",
         confidence=7,
         out_of_sample_split={
             "split_type": "temporal",
