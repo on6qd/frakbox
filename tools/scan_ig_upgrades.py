@@ -79,21 +79,19 @@ KNOWN_EVENTS = [
 
 # Companies currently monitored as IG candidates
 MONITORING_LIST = [
+    # CCL DISQUALIFIED: return-to-IG (had Baa3 before COVID March 2020 downgrade)
+    # {
+    #     "symbol": "CCL", "name": "Carnival Corp", "current_rating_sp": "BB-",
+    #     "notes": "RETURN-TO-IG - had prior IG, NEGATIVE/NEUTRAL effect per exclusion criterion"
+    # },
+    # MSCI already upgraded to BBB- by S&P on Feb 27, 2023 - NOT a candidate
     {
-        "symbol": "CCL",
-        "name": "Carnival Corp",
-        "current_rating_sp": "BB+",
+        "symbol": "COIN",
+        "name": "Coinbase Global",
+        "current_rating_sp": "BB-",
         "outlook": "positive",
-        "notes": "S&P upgrade to BBB- possible H2 2026/2027 (requires leverage <3x)",
-        "watch_since": "2026-02-01",
-    },
-    {
-        "symbol": "MSCI",
-        "name": "MSCI Inc",
-        "current_rating_sp": "BB+",  # May have been upgraded already
-        "outlook": "unknown",
-        "notes": "Possible S&P upgrade around March 17-23 2026 - verify",
-        "watch_since": "2026-03-23",
+        "notes": "No prior IG ever. BB- from S&P. Possible upgrade to BBB- if crypto regulation improves.",
+        "watch_since": "2026-03-29",
     },
 ]
 
