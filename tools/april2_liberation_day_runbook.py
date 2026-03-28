@@ -297,9 +297,6 @@ def check_conditions():
     print("    Entry: April 7 open. Hold: 10 trading days. Stop: 10%.")
     print()
     if spy_condition:
-        import yfinance as yf
-        from datetime import timedelta
-        from datetime import datetime
         recent = yf.download(['AMD', 'QCOM'], start=datetime.now()-timedelta(days=5),
                             end=datetime.now()+timedelta(days=1), progress=False)
         try:
