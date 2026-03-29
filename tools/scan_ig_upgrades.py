@@ -80,10 +80,22 @@ KNOWN_EVENTS = [
 # Companies currently monitored as IG candidates
 MONITORING_LIST = [
     # CCL DISQUALIFIED: return-to-IG (had Baa3 before COVID March 2020 downgrade)
-    # {
-    #     "symbol": "CCL", "name": "Carnival Corp", "current_rating_sp": "BB-",
-    #     "notes": "RETURN-TO-IG - had prior IG, NEGATIVE/NEUTRAL effect per exclusion criterion"
-    # },
+    {
+        "symbol": "TEVA",
+        "name": "Teva Pharmaceuticals",
+        "current_rating_sp": "BB+",
+        "outlook": "unknown",
+        "notes": "Still BB+ at S&P as of March 2026. Verify if first-ever IG (may have had prior IG).",
+        "watch_since": "2026-03-29",
+    },
+    {
+        "symbol": "BIRK",
+        "name": "Birkenstock",
+        "current_rating_sp": "BB+",
+        "outlook": "positive",
+        "notes": "Upgraded to BB+ early 2026. IPO October 2023 - TRUE first-ever IG when crosses BBB-.",
+        "watch_since": "2026-03-29",
+    },
     # MSCI already upgraded to BBB- by S&P on Feb 27, 2023 - NOT a candidate
     {
         "symbol": "COIN",
