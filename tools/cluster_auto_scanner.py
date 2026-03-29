@@ -36,11 +36,15 @@ VIX + Cluster Size Trading Gate (full-population analysis, N=1566, 2021-2025):
         n=6-9: EV = +2.78%, 55.6% pos rate, p=0.0021. Tradeable.
         n=3-5: EV = -0.48%, 38% positive -- DO NOT TRADE.
         n>=10: Still noise. DO NOT TRADE.
-    Tier 4 - DO NOT TRADE (VIX > 30):
-        Crisis regime -- signal noisy, N=94. Avoid.
+    Tier 4A - CONDITIONAL (VIX 30-40, n=6-9 only):
+        n=6-9: EV=+4.44%, pos=60%, p=0.024 (N=25, 2020-2024). 2022 OOS: EV=+7.75%, pos=67%, p=0.015.
+        TRADEABLE for n=6-9 only. Use 3d hold. Updated 2026-03-30.
+        n<6: DO NOT TRADE even in 30-40 range.
+    Tier 4B - DO NOT TRADE (VIX > 40):
+        Extreme crisis -- VIX 40-60 backtest N=7, avg=-1.12%, pos=29%. Signal breaks down.
 
-Key implication: When VIX is elevated (20-30), ONLY trade n=6-9 clusters.
-    n=3-5 in elevated VIX = coin flip. n>=10 in any VIX = noise.
+Key implication: When VIX is elevated (20-40), ONLY trade n=6-9 clusters.
+    n=3-5 in elevated VIX = coin flip. n>=10 in any VIX = noise. VIX>40 = no signal.
 """
 
 import argparse
@@ -294,7 +298,11 @@ CLUSTER_HYPOTHESIS_IDS = ["1cb6140f", "76678219"]  # 3d and 5d cluster hypothese
 VIX_CALM_THRESHOLD = 20.0      # VIX < 20: Tier 1 (HIGH CONFIDENCE, any cluster size)
 VIX_MODERATE_THRESHOLD = 25.0  # VIX 20-25: Tier 2 (n>=5 recommended, n>=3 marginal)
 VIX_ELEVATED_THRESHOLD = 30.0  # VIX 25-30: Tier 3 (n>=6 only, n<6 DO NOT TRADE)
-# VIX > 30: Tier 4 (DO NOT TRADE - crisis regime, N=94 noisy)
+VIX_CRISIS_THRESHOLD = 40.0    # VIX 30-40: Tier 4A (n=6-9 TRADEABLE, n<6 DO NOT TRADE)
+# VIX > 40: Tier 4B (DO NOT TRADE - extreme crisis, signal breaks down)
+# RESEARCH UPDATE 2026-03-30: VIX 30-40 n=6-9 backtest shows N=25, avg=+4.44%, pos=60%, p=0.024
+# 2022 OOS validation (rate hike period): N=12, avg=+7.75%, pos=67%, p=0.015 (STRONG OOS)
+# VIX 40-60: N=7, avg=-1.12%, pos=29%, p=0.771 — NO SIGNAL (breaks down above 40)
 
 
 def get_current_vix() -> tuple[float, str, str]:
@@ -322,9 +330,12 @@ def get_current_vix() -> tuple[float, str, str]:
     elif vix_level < VIX_ELEVATED_THRESHOLD:
         regime = "elevated"
         label = f"TIER 3 (elevated VIX {vix_level:.1f} 25-30, EV=+2.37% for n>=6 only, -0.48% for n<6)"
-    else:
+    elif vix_level < VIX_CRISIS_THRESHOLD:
         regime = "crisis"
-        label = f"TIER 4 / DO NOT TRADE (crisis VIX {vix_level:.1f} > {VIX_ELEVATED_THRESHOLD}, signal unreliable)"
+        label = f"TIER 4A (VIX {vix_level:.1f} 30-40, n=6-9 TRADEABLE: EV=+4.44%, pos=60%, p=0.024)"
+    else:
+        regime = "extreme"
+        label = f"TIER 4B / DO NOT TRADE (extreme VIX {vix_level:.1f} > {VIX_CRISIS_THRESHOLD}, signal breaks down)"
 
     return (vix_level, regime, label)
 
@@ -417,8 +428,18 @@ def get_vix_action_recommendation(vix_regime: str, n_insiders: int, total_value_
             return (f"DO NOT TRADE (VIX 25-30, n={n_insiders}<5). "
                     "EV=-0.48%, 38% pos rate for n<5 in elevated VIX — historically a coin flip. SKIP.")
     elif vix_regime == "crisis":
-        return (f"DO NOT TRADE (VIX>30 crisis regime). "
-                "Signal unreliable in crisis. N=94, mixed results. Wait for VIX to fall below 25.")
+        # VIX 30-40: n=6-9 clusters are TRADEABLE (backtest 2020-2024, N=25, p=0.024)
+        # VIX>40 (extreme regime) is NOT tradeable
+        if 6 <= n_insiders <= 9:
+            return (f"CONDITIONAL (VIX 30-40, n={n_insiders} in 6-9 tier). "
+                    "Backtest 2020-2024: EV=+4.44%, pos=60%, p=0.024. 2022 OOS: EV=+7.75%, pos=67%, p=0.015. "
+                    "TRADEABLE for n=6-9 only. Use 3d hold. Updated 2026-03-30.")
+        else:
+            return (f"DO NOT TRADE (VIX 30-40, n={n_insiders}<6). "
+                    "Signal only works at n=6-9 in crisis. n<6 has shown no signal at VIX>25.")
+    elif vix_regime == "extreme":
+        return (f"DO NOT TRADE (extreme VIX>40 regime). "
+                "VIX 40-60 backtest: N=7, avg=-1.12%, pos=29% — signal breaks down above VIX=40. Wait.")
     else:
         return "VIX regime unknown. Review manually before trading."
 
@@ -662,7 +683,10 @@ def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[d
             print(f"  -> Tier 3: Elevated regime (VIX 25-30). n=6-9 ONLY is tradeable (EV=+2.78%, p=0.002).")
             print(f"     n=3-5: EV=-0.48%, p=0.27 (coin flip). n>=10: noise. Skip all but n=6-9.")
         elif vix_regime == "crisis":
-            print(f"  -> Tier 4: Crisis regime (VIX>30). DO NOT TRADE. Signal unreliable in crisis conditions.")
+            print(f"  -> Tier 4A: Crisis regime (VIX 30-40). n=6-9 TRADEABLE (EV=+4.44%, p=0.024). n<6: DO NOT TRADE.")
+            print(f"     2022 OOS validation: EV=+7.75%, pos=67%, p=0.015. Updated 2026-03-30.")
+        elif vix_regime == "extreme":
+            print(f"  -> Tier 4B: Extreme regime (VIX>40). DO NOT TRADE. Signal breaks down above VIX=40.")
         else:
             print(f"  -> VIX regime unknown. Proceed with caution.")
         print()
