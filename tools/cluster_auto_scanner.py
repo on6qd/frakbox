@@ -329,6 +329,53 @@ def get_current_vix() -> tuple[float, str, str]:
     return (vix_level, regime, label)
 
 
+def get_macro_regime() -> tuple[str, float, float, str]:
+    """
+    Check if the broad market is in a sustained macro selloff regime.
+
+    Research finding (2026-03-29): Insider clusters FAIL during sustained macro selloffs
+    even when VIX<30. March 2026 test: 6 clusters with VIX=21-29, only 2/6 correct (33%).
+    Normal market: ~75% direction rate.
+
+    Signal: SPY price vs 20-day moving average.
+    - SPY > 20d MA: macro regime stable → insider signal reliable
+    - SPY < 20d MA by >2%: macro selloff → insider signal degraded (33% direction)
+
+    Returns (regime, spy_close, spy_ma20, label):
+        regime: "stable" | "caution" | "selloff"
+        spy_close: last SPY close
+        spy_ma20: 20-day moving average
+        label: human-readable description
+    """
+    try:
+        import pandas as pd
+        from datetime import datetime, timedelta
+        end = datetime.now()
+        start = end - timedelta(days=60)
+        spy_data = yf.Ticker("SPY").history(start=start, end=end)
+        if spy_data.empty or len(spy_data) < 20:
+            return ("unknown", None, None, "UNKNOWN (SPY data unavailable)")
+        close = spy_data['Close']
+        spy_close = float(close.iloc[-1])
+        spy_ma20 = float(close.rolling(20).mean().iloc[-1])
+        pct_vs_ma = (spy_close - spy_ma20) / spy_ma20 * 100
+
+        if pct_vs_ma > 0:
+            regime = "stable"
+            label = f"STABLE (SPY {spy_close:.0f} is {pct_vs_ma:+.1f}% vs 20d MA {spy_ma20:.0f}). Insider signal reliable."
+        elif pct_vs_ma > -2:
+            regime = "caution"
+            label = f"CAUTION (SPY {spy_close:.0f} is {pct_vs_ma:+.1f}% vs 20d MA {spy_ma20:.0f}). Near selloff boundary. Prefer n>=6."
+        else:
+            regime = "selloff"
+            label = (f"MACRO SELLOFF (SPY {spy_close:.0f} is {pct_vs_ma:+.1f}% vs 20d MA {spy_ma20:.0f}). "
+                     f"Insider signal degraded: 33% direction in March 2026 macro test. "
+                     f"Only activate n>=6 clusters with >$5M value during macro stabilization.")
+        return (regime, spy_close, spy_ma20, label)
+    except Exception as e:
+        return ("unknown", None, None, f"UNKNOWN (macro check failed: {e})")
+
+
 def get_vix_action_recommendation(vix_regime: str, n_insiders: int, total_value_k: float) -> str:
     """
     Return a trading action recommendation based on VIX tier + cluster size.
@@ -620,6 +667,22 @@ def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[d
             print(f"  -> VIX regime unknown. Proceed with caution.")
         print()
 
+    # Macro regime check (2026-03-29): Insider signal degrades during sustained market selloffs
+    # March 2026 finding: 6 clusters with VIX=21-29 had only 33% direction (vs 75% normal)
+    # when SPY was in sustained downtrend. Add SPY vs 20d MA as second gate.
+    macro_regime, spy_close, spy_ma20, macro_label = get_macro_regime()
+    if verbose:
+        print(f"Macro Regime Check (SPY vs 20d MA):")
+        print(f"  {macro_label}")
+        if macro_regime == "selloff":
+            print(f"  WARNING: Insider signal degraded in macro selloffs (33% direction, March 2026 evidence).")
+            print(f"  Only activate if: n>=6 clusters AND total value >$5M AND strong CEO/CFO conviction.")
+        elif macro_regime == "caution":
+            print(f"  CAUTION: SPY near selloff boundary. Prefer n>=6 clusters.")
+        else:
+            print(f"  -> Macro regime OK. Insider signal not suppressed by market trend.")
+        print()
+
     fresh_clusters = find_fresh_clusters(hours=hours)
 
     if verbose:
@@ -685,6 +748,8 @@ def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[d
         cluster['vix_level'] = vix_level
         cluster['vix_regime'] = vix_regime
         cluster['vix_label'] = vix_label
+        cluster['macro_regime'] = macro_regime
+        cluster['macro_label'] = macro_label
         qualifying.append(cluster)
 
         if verbose:
@@ -692,7 +757,8 @@ def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[d
             ceo_flag = " [CEO/CFO PRESENT -> hypothesis 2bbe0f04]" if cluster.get('has_ceo_cfo') else ""
             print(f"  QUALIFYING: {cluster['n_insiders']} insiders, ${cluster.get('total_value_k', 0)/1000:.1f}M, "
                   f"${mktcap_m:.0f}M mktcap, {pct:.1f}% from 52W high{ceo_flag}")
-            print(f"  Signal confidence: {vix_label}")
+            print(f"  VIX signal: {vix_label}")
+            print(f"  Macro regime: {macro_label}")
 
         # Log to research queue (includes CEO/CFO flag)
         log_opportunity(cluster, mktcap_m, pos_52w, dry_run=dry_run)
