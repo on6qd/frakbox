@@ -268,7 +268,7 @@ def execute_pending_triggers():
                 "position_size": position_size,
                 "entry_time": datetime.now().isoformat(),
                 "order_id": result.get("order_id"),
-                "deadline": _trading_deadline(h.get("expected_timeframe_days", 5)).isoformat(),
+                "deadline": h["exit_deadline"] if h.get("exit_deadline") else _trading_deadline(h.get("expected_timeframe_days", 5)).isoformat(),
                 "stop_loss_pct": stop_loss,
                 "take_profit_pct": h.get("trigger_take_profit_pct", DEFAULT_TAKE_PROFIT_PCT),
                 "spy_at_entry": spy_price,
