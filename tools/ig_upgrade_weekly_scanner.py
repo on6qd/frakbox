@@ -97,11 +97,13 @@ def print_monitoring_checklist(days=7):
 
     print("STEP 5: Known near-IG candidates to check for upgrade news:")
     candidates = [
-        ("COIN", "BB-", "S&P", "Coinbase — ~$60B mktcap, crypto exchange, never IG"),
-        ("BIRK", "BB+", "S&P", "Birkenstock — IPO Oct 2023, would be first-ever IG"),
-        ("TEVA", "BB+", "S&P", "Teva Pharma — verify if ever had prior IG"),
-        ("RCL",  "BB+", "S&P", "Royal Caribbean — check if first-ever or return-to-IG"),
-        ("HLT",  "BB+", "S&P", "Hilton Hotels — verify current rating"),
+        ("COIN", "BB-",  "S&P", "Coinbase — ~$60B mktcap, never IG. Far from threshold (2027+)"),
+        ("HLT",  "BB+",  "S&P", "Hilton Hotels — S&P BB+ affirmed Apr 2025 (stable). Moody's Ba2. Monitor quarterly"),
+        ("BIRK", "BB",   "S&P", "Birkenstock — UPDATED: only BB now (2 notches below BBB-). Long runway"),
+        ("TEVA", "BB+",  "S&P", "Teva Pharma — verify if ever had prior IG before trading"),
+        # EXCLUDED:
+        # RCL — RETURN to IG (S&P BBB- Feb 2025 after COVID downgrade). NOT first-ever.
+        # Citadel Securities — private firm (Ken Griffin). No equity ticker. Not tradeable.
     ]
     for ticker, rating, agency, note in candidates:
         print(f"  {ticker:6} ({agency} {rating}): {note}")
