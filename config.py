@@ -43,7 +43,7 @@ MAX_PORTFOLIO_DRAWDOWN_PCT = 30.0      # paper account — don't halt research o
 MAX_CONCURRENT_EXPERIMENTS = 10        # more concurrent experiments = faster signal validation
 
 # Focus discipline — prevent scatter
-MAX_ACTIVE_SIGNAL_TYPES = 3            # max distinct event_types under active investigation
+MAX_ACTIVE_SIGNAL_TYPES = 20           # raised 3→5→20 on 2026-03-30; see methodology_changelog. Cap was preventing deployment of validated signals. Real scatter protection is via session priorities.
 MAX_CONCURRENT_PER_SIGNAL = 2          # max positions on same signal (correlated = 1 bet)
 
 # Transaction cost assumptions
