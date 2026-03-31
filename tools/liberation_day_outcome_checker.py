@@ -40,11 +40,12 @@ TRADES = [
         'symbol': 'SPY',
         'direction': 'long',
         'signal': 'vix_spike_above_30_spy_long',
-        'entry_date': '2026-03-31',
+        'entry_date': '2026-03-30',
+        'entry_price_override': 639.87,
         'target_days': 20,
         'target_exit': '2026-04-28',
         'expected_return_pct': 1.69,
-        'notes': 'VIX crossed 30 on March 27. Entry March 31 open. 20d target.'
+        'notes': 'VIX crossed 30 on March 27. Entry March 30 open (Alpaca fill $639.87). 20d target.'
     },
     {
         'hyp_id': '2d94ac68',
