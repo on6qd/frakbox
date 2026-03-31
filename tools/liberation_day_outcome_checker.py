@@ -110,23 +110,23 @@ TRADES = [
         'symbol': 'KRE',
         'direction': 'short',
         'signal': 'tariff_escalation_kre_bank_short',
-        'entry_date': '2026-04-10',
+        'entry_date': '2026-04-13',  # Updated: was 04-10, moved to 04-13 after WFC/AMD/QCOM close (~Apr 11)
         'target_days': 10,
-        'target_exit': '2026-04-24',
+        'target_exit': '2026-04-25',
         'expected_return_pct': 3.08,
-        'early_exit': '2026-04-17',  # 5d manual close if profitable
-        'notes': 'Regional bank ETF short. 10d target but close at 5d if profitable (rollback risk).'
+        'early_exit': '2026-04-18',  # 5d manual close if profitable
+        'notes': 'Regional bank ETF short. 10d target but close at 5d if profitable (rollback risk). Entry delayed to Apr 13 for capacity.'
     },
     {
         'hyp_id': '8c2f8cbb',
         'symbol': 'COST',
         'direction': 'long',
         'signal': 'tariff_defensive_retail_long',
-        'entry_date': '2026-04-11',
+        'entry_date': '2026-04-14',  # Updated: was 04-11, moved to 04-14 for capacity management
         'target_days': 10,
-        'target_exit': '2026-04-25',
+        'target_exit': '2026-04-28',
         'expected_return_pct': 3.57,
-        'notes': 'Costco defensive retail long. 10d target.'
+        'notes': 'Costco defensive retail long. 10d target. Entry delayed to Apr 14 for capacity.'
     },
     {
         'hyp_id': '35b63a23',
