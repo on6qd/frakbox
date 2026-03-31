@@ -7,9 +7,9 @@ Run this AFTER each hypothesis reaches its target hold period to get completion 
 Liberation Day hypothesis IDs and target dates:
   SPY long  (b63a0168): entry 2026-03-31, 20d = 2026-04-28
   VGNT short (2d94ac68): entry 2026-04-01, 2d = 2026-04-03
-  WFC short (b73efac3): entry 2026-04-03, 5d = 2026-04-10
-  AMD short (132e9128): entry 2026-04-03, 5d = 2026-04-10, 10d = 2026-04-17
-  QCOM short (14de5527): entry 2026-04-03, 5d = 2026-04-10, 10d = 2026-04-17
+  WFC short (b73efac3): entry 2026-04-06 (orig trigger 04-03, Good Friday), 5d = 2026-04-13
+  AMD short (132e9128): entry 2026-04-06 (orig trigger 04-03, Good Friday), 5d = 2026-04-13, 10d = 2026-04-18
+  QCOM short (14de5527): entry 2026-04-06 (orig trigger 04-03, Good Friday), 5d = 2026-04-13, 10d = 2026-04-18
   GLD long (b768e8d8): entry 2026-04-07, 20d = 2026-05-05
   KRE short (6e732966): entry 2026-04-10, 5d = 2026-04-17 (MANUAL CLOSE), 10d = 2026-04-24
   COST long (8c2f8cbb): entry 2026-04-11, 10d = 2026-04-25
@@ -62,37 +62,37 @@ TRADES = [
         'symbol': 'WFC',
         'direction': 'short',
         'signal': 'tariff_escalation_bank_short',
-        'entry_date': '2026-04-03',
+        'entry_date': '2026-04-06',
         'target_days': 5,
-        'target_exit': '2026-04-10',
+        'target_exit': '2026-04-13',
         'expected_return_pct': 2.39,
-        'notes': 'Liberation Day tariff escalation. Bank short. 5d target.'
+        'notes': 'Liberation Day tariff escalation. Bank short. 5d target. Trigger was 04-03 but Good Friday -> fires 04-06.'
     },
     {
         'hyp_id': '132e9128',
         'symbol': 'AMD',
         'direction': 'short',
         'signal': 'tariff_escalation_semiconductor_short',
-        'entry_date': '2026-04-03',
+        'entry_date': '2026-04-06',
         'target_days': 5,
-        'target_exit': '2026-04-10',
+        'target_exit': '2026-04-13',
         'expected_return_pct': 3.05,
         'alt_target_days': 10,
-        'alt_target_exit': '2026-04-17',
-        'notes': 'Semiconductor tariff short. 5d or 10d target.'
+        'alt_target_exit': '2026-04-18',
+        'notes': 'Semiconductor tariff short. 5d or 10d target. Trigger was 04-03 but Good Friday -> fires 04-06.'
     },
     {
         'hyp_id': '14de5527',
         'symbol': 'QCOM',
         'direction': 'short',
         'signal': 'tariff_escalation_semiconductor_short',
-        'entry_date': '2026-04-03',
+        'entry_date': '2026-04-06',
         'target_days': 5,
-        'target_exit': '2026-04-10',
+        'target_exit': '2026-04-13',
         'expected_return_pct': 3.05,
         'alt_target_days': 10,
-        'alt_target_exit': '2026-04-17',
-        'notes': 'Semiconductor tariff short. 5d or 10d target.'
+        'alt_target_exit': '2026-04-18',
+        'notes': 'Semiconductor tariff short. 5d or 10d target. Trigger was 04-03 but Good Friday -> fires 04-06.'
     },
     {
         'hyp_id': 'b768e8d8',
