@@ -54,7 +54,7 @@ for ticker, baseline in BASELINES.items():
         print(f'{ticker}: {baseline:.2f} -> {current:.2f} = {ret:.2f}% (abnormal: {abnormal:.2f}%) {"✓ DIRECTION OK" if direction_ok else "✗ WRONG DIRECTION"}')
 
 print()
-auto_returns = [r['abnormal'] for r in results.values() if r['ticker'] != 'SPY'] if results else []
+# Calculate basket avg (TM/HMC are primary autos, F/GM are secondary)
 auto_tickers = ['TM', 'HMC']  # primary
 basket_avg = sum(results[t]['abnormal'] for t in auto_tickers if t in results) / 2 if all(t in results for t in auto_tickers) else None
 if basket_avg is not None:
