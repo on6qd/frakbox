@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Complete SYK short hypothesis after BUY close order fills on April 3.
+Complete SYK short hypothesis after BUY close order fills.
+NOTE: April 3, 2026 is Good Friday (market CLOSED). Order fills at April 6 (Monday) open.
 SYK hypothesis ID: 5b09b097
 BUY order: db5e3b80-739e-4d25-ad33-207254db303e
 """
@@ -29,4 +30,4 @@ if order.status == 'filled':
     )
     print('Hypothesis completed!')
 else:
-    print('Order not yet filled - run again after April 3 market open')
+    print('Order not yet filled - run again after April 6 market open (April 3 = Good Friday, market closed)')
