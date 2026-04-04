@@ -1,50 +1,32 @@
 """
-FDXF (FedEx Freight) SpinCo Institutional Selling Short Trade Activation Script
-=================================================================================
-Run this at June 1, 2026 market CLOSE (16:00 ET) — first regular-way trading day.
+FDXF (FedEx Freight) SpinCo Short — CURRENTLY ON HOLD
+=======================================================
+HYPOTHESIS 60558434 was ABANDONED on 2026-03-25 due to "desirable pure-play"
+concern. FDXF is a known, desired LTL business — similar to GXO (which went
++1.8% in 5d, opposite direction to signal).
 
-HYPOTHESIS: 60558434 (spinco_institutional_selling_short, 5d hold)
+STATUS: DO NOT RUN until a NEW hypothesis is created in May 2026.
 
-SIGNAL: SHORT FedEx Freight (FDXF) at close of first trading day.
-FedEx Corp (FDX, ~$55B market cap) spins off FedEx Freight as a pure-play
-LTL (less-than-truckload) carrier. Estimated $30-35B SpinCo market cap.
+BEFORE CREATING NEW HYPOTHESIS (May 2026):
+  1. Check S&P index announcements (press.spglobal.com) — if FDXF added to
+     S&P MidCap 400 or S&P 500, ABORT (contra-signal, VGNT lesson).
+  2. Review April 8 Investor Day data (equity value, strategy).
+  3. Assess "desirability score" — who wants to own pure-play LTL?
+  4. Check borrow availability for FDXF short.
 
-WHY THIS IS STRONG:
-  Backtest (N=25 spinoffs, 2018-2026):
-  - 5d avg abnormal return: -5.69% (negative = SpinCo underperforms)
-  - Direction: 73.9% negative
-  - OOS validation 2022-2026: 80% negative
-  - Live OOS: VSNT (Jan 2026) -17.5%, LION (May 2025) -19.9%
+SIGNAL STATS (base spinco short):
+  N=25, 5d avg abnormal=-6.73%, neg_rate=72%
+  BUT: "desirable" spincos (GXO, GEHC) show REVERSED signal.
+  FDXF likely falls in "desirable" bucket (high-quality LTL franchise).
 
-FORCED SELLING MECHANISM:
-  FDX shareholders are diversified logistics/conglomerate investors.
-  LTL trucking is a different sector — pension funds, growth funds, and index
-  funds that hold FDX are NOT mandated to own LTL trucking pure-plays.
-  Systematic rebalancing creates selling pressure for 5-10 trading days.
-
-ENTRY CONDITIONS:
-  1. Today (June 1, 2026) is first trading day for FDXF
-  2. FDXF is actually trading (not halted)
-  3. Portfolio has capacity (<5 active positions)
-  4. VIX < 60 (no circuit breaker risk)
-
-ABORT CONDITIONS:
-  - FDXF drops >30% on day 1 (exceptional bad news — don't chase extreme gap)
-  - Portfolio at 5/5 capacity
-  - VIX > 60
-
-EXIT: June 10, 2026 market close (5 trading days)
-Position: $5,000
-Stop loss: 10%
-Take profit: 15%
-
-Related dates:
-  - FedEx Freight Investor Day: April 8, 2026 (could provide new price targets)
-  - Form 10 was filed: March 2026
-  - FDX ex-distribution date: TBD (check closer to June 1)
+VGNT LESSON (March 2026):
+  S&P announced VGNT (Aptiv spinco) for SmallCap 600 on day 2.
+  Index buying pressure invalidated the short thesis.
+  ALWAYS check press.spglobal.com before shorting any spinco.
 
 Usage:
   python tools/activate_fdxf_trade.py [--dry-run] [--price XXXX]
+  NOTE: Will refuse to run unless --force flag is provided.
 """
 
 import sys
@@ -109,7 +91,19 @@ def main():
     parser.add_argument('--dry-run', action='store_true', help='Show what would be done without trading')
     parser.add_argument('--price', type=float, help='Override FDXF price (for testing)')
     parser.add_argument('--yes', action='store_true', help='Skip confirmation prompt')
+    parser.add_argument('--force', action='store_true', help='Override abandoned hypothesis guard')
     args = parser.parse_args()
+
+    if not args.force:
+        print("BLOCKED: Hypothesis 60558434 was ABANDONED (desirable pure-play concern).")
+        print("FDXF is likely a 'desired' spinco (like GXO) where signal reverses.")
+        print("Create a NEW hypothesis in May 2026 after:")
+        print("  1. April 8 Investor Day data review")
+        print("  2. S&P index announcement check (press.spglobal.com)")
+        print("  3. Desirability assessment")
+        print("  4. Borrow availability check")
+        print("\nUse --force to override this guard (not recommended).")
+        return 1
 
     print(f"\n=== FDXF SpinCo Short Activation ===")
     print(f"Hypothesis: {HYPOTHESIS_ID}")
