@@ -161,19 +161,22 @@ def cmd_largecap_filter(args):
     from tools.largecap_filter import filter_to_largecap
 
     symbols = json.loads(args.symbols)
-    result = filter_to_largecap(symbols)
+    import pandas as pd
+    df = pd.DataFrame({"ticker": symbols})
+    result_df = filter_to_largecap(df, ticker_col="ticker", verbose=False)
+    largecap = result_df["ticker"].tolist()
     summary = {
         "status": "ok",
         "input_count": len(symbols),
-        "output_count": len(result),
-        "largecap_symbols": result,
-        "filtered_out": [s for s in symbols if s not in result],
+        "output_count": len(largecap),
+        "largecap_symbols": largecap,
+        "filtered_out": [s for s in symbols if s not in largecap],
     }
 
     result_id = _store_result(
         "largecap_filter",
         {"symbols": symbols},
-        {"largecap": result, "filtered_out": summary["filtered_out"]},
+        {"largecap": largecap, "filtered_out": summary["filtered_out"]},
         json.dumps(summary),
     )
     summary["result_id"] = result_id

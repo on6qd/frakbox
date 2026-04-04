@@ -108,9 +108,13 @@ def fetch_form4_metadata(start_date: str, end_date: str, quiet: bool = False) ->
 
         resp = sec_get(url, timeout=30)
         if resp is None or resp.status_code != 200:
-            if not quiet:
-                print(f"  EFTS error at offset {from_offset}: {resp.status_code if resp else 'timeout'}")
-            break
+            # Retry once with longer timeout
+            time.sleep(2)
+            resp = sec_get(url, timeout=60)
+            if resp is None or resp.status_code != 200:
+                if not quiet:
+                    print(f"  EFTS error at offset {from_offset}: {resp.status_code if resp else 'timeout'}, continuing with {len(all_filings)} filings")
+                break
 
         try:
             data = resp.json()
