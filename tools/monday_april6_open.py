@@ -53,19 +53,37 @@ print("\n--- TASK 3: ZBIO Regime Filter ---")
 try:
     from tools.yfinance_utils import safe_download
 
-    # Get SPY 20d MA
+    # Get SPY 20d MA and VIX
     spy_data = safe_download('SPY', period='30d')
+    vix_data = safe_download('^VIX', period='5d')
+
     if spy_data is not None and len(spy_data) >= 20:
         spy_close = spy_data['Close'].squeeze()
         ma_20 = spy_close.rolling(20).mean().iloc[-1]
         last_close = spy_close.iloc[-1]
         print(f'SPY close: ${last_close:.2f}, 20d MA: ${ma_20:.2f}')
+
+        vix_level = None
+        if vix_data is not None and len(vix_data) > 0:
+            vix_level = float(vix_data['Close'].squeeze().iloc[-1])
+            print(f'VIX: {vix_level:.2f}')
+
         if last_close > ma_20:
-            print('✓ ZBIO regime filter PASSES — SPY above 20d MA')
-            print('  ZBIO trigger set for April 14 — proceed as planned')
+            print('✓ SPY above 20d MA')
         else:
-            print(f'⚠ ZBIO regime filter FAILS — SPY ${last_close - ma_20:.2f} below 20d MA')
-            print('  Consider delaying ZBIO trigger beyond April 14')
+            print(f'⚠ SPY ${last_close - ma_20:.2f} below 20d MA')
+
+        # ZBIO activation decision
+        # Hypothesis notes: DO NOT ACTIVATE unless VIX < 20 by April 14
+        # VIX tier data: <20 = +3.04% avg, 20-25 = +3.24% avg, 25-30 = +6.79% avg
+        if vix_level and vix_level < 20 and last_close > ma_20:
+            print('✓ ZBIO VIX gate PASSES (VIX < 20) — SET TRIGGER for April 14')
+        elif vix_level and vix_level < 25 and last_close > ma_20:
+            print('⚠ ZBIO VIX at 20-25 (borderline). Pre-registered gate requires <20.')
+            print('  Decision: WAIT until April 14. If VIX drops below 20, activate.')
+        else:
+            print('⚠ ZBIO regime filter FAILS — VIX too high or SPY below MA')
+            print('  Consider delaying ZBIO beyond April 14 or abandoning')
     else:
         print('⚠ Insufficient SPY data for 20d MA calculation')
 except Exception as e:
