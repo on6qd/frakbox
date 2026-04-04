@@ -103,7 +103,7 @@ PROMPT
 
   local exit_code=0
   $TIMEOUT_CMD claude \
-    --agent financial-researcher \
+    --agent orchestrator \
     --dangerously-skip-permissions \
     --verbose \
     --output-format stream-json \

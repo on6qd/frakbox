@@ -272,6 +272,18 @@ CREATE TABLE IF NOT EXISTS nav_snapshots (
     position_count INTEGER DEFAULT 0,
     snapshot_time TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS task_results (
+    id TEXT PRIMARY KEY,
+    task_type TEXT NOT NULL,
+    parameters TEXT,
+    result TEXT,
+    summary TEXT,
+    status TEXT DEFAULT 'completed',
+    timestamp TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_task_results_type ON task_results(task_type);
+CREATE INDEX IF NOT EXISTS idx_task_results_ts ON task_results(timestamp);
 """
 
 # ---------------------------------------------------------------------------
@@ -1455,4 +1467,76 @@ def get_nav_history():
     rows = conn.execute(
         "SELECT date, equity, cash, position_count FROM nav_snapshots ORDER BY date"
     ).fetchall()
+    return [dict(r) for r in rows]
+
+
+# ---------------------------------------------------------------------------
+# Task Results (for data_tasks.py — stores full results, returns summaries)
+# ---------------------------------------------------------------------------
+
+def store_task_result(result_id, task_type, parameters, result, summary):
+    """Store a data task result. Parameters and result are dicts, summary is a string."""
+    conn = get_db()
+    init_db()
+    conn.execute(
+        "INSERT INTO task_results (id, task_type, parameters, result, summary, timestamp) "
+        "VALUES (?, ?, ?, ?, ?, ?)",
+        (
+            result_id,
+            task_type,
+            json.dumps(parameters, default=str) if isinstance(parameters, (dict, list)) else parameters,
+            json.dumps(result, default=str) if isinstance(result, (dict, list)) else result,
+            summary,
+            datetime.now().isoformat(),
+        ),
+    )
+    conn.commit()
+
+
+def get_task_result(result_id):
+    """Retrieve a task result by ID. Returns full result dict or None."""
+    conn = get_db()
+    init_db()
+    row = conn.execute(
+        "SELECT * FROM task_results WHERE id = ?", (result_id,)
+    ).fetchone()
+    if row is None:
+        return None
+    d = dict(row)
+    for field in ("parameters", "result"):
+        val = d.get(field)
+        if isinstance(val, str) and val and val[0] in ("{", "["):
+            try:
+                d[field] = json.loads(val)
+            except (json.JSONDecodeError, TypeError):
+                pass
+    return d
+
+
+def get_task_summary(result_id):
+    """Retrieve just the summary string for a task result."""
+    conn = get_db()
+    init_db()
+    row = conn.execute(
+        "SELECT summary FROM task_results WHERE id = ?", (result_id,)
+    ).fetchone()
+    return row["summary"] if row else None
+
+
+def get_recent_task_results(task_type=None, limit=20):
+    """Retrieve recent task results, optionally filtered by type."""
+    conn = get_db()
+    init_db()
+    if task_type:
+        rows = conn.execute(
+            "SELECT id, task_type, summary, timestamp FROM task_results "
+            "WHERE task_type = ? ORDER BY timestamp DESC LIMIT ?",
+            (task_type, limit),
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT id, task_type, summary, timestamp FROM task_results "
+            "ORDER BY timestamp DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
     return [dict(r) for r in rows]

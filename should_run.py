@@ -65,7 +65,13 @@ def should_run():
 
     # 5. Session handoff has specific next_step
     handoff = queue.get("session_handoff", {})
-    next_step = handoff.get("next_step", "")
+    if isinstance(handoff, str):
+        try:
+            import json
+            handoff = json.loads(handoff)
+        except (json.JSONDecodeError, TypeError):
+            handoff = {}
+    next_step = handoff.get("next_step", "") if isinstance(handoff, dict) else ""
     if next_step and len(next_step) > 10:
         reasons.append(f"handoff: {next_step[:60]}")
 

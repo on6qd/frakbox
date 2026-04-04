@@ -62,6 +62,14 @@ EVENT_COST_DEFAULTS = {
 DEFAULT_EVENT_COST_PCT = 0.10
 
 
+# ---------------------------------------------------------------------------
+# Subagent Model Configuration — controls which models run which tasks
+# ---------------------------------------------------------------------------
+ORCHESTRATOR_MODEL = "opus"      # strategic reasoning, hypothesis evaluation
+REVIEWER_MODEL = "sonnet"        # self-review, post-mortems, methodology
+DATA_INTERPRETER_MODEL = "haiku" # SEC filing interpretation, news extraction
+
+
 def require_alpaca():
     """Raise if Alpaca credentials are missing. Call at point-of-use, not import time."""
     if not ALPACA_API_KEY or not ALPACA_SECRET_KEY:
