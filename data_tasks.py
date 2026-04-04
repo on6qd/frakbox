@@ -218,6 +218,43 @@ def cmd_price_history(args):
     print(json.dumps(summary, indent=2))
 
 
+def cmd_scan_insiders(args):
+    """Scan EDGAR for insider buying clusters."""
+    from tools.edgar_insider_scanner_v2 import scan_insider_clusters
+
+    clusters = scan_insider_clusters(
+        days=args.days,
+        min_insiders=args.min_insiders,
+        min_value_per_insider=args.min_value,
+        quiet=True,
+    )
+
+    summary = {
+        "status": "ok",
+        "days": args.days,
+        "clusters_found": len(clusters),
+        "clusters": [
+            {
+                "ticker": c["ticker"],
+                "issuer_name": c["issuer_name"][:40],
+                "n_insiders": c["n_insiders"],
+                "total_value": c["total_value"],
+                "top_insider": c["insiders"][0]["name"] if c["insiders"] else "",
+            }
+            for c in clusters
+        ],
+    }
+
+    result_id = _store_result(
+        "scan_insiders",
+        {"days": args.days, "min_insiders": args.min_insiders, "min_value": args.min_value},
+        clusters,
+        json.dumps(summary, default=str),
+    )
+    summary["result_id"] = result_id
+    print(json.dumps(summary, indent=2, default=str))
+
+
 def cmd_get_result(args):
     """Retrieve a stored task result by ID."""
     result = db.get_task_result(args.id)
@@ -265,6 +302,12 @@ def main():
     gr = subparsers.add_parser("get-result", help="Get stored result by ID")
     gr.add_argument("--id", required=True)
 
+    # scan-insiders
+    si = subparsers.add_parser("scan-insiders", help="Scan EDGAR for insider buying clusters")
+    si.add_argument("--days", type=int, default=14, help="Days to look back")
+    si.add_argument("--min-insiders", type=int, default=3)
+    si.add_argument("--min-value", type=int, default=50000)
+
     args = parser.parse_args()
 
     commands = {
@@ -273,6 +316,7 @@ def main():
         "largecap-filter": cmd_largecap_filter,
         "price-history": cmd_price_history,
         "get-result": cmd_get_result,
+        "scan-insiders": cmd_scan_insiders,
     }
     commands[args.command](args)
 

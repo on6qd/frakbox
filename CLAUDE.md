@@ -51,6 +51,9 @@ python3 data_tasks.py verify-date --event "AAPL S&P 500 addition" --expected-dat
 python3 data_tasks.py largecap-filter --symbols '["AAPL","MSFT","TINY"]'
 python3 data_tasks.py price-history --symbol AAPL --days 90
 
+# Scan EDGAR for insider buying clusters (replaces OpenInsider)
+python3 data_tasks.py scan-insiders --days 14 --min-insiders 3 --min-value 50000
+
 # Retrieve full stored result if summary isn't enough
 python3 data_tasks.py get-result --id T-abc12345
 ```
