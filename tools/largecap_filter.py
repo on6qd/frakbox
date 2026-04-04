@@ -46,17 +46,45 @@ def _save_market_cap_cache(cache: dict):
         json.dump(cache, f)
 
 
+# Separate cache for failed lookups with TTL (don't permanently cache weekend failures)
+_FAILED_CACHE_FILE = CACHE_DIR / 'market_cap_failed.json'
+_FAILED_TTL_HOURS = 24
+
+
+def _load_failed_cache() -> dict:
+    if _FAILED_CACHE_FILE.exists():
+        with open(_FAILED_CACHE_FILE) as f:
+            return json.load(f)
+    return {}
+
+
+def _save_failed_cache(cache: dict):
+    with open(_FAILED_CACHE_FILE, 'w') as f:
+        json.dump(cache, f)
+
+
 def get_market_cap(ticker: str, cache: dict = None) -> float | None:
     """
     Get current market cap for a ticker in millions USD.
     Returns None if data unavailable.
     Uses in-memory + file cache to avoid repeated API calls.
+
+    Failed lookups (e.g., weekend $0 responses) are cached separately
+    with a 24-hour TTL so they get retried on the next trading day.
     """
     if cache is None:
         cache = _load_market_cap_cache()
 
-    if ticker in cache:
+    # Check successful cache first
+    if ticker in cache and cache[ticker] is not None:
         return cache[ticker]
+
+    # Check failed cache with TTL
+    failed_cache = _load_failed_cache()
+    if ticker in failed_cache:
+        failed_at = failed_cache[ticker].get('timestamp', 0)
+        if time.time() - failed_at < _FAILED_TTL_HOURS * 3600:
+            return None  # Still within TTL, don't retry
 
     try:
         info = yf.Ticker(ticker).info
@@ -64,11 +92,17 @@ def get_market_cap(ticker: str, cache: dict = None) -> float | None:
         if cap and cap > 0:
             cap_m = cap / 1_000_000
             cache[ticker] = cap_m
+            # Remove from failed cache if it was there
+            if ticker in failed_cache:
+                del failed_cache[ticker]
+                _save_failed_cache(failed_cache)
             return cap_m
     except Exception:
         pass
 
-    cache[ticker] = None
+    # Record failure with timestamp (NOT in main cache)
+    failed_cache[ticker] = {'timestamp': time.time()}
+    _save_failed_cache(failed_cache)
     return None
 
 

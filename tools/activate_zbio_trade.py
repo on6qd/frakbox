@@ -10,21 +10,28 @@ VIX at detection: 24.5 (< 30 gate = QUALIFIED)
 Window expires: April 30, 2026
 
 ENTRY CONDITIONS:
-  1. VIX < 30 on entry day (hard gate)
+  1. VIX < 20 on entry day (HARD GATE — see regime analysis below)
   2. SPY not in acute selloff (within 5% of recent 20d MA)
   3. Portfolio capacity < 5 active positions
   4. ZBIO price not >30% above detection price (chase filter)
 
 ABORT CONDITIONS:
-  - VIX >= 30 (gate violated)
+  - VIX >= 20 (regime gate — see below)
   - ZBIO announces bad news (earnings miss, pipeline failure, etc.)
   - SPY down >3% from previous close
   - Portfolio at max capacity (5/5 positions)
+  - After April 29 (>20 trading days since filing = stale signal)
+
+VIX REGIME ANALYSIS:
+  - VIX < 20: Full signal strength, EV=+7.01% (CEO/CFO premium)
+  - VIX 20-25: EV drops to +1.4-1.85% — COIN FLIP, NOT WORTH $5K RISK
+  - VIX > 25: Adverse macro regime, signal unreliable
+  VIX was 24.5 at detection (April 1). Must wait for VIX < 20.
 
 SIGNAL STATS (from hypothesis 2bbe0f04 backtest):
   - N=438, consistency=64%, avg return=+5% in 5d
   - CEO/CFO present = "12x more predictive" (Cohen, Malloy & Pomorski 2012)
-  - Best in calm VIX (<20), acceptable at 20-30
+  - ONLY reliable at VIX < 20
 
 Usage:
   python tools/activate_zbio_trade.py --dry-run     # check conditions
@@ -72,8 +79,9 @@ def main():
     vix_hist = yf.Ticker('^VIX').history(period='2d')
     current_vix = float(vix_hist['Close'].iloc[-1]) if not vix_hist.empty else 999
     print(f"VIX: {current_vix:.1f}")
-    if current_vix >= 30:
-        print(f"ABORT: VIX={current_vix:.1f} >= 30. Signal gate not met. Wait for VIX < 30.")
+    if current_vix >= 20:
+        print(f"ABORT: VIX={current_vix:.1f} >= 20. Signal is COIN FLIP at VIX 20-25 (EV=+1.4-1.85%).")
+        print(f"  Wait for VIX < 20, or ABANDON if VIX stays >=20 through April 25.")
         return 1
 
     # Check current ZBIO price
