@@ -11,3 +11,7 @@ research.db
 research.db-wal
 research.db-shm
 dashboard/data/
+
+# EDGAR Form 4 cache
+data/edgar_form4_cache/
+data/edgar_form4_cache_v2/
