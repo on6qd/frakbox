@@ -307,6 +307,24 @@ def create_hypothesis(
             f"starting '{event_type}'. Active types: {', '.join(sorted(active_types))}"
         )
 
+    # --- Abandon threshold gate: prevent over-investigation of dead signals ---
+    ABANDON_THRESHOLD = 3  # Retire signal type after 3 consecutive failures
+    abandoned_in_type = [h for h in hypotheses
+                         if h.get("event_type") == event_type
+                         and h["status"] == "abandoned"]
+    completed_correct_in_type = [h for h in hypotheses
+                                 if h.get("event_type") == event_type
+                                 and h["status"] == "completed"
+                                 and isinstance(h.get("result"), dict)
+                                 and h["result"].get("direction_correct")]
+    if len(abandoned_in_type) >= ABANDON_THRESHOLD and not completed_correct_in_type:
+        raise ValueError(
+            f"Abandon threshold: {len(abandoned_in_type)} hypotheses already abandoned "
+            f"for signal type '{event_type}' with 0 correct completions. "
+            f"Signal type appears to be a dead end. Record it with record_dead_end() "
+            f"and investigate a different signal type."
+        )
+
     # Validate symbol format (TBD is allowed for event-driven hypotheses)
     symbol_warnings = []
     if expected_symbol == "TBD":
@@ -727,6 +745,10 @@ def complete_hypothesis(hypothesis_id, exit_price, actual_return_pct, post_morte
                 "confounder_attribution": confounder_attribution,
                 "surprise_factor": surprise_factor,
             }
+            # Propagate key result fields to top-level for calibration/reporting
+            h["outcome_correct"] = direction_correct
+            h["actual_return"] = round(abnormal_return, 2)
+
             log_result(h)
             _update_pattern(h)
 

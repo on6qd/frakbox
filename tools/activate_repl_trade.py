@@ -44,8 +44,10 @@ ABORT CONDITIONS:
 DATES:
   - PDUFA: April 10, 2026 (Friday)
   - FDA typically acts on or before PDUFA date
-  - If announced AH on April 9 or April 10: enter at April 11 open
+  - If announced AH Thursday April 9: enter at April 10 (Friday) open
+  - If announced AH Friday April 10: enter at Monday April 13 open
   - If announced April 10 pre-mkt: enter at April 10 open
+  - NOTE: April 10 is FRIDAY. AH announcements mean Monday entry (2 weekend days of info diffusion)
 
 Usage:
   python tools/activate_repl_trade.py [--dry-run] [--price XXXX] [--prior-close XXXX]
