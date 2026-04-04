@@ -213,9 +213,9 @@ def show_context():
     for status in ("completed", "abandoned", "superseded"):
         items = _db.get_hypotheses_by_status(status)
         if items:
-            correct = sum(1 for h in items if (h.get("result") or {}).get("direction_correct"))
+            correct = sum(1 for h in items if isinstance(h.get("result"), dict) and h["result"].get("direction_correct"))
             total = len(items)
-            types = Counter(h["event_type"] for h in items)
+            types = Counter(h.get("event_type", "unknown") for h in items)
             type_str = ", ".join(f"{t}:{n}" for t, n in types.most_common(5))
             other_statuses.append(f"  {status}: {total} ({correct}/{total} correct) [{type_str}]")
     if other_statuses:
