@@ -32,7 +32,8 @@ ENTRY CONDITIONS:
 
 DECISION TREE:
   If crash_pct > 55%: use hypothesis d302c84b (larger effect expected)
-  If crash_pct 40-55%: use hypothesis 5f805860
+  If crash_pct 40-55%: SKIP — REPL bounced after July 2025 CRL (prior pattern).
+    Only enter >55% to avoid repeat bounce risk.
 
 ABORT CONDITIONS:
   - FDA APPROVED (we only short on rejection)
@@ -112,7 +113,7 @@ def classify_crash(crash_pct):
     elif abs_crash >= 55:
         return HYP_EFFICACY_SHORT, f"STRONG: crash={abs_crash:.1f}% (>55%) -> use clinical_efficacy_failure_short"
     elif abs_crash >= 40:
-        return HYP_CRL_SHORT, f"OK: crash={abs_crash:.1f}% (40-55%) -> use fda_clinical_rejection_short"
+        return None, f"SKIP: crash={abs_crash:.1f}% (40-55%). REPL bounced after July 2025 CRL — prior pattern suggests 40-55% crashes reverse. Only enter >55%."
     else:
         return None, f"ABORT: crash={abs_crash:.1f}% (<40%) — below threshold, signal too weak"
 
