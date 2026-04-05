@@ -52,10 +52,14 @@ except Exception as e:
 print("\n--- TASK 3: ZBIO Regime Filter ---")
 try:
     from tools.yfinance_utils import safe_download
+    from datetime import datetime, timedelta
 
     # Get SPY 20d MA and VIX
-    spy_data = safe_download('SPY', period='30d')
-    vix_data = safe_download('^VIX', period='5d')
+    end_date = datetime.now().strftime('%Y-%m-%d')
+    start_30d = (datetime.now() - timedelta(days=45)).strftime('%Y-%m-%d')
+    start_5d = (datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d')
+    spy_data = safe_download('SPY', start_30d, end_date)
+    vix_data = safe_download('^VIX', start_5d, end_date)
 
     if spy_data is not None and len(spy_data) >= 20:
         spy_close = spy_data['Close'].squeeze()
