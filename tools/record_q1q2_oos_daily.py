@@ -12,13 +12,16 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import research, db
 from tools.yfinance_utils import safe_download
+from datetime import datetime, timedelta
 
 db.init_db()
 
 BASELINE = 650.34
 
 # Get latest SPY data
-spy_data = safe_download('SPY', period='10d')
+end_date = datetime.now().strftime('%Y-%m-%d')
+start_date = (datetime.now() - timedelta(days=15)).strftime('%Y-%m-%d')
+spy_data = safe_download('SPY', start_date, end_date)
 if spy_data is None or len(spy_data) == 0:
     print("ERROR: No SPY data available")
     sys.exit(1)
