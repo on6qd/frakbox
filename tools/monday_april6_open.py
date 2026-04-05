@@ -78,20 +78,33 @@ try:
         # Rationale: VIX tier data (N=hundreds) shows VIX 20-25 = +3.24% avg, 61% pos.
         # Nearly identical to VIX <20 (+3.04%). OOS validation (p=0.0096) confirms overall.
         # ZBIO knowledge entry says "VIX<30" is acceptable per backtest.
-        # Keep SPY>MA as secondary filter (trend confirmation).
-        if vix_level and vix_level < 25 and last_close > ma_20:
-            print('✓ ZBIO VIX gate PASSES (VIX < 25) — SET TRIGGER for April 14')
+        # SPY filter: align with activate_zbio_trade.py (warn at -5%, not block at 0%).
+        # ZBIO already at $21.46 (up +5.4% from $20.36 detection price).
+        # Chase filter: activate_zbio_trade.py allows up to +30% above detection.
+        spy_vs_ma_pct = (last_close / ma_20 - 1) * 100
+
+        # Primary gate: VIX
+        if vix_level and vix_level < 25:
+            print(f'✓ ZBIO VIX gate PASSES (VIX {vix_level:.1f} < 25)')
             print(f'  VIX tier data: <20 = +3.04%, 20-25 = +3.24% (current regime)')
-        elif vix_level and vix_level < 30 and last_close > ma_20:
-            print('⚠ ZBIO VIX at 25-30 (acceptable but elevated).')
-            print('  VIX tier data: 25-30 = +6.79% (actually STRONGEST tier)')
-            print('  Decision: ACTIVATE — VIX 25-30 historically enhances signal.')
+            # Secondary: SPY trend
+            if spy_vs_ma_pct < -5:
+                print(f'  ⚠ SPY {spy_vs_ma_pct:.1f}% below MA — acute selloff. DELAY activation.')
+            elif spy_vs_ma_pct < 0:
+                print(f'  ⚠ SPY {spy_vs_ma_pct:.1f}% below MA — borderline. Proceed with caution.')
+                print(f'  activate_zbio_trade.py only blocks at -5%. This is OK to proceed.')
+            else:
+                print(f'  ✓ SPY above MA (+{spy_vs_ma_pct:.1f}%)')
+            print()
+            print('  ACTION: Run python3 tools/activate_zbio_trade.py --dry-run')
+            print('  If conditions pass: python3 tools/activate_zbio_trade.py --yes')
         elif vix_level and vix_level < 30:
-            print(f'⚠ ZBIO: VIX OK ({vix_level:.1f}) but SPY below MA (bearish trend)')
-            print('  Decision: WAIT — SPY below MA suggests continued selling pressure')
+            print(f'⚠ ZBIO VIX at {vix_level:.1f} (25-30 range, elevated).')
+            print('  VIX tier data: 25-30 = +6.79% (strongest tier historically)')
+            print('  But March 2026 tariff regime was hostile. Use judgment.')
         else:
             print('⚠ ZBIO regime filter FAILS — VIX too high (≥30)')
-            print('  Consider delaying ZBIO beyond April 14 or abandoning')
+            print('  Consider abandoning if VIX stays ≥30 past April 25.')
     else:
         print('⚠ Insufficient SPY data for 20d MA calculation')
 except Exception as e:
