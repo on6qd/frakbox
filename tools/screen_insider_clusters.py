@@ -6,7 +6,7 @@ Automates the full evaluation of EDGAR insider clusters:
 1. Scan EDGAR for insider buying clusters (3+ insiders, $50K+ each)
 2. Filter to large-cap ($500M+ market cap)
 3. Check for CEO/CFO involvement (strongest signal per OOS validation)
-4. Check VIX regime (validated: VIX<20 = +3.04%, 20-25 = +3.24%, 25-30 = +6.79%)
+4. Check VIX regime (N=5364 analysis: VIX<25 optimal, CEO+3-5ins works at ANY VIX)
 5. Check if cluster is already known in knowledge base
 6. Check entry window (within 5 trading days)
 7. Output qualified candidates with recommended action
@@ -127,9 +127,11 @@ def screen_clusters(days=14, output='table'):
         status = "ABOVE" if spy_above_ma else "BELOW"
         print(f"  SPY: ${spy_close:.2f} vs 20d MA ${spy_ma20:.2f} ({status})")
 
-    if vix and vix >= 40:
-        print(f"\n⚠ VIX >= 40 — REGIME BLOCKED. No insider cluster trades in extreme volatility.")
+    if vix and vix >= 50:
+        print(f"\n⚠ VIX >= 50 — REGIME BLOCKED. No insider cluster trades in extreme volatility.")
         return []
+    elif vix and vix >= 40:
+        print(f"\n⚠ VIX >= 40 — EXTREME. Only CEO/CFO clusters with 3-5 insiders qualify (N=5364: still +3.49% at VIX>30).")
 
     # Step 2: Scan EDGAR
     print(f"\nScanning EDGAR (last {days} days)...")
@@ -205,12 +207,12 @@ def screen_clusters(days=14, output='table'):
         if eval_result['has_csuite']:
             score += 3
             reasons.append(f"CEO/CFO buying ({len(csuite)} C-suite)")
-        if eval_result['n_insiders'] >= 5:
+        if 3 <= eval_result['n_insiders'] <= 5:
             score += 2
-            reasons.append(f"{eval_result['n_insiders']} insiders (large cluster)")
-        elif eval_result['n_insiders'] >= 3:
-            score += 1
-            reasons.append(f"{eval_result['n_insiders']} insiders")
+            reasons.append(f"{eval_result['n_insiders']} insiders (optimal 3-5 range)")
+        elif eval_result['n_insiders'] >= 6:
+            score += 0  # 6+ insiders degrades signal (N=5364 analysis: 49.8% pos vs 54.9% for 4-5)
+            reasons.append(f"⚠ {eval_result['n_insiders']} insiders (6+ is anti-pattern, likely formulaic)")
         if eval_result['total_value'] >= 5_000_000:
             score += 2
             reasons.append(f"${eval_result['total_value']/1e6:.1f}M total value")
@@ -223,6 +225,13 @@ def screen_clusters(days=14, output='table'):
         if vix and vix < 20:
             score += 1
             reasons.append("VIX < 20 (optimal)")
+        elif vix and 20 <= vix < 25:
+            reasons.append("VIX 20-25 (acceptable, +2.89% avg)")
+        elif vix and vix >= 30 and eval_result['has_csuite']:
+            reasons.append(f"VIX {vix:.0f} — CEO clusters still work at VIX>30 (+3.49%, N=334)")
+        elif vix and vix >= 30:
+            score -= 1
+            reasons.append(f"⚠ VIX {vix:.0f} — no CEO/CFO + high VIX = weak signal")
 
         # Penalties
         if eval_result['already_known']:
