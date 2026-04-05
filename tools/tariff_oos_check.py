@@ -34,6 +34,9 @@ def check_tariff_oos(entry_date: str):
         'SPY':  ('long',  'S&P 500 - benchmark'),
         'GDX':  ('long',  'Gold Miners - tariff_gdx_gold_miners, expected +5.5%'),
         'XLV':  ('long',  'Healthcare - tariff_xlv_healthcare, expected +1.5%'),
+        'AEP':  ('long',  'Am Elec Power - tariff_aep_utility_long, expected +3.79% at 10d'),
+        'AMD':  ('short', 'AMD - tariff_semiconductor_basket (half), expected -2% at 5d'),
+        'QCOM': ('short', 'Qualcomm - tariff_semiconductor_basket (half), expected -2% at 5d'),
     }
 
     start = (pd.Timestamp(entry_date) - timedelta(days=5)).strftime('%Y-%m-%d')
