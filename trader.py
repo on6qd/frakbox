@@ -286,9 +286,12 @@ def check_stop_losses():
                 abnormal_ret = raw_ret
                 try:
                     from tools.yfinance_utils import safe_download
+                    from datetime import datetime, timedelta
                     spy_at_entry = trade.get("spy_at_entry")
                     if spy_at_entry:
-                        spy_data = safe_download("SPY", period="5d", interval="1d")
+                        _end = datetime.now().strftime('%Y-%m-%d')
+                        _start = (datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d')
+                        spy_data = safe_download("SPY", _start, _end)
                         if spy_data is not None and len(spy_data) > 0:
                             spy_now = float(spy_data["Close"].iloc[-1])
                             spy_ret = round((spy_now / spy_at_entry - 1) * 100, 2)
