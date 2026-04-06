@@ -253,6 +253,35 @@ def main():
             'note': 'r_trans_5d minus r_filing_5d. Positive means backtest overstates real-time returns.',
         }
 
+    # Lag segmentation — does filtering on short lag rescue the signal?
+    lag_buckets = [
+        ('lag_0_1d', lambda r: r['lag_days'] <= 1),
+        ('lag_2d',   lambda r: r['lag_days'] == 2),
+        ('lag_3_5d', lambda r: 3 <= r['lag_days'] <= 5),
+        ('lag_6plus', lambda r: r['lag_days'] >= 6),
+    ]
+    lag_seg = {}
+    for name, pred in lag_buckets:
+        sub = [r for r in rows if pred(r)]
+        if not sub:
+            continue
+        lag_seg[name] = {
+            'n': len(sub),
+            'post_filing_5d': summarize([r['r_filing_5d'] for r in sub], 'post_filing_5d'),
+            'post_filing_plus1_5d': summarize([r['r_filing_plus1_5d'] for r in sub], 'post_filing_plus1_5d'),
+            'post_trans_5d': summarize([r['r_trans_5d'] for r in sub], 'post_trans_5d'),
+        }
+    summary['lag_segmentation'] = lag_seg
+
+    # Save rows to cache for reanalysis
+    import os
+    cache_dir = ROOT / 'data' / 'cache'
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_path = cache_dir / 'insider_cluster_timing_drift_rows.json'
+    with open(cache_path, 'w') as f:
+        json.dump(rows, f, default=str)
+    summary['cache_path'] = str(cache_path)
+
     print(json.dumps(summary, indent=2, default=str))
 
 
