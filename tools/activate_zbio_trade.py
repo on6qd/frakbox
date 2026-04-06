@@ -150,19 +150,18 @@ def main():
         trigger_take_profit_pct=TAKE_PROFIT_PCT,
     )
 
-    # Place trade
-    result = trader.place_order(
+    # Place trade via place_experiment (stop/TP managed by trade_loop via hypothesis fields)
+    result = trader.place_experiment(
         symbol=SYMBOL,
-        side='buy',
-        qty=shares,
-        hypothesis_id=HYPOTHESIS_ID,
-        stop_loss_pct=STOP_LOSS_PCT,
-        take_profit_pct=TAKE_PROFIT_PCT,
+        direction='long',
+        notional_amount=POSITION_SIZE,
     )
 
     if result:
-        print(f"\n✓ LONG {shares} shares of ZBIO placed")
+        print(f"\n✓ LONG ~${POSITION_SIZE} of ZBIO placed")
+        print(f"  Order: {result}")
         print(f"  Hypothesis: {HYPOTHESIS_ID} (insider_buying_cluster_ceo_cfo)")
+        print(f"  Stop/TP managed by trade_loop.py via hypothesis fields")
     else:
         print("\nERROR: Trade placement failed")
         return 1
