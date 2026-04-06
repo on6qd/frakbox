@@ -765,6 +765,18 @@ def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[d
         # Get 52W position
         pos_52w = get_52w_position(ticker)
 
+        # Check prior 20-day drawdown (feature analysis: >10% drawdown = +4.55% avg vs +3.52%)
+        prior_drawdown = None
+        try:
+            from tools.yfinance_utils import safe_download
+            hist = safe_download(ticker, start=(datetime.now() - timedelta(days=35)).strftime('%Y-%m-%d'),
+                                 end=datetime.now().strftime('%Y-%m-%d'))
+            if hist is not None and len(hist) >= 20:
+                close = hist['Close'].iloc[-20:]
+                prior_drawdown = round((float(close.iloc[-1]) / float(close.iloc[0]) - 1) * 100, 1)
+        except Exception:
+            pass
+
         # Check if already trading
         if check_existing_positions(ticker):
             if verbose:
@@ -775,6 +787,7 @@ def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[d
         cluster['market_cap_m'] = mktcap_m
         cluster['position_52w'] = pos_52w
         cluster['price_per_share'] = pos_52w.get('price', 0)
+        cluster['prior_20d_drawdown'] = prior_drawdown
         cluster['vix_level'] = vix_level
         cluster['vix_regime'] = vix_regime
         cluster['vix_label'] = vix_label
@@ -785,8 +798,11 @@ def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[d
         if verbose:
             pct = pos_52w.get('pct_from_52w_high', 0) or 0
             ceo_flag = " [CEO/CFO PRESENT -> hypothesis 2bbe0f04]" if cluster.get('has_ceo_cfo') else ""
+            drawdown_flag = ""
+            if prior_drawdown is not None and prior_drawdown < -10:
+                drawdown_flag = f" [STRONG: 20d drawdown {prior_drawdown:.1f}% -> best filter, EV=+4.55%]"
             print(f"  QUALIFYING: {cluster['n_insiders']} insiders, ${cluster.get('total_value_k', 0)/1000:.1f}M, "
-                  f"${mktcap_m:.0f}M mktcap, {pct:.1f}% from 52W high{ceo_flag}")
+                  f"${mktcap_m:.0f}M mktcap, {pct:.1f}% from 52W high{ceo_flag}{drawdown_flag}")
             print(f"  VIX signal: {vix_label}")
             print(f"  Macro regime: {macro_label}")
 
