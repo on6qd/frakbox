@@ -1984,7 +1984,7 @@ def verify_data_integrity():
     # Check for stale active hypotheses past deadline
     for h in hypotheses:
         if h["status"] == "active":
-            deadline = h.get("trade", {}).get("deadline")
+            deadline = (h.get("trade") or {}).get("deadline")
             if deadline and deadline < datetime.now().isoformat():
                 issues.append(
                     f"OVERDUE: Hypothesis {h['id']} ({h['event_type']}) is past deadline "

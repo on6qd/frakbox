@@ -209,6 +209,16 @@ def evaluate_cluster(
     else:
         warnings.append(f"⚠ Market cap unavailable — manual check needed")
 
+    # 4b. IPO/recent listing filter (stocks with <20 trading days are likely IPOs)
+    try:
+        import yfinance as yf
+        hist = yf.download(ticker, period="3mo", progress=False)
+        trading_days = len(hist) if hist is not None else 0
+        if trading_days < 20:
+            blockers.append(f"✗ Only {trading_days} trading days — likely recent IPO/listing (need ≥20)")
+    except Exception:
+        pass  # Fail open — other checks will catch issues
+
     # 5. VIX regime
     if vix_tier:
         if has_csuite:
