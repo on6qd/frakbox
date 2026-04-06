@@ -360,7 +360,7 @@ def get_macro_regime() -> tuple[str, float, float, str]:
     """
     try:
         import pandas as pd
-        from datetime import datetime, timedelta
+        # datetime/timedelta imported at module level
         end = datetime.now()
         start = end - timedelta(days=60)
         spy_data = yf.Ticker("SPY").history(start=start, end=end)

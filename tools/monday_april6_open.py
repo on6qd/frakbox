@@ -12,7 +12,7 @@ Tasks:
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import trader, db, json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 db.init_db()
 api = trader.get_api()
@@ -52,7 +52,7 @@ except Exception as e:
 print("\n--- TASK 3: ZBIO Regime Filter ---")
 try:
     from tools.yfinance_utils import safe_download
-    from datetime import datetime, timedelta
+    # datetime/timedelta imported at module level
 
     # Get SPY 20d MA and VIX
     end_date = datetime.now().strftime('%Y-%m-%d')
