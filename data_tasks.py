@@ -255,6 +255,92 @@ def cmd_scan_insiders(args):
     print(json.dumps(summary, indent=2, default=str))
 
 
+def cmd_scan_insiders_evaluate(args):
+    """Scan EDGAR for insider clusters AND run GO/NO-GO evaluator on each."""
+    from tools.edgar_insider_scanner_v2 import scan_insider_clusters
+    from tools.insider_cluster_evaluator import evaluate_cluster
+
+    clusters = scan_insider_clusters(
+        days=args.days,
+        min_insiders=args.min_insiders,
+        min_value_per_insider=args.min_value,
+        quiet=True,
+    )
+
+    evaluated = []
+    for c in clusters:
+        ticker = c.get("ticker", "")
+        # Clean exchange-prefixed tickers (e.g., "NASDAQ:SVC" -> "SVC")
+        if ":" in ticker:
+            ticker = ticker.split(":")[-1]
+        if not ticker or ticker in ("N/A", "NONE"):
+            evaluated.append({
+                "ticker": ticker,
+                "issuer_name": c["issuer_name"][:40],
+                "decision": "SKIP",
+                "reason": "No ticker / not a stock",
+            })
+            continue
+
+        # Determine if CEO/CFO present
+        has_ceo = False
+        has_cfo = False
+        for ins in c.get("insiders", []):
+            title = ins.get("title", "").upper()
+            if "CEO" in title or "CHIEF EXECUTIVE" in title:
+                has_ceo = True
+            if "CFO" in title or "CHIEF FINANCIAL" in title:
+                has_cfo = True
+
+        try:
+            result = evaluate_cluster(
+                ticker=ticker,
+                n_insiders=c["n_insiders"],
+                total_value_usd=c["total_value"],
+                has_ceo=has_ceo,
+                has_cfo=has_cfo,
+            )
+            evaluated.append({
+                "ticker": ticker,
+                "issuer_name": c["issuer_name"][:40],
+                "n_insiders": c["n_insiders"],
+                "total_value": c["total_value"],
+                "decision": result["decision"],
+                "score": result["score"],
+                "has_ceo": has_ceo,
+                "has_cfo": has_cfo,
+                "blockers": result["blockers"],
+                "warnings": result["warnings"],
+                "market_cap_m": result["market_data"].get("market_cap_m"),
+            })
+        except Exception as e:
+            evaluated.append({
+                "ticker": ticker,
+                "issuer_name": c["issuer_name"][:40],
+                "decision": "ERROR",
+                "reason": str(e)[:100],
+            })
+
+    summary = {
+        "status": "ok",
+        "days": args.days,
+        "clusters_found": len(clusters),
+        "go_count": sum(1 for e in evaluated if e.get("decision") == "GO"),
+        "weak_go_count": sum(1 for e in evaluated if e.get("decision") == "WEAK_GO"),
+        "no_go_count": sum(1 for e in evaluated if e.get("decision") in ("NO_GO", "SKIP", "ERROR")),
+        "evaluated": evaluated,
+    }
+
+    result_id = _store_result(
+        "scan_insiders_evaluate",
+        {"days": args.days, "min_insiders": args.min_insiders, "min_value": args.min_value},
+        {"clusters": clusters, "evaluations": evaluated},
+        json.dumps(summary, default=str),
+    )
+    summary["result_id"] = result_id
+    print(json.dumps(summary, indent=2, default=str))
+
+
 def cmd_get_result(args):
     """Retrieve a stored task result by ID."""
     result = db.get_task_result(args.id)
@@ -308,6 +394,12 @@ def main():
     si.add_argument("--min-insiders", type=int, default=3)
     si.add_argument("--min-value", type=int, default=50000)
 
+    # scan-insiders-evaluate
+    sie = subparsers.add_parser("scan-insiders-evaluate", help="Scan + GO/NO-GO evaluate clusters")
+    sie.add_argument("--days", type=int, default=14, help="Days to look back")
+    sie.add_argument("--min-insiders", type=int, default=3)
+    sie.add_argument("--min-value", type=int, default=50000)
+
     args = parser.parse_args()
 
     commands = {
@@ -317,6 +409,7 @@ def main():
         "price-history": cmd_price_history,
         "get-result": cmd_get_result,
         "scan-insiders": cmd_scan_insiders,
+        "scan-insiders-evaluate": cmd_scan_insiders_evaluate,
     }
     commands[args.command](args)
 
