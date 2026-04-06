@@ -487,6 +487,12 @@ def find_fresh_clusters(hours: int = 48) -> list[dict]:
         if total_value_k < MIN_TOTAL_VALUE_K:
             continue
 
+        # Extract filing date from insider dates (most recent)
+        all_dates = []
+        for ins in ec.get('insiders', []):
+            all_dates.extend(ins.get('dates', []))
+        filing_date = max(all_dates) if all_dates else datetime.now().strftime('%Y-%m-%d')
+
         fresh.append({
             'ticker': ec.get('ticker', ''),
             'company': ec.get('issuer_name', ''),
@@ -496,6 +502,7 @@ def find_fresh_clusters(hours: int = 48) -> list[dict]:
             'has_ceo_cfo': has_ceo_cfo,
             'buyer_titles': buyer_titles,
             'insiders': ec.get('insiders', []),
+            'filing_date': filing_date,
             'source': 'edgar_v2',
         })
 
@@ -767,6 +774,7 @@ def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[d
         # Qualifying!
         cluster['market_cap_m'] = mktcap_m
         cluster['position_52w'] = pos_52w
+        cluster['price_per_share'] = pos_52w.get('price', 0)
         cluster['vix_level'] = vix_level
         cluster['vix_regime'] = vix_regime
         cluster['vix_label'] = vix_label
