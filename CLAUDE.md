@@ -54,6 +54,9 @@ python3 data_tasks.py price-history --symbol AAPL --days 90
 # Scan EDGAR for insider buying clusters (replaces OpenInsider)
 python3 data_tasks.py scan-insiders --days 14 --min-insiders 3 --min-value 50000
 
+# Scan + auto-evaluate GO/NO-GO (preferred — one step)
+python3 data_tasks.py scan-insiders-evaluate --days 7 --min-insiders 3 --min-value 50000
+
 # Retrieve full stored result if summary isn't enough
 python3 data_tasks.py get-result --id T-abc12345
 ```
