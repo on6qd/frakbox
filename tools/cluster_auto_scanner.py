@@ -456,37 +456,48 @@ def get_current_market_cap_m(ticker: str) -> float:
 
 def find_fresh_clusters(hours: int = 48) -> list[dict]:
     """
-    Fetch fresh insider clusters from OpenInsider filed within the last N hours.
+    Fetch fresh insider clusters directly from SEC EDGAR Form 4 filings.
+
+    Uses edgar_insider_scanner_v2 as primary data source (replaces OpenInsider
+    which has been unreliable — 134 ECONNREFUSED friction events).
 
     Returns list of qualifying clusters with details.
     """
-    from tools.openinsider_scraper import get_cluster_buys
+    from tools.edgar_insider_scanner_v2 import scan_insider_clusters
 
-    cutoff = datetime.now(ET) - timedelta(hours=hours)
+    # Convert hours to days, minimum 7 days to catch rolling clusters
+    days = max(7, (hours + 23) // 24)
 
-    clusters = get_cluster_buys(min_insiders=MIN_INSIDERS, days=7, min_value_k=100)
+    edgar_clusters = scan_insider_clusters(
+        days=days,
+        min_insiders=MIN_INSIDERS,
+        min_value_per_insider=50_000,
+        quiet=True,
+    )
 
+    # Map EDGAR v2 format to auto-scanner format
     fresh = []
-    for c in clusters:
-        # Check recency
-        try:
-            filing_date = datetime.strptime(c['filing_date'], '%Y-%m-%d')
-            filing_date = filing_date.replace(tzinfo=ET)
-            if filing_date < cutoff:
-                continue
-        except (ValueError, KeyError):
-            continue
+    for ec in edgar_clusters:
+        # Check CEO/CFO presence from EDGAR titles
+        has_ceo_cfo = any(is_ceo_or_cfo(ins.get('title', '')) for ins in ec.get('insiders', []))
+        buyer_titles = [ins.get('title', '') for ins in ec.get('insiders', [])]
 
-        # Check minimum thresholds
-        n_insiders = c.get('n_insiders', 0)
-        total_value_k = c.get('total_value_k', 0) or 0
+        total_value_k = ec.get('total_value', 0) / 1000.0
 
-        if n_insiders < MIN_INSIDERS:
-            continue
         if total_value_k < MIN_TOTAL_VALUE_K:
             continue
 
-        fresh.append(c)
+        fresh.append({
+            'ticker': ec.get('ticker', ''),
+            'company': ec.get('issuer_name', ''),
+            'n_insiders': ec.get('n_insiders', 0),
+            'n_insiders_verified': ec.get('n_insiders', 0),
+            'total_value_k': total_value_k,
+            'has_ceo_cfo': has_ceo_cfo,
+            'buyer_titles': buyer_titles,
+            'insiders': ec.get('insiders', []),
+            'source': 'edgar_v2',
+        })
 
     return fresh
 
@@ -733,29 +744,16 @@ def scan(hours: int = 48, dry_run: bool = False, verbose: bool = True) -> list[d
         # EDGAR Form 4 verification: confirm OpenInsider counts are code-P open-market
         # purchases and not RSU award grants (code A). OpenInsider can inflate counts
         # by including non-purchase transactions (discovered 2026-03-22, POOL case).
-        openinsider_n = cluster.get('n_insiders', 0)
-        verified_n, verified_names, has_ceo_cfo, buyer_titles = verify_edgar_open_market_purchases(
-            ticker, days_back=35, min_value_usd=50_000, verbose=verbose
-        )
+        # Data already comes from EDGAR v2 — no need for secondary verification
+        # (Previously used OpenInsider as primary + EDGAR verification; now EDGAR is primary)
+        verified_n = cluster.get('n_insiders_verified', cluster.get('n_insiders', 0))
+        has_ceo_cfo = cluster.get('has_ceo_cfo', False)
+        buyer_titles = cluster.get('buyer_titles', [])
+
         if verified_n < MIN_INSIDERS:
             if verbose:
-                print(
-                    f"  SKIP: EDGAR verified only {verified_n} open-market buyers "
-                    f"(OpenInsider reported {openinsider_n}, min={MIN_INSIDERS}). "
-                    f"Likely RSU/award inflation."
-                )
+                print(f"  SKIP: Only {verified_n} verified open-market buyers (min={MIN_INSIDERS})")
             continue
-        if verbose and verified_n != openinsider_n:
-            print(
-                f"  NOTE: OpenInsider reported {openinsider_n} insiders; "
-                f"EDGAR confirms {verified_n} open-market buyers."
-            )
-        # Update cluster with verified count and CEO/CFO flag
-        cluster['n_insiders_verified'] = verified_n
-        cluster['n_insiders_openinsider'] = openinsider_n
-        cluster['n_insiders'] = verified_n  # Use verified count going forward
-        cluster['has_ceo_cfo'] = has_ceo_cfo
-        cluster['buyer_titles'] = buyer_titles
 
         # Get 52W position
         pos_52w = get_52w_position(ticker)
