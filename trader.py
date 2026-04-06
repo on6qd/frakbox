@@ -13,7 +13,7 @@ Risk controls:
 import json
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import alpaca_trade_api as tradeapi
 import db as _db
@@ -286,7 +286,7 @@ def check_stop_losses():
                 abnormal_ret = raw_ret
                 try:
                     from tools.yfinance_utils import safe_download
-                    from datetime import datetime, timedelta
+                    # datetime and timedelta imported at module level
                     spy_at_entry = trade.get("spy_at_entry")
                     if spy_at_entry:
                         _end = datetime.now().strftime('%Y-%m-%d')
