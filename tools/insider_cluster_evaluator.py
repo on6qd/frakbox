@@ -52,12 +52,20 @@ STOP_LOSS_PCT = 15.0           # Standard stop
 TAKE_PROFIT_PCT = 20.0         # Standard TP
 
 # VIX tier expected values (CEO/CFO + 3-5 insiders, 5d)
+# NOTE: These are TRANS_DATE-based historical numbers (overstate real-time returns
+# by ~2-3pp due to filing lag drift). The canonical real-time benchmark
+# (insider_cluster_canonical_benchmark_2026_04_08) puts t+1 entry at +1.26% mean,
+# 42.5% pos rate. Reduce sizing accordingly when filing_lag>=1d forces t+1 entry.
 VIX_TIERS = {
     "low":     {"range": (0, 20),   "ev": 7.01, "pos_rate": 60.0, "note": "Full strength"},
     "medium":  {"range": (20, 25),  "ev": 3.24, "pos_rate": 56.0, "note": "Reduced but positive"},
     "elevated":{"range": (25, 30),  "ev": 6.79, "pos_rate": 55.0, "note": "Historically strong, regime caution"},
     "high":    {"range": (30, 100), "ev": 3.49, "pos_rate": 55.1, "note": "CEO conviction amplified in panic"},
 }
+
+# Canonical real-time t+1 benchmark (insider_cluster_canonical_benchmark_2026_04_08)
+REAL_TIME_T1_EV = 1.26   # mean 5d abnormal at filing_date+1 entry, CEO/CFO + n[3,5] + lag<=1
+REAL_TIME_T1_POS = 42.5
 
 
 def get_vix() -> float:
@@ -301,6 +309,14 @@ def evaluate_cluster(
     trade_plan = None
     if decision in ("GO", "WEAK_GO"):
         shares = int(POSITION_SIZE / current_price) if current_price else 0
+        # Use canonical t+1 EV when scanner can only enter next-open (lag>=1d).
+        # Use the higher VIX-tier EV only if filing was today (lag=0) — same-day intraday entry possible.
+        if days_since_latest_filing is not None and days_since_latest_filing == 0:
+            ev_used = vix_ev
+            ev_basis = "vix_tier_filing_day_intraday"
+        else:
+            ev_used = REAL_TIME_T1_EV
+            ev_basis = "canonical_t_plus_1_real_time"
         trade_plan = {
             "symbol": ticker,
             "direction": "long",
@@ -312,7 +328,9 @@ def evaluate_cluster(
             "hold_days": HOLD_DAYS,
             "vix_at_eval": round(vix, 1),
             "vix_tier": vix_tier,
-            "expected_return_pct": vix_ev,
+            "expected_return_pct": ev_used,
+            "expected_return_basis": ev_basis,
+            "real_time_t1_pos_rate": REAL_TIME_T1_POS,
         }
 
     return {
