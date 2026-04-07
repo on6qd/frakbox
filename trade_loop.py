@@ -235,6 +235,16 @@ def execute_pending_triggers():
         direction = h.get("expected_direction", "long")
         position_size = h.get("trigger_position_size", 5000)
 
+        # Insider cluster signal: cap at $2,500 until intraday EDGAR scanner is built.
+        # Canonical benchmark (insider_cluster_canonical_benchmark_2026_04_08) shows
+        # scanner_t_plus_1 entry collapses to 42.5% pos rate / +1.26% mean abnormal —
+        # half the historical edge. Reduce sizing until intraday cadence restores edge.
+        signal_type = (h.get("signal_type") or "").lower()
+        if "insider_cluster" in signal_type or "insider_buying" in signal_type:
+            if position_size > 2500:
+                print(f"[TRADE LOOP] insider cluster cap: reducing position size for {h['id']} from ${position_size} to $2500 (intraday scanner not yet built)")
+                position_size = 2500
+
         # Portfolio drawdown check
         dd = check_portfolio_drawdown()
         if not dd.get("safe_to_trade"):

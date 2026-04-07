@@ -97,7 +97,8 @@ def check_portfolio_capacity():
     """Check if we have room for another position."""
     try:
         positions = trader.get_api().list_positions()
-        active = len([p for p in positions if p.get('qty') != 0])
+        # Alpaca Position objects expose attributes (not dict) — qty is a string
+        active = len([p for p in positions if float(getattr(p, 'qty', 0) or 0) != 0])
         print(f"  Active positions: {active}/5")
         return active < 5
     except Exception as e:
