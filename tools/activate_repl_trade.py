@@ -77,6 +77,7 @@ TAKE_PROFIT_PCT = 25.0     # Capture 25% gain early
 SYMBOL = 'REPL'
 
 PDUFA_DATE = '2026-04-10'
+MAX_PRE_EVENT_DECLINE_PCT = 20.0  # Abort if stock already dropped >20% in 10td before PDUFA
 
 
 def get_repl_price():
@@ -91,6 +92,54 @@ def get_repl_price():
     except Exception as e:
         print(f"  Warning: could not get {SYMBOL} price: {e}")
     return None, None
+
+
+def check_pre_event_decline(prior_close=None, crash_pct=None):
+    """
+    Abort rule: if REPL is already >MAX_PRE_EVENT_DECLINE_PCT below its 30-day
+    peak going INTO the FDA decision, the signal is contaminated (pre-leak has
+    priced in most of the rejection). Enter only on clean surprises.
+
+    Uses 30-day max drawdown from peak so leaks older than 10 days still trip
+    the check.
+
+    Returns (ok: bool, drawdown_pct: float | None, message: str).
+    """
+    try:
+        from tools.yfinance_utils import safe_download
+    except ImportError:
+        return True, None, "cannot import yfinance_utils — skipping pre-decline check"
+    try:
+        from datetime import date, timedelta
+        end = date.today() + timedelta(days=1)
+        start = end - timedelta(days=60)
+        df = safe_download(SYMBOL, start=start.isoformat(), end=end.isoformat())
+        if df is None or len(df) < 12:
+            return True, None, "insufficient history (<12 bars)"
+        closes = df['Close'].dropna().values.flatten()
+        if len(closes) < 12:
+            return True, None, "insufficient lookback"
+        # If a crash already happened today, exclude the crash bar from the pre-event window.
+        if crash_pct is not None and abs(crash_pct) > 10 and len(closes) >= 2:
+            pre_crash = closes[:-1]
+        else:
+            pre_crash = closes
+        anchor = float(prior_close) if prior_close is not None else float(pre_crash[-1])
+        peak_30d = float(max(pre_crash[-30:]))
+        drawdown_pct = (anchor / peak_30d - 1.0) * 100.0
+        if drawdown_pct < -MAX_PRE_EVENT_DECLINE_PCT:
+            return False, drawdown_pct, (
+                f"PRE-EVENT CONTAMINATION: {SYMBOL} prior close ${anchor:.2f} is "
+                f"{drawdown_pct:+.1f}% below 30d peak (${peak_30d:.2f}). Rejection is "
+                f"likely priced in — expected post-event abnormal drop will be much "
+                f"smaller than backtest. Do NOT short a pre-leaked event."
+            )
+        return True, drawdown_pct, (
+            f"30d drawdown from peak: {drawdown_pct:+.1f}% "
+            f"(peak ${peak_30d:.2f} -> prior ${anchor:.2f}) — clean"
+        )
+    except Exception as e:
+        return True, None, f"pre-decline check error: {e} — allowing"
 
 
 def check_portfolio_capacity():
@@ -165,6 +214,13 @@ def main():
             print("  Historical: CMC CRLs show reversal (like RCKT 2024: recovered from -20%)")
             return 1
         print(f"CRL type: {crl_type} → qualifies for short")
+
+    # Pre-event contamination check (coded-enforced version of doc rule)
+    ok, decline_pct, msg = check_pre_event_decline(prior_close=prior_close, crash_pct=crash_pct)
+    print(f"\nPre-event decline check: {msg}")
+    if not ok:
+        print(f"ABORT: {msg}")
+        return 1
 
     # Classify crash and select hypothesis
     if crash_pct is not None:

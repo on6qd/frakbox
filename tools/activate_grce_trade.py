@@ -69,6 +69,58 @@ STOP_LOSS_PCT = 10
 HOLD_DAYS = 3
 MIN_CRASH_PCT = 40.0  # must crash at least 40% to enter
 MAX_CRASH_PCT = 85.0  # above 85% = panic reversal risk, abort
+MAX_PRE_EVENT_DECLINE_PCT = 20.0  # abort if stock already dropped >20% in 10td pre-PDUFA
+SYMBOL = 'GRCE'
+
+
+def check_pre_event_decline(crash_pct=None):
+    """
+    Hard-coded version of the doc abort rule at the top of this file.
+    Uses 30-day max drawdown from peak (NOT rolling 10td window), so it
+    catches leaks that happened more than 10 days ago but still have the
+    information priced in.
+
+    If the drawdown from the 30-day peak (excluding today's crash) exceeds
+    MAX_PRE_EVENT_DECLINE_PCT, the rejection is already priced in and the
+    activator should abort.
+    """
+    try:
+        from tools.yfinance_utils import safe_download
+    except ImportError:
+        return True, None, "cannot import yfinance_utils — skipping pre-decline check"
+    try:
+        from datetime import date, timedelta
+        end = date.today() + timedelta(days=1)
+        start = end - timedelta(days=60)
+        df = safe_download(SYMBOL, start=start.isoformat(), end=end.isoformat())
+        if df is None or len(df) < 12:
+            return True, None, "insufficient history (<12 bars)"
+        closes = df['Close'].dropna().values.flatten()
+        if len(closes) < 12:
+            return True, None, "insufficient lookback"
+        # Exclude the latest bar if crash_pct is provided (that's the crash day).
+        # Otherwise use all bars (simulation/dry-run).
+        if crash_pct is not None and crash_pct > 0 and len(closes) >= 2:
+            pre_crash = closes[:-1]
+            anchor = float(pre_crash[-1])  # prior close
+        else:
+            pre_crash = closes
+            anchor = float(pre_crash[-1])
+        peak_30d = float(max(pre_crash[-30:]))
+        drawdown_pct = (anchor / peak_30d - 1.0) * 100.0
+        if drawdown_pct < -MAX_PRE_EVENT_DECLINE_PCT:
+            return False, drawdown_pct, (
+                f"PRE-EVENT CONTAMINATION: {SYMBOL} prior close ${anchor:.2f} is "
+                f"{drawdown_pct:+.1f}% below 30d peak (${peak_30d:.2f}). Leak/priced-in "
+                f"rejection — expected post-event abnormal drop will be much smaller "
+                f"than backtest. Do NOT short a pre-leaked event."
+            )
+        return True, drawdown_pct, (
+            f"30d drawdown from peak: {drawdown_pct:+.1f}% "
+            f"(peak ${peak_30d:.2f} -> prior ${anchor:.2f}) — clean"
+        )
+    except Exception as e:
+        return True, None, f"pre-decline check error: {e} — allowing"
 
 
 def check_capacity():
@@ -152,6 +204,13 @@ def main():
                 return 0
 
     print(f"✓ Crash condition met ({crash_pct:.1f}% ≥ {MIN_CRASH_PCT}%)")
+
+    # Pre-event contamination check
+    ok, decline_pct, msg = check_pre_event_decline(crash_pct=crash_pct)
+    print(f"\nPre-event decline check: {msg}")
+    if not ok:
+        print(f"ABORT: {msg}")
+        return 1
 
     # Portfolio capacity
     active_count = check_capacity()
