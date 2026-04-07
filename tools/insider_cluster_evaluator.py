@@ -126,6 +126,8 @@ def evaluate_cluster(
     has_cfo: bool = False,
     detection_price: Optional[float] = None,
     insiders_detail: Optional[str] = None,
+    days_since_latest_filing: Optional[int] = None,
+    max_trans_to_filing_lag: Optional[int] = None,
 ) -> dict:
     """
     Evaluate an insider buying cluster for trade activation.
@@ -252,6 +254,36 @@ def evaluate_cluster(
             warnings.append(f"⚠ SPY {spy_info['pct_vs_ma']}% vs 20d MA (acute selloff risk)")
         else:
             reasons.append(f"✓ SPY {spy_info['pct_vs_ma']:+.1f}% vs 20d MA")
+
+    # 9. Filing freshness — HARD BLOCK on stale clusters
+    # Source: insider_cluster_filing_lag_drift (CRITICAL_METHODOLOGY_FINDING 2026-04-07)
+    # post_filing_plus1_5d_abn collapses to 39.8% pos rate (below threshold).
+    # Latest filing must be no older than 1 business day so we can enter at filing+1 max.
+    if days_since_latest_filing is not None:
+        if days_since_latest_filing > 1:
+            blockers.append(
+                f"✗ Latest filing is {days_since_latest_filing} business days old "
+                f"(>1bd hard block — alpha decayed; see insider_cluster_filing_lag_drift)"
+            )
+        elif days_since_latest_filing == 1:
+            warnings.append(
+                f"⚠ Latest filing is 1 business day old — entering at filing+1, signal borderline"
+            )
+        else:
+            score += 0.5
+            reasons.append(f"✓ Latest filing is fresh (today) — can enter at filing+0/+1")
+    else:
+        warnings.append("⚠ days_since_latest_filing unavailable — manual freshness check required")
+
+    # 10. Trans-to-filing lag — secondary penalty for slow filers
+    if max_trans_to_filing_lag is not None:
+        if max_trans_to_filing_lag > 5:
+            warnings.append(
+                f"⚠ Max trans-to-filing lag = {max_trans_to_filing_lag}bd (>5bd: stale insider intent)"
+            )
+        elif max_trans_to_filing_lag <= 1:
+            score += 0.5
+            reasons.append(f"✓ Trans-to-filing lag ≤1bd (insiders filed promptly)")
 
     # --- Decision ---
     if blockers:

@@ -397,6 +397,30 @@ def _xml_float(root, xpath: str) -> Optional[float]:
     return None
 
 
+def _business_days_between(start_date_str: str, end_date_str: str) -> int:
+    """Number of business days from start to end (inclusive of neither endpoint).
+
+    Treats Mon-Fri as business days; ignores holidays. Always returns >=0.
+    Returns 0 if dates are the same or end is before start.
+    """
+    from datetime import datetime as _dt
+    try:
+        start = _dt.strptime(start_date_str, "%Y-%m-%d").date()
+        end = _dt.strptime(end_date_str, "%Y-%m-%d").date()
+    except Exception:
+        return 0
+    if end <= start:
+        return 0
+    days = 0
+    cur = start
+    from datetime import timedelta as _td
+    while cur < end:
+        cur = cur + _td(days=1)
+        if cur.weekday() < 5:
+            days += 1
+    return days
+
+
 # ---------------------------------------------------------------------------
 # Main scanner
 # ---------------------------------------------------------------------------
@@ -488,12 +512,14 @@ def scan_insider_clusters(
                     "value": total_value,
                     "n_transactions": len(parsed["transactions"]),
                     "dates": [t["date"] for t in parsed["transactions"]],
+                    "filing_date": filing.get("filing_date", ""),
                 })
 
     if not quiet:
         print(f"  Done: {fetched} fetched, {errors} errors")
 
     # Step 4: Filter to qualifying clusters
+    today_str = datetime.now().strftime("%Y-%m-%d")
     clusters = []
     for issuer_cik, purchases in purchases_by_issuer.items():
         if len(purchases) >= min_insiders:
@@ -501,18 +527,46 @@ def scan_insider_clusters(
             issuer_name = purchases[0]["issuer_name"]
             total_value = sum(p["value"] for p in purchases)
 
+            # Filing freshness: how stale is this cluster as of today?
+            filing_dates = [p.get("filing_date", "") for p in purchases if p.get("filing_date")]
+            latest_filing_date = max(filing_dates) if filing_dates else ""
+            days_since_latest_filing = None
+            max_trans_to_filing_lag = None
+            if latest_filing_date:
+                try:
+                    days_since_latest_filing = _business_days_between(latest_filing_date, today_str)
+                except Exception:
+                    days_since_latest_filing = None
+            try:
+                lags = []
+                for p in purchases:
+                    fd = p.get("filing_date", "")
+                    if not fd or not p.get("dates"):
+                        continue
+                    earliest_trans = min(d for d in p["dates"] if d)
+                    if earliest_trans:
+                        lags.append(_business_days_between(earliest_trans, fd))
+                if lags:
+                    max_trans_to_filing_lag = max(lags)
+            except Exception:
+                max_trans_to_filing_lag = None
+
             clusters.append({
                 "ticker": ticker,
                 "issuer_name": issuer_name,
                 "issuer_cik": issuer_cik,
                 "n_insiders": len(purchases),
                 "total_value": total_value,
+                "latest_filing_date": latest_filing_date,
+                "days_since_latest_filing": days_since_latest_filing,
+                "max_trans_to_filing_lag": max_trans_to_filing_lag,
                 "insiders": [
                     {
                         "name": p["name"],
                         "title": p["title"] or ("Director" if p["is_director"] else ""),
                         "value": p["value"],
                         "dates": p["dates"],
+                        "filing_date": p.get("filing_date", ""),
                     }
                     for p in sorted(purchases, key=lambda x: -x["value"])
                 ],
