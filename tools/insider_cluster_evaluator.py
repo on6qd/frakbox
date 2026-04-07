@@ -263,10 +263,12 @@ def evaluate_cluster(
         else:
             reasons.append(f"✓ SPY {spy_info['pct_vs_ma']:+.1f}% vs 20d MA")
 
-    # 9. Filing freshness — HARD BLOCK on stale clusters
-    # Source: insider_cluster_filing_lag_drift (CRITICAL_METHODOLOGY_FINDING 2026-04-07)
-    # post_filing_plus1_5d_abn collapses to 39.8% pos rate (below threshold).
-    # Latest filing must be no older than 1 business day so we can enter at filing+1 max.
+    # 9. Filing freshness — HARD BLOCK on any t+1 or later entry
+    # Source: insider_cluster_canonical_benchmark_2026_04_08 (RETIREMENT decision 2026-04-08)
+    # Real-time scanner_t_plus_1 cadence = +1.26% mean, 42.5% pos rate (fails 50% directional threshold,
+    # only marginal vs round-trip costs). Only filing_day same-day intraday entry is tradeable
+    # (+3.28% mean, 58.8% pos rate). Until an intraday EDGAR poller exists, t+1 entries are NO_GO.
+    # ZBIO (placed pre-retirement at filing_lag=1) is grandfathered — let it run, do not open new t+1s.
     if days_since_latest_filing is not None:
         if days_since_latest_filing > 1:
             blockers.append(
@@ -274,12 +276,14 @@ def evaluate_cluster(
                 f"(>1bd hard block — alpha decayed; see insider_cluster_filing_lag_drift)"
             )
         elif days_since_latest_filing == 1:
-            warnings.append(
-                f"⚠ Latest filing is 1 business day old — entering at filing+1, signal borderline"
+            blockers.append(
+                f"✗ Latest filing is 1 business day old — t+1 entry RETIRED "
+                f"(canonical benchmark 42.5% pos rate, fails 50% directional threshold). "
+                f"Build intraday scanner to capture this signal."
             )
         else:
             score += 0.5
-            reasons.append(f"✓ Latest filing is fresh (today) — can enter at filing+0/+1")
+            reasons.append(f"✓ Latest filing is today — same-day intraday entry possible (lag=0)")
     else:
         warnings.append("⚠ days_since_latest_filing unavailable — manual freshness check required")
 
