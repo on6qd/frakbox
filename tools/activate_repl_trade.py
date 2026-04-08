@@ -103,6 +103,13 @@ def check_pre_event_decline(prior_close=None, crash_pct=None):
     Uses 30-day max drawdown from peak so leaks older than 10 days still trip
     the check.
 
+    The "exclude crash bar" heuristic only applies when today's date is >=
+    PDUFA_DATE. Otherwise we are running pre-event, so the most recent bar is
+    pre-event price action (potentially leak), not the FDA crash itself, and
+    excluding it would mask contamination. (Bug found 2026-04-09: pre-event
+    leak of -24.6% on Apr 8 was being excluded as "the crash" the day before
+    PDUFA.)
+
     Returns (ok: bool, drawdown_pct: float | None, message: str).
     """
     try:
@@ -119,24 +126,41 @@ def check_pre_event_decline(prior_close=None, crash_pct=None):
         closes = df['Close'].dropna().values.flatten()
         if len(closes) < 12:
             return True, None, "insufficient lookback"
-        # If a crash already happened today, exclude the crash bar from the pre-event window.
-        if crash_pct is not None and abs(crash_pct) > 10 and len(closes) >= 2:
+        # Only exclude the latest bar as "the crash" when we are AT or AFTER the
+        # PDUFA date. Before PDUFA the latest bar is pre-event price action and
+        # MUST count toward the contamination check.
+        try:
+            from datetime import date as _date
+            today = _date.today()
+            pdufa = _date.fromisoformat(PDUFA_DATE)
+            is_post_event = today >= pdufa
+        except Exception:
+            is_post_event = True  # default to legacy behavior on parse error
+        if is_post_event and crash_pct is not None and abs(crash_pct) > 10 and len(closes) >= 2:
             pre_crash = closes[:-1]
         else:
             pre_crash = closes
-        anchor = float(prior_close) if prior_close is not None else float(pre_crash[-1])
+        # When pre-event, the "anchor" is the latest available close (today's
+        # pre-event price), not whatever the caller passed as prior_close (which
+        # in pre-event mode is yesterday-vs-day-before-yesterday — meaningless).
+        if not is_post_event:
+            anchor = float(pre_crash[-1])
+        else:
+            anchor = float(prior_close) if prior_close is not None else float(pre_crash[-1])
         peak_30d = float(max(pre_crash[-30:]))
         drawdown_pct = (anchor / peak_30d - 1.0) * 100.0
+        mode = "post-event" if is_post_event else "pre-event"
         if drawdown_pct < -MAX_PRE_EVENT_DECLINE_PCT:
             return False, drawdown_pct, (
-                f"PRE-EVENT CONTAMINATION: {SYMBOL} prior close ${anchor:.2f} is "
-                f"{drawdown_pct:+.1f}% below 30d peak (${peak_30d:.2f}). Rejection is "
-                f"likely priced in — expected post-event abnormal drop will be much "
-                f"smaller than backtest. Do NOT short a pre-leaked event."
+                f"PRE-EVENT CONTAMINATION ({mode} check): {SYMBOL} anchor "
+                f"${anchor:.2f} is {drawdown_pct:+.1f}% below 30d peak "
+                f"(${peak_30d:.2f}). Rejection is likely priced in — expected "
+                f"post-event abnormal drop will be much smaller than backtest. "
+                f"Do NOT short a pre-leaked event."
             )
         return True, drawdown_pct, (
-            f"30d drawdown from peak: {drawdown_pct:+.1f}% "
-            f"(peak ${peak_30d:.2f} -> prior ${anchor:.2f}) — clean"
+            f"30d drawdown from peak ({mode}): {drawdown_pct:+.1f}% "
+            f"(peak ${peak_30d:.2f} -> anchor ${anchor:.2f}) — clean"
         )
     except Exception as e:
         return True, None, f"pre-decline check error: {e} — allowing"

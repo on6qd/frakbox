@@ -31,6 +31,7 @@ def check_pre_event_contamination(
     prior_close: float | None = None,
     max_drawdown_pct: float = DEFAULT_MAX_DRAWDOWN_PCT,
     peak_window: int = DEFAULT_PEAK_WINDOW,
+    event_date: str | None = None,
 ):
     """
     Returns (ok: bool, drawdown_pct: float | None, message: str).
@@ -41,6 +42,13 @@ def check_pre_event_contamination(
     - prior_close: optional override for the pre-event anchor price.
     - max_drawdown_pct: abort threshold (positive number, e.g. 20.0 for 20%).
     - peak_window: lookback in trading days for the peak.
+    - event_date: ISO date of the catalyst (e.g. PDUFA day). When provided
+      and today < event_date, runs in PRE-EVENT mode: never excludes the most
+      recent bar (it's pre-event price action, possibly leak — must count toward
+      contamination), and ignores prior_close (it would be yesterday-vs-day-
+      before-yesterday, meaningless before the event). Without event_date, the
+      legacy post-event heuristic applies. Bug found 2026-04-09: REPL pre-event
+      leak was being silently excluded as if it were the post-event crash bar.
     """
     try:
         from tools.yfinance_utils import safe_download
@@ -56,23 +64,35 @@ def check_pre_event_contamination(
         closes = df['Close'].dropna().values.flatten()
         if len(closes) < 12:
             return True, None, f"insufficient lookback for {symbol}"
-        if crash_pct is not None and abs(crash_pct) > 10 and len(closes) >= 2:
+        # Determine pre vs post-event mode
+        is_post_event = True
+        if event_date:
+            try:
+                from datetime import date as _date
+                is_post_event = _date.today() >= _date.fromisoformat(event_date)
+            except Exception:
+                pass
+        if is_post_event and crash_pct is not None and abs(crash_pct) > 10 and len(closes) >= 2:
             pre_crash = closes[:-1]
         else:
             pre_crash = closes
-        anchor = float(prior_close) if prior_close is not None else float(pre_crash[-1])
+        if not is_post_event:
+            anchor = float(pre_crash[-1])
+        else:
+            anchor = float(prior_close) if prior_close is not None else float(pre_crash[-1])
         peak = float(max(pre_crash[-peak_window:]))
         drawdown_pct = (anchor / peak - 1.0) * 100.0
+        mode = "post-event" if is_post_event else "pre-event"
         if drawdown_pct < -max_drawdown_pct:
             return False, drawdown_pct, (
-                f"PRE-EVENT CONTAMINATION: {symbol} prior close ${anchor:.2f} is "
-                f"{drawdown_pct:+.1f}% below its {peak_window}d peak (${peak:.2f}). "
-                f"Signal is already priced in — expected post-event abnormal drop "
-                f"will be much smaller than backtest, while short-squeeze risk "
-                f"remains. Do NOT short a pre-leaked event."
+                f"PRE-EVENT CONTAMINATION ({mode} check): {symbol} anchor "
+                f"${anchor:.2f} is {drawdown_pct:+.1f}% below its {peak_window}d "
+                f"peak (${peak:.2f}). Signal is already priced in — expected "
+                f"post-event abnormal drop will be much smaller than backtest, "
+                f"while short-squeeze risk remains. Do NOT short a pre-leaked event."
             )
         return True, drawdown_pct, (
-            f"{peak_window}d drawdown from peak: {drawdown_pct:+.1f}% "
+            f"{peak_window}d drawdown from peak ({mode}): {drawdown_pct:+.1f}% "
             f"(peak ${peak:.2f} -> anchor ${anchor:.2f}) — clean"
         )
     except Exception as e:
