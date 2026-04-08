@@ -353,6 +353,23 @@ def run_poller(
         except Exception as e:
             decision = {"decision": "ERROR", "score": 0, "blockers": [str(e)], "warnings": []}
 
+        # Trigger-class quality tier (from insider_cluster_intraday_replay_2026_04_09):
+        #   STRONG: pre_open_same_day | intraday_same_day  -> realistic +2.08% / 62% pos (n=55, 2024-25)
+        #   WEAK:   after_close_same_day                    -> realistic +0.67% / 39.7% pos (functionally t+1)
+        #   MISS:   previous_session | stale | unknown
+        if trigger_class in ("intraday_same_day", "pre_open_same_day"):
+            quality_tier = "STRONG"
+            quality_note = "same-session entry possible"
+        elif trigger_class == "after_close_same_day":
+            quality_tier = "WEAK"
+            quality_note = (
+                "after-close filing -> next-open entry only; expected 5d abnormal "
+                "+0.67% / 39.7% pos (functionally retired t+1 cadence)"
+            )
+        else:
+            quality_tier = "MISS"
+            quality_note = "trigger time too stale to act"
+
         summary = {
             "ticker": ticker,
             "issuer_name": c.get("issuer_name", "")[:60],
@@ -365,6 +382,8 @@ def run_poller(
             "days_since_latest_filing": c.get("days_since_latest_filing"),
             "max_trans_to_filing_lag": c.get("max_trans_to_filing_lag"),
             "trigger_classification": trigger_class,
+            "trigger_quality_tier": quality_tier,
+            "trigger_quality_note": quality_note,
             "decision": decision.get("decision"),
             "score": decision.get("score"),
             "blockers": decision.get("blockers", []),
@@ -462,11 +481,21 @@ def main():
     }, indent=2))
 
     if result["new_clusters"]:
-        print("\nNEW CLUSTERS:")
-        for c in result["new_clusters"]:
-            print(f"  {c['ticker']:<6} n={c['n_insiders']} ${c['total_value']:>12,.0f} "
-                  f"accept={c['latest_accept_time']} trig={c['trigger_classification']} "
-                  f"dec={c['decision']}")
+        # Sort new clusters: STRONG first, then WEAK
+        strong = [c for c in result["new_clusters"] if c.get("trigger_quality_tier") == "STRONG"]
+        weak = [c for c in result["new_clusters"] if c.get("trigger_quality_tier") == "WEAK"]
+        if strong:
+            print("\nNEW CLUSTERS [STRONG — same-session entry]:")
+            for c in strong:
+                print(f"  {c['ticker']:<6} n={c['n_insiders']} ${c['total_value']:>12,.0f} "
+                      f"accept={c['latest_accept_time']} trig={c['trigger_classification']} "
+                      f"dec={c['decision']} tier=STRONG")
+        if weak:
+            print("\nNEW CLUSTERS [WEAK — after-close, next-open only, ~t+1 cadence]:")
+            for c in weak:
+                print(f"  {c['ticker']:<6} n={c['n_insiders']} ${c['total_value']:>12,.0f} "
+                      f"accept={c['latest_accept_time']} trig={c['trigger_classification']} "
+                      f"dec={c['decision']} tier=WEAK")
     if result["stale_clusters"]:
         print("\nSTALE/MISSED CLUSTERS:")
         for c in result["stale_clusters"]:

@@ -1,0 +1,205 @@
+{
+  "n_canonical_gated": 221,
+  "n_catchable": 211,
+  "catch_rate_pct": 95.5,
+  "trigger_class_distribution": {
+    "after_close_same_day": 156,
+    "intraday_same_day": 37,
+    "pre_open_same_day": 18,
+    "unknown": 4,
+    "not_found_no_cik": 4,
+    "not_found_no_same_day_filing": 2
+  },
+  "catchable_alpha": {
+    "r_trans_5d": {
+      "n": 211,
+      "mean": 4.17,
+      "median": 1.63,
+      "stdev": 12.35,
+      "pos_rate": 61.1
+    },
+    "r_filing_5d": {
+      "n": 211,
+      "mean": 3.21,
+      "median": 1.41,
+      "stdev": 12.78,
+      "pos_rate": 58.8
+    },
+    "r_filing_plus1_5d": {
+      "n": 211,
+      "mean": 1.22,
+      "median": -0.2,
+      "stdev": 10.5,
+      "pos_rate": 42.7
+    }
+  },
+  "not_catchable_alpha": {
+    "r_trans_5d": {
+      "n": 10,
+      "mean": 6.28,
+      "median": 2.53,
+      "stdev": 12.8,
+      "pos_rate": 60.0
+    },
+    "r_filing_5d": {
+      "n": 10,
+      "mean": 4.66,
+      "median": 1.73,
+      "stdev": 11.33,
+      "pos_rate": 60.0
+    },
+    "r_filing_plus1_5d": {
+      "n": 10,
+      "mean": 2.11,
+      "median": -1.71,
+      "stdev": 9.76,
+      "pos_rate": 40.0
+    }
+  },
+  "by_trigger_class": {
+    "after_close_same_day": {
+      "n": 156,
+      "r_trans_5d": {
+        "n": 156,
+        "mean": 4.09,
+        "median": 1.35,
+        "stdev": 12.49,
+        "pos_rate": 57.7
+      },
+      "r_filing_5d": {
+        "n": 156,
+        "mean": 3.61,
+        "median": 1.44,
+        "stdev": 13.75,
+        "pos_rate": 57.7
+      },
+      "r_filing_plus1_5d": {
+        "n": 156,
+        "mean": 0.67,
+        "median": -0.39,
+        "stdev": 10.61,
+        "pos_rate": 39.7
+      }
+    },
+    "intraday_same_day": {
+      "n": 37,
+      "r_trans_5d": {
+        "n": 37,
+        "mean": 3.39,
+        "median": 1.35,
+        "stdev": 10.46,
+        "pos_rate": 70.3
+      },
+      "r_filing_5d": {
+        "n": 37,
+        "mean": 1.87,
+        "median": 1.14,
+        "stdev": 8.79,
+        "pos_rate": 62.2
+      },
+      "r_filing_plus1_5d": {
+        "n": 37,
+        "mean": 1.35,
+        "median": 0.01,
+        "stdev": 9.36,
+        "pos_rate": 45.9
+      }
+    },
+    "not_found_no_cik": {
+      "n": 4,
+      "r_trans_5d": {
+        "n": 4,
+        "mean": 10.64,
+        "median": 2.53,
+        "stdev": 18.01,
+        "pos_rate": 75.0
+      },
+      "r_filing_5d": {
+        "n": 4,
+        "mean": 8.96,
+        "median": 4.06,
+        "stdev": 14.61,
+        "pos_rate": 75.0
+      },
+      "r_filing_plus1_5d": {
+        "n": 4,
+        "mean": 6.14,
+        "median": 2.52,
+        "stdev": 12.6,
+        "pos_rate": 50.0
+      }
+    },
+    "not_found_no_same_day_filing": {
+      "n": 2,
+      "r_trans_5d": {
+        "n": 2,
+        "mean": 1.38,
+        "median": 1.38,
+        "stdev": 4.33,
+        "pos_rate": 50.0
+      },
+      "r_filing_5d": {
+        "n": 2,
+        "mean": -0.33,
+        "median": -0.33,
+        "stdev": 2.7,
+        "pos_rate": 50.0
+      },
+      "r_filing_plus1_5d": {
+        "n": 2,
+        "mean": -0.03,
+        "median": -0.03,
+        "stdev": 4.48,
+        "pos_rate": 50.0
+      }
+    },
+    "pre_open_same_day": {
+      "n": 18,
+      "r_trans_5d": {
+        "n": 18,
+        "mean": 6.54,
+        "median": 5.45,
+        "stdev": 14.93,
+        "pos_rate": 72.2
+      },
+      "r_filing_5d": {
+        "n": 18,
+        "mean": 2.52,
+        "median": 4.38,
+        "stdev": 11.17,
+        "pos_rate": 61.1
+      },
+      "r_filing_plus1_5d": {
+        "n": 18,
+        "mean": 5.76,
+        "median": 5.16,
+        "stdev": 11.23,
+        "pos_rate": 61.1
+      }
+    },
+    "unknown": {
+      "n": 4,
+      "r_trans_5d": {
+        "n": 4,
+        "mean": 4.36,
+        "median": 5.36,
+        "stdev": 10.71,
+        "pos_rate": 50.0
+      },
+      "r_filing_5d": {
+        "n": 4,
+        "mean": 2.85,
+        "median": 0.87,
+        "stdev": 11.13,
+        "pos_rate": 50.0
+      },
+      "r_filing_plus1_5d": {
+        "n": 4,
+        "mean": -0.85,
+        "median": -4.06,
+        "stdev": 9.16,
+        "pos_rate": 25.0
+      }
+    }
+  }
+}
