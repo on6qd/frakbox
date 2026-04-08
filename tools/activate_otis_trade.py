@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# DEPRECATED 2026-04-09: hypothesis is abandoned (non-first-touch or strategic cancel).
+# This script will not activate a live trade. Retained for pattern reference only.
+# New activators MUST call tools.pre_event_contamination.check_pre_event_contamination(
+#   symbol, event_date=<event_iso_date>) before entry.
 """Activate OTIS catalyst_short when OTIS closes below 52w low ($77.80) and earnings miss.
 Pre-registered hypothesis: dbedf16e
 Trigger: OTIS closes below $77.80 AND abnormal return < -2% on earnings day (April 22)

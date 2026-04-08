@@ -41,6 +41,12 @@ Usage:
   python tools/activate_pgr_trade.py [--dry-run] [--price XXXX]
 """
 
+# DEPRECATED 2026-04-09: hypothesis is abandoned (non-first-touch or strategic cancel).
+# This script will not activate a live trade. Retained for pattern reference only.
+# New activators MUST call tools.pre_event_contamination.check_pre_event_contamination(
+#   symbol, event_date=<event_iso_date>) before entry.
+
+
 import sys
 import argparse
 from pathlib import Path
