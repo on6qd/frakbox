@@ -15,3 +15,8 @@ dashboard/data/
 # EDGAR Form 4 cache
 data/edgar_form4_cache/
 data/edgar_form4_cache_v2/
+
+# Intraday insider poller runtime state (ephemeral, per-host)
+data/intraday_poller_state.json
+data/intraday_poller_alerts.jsonl
+data/intraday_poller_accept_cache.json
