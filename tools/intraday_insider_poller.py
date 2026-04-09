@@ -293,7 +293,11 @@ def run_poller(
     from tools.insider_cluster_evaluator import evaluate_cluster
 
     if now_et is None:
-        now_et = datetime.now()  # system is on ET for this project
+        try:
+            import pytz
+            now_et = datetime.now(pytz.timezone("US/Eastern")).replace(tzinfo=None)
+        except ImportError:
+            now_et = datetime.now()  # fallback if pytz not available
 
     run_ts = now_et.strftime("%Y-%m-%dT%H:%M:%S")
     state = _load_state()
