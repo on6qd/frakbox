@@ -56,6 +56,23 @@ def _run_migrations(conn):
         conn.execute("ALTER TABLE hypotheses ADD COLUMN success_criteria TEXT")
         conn.commit()
 
+    # Migration 2: add hypothesis_class and spec_json columns for non-event hypothesis types
+    try:
+        conn.execute("SELECT hypothesis_class FROM hypotheses LIMIT 1")
+    except sqlite3.OperationalError:
+        conn.execute("ALTER TABLE hypotheses ADD COLUMN hypothesis_class TEXT DEFAULT 'event'")
+        conn.commit()
+
+    try:
+        conn.execute("SELECT spec_json FROM hypotheses LIMIT 1")
+    except sqlite3.OperationalError:
+        conn.execute("ALTER TABLE hypotheses ADD COLUMN spec_json TEXT")
+        conn.commit()
+
+    # Index on hypothesis_class for filtering
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_hypotheses_class ON hypotheses(hypothesis_class)")
+    conn.commit()
+
 
 # ---------------------------------------------------------------------------
 # Schema
@@ -295,6 +312,7 @@ _HYPOTHESIS_JSON_FIELDS = {
     "causal_mechanism_criteria", "backtest_symbols", "backtest_events",
     "historical_evidence", "out_of_sample_split", "confounders",
     "symbol_warnings", "dead_end_warnings", "trade", "result",
+    "spec_json",
 }
 
 # Known top-level column names in hypotheses table
@@ -312,6 +330,7 @@ _HYPOTHESIS_COLUMNS = {
     "dead_end_warnings", "trade", "result",
     "trigger", "trigger_position_size", "trigger_stop_loss_pct",
     "trigger_take_profit_pct", "extra",
+    "hypothesis_class", "spec_json",
 }
 
 

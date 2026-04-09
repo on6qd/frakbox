@@ -21,7 +21,7 @@ EXPORT_INTERVAL=3600       # 1 hour between dashboard exports
 TICK=60                    # main loop tick (1 min)
 
 set -a; source .env; set +a
-MAX_SESSIONS_PER_DAY="${MAX_SESSIONS_PER_DAY:-6}"  # hard cap from .env
+MAX_SESSIONS_PER_DAY="${MAX_SESSIONS_PER_DAY:-10}"  # hard cap from .env
 source venv/bin/activate 2>/dev/null || true
 
 # Timestamps for interval tracking

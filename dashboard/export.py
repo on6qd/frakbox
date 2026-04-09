@@ -403,7 +403,9 @@ def export_hypotheses():
             "active": sum(1 for h in hypotheses if h["status"] == "active"),
             "pending": sum(1 for h in hypotheses if h["status"] == "pending"),
             "completed": sum(1 for h in hypotheses if h["status"] == "completed"),
+            "abandoned": sum(1 for h in hypotheses if h["status"] == "abandoned"),
             "invalidated": sum(1 for h in hypotheses if h["status"] == "invalidated"),
+            "superseded": sum(1 for h in hypotheses if h["status"] == "superseded"),
         },
     }
     _atomic_write(os.path.join(DATA_DIR, "hypotheses.json"), data)

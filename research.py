@@ -147,19 +147,49 @@ def validate_out_of_sample(historical_evidence, discovery_cutoff_date=None,
 
 
 def _compute_prediction_hash(event_type, expected_symbol, expected_direction,
-                              expected_magnitude_pct, expected_timeframe_days):
+                              expected_magnitude_pct, expected_timeframe_days,
+                              hypothesis_class='event', spec_json=None):
     """
     Create a hash of the prediction fields for pre-registration.
     This prevents post-hoc adjustment of predictions after seeing results.
+
+    For non-event classes, also hashes hypothesis_class and class-specific
+    prediction fields from spec_json.
     """
-    payload = json.dumps({
+    payload_dict = {
         "event_type": event_type,
         "expected_symbol": expected_symbol,
         "expected_direction": expected_direction,
         "expected_magnitude_pct": expected_magnitude_pct,
         "expected_timeframe_days": expected_timeframe_days,
-    }, sort_keys=True)
+    }
+    if hypothesis_class != 'event' and spec_json:
+        payload_dict["hypothesis_class"] = hypothesis_class
+        prediction_keys = _SPEC_PREDICTION_KEYS.get(hypothesis_class, [])
+        for k in prediction_keys:
+            if k in spec_json:
+                val = spec_json[k]
+                # Normalize lists to sorted tuples for consistent hashing
+                if isinstance(val, list):
+                    val = sorted(str(v) for v in val)
+                payload_dict[f"spec.{k}"] = val
+    payload = json.dumps(payload_dict, sort_keys=True, default=str)
     return hashlib.sha256(payload.encode()).hexdigest()[:16]
+
+
+# Fields from spec_json that define the testable prediction (hashed for pre-registration).
+# Window/config params are NOT hashed — they're tuning, not the prediction itself.
+_SPEC_PREDICTION_KEYS = {
+    "exposure": ["factor_series", "beta_direction"],
+    "lead_lag": ["leader_series", "follower_series", "expected_direction"],
+    "cointegration": ["series_a", "series_b", "entry_threshold_zscore"],
+    "regime": ["target_symbol", "regime_indicator", "regimes"],
+    "structural_break": ["relationship", "suspected_break_date"],
+    "threshold": ["trigger_series", "threshold_value", "threshold_direction", "expected_target_direction"],
+    "network": ["hub_symbol", "spoke_symbols", "expected_propagation_lag_days"],
+    "calendar": ["pattern_type", "pattern_spec", "expected_direction"],
+    "cross_section": ["universe", "sort_factor", "long_quintile", "short_quintile"],
+}
 
 
 def _compute_idempotency_key(event_type, expected_symbol, event_description):
@@ -235,12 +265,14 @@ def create_hypothesis(
     passes_multiple_testing=None,
     backtest_symbols=None,
     backtest_events=None,
+    hypothesis_class='event',
+    spec_json=None,
 ):
     """
     Create a new hypothesis with full research backing.
 
     Args:
-        event_type: Category (e.g., "earnings_surprise", "fda_decision")
+        event_type: Category (e.g., "earnings_surprise", "fda_decision", "oil_airline_exposure")
         event_description: The specific current event triggering this test
         causal_mechanism: WHY this should work — the explanatory chain
         causal_mechanism_criteria: List of criteria met from the rubric:
@@ -250,7 +282,12 @@ def create_hypothesis(
         expected_direction: "long" or "short"
         expected_magnitude_pct: Expected move in percent
         expected_timeframe_days: Days for the move to play out
-        historical_evidence: List of past instances with dates and outcomes
+        historical_evidence: List of past instances with dates and outcomes (for event class)
+            or a list containing a task_result reference dict (for non-event classes)
+        hypothesis_class: One of: event, exposure, lead_lag, cointegration, regime,
+            structural_break, threshold, network, calendar, cross_section (default: 'event')
+        spec_json: Class-specific specification dict (required for non-event classes).
+            See CLAUDE.md for the schema per class.
         sample_size: Number of historical instances studied
         consistency_pct: What % of historical instances showed the expected effect
         confounders: Known confounding variables as a dict. MUST include all keys
@@ -369,20 +406,28 @@ def create_hypothesis(
         )
 
     # Validate out-of-sample split
-    if not out_of_sample_split or not out_of_sample_split.get("validation_indices"):
-        raise ValueError(
-            "out_of_sample_split is required with discovery_indices and validation_indices. "
-            "Split historical evidence 70/30 and verify pattern holds in both sets."
-        )
-
-    # Enforce minimum 3 OOS validation instances
-    oos = out_of_sample_split or {}
-    validation_indices = oos.get("validation_indices", [])
-    if len(validation_indices) < 3:
-        raise ValueError(
-            f"out_of_sample_split.validation_indices must have >= 3 entries. "
-            f"Got {len(validation_indices)}. Minimum 3 real named validation instances required."
-        )
+    if hypothesis_class == 'event':
+        # Event class: requires explicit validation_indices into historical_evidence list
+        if not out_of_sample_split or not out_of_sample_split.get("validation_indices"):
+            raise ValueError(
+                "out_of_sample_split is required with discovery_indices and validation_indices. "
+                "Split historical evidence 70/30 and verify pattern holds in both sets."
+            )
+        oos = out_of_sample_split or {}
+        validation_indices = oos.get("validation_indices", [])
+        if len(validation_indices) < 3:
+            raise ValueError(
+                f"out_of_sample_split.validation_indices must have >= 3 entries. "
+                f"Got {len(validation_indices)}. Minimum 3 real named validation instances required."
+            )
+    else:
+        # Non-event classes: OOS is handled by temporal split in the regression/test itself.
+        # The out_of_sample_split dict should contain split_type and oos_start date.
+        if not out_of_sample_split or not out_of_sample_split.get("split_type"):
+            raise ValueError(
+                "out_of_sample_split is required for non-event hypotheses. "
+                "Provide {'split_type': 'temporal', 'oos_start': 'YYYY-MM-DD'}."
+            )
 
     # Load methodology for validation checks
     from self_review import load_methodology
@@ -406,23 +451,38 @@ def create_hypothesis(
             f"minimum ({min_net}%). Not economically viable."
         )
 
-    # Validate historical evidence contains real price data (not placeholders)
-    placeholder_count = 0
-    measured_count = 0
-    for ev in historical_evidence:
-        if ev.get("note") and "placeholder" in ev["note"].lower():
-            placeholder_count += 1
-        elif str(ev.get("symbol", "")).startswith("LIT_REF"):
-            placeholder_count += 1
-        elif ev.get("abnormal_1d") is not None or ev.get("abnormal_5d") is not None:
-            measured_count += 1
-    min_measured = m.get("defaults", {}).get("min_sample_size_exploratory", 5)
-    if placeholder_count > 0 and measured_count < min_measured:
-        raise ValueError(
-            f"historical_evidence has {placeholder_count} placeholder entries and only "
-            f"{measured_count} measured entries (need >= {min_measured}). "
-            f"Run measure_event_impact() to collect real price data before creating a hypothesis."
+    # Validate historical evidence contains real data (not placeholders)
+    if hypothesis_class == 'event':
+        # Event class: evidence must contain measured event impacts
+        placeholder_count = 0
+        measured_count = 0
+        for ev in historical_evidence:
+            if ev.get("note") and "placeholder" in ev["note"].lower():
+                placeholder_count += 1
+            elif str(ev.get("symbol", "")).startswith("LIT_REF"):
+                placeholder_count += 1
+            elif ev.get("abnormal_1d") is not None or ev.get("abnormal_5d") is not None:
+                measured_count += 1
+        min_measured = m.get("defaults", {}).get("min_sample_size_exploratory", 5)
+        if placeholder_count > 0 and measured_count < min_measured:
+            raise ValueError(
+                f"historical_evidence has {placeholder_count} placeholder entries and only "
+                f"{measured_count} measured entries (need >= {min_measured}). "
+                f"Run measure_event_impact() to collect real price data before creating a hypothesis."
+            )
+    else:
+        # Non-event classes: evidence must contain at least one statistical test result
+        # (identified by having test_name, p_value, or result_id fields)
+        has_test_result = any(
+            ev.get("test_name") or ev.get("result_id") or ev.get("p_value") is not None
+            for ev in historical_evidence
         )
+        if not has_test_result:
+            raise ValueError(
+                f"historical_evidence for {hypothesis_class} hypothesis must contain at least one "
+                f"statistical test result (with test_name/result_id/p_value). "
+                f"Run the appropriate data_tasks.py command first."
+            )
 
     # Validate confounders contain all tracked fields (blocking)
     tracked = m.get("confounders_tracked", [])
@@ -454,7 +514,8 @@ def create_hypothesis(
     # Pre-registration: hash the prediction before any trade is placed
     prediction_hash = _compute_prediction_hash(
         event_type, expected_symbol, expected_direction,
-        expected_magnitude_pct, expected_timeframe_days
+        expected_magnitude_pct, expected_timeframe_days,
+        hypothesis_class=hypothesis_class, spec_json=spec_json,
     )
 
     hypothesis = {
@@ -463,6 +524,10 @@ def create_hypothesis(
         "prediction_hash": prediction_hash,
         "idempotency_key": idempotency_key,
         "status": "pending",  # pending -> active -> completed | invalidated
+
+        # Hypothesis class (event, exposure, lead_lag, cointegration, etc.)
+        "hypothesis_class": hypothesis_class,
+        "spec_json": spec_json,
 
         # The thesis
         "event_type": event_type,

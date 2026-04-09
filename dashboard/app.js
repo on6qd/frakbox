@@ -426,6 +426,8 @@ const STATUS_LABELS = {
     pending: 'Pending',
     completed: 'Completed',
     invalidated: 'Invalidated',
+    abandoned: 'Abandoned',
+    superseded: 'Superseded',
 };
 
 function getFilteredHyps() {
@@ -501,6 +503,7 @@ function initHypotheses(data) {
         `<span><span class="hyp-count">${c.active || 0}</span> active</span>`,
         `<span><span class="hyp-count">${c.pending || 0}</span> pending</span>`,
         `<span><span class="hyp-count">${c.completed || 0}</span> completed</span>`,
+        `<span><span class="hyp-count">${c.abandoned || 0}</span> abandoned</span>`,
         `<span><span class="hyp-count">${c.invalidated || 0}</span> invalidated</span>`,
     ].join('');
 

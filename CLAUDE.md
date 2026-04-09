@@ -1,6 +1,6 @@
-# Stock Market Causal Research
+# Market Causal Research
 
-Learn to trade perfectly through causal research. Paper trading on Alpaca ($100K, $5K/experiment).
+Discover and test any causal influence of the world on the markets. Paper trading on Alpaca ($100K, $5K/experiment).
 
 ## Multi-Agent Architecture
 
@@ -21,7 +21,8 @@ Data-heavy tasks (backtesting, scanning, price fetching) run as pure Python via 
 | `db.py` | SQLite — all CRUD for hypotheses, knowledge, queue, task_results |
 | `research.py` | Hypothesis lifecycle, knowledge base (uses db.py) |
 | `market_data.py` | Prices, event impact, power analysis |
-| `data_tasks.py` | CLI dispatcher — runs backtests/scans without LLM, stores results in SQLite |
+| `causal_tests.py` | Statistical engines for non-event hypotheses (regression, cointegration, Granger, etc.) |
+| `data_tasks.py` | CLI dispatcher — runs backtests/scans/regressions without LLM, stores results in SQLite |
 | `self_review.py` | Confidence scoring, methodology |
 | `research_queue.py` | Task queue, watchlist, handoffs (uses db.py) |
 | `trader.py` | Paper trades via Alpaca |
@@ -30,6 +31,7 @@ Data-heavy tasks (backtesting, scanning, price fetching) run as pure Python via 
 | `email_report.py` | HTML email digest (uses db.py) |
 | `config.py` | Risk parameters, subagent model config |
 | `tools/` | Custom tools (insider scanners, largecap filter, date verifier, yfinance_utils) |
+| `tools/timeseries.py` | Unified fetcher for any time series (yfinance, FRED, Fama-French) |
 
 ## Storage
 
@@ -68,6 +70,55 @@ from tools.largecap_filter import filter_to_largecap      # filter >500M cap
 from tools.yfinance_utils import safe_download, get_close_prices  # ALWAYS use (not raw yf.download)
 result = market_data.measure_event_impact(event_dates=[...], entry_price="open")  # open for after-hours
 ```
+
+## Hypothesis Classes
+
+The system supports 10 hypothesis classes — not just discrete events:
+
+| Class | Shape | Data Task |
+|---|---|---|
+| `event` | Discrete event -> price reaction | `backtest` |
+| `exposure` | Factor -> asset sensitivity (beta) | `regression --test-type exposure` |
+| `lead_lag` | Series A leads B by N days | `regression --test-type lead_lag` |
+| `cointegration` | Two series share long-run equilibrium | `cointegration` |
+| `regime` | Returns differ across states | `regression --test-type regime` |
+| `structural_break` | Relationship reset at date | `regression --test-type structural_break` |
+| `threshold` | Indicator crosses level -> reaction | `threshold` |
+| `network` | Shock propagates to connected assets | `regression --test-type network` |
+| `calendar` | Seasonal/day-of-week anomaly | `calendar` |
+| `cross_section` | Factor sorts stocks into quintiles | `regression --test-type cross_section` |
+
+Use `create_hypothesis(hypothesis_class='exposure', spec_json={...})` for non-event classes. The `spec_json` dict holds class-specific fields (driver series, expected beta, lag, etc.).
+
+## Non-Event Data Tasks
+
+```bash
+# Regression: test factor exposure (oil -> airline)
+python3 data_tasks.py regression --target AAL --factor CL=F --controls SPY --oos-start 2024-01-01
+
+# Lead-lag: does copper lead industrial stocks?
+python3 data_tasks.py regression --target XLI --factor HG=F --test-type lead_lag --max-lags 10
+
+# Cointegration: pairs trade candidate?
+python3 data_tasks.py cointegration --series-a GLD --series-b GDX --oos-start 2024-01-01
+
+# Threshold: VIX > 30 mean-reversion
+python3 data_tasks.py threshold --trigger "^VIX" --target SPY --threshold-value 30 --direction above
+
+# Calendar: January effect
+python3 data_tasks.py calendar --symbol SPY --pattern monthly --pattern-month 1 --oos-start-year 2020
+
+# Regime: rate hiking -> utility stocks
+python3 data_tasks.py regression --target XLU --factor "FRED:FEDFUNDS" --test-type regime
+
+# Network: AAPL shock -> suppliers
+python3 data_tasks.py regression --target AAPL --factor AAPL --test-type network --controls AVGO,QCOM,TSM
+
+# Fetch any time series (prices, FRED, Fama-French)
+python3 data_tasks.py fetch-series --identifiers "CL=F,AAL,FRED:DGS10" --start 2020-01-01
+```
+
+Series identifiers: `AAPL` (equity), `CL=F` (oil future), `^VIX` (index), `EURUSD=X` (FX), `BTC-USD` (crypto), `FRED:DGS10` (FRED series), `FF:Mkt-RF` (Fama-French factor).
 
 ## Trade Execution
 

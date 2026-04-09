@@ -82,16 +82,62 @@ If the tools don't do what you need, build new ones. Put tools in `tools/` and c
 
 You CANNOT modify validation gates in `research.py`, lower thresholds in `methodology.json` without documenting rationale, or modify agent constitution files (`.claude/agents/*.md`).
 
+## The World Influences Markets in Many Shapes
+
+The system supports 10 hypothesis classes, not just discrete events. Before designing a test, classify your hypothesis. Choose the class that fits the **relationship you suspect**, not the one that fits your existing tools.
+
+| Class | Shape | Data Task |
+|---|---|---|
+| event | Discrete event -> price reaction | `backtest` |
+| exposure | Factor -> asset sensitivity (beta) | `regression --test-type exposure` |
+| lead_lag | Series A leads B by N days | `regression --test-type lead_lag` |
+| cointegration | Two series share long-run equilibrium | `cointegration` |
+| regime | Returns differ across macro states | `regression --test-type regime` |
+| structural_break | Relationship reset at a date | `regression --test-type structural_break` |
+| threshold | Indicator crosses level -> reaction | `threshold` |
+| network | Shock propagates to connected assets | `regression --test-type network` |
+| calendar | Seasonal/day-of-week anomaly | `calendar` |
+| cross_section | Factor sorts stocks into quintiles | future — build when needed |
+
+**Non-event hypotheses are research-only for now** — they discover and validate relationships. When you find a validated relationship (e.g., oil→airlines β=-0.2), convert it into an event-class trade when conditions fire (e.g., "oil spiked 5% today → short AAL").
+
+### Discovery Strategies for Non-Event Hypotheses
+
+Don't wait for hand-curated lists. Use these strategies to find causal relationships:
+
+1. **Factor exposure screening**: For sector ETFs (XLE, XLU, XLF, XLK, etc.), test exposure to macro drivers (oil `CL=F`, gold `GC=F`, rates `FRED:DGS10`, dollar `DX-Y.NYB`). Use `data_tasks.py regression`.
+
+2. **Lead-lag scanning**: Test whether commodity futures (`CL=F`, `GC=F`, `HG=F`, `ZC=F`) lead sector returns with 1-5 day lag. Use `regression --test-type lead_lag`.
+
+3. **Cointegration screening**: Test pairs within sectors (GLD/GDX, XOM/CVX, KO/PEP) for mean-reverting spreads. Use `cointegration`.
+
+4. **Regime analysis**: Test how returns differ across VIX regimes, rate regimes, yield curve states. Use `regression --test-type regime`.
+
+5. **Threshold analysis**: Test VIX > 30, oil > $100, DXY > 110, etc. as market-turning signals. Use `threshold`.
+
+6. **Calendar anomalies**: Test turn-of-month, January effect, day-of-week on SPY and sector ETFs. Use `calendar`.
+
+Start with 1-2 non-event classes per session. Don't scatter across all 10 at once.
+
 ## Investigation Method (required workflow)
 
 Every investigation follows these 6 steps in order. Do not skip steps.
 
+### For event-class hypotheses:
 **Step 1 — Hypothesis**: Write as Given/When/Then. Must be specific and falsifiable.
 **Step 2 — Test Design**: Define stocks, time period, benchmark, measurement method, bias controls. BEFORE touching any data.
 **Step 3 — Success Criteria**: Write concrete thresholds BEFORE testing. Lock these in.
 **Step 4 — Outcome**: Run `data_tasks.py backtest`, report raw numbers without interpretation.
 **Step 5 — Conclusion**: State valid/invalid with reasoning. One outlier is not validation.
 **Step 6 — New Hypothesis**: Only if the result reveals a specific new direction.
+
+### For non-event hypotheses (exposure, lead_lag, cointegration, etc.):
+**Step 1 — Hypothesis**: "Factor X has a [positive/negative] relationship with Y [at lag N days]." Must be falsifiable.
+**Step 2 — Test Design**: Define target, factor, controls, window, OOS split date. BEFORE touching data.
+**Step 3 — Success Criteria**: "Beta significant at p<0.05, same sign in OOS period, R²>0.03."
+**Step 4 — Outcome**: Run the appropriate `data_tasks.py` command (see table above). Report raw statistics.
+**Step 5 — Conclusion**: Significant in-sample AND confirmed out-of-sample = supported. Otherwise, record as dead end or inconclusive.
+**Step 6 — Next**: If supported, design a concrete trading strategy that exploits the relationship.
 
 After completing a hypothesis, call `generate_investigation_report(hypothesis_id)`.
 
@@ -121,7 +167,8 @@ Before placing any trade via `trader.py`:
 
 ## Focus Discipline
 
-- **Maximum 3 signal types** under active investigation at any time.
+- **Maximum 6 signal types** under active investigation at any time (across all classes).
+- **At least 2 slots reserved for non-event hypothesis classes** — event signals cannot crowd out exploration.
 - **Maximum 2 concurrent experiments per signal**.
 - **If 3 consecutive experiments on a signal fail, retire it.**
 - **Complete pending work before creating new work.** If >5 pending hypotheses, activate/test/retire them.

@@ -165,6 +165,100 @@
     "requirement": "After finding event dates via web search, ALWAYS verify the price impact with measure_event_impact(). Never form hypotheses based on news narratives alone."
   },
   "per_category": {},
+  "hypothesis_classes": {
+    "note": "The system supports 10 hypothesis classes. Each has its own test method, data_task command, and validation criteria. Non-event classes use regression-based tests instead of event studies.",
+    "event": {
+      "description": "Discrete event -> price reaction in N days",
+      "test_type": "event_study",
+      "data_task": "backtest",
+      "min_sample_size": 12
+    },
+    "exposure": {
+      "description": "Continuous factor exposure (regression beta)",
+      "test_type": "ols_regression",
+      "data_task": "regression --test-type exposure",
+      "min_window_days": 126,
+      "min_r_squared": 0.03,
+      "requires_oos": true
+    },
+    "lead_lag": {
+      "description": "Series A leads series B by N days",
+      "test_type": "granger_causality",
+      "data_task": "regression --test-type lead_lag",
+      "min_window_days": 252,
+      "requires_oos": true
+    },
+    "cointegration": {
+      "description": "Two series share a long-run equilibrium",
+      "test_type": "engle_granger",
+      "data_task": "cointegration",
+      "min_window_days": 504,
+      "requires_oos": true
+    },
+    "regime": {
+      "description": "Returns differ across macro regimes",
+      "test_type": "kruskal_wallis",
+      "data_task": "regression --test-type regime",
+      "min_observations_per_regime": 30
+    },
+    "structural_break": {
+      "description": "Relationship changed at a specific date",
+      "test_type": "chow_test",
+      "data_task": "regression --test-type structural_break",
+      "min_pre_observations": 60,
+      "min_post_observations": 60
+    },
+    "threshold": {
+      "description": "Indicator crosses threshold -> price reaction",
+      "test_type": "threshold_event_study",
+      "data_task": "threshold",
+      "min_crossings": 8
+    },
+    "network": {
+      "description": "Shocks propagate through supply/sector network",
+      "test_type": "network_granger",
+      "data_task": "regression --test-type network",
+      "min_spokes": 3
+    },
+    "calendar": {
+      "description": "Seasonal/calendar anomaly",
+      "test_type": "calendar_dummy_regression",
+      "data_task": "calendar",
+      "min_years": 10
+    },
+    "cross_section": {
+      "description": "Factor sorts stocks into return-predictive quantiles",
+      "test_type": "quintile_sort",
+      "data_task": "regression --test-type cross_section",
+      "min_universe_size": 50,
+      "min_months": 36
+    }
+  },
+  "confidence_rubric_non_event": {
+    "note": "For non-event hypothesis classes, confidence is computed from regression/test statistics. Score = sum of component scores, capped at 10.",
+    "components": {
+      "sample_size_days": {
+        "<126": 1,
+        "126-504": 2,
+        "504+": 3
+      },
+      "fit_quality": {
+        "R2 0.03-0.10 or p<0.05": 1,
+        "R2 0.10-0.20 or p<0.01": 2,
+        "R2>0.20 or p<0.001": 3
+      },
+      "effect_significance": {
+        "|t| 2.0-3.0": 1,
+        "|t| 3.0+": 2
+      },
+      "literature_support": {
+        "none": 0,
+        "partial": 1,
+        "strong": 2
+      }
+    },
+    "max_score": 10
+  },
   "confidence_rubric": {
     "note": "Confidence is computed from evidence, not assigned by feel. Score = sum of component scores, capped at 10.",
     "components": {

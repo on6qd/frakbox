@@ -356,6 +356,200 @@ def cmd_get_result(args):
     print(json.dumps(result, indent=2, default=str))
 
 
+# ---------------------------------------------------------------------------
+# Non-event hypothesis commands
+# ---------------------------------------------------------------------------
+
+def _causal_summary(result):
+    """Extract compact summary from any causal_tests result."""
+    if "error" in result:
+        return {"status": "error", "error": result["error"]}
+    return {
+        "status": "ok",
+        "test_name": result.get("test_name"),
+        "hypothesis_class": result.get("hypothesis_class"),
+        "effect_size": result.get("effect_size"),
+        "p_value": result.get("p_value"),
+        "significant": result.get("significant"),
+        "r_squared": result.get("r_squared"),
+        "n_observations": result.get("n_observations"),
+        "oos_significant": result.get("oos_result", {}).get("significant") if result.get("oos_result") else None,
+        "summary": result.get("summary"),
+    }
+
+
+def cmd_regression(args):
+    """Run exposure, lead-lag, or structural break regression test."""
+    from tools.timeseries import get_returns, get_aligned_returns
+    import causal_tests
+
+    identifiers = [args.target, args.factor]
+    if args.controls:
+        identifiers.extend(args.controls.split(","))
+
+    try:
+        rets = get_aligned_returns(identifiers, args.start, args.end)
+    except Exception as e:
+        print(json.dumps({"status": "error", "error": str(e)}))
+        return
+
+    target_rets = rets[args.target]
+    factor_rets = rets[args.factor]
+    control_rets = None
+    if args.controls:
+        control_cols = args.controls.split(",")
+        control_rets = rets[control_cols]
+
+    test_type = args.test_type or "exposure"
+    params = {"target": args.target, "factor": args.factor, "test_type": test_type,
+              "controls": args.controls, "start": args.start, "end": args.end, "oos_start": args.oos_start}
+
+    if test_type == "exposure":
+        result = causal_tests.test_exposure(target_rets, factor_rets, control_rets, oos_start=args.oos_start)
+    elif test_type == "lead_lag":
+        max_lags = args.max_lags or 10
+        result = causal_tests.test_lead_lag(factor_rets, target_rets, max_lags=max_lags, oos_start=args.oos_start)
+        params["max_lags"] = max_lags
+    elif test_type == "structural_break":
+        if not args.break_date:
+            print(json.dumps({"status": "error", "error": "--break-date required for structural_break test"}))
+            return
+        result = causal_tests.test_structural_break(target_rets, factor_rets, args.break_date)
+        params["break_date"] = args.break_date
+    elif test_type == "regime":
+        # Regime test: factor is used as regime indicator
+        from tools.timeseries import get_series
+        indicator = get_series(args.factor, args.start, args.end)
+        # Auto-label regimes by terciles
+        import pandas as pd
+        labels = pd.qcut(indicator, 3, labels=["low", "mid", "high"])
+        aligned = pd.DataFrame({"returns": target_rets, "regime": labels}).dropna()
+        result = causal_tests.test_regime(aligned["returns"], aligned["regime"])
+    elif test_type == "network":
+        spokes = args.controls.split(",") if args.controls else []
+        if not spokes:
+            print(json.dumps({"status": "error", "error": "--controls must list spoke symbols for network test"}))
+            return
+        hub_rets = rets[args.target]
+        spoke_rets = rets[spokes]
+        result = causal_tests.test_network(hub_rets, spoke_rets, max_lag=args.max_lags or 5)
+    else:
+        print(json.dumps({"status": "error", "error": f"Unknown test_type: {test_type}"}))
+        return
+
+    summary = _causal_summary(result)
+    result_id = _store_result(f"regression_{test_type}", params, result, json.dumps(summary, default=str))
+    summary["result_id"] = result_id
+    print(json.dumps(summary, indent=2, default=str))
+
+
+def cmd_cointegration(args):
+    """Run Engle-Granger cointegration test."""
+    from tools.timeseries import get_series
+    import causal_tests
+
+    try:
+        series_a = get_series(args.series_a, args.start, args.end)
+        series_b = get_series(args.series_b, args.start, args.end)
+    except Exception as e:
+        print(json.dumps({"status": "error", "error": str(e)}))
+        return
+
+    result = causal_tests.test_cointegration(series_a, series_b, oos_start=args.oos_start)
+    params = {"series_a": args.series_a, "series_b": args.series_b,
+              "start": args.start, "end": args.end, "oos_start": args.oos_start}
+
+    summary = _causal_summary(result)
+    result_id = _store_result("cointegration", params, result, json.dumps(summary, default=str))
+    summary["result_id"] = result_id
+    print(json.dumps(summary, indent=2, default=str))
+
+
+def cmd_threshold(args):
+    """Run threshold-triggered event study."""
+    from tools.timeseries import get_series, get_returns
+    import causal_tests
+
+    try:
+        trigger = get_series(args.trigger, args.start, args.end)
+        target_rets = get_returns(args.target, args.start, args.end)
+    except Exception as e:
+        print(json.dumps({"status": "error", "error": str(e)}))
+        return
+
+    horizons = [int(h) for h in args.horizons.split(",")] if args.horizons else [5, 10, 20]
+    result = causal_tests.test_threshold(trigger, target_rets, args.threshold_value,
+                                          direction=args.direction, horizons=horizons)
+    params = {"trigger": args.trigger, "target": args.target, "threshold": args.threshold_value,
+              "direction": args.direction, "horizons": horizons, "start": args.start, "end": args.end}
+
+    summary = _causal_summary(result)
+    result_id = _store_result("threshold", params, result, json.dumps(summary, default=str))
+    summary["result_id"] = result_id
+    print(json.dumps(summary, indent=2, default=str))
+
+
+def cmd_calendar(args):
+    """Run calendar anomaly test."""
+    from tools.timeseries import get_returns
+    import causal_tests
+
+    try:
+        rets = get_returns(args.symbol, args.start, args.end)
+    except Exception as e:
+        print(json.dumps({"status": "error", "error": str(e)}))
+        return
+
+    pattern_spec = None
+    if args.pattern_month:
+        pattern_spec = {"month": int(args.pattern_month)}
+
+    result = causal_tests.test_calendar(rets, args.pattern, pattern_spec=pattern_spec,
+                                         oos_start_year=args.oos_start_year)
+    params = {"symbol": args.symbol, "pattern": args.pattern, "pattern_spec": pattern_spec,
+              "oos_start_year": args.oos_start_year, "start": args.start, "end": args.end}
+
+    summary = _causal_summary(result)
+    result_id = _store_result("calendar", params, result, json.dumps(summary, default=str))
+    summary["result_id"] = result_id
+    print(json.dumps(summary, indent=2, default=str))
+
+
+def cmd_fetch_series(args):
+    """Fetch and display time series data."""
+    from tools.timeseries import get_aligned_series
+
+    identifiers = [s.strip() for s in args.identifiers.split(",")]
+    try:
+        df = get_aligned_series(identifiers, args.start, args.end)
+    except Exception as e:
+        print(json.dumps({"status": "error", "error": str(e)}))
+        return
+
+    summary = {
+        "status": "ok",
+        "identifiers": identifiers,
+        "start": str(df.index[0].date()),
+        "end": str(df.index[-1].date()),
+        "n_days": len(df),
+        "stats": {},
+    }
+    for col in df.columns:
+        s = df[col]
+        summary["stats"][col] = {
+            "mean": round(float(s.mean()), 4),
+            "std": round(float(s.std()), 4),
+            "min": round(float(s.min()), 4),
+            "max": round(float(s.max()), 4),
+            "last": round(float(s.iloc[-1]), 4),
+        }
+
+    result_id = _store_result("fetch_series", {"identifiers": identifiers, "start": args.start, "end": args.end},
+                               df.to_dict(), json.dumps(summary, default=str))
+    summary["result_id"] = result_id
+    print(json.dumps(summary, indent=2, default=str))
+
+
 def main():
     db.init_db()
 
@@ -405,6 +599,55 @@ def main():
     sie.add_argument("--min-insiders", type=int, default=3)
     sie.add_argument("--min-value", type=int, default=50000)
 
+    # --- Non-event hypothesis commands ---
+
+    # regression (exposure / lead_lag / structural_break / regime / network)
+    reg = subparsers.add_parser("regression", help="Run regression-based causal test")
+    reg.add_argument("--target", required=True, help="Target symbol or series ID")
+    reg.add_argument("--factor", required=True, help="Factor/driver symbol or series ID")
+    reg.add_argument("--controls", help="Comma-separated control symbols (e.g., SPY,XLE)")
+    reg.add_argument("--test-type", default="exposure",
+                     choices=["exposure", "lead_lag", "structural_break", "regime", "network"],
+                     help="Type of regression test")
+    reg.add_argument("--start", default="2020-01-01", help="Start date")
+    reg.add_argument("--end", default="2026-01-01", help="End date")
+    reg.add_argument("--oos-start", help="OOS validation start date (default: auto 70/30)")
+    reg.add_argument("--max-lags", type=int, help="Max lags for lead_lag/network (default 10)")
+    reg.add_argument("--break-date", help="Break date for structural_break test")
+
+    # cointegration
+    coint = subparsers.add_parser("cointegration", help="Run Engle-Granger cointegration test")
+    coint.add_argument("--series-a", required=True, help="First series identifier")
+    coint.add_argument("--series-b", required=True, help="Second series identifier")
+    coint.add_argument("--start", default="2020-01-01")
+    coint.add_argument("--end", default="2026-01-01")
+    coint.add_argument("--oos-start", help="OOS validation start date")
+
+    # threshold
+    thr = subparsers.add_parser("threshold", help="Threshold-triggered event study")
+    thr.add_argument("--trigger", required=True, help="Trigger series (e.g., ^VIX)")
+    thr.add_argument("--target", required=True, help="Target series for measuring returns")
+    thr.add_argument("--threshold-value", required=True, type=float)
+    thr.add_argument("--direction", default="above", choices=["above", "below"])
+    thr.add_argument("--horizons", default="5,10,20", help="Comma-separated horizons in days")
+    thr.add_argument("--start", default="2015-01-01")
+    thr.add_argument("--end", default="2026-01-01")
+
+    # calendar
+    cal = subparsers.add_parser("calendar", help="Calendar anomaly test")
+    cal.add_argument("--symbol", required=True)
+    cal.add_argument("--pattern", required=True, choices=["monthly", "dow", "tom"])
+    cal.add_argument("--pattern-month", type=int, help="Specific month to test (1-12)")
+    cal.add_argument("--oos-start-year", type=int, help="Year to start OOS validation")
+    cal.add_argument("--start", default="2005-01-01")
+    cal.add_argument("--end", default="2026-01-01")
+
+    # fetch-series
+    fs = subparsers.add_parser("fetch-series", help="Fetch and display time series data")
+    fs.add_argument("--identifiers", required=True, help="Comma-separated series identifiers")
+    fs.add_argument("--start", default="2020-01-01")
+    fs.add_argument("--end", default="2026-01-01")
+
     args = parser.parse_args()
 
     commands = {
@@ -415,6 +658,11 @@ def main():
         "get-result": cmd_get_result,
         "scan-insiders": cmd_scan_insiders,
         "scan-insiders-evaluate": cmd_scan_insiders_evaluate,
+        "regression": cmd_regression,
+        "cointegration": cmd_cointegration,
+        "threshold": cmd_threshold,
+        "calendar": cmd_calendar,
+        "fetch-series": cmd_fetch_series,
     }
     commands[args.command](args)
 
