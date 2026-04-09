@@ -446,6 +446,95 @@ h1 { font-size: 26px; letter-spacing: 5px; color: var(--accent); font-weight: 70
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
+/* Intro card */
+.intro-card {
+    border-color: var(--accent);
+    border-width: 1px;
+    box-shadow: 0 0 30px rgba(79, 195, 247, 0.04);
+}
+.intro-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    margin-bottom: 16px;
+}
+.intro-text strong { color: var(--accent); }
+.intro-stats {
+    display: flex;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--muted);
+    flex-wrap: wrap;
+    align-items: center;
+}
+.intro-stats strong { color: var(--accent); font-size: 15px; }
+.intro-sep { color: var(--border); }
+
+/* Section descriptions */
+.section-desc {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 18px;
+    max-width: 800px;
+}
+.section-desc-small {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+/* Spacer between subsections */
+.spacer {
+    height: 1px;
+    background: var(--border-subtle);
+    margin: 20px 0;
+}
+
+/* Chart container */
+.chart-container { max-height: 280px; }
+.chart-container canvas { max-height: 280px; }
+
+/* How it works */
+.how-it-works {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.how-step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    background: var(--card-raised);
+    border-radius: 8px;
+}
+.how-number {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 50%;
+    background: rgba(79, 195, 247, 0.1);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+}
+.how-step strong {
+    display: block;
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+.how-step p {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
 /* Footer */
 footer {
     text-align: center;

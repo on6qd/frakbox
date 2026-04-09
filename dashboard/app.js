@@ -47,6 +47,29 @@ function esc(s) {
 
 // --- Renderers ---
 
+function renderIntro(fund, research, hypotheses) {
+    // Days running
+    const nav = fund?.nav_history || [];
+    if (nav.length >= 2) {
+        const start = new Date(nav[0].date);
+        const end = new Date(nav[nav.length - 1].date);
+        const days = Math.round((end - start) / (1000 * 60 * 60 * 24));
+        el('days-running').textContent = days;
+    }
+
+    // Total sessions
+    const journal = research?.journal || [];
+    el('total-sessions').textContent = journal.length;
+
+    // Hypotheses formed
+    const counts = hypotheses?.counts || {};
+    el('hypotheses-formed').textContent = counts.total || 0;
+
+    // Dead ends
+    const k = research?.knowledge || {};
+    el('dead-ends-found').textContent = k.dead_end_count || 0;
+}
+
 function renderMeta(meta) {
     if (!meta) return;
     el('last-updated').textContent = 'Updated ' + timeAgo(meta.exported_at);
@@ -67,12 +90,8 @@ function renderFund(fund, research) {
     retEl.textContent = ret != null ? fmtPct(ret) : '--';
     if (ret != null) retEl.className = 'metric-value ' + (ret >= 0 ? 'positive' : 'negative');
 
-    // Hypotheses tested = signals + dead ends
-    const k = research?.knowledge;
-    if (k) {
-        const tested = (k.signal_count || 0) + (k.dead_end_count || 0);
-        el('hypotheses-tested').textContent = tested;
-    }
+    // Total trades
+    el('total-trades').textContent = fund.performance?.total_trades ?? '--';
 
     const wr = fund.performance?.win_rate_pct;
     el('win-rate').textContent = wr != null ? wr.toFixed(0) + '%' : '--';
@@ -228,10 +247,10 @@ function renderLiveSignals(res) {
         }).join('');
     }
 
-    // Focus status
+    // Focus status (optional element)
     const focus = res?.focus;
     const focusEl = el('focus-status');
-    if (focus) {
+    if (focus && focusEl) {
         const c = focus.over_limit ? '#ef5350' : '#66bb6a';
         focusEl.innerHTML = `<span style="color:${c};font-size:13px;font-weight:bold;">${focus.active_signal_types}/${focus.max_signal_types} signal types active</span>`;
     }
@@ -252,21 +271,23 @@ function renderActiveNow(pos, res) {
         `).join('');
     }
 
-    // Today's research — most recent journal entries from today
+    // Latest research — most recent journal entry (not just today)
     const todayEl = el('todays-research');
-    const today = new Date().toISOString().slice(0, 10);
-    const todayEntries = (res?.journal || []).filter(j => j.date === today);
-    if (todayEntries.length) {
-        const latest = todayEntries[todayEntries.length - 1];
+    const journal = (res?.journal || []);
+    if (journal.length) {
+        const latest = journal[journal.length - 1];
+        const today = new Date().toISOString().slice(0, 10);
+        const todayCount = journal.filter(j => j.date === today).length;
+        const dateLabel = latest.date === today ? 'Today' : latest.date;
         todayEl.innerHTML = `
             <div class="today-focus">
                 <div class="today-investigated">${esc(latest.investigated)}</div>
                 <div class="today-findings">${esc(latest.findings)}</div>
             </div>
-            <div class="muted" style="margin-top:6px">${todayEntries.length} session${todayEntries.length > 1 ? 's' : ''} today</div>
+            <div class="muted" style="margin-top:8px">${dateLabel}${todayCount > 0 ? ` \u2014 ${todayCount} session${todayCount > 1 ? 's' : ''} today` : ''} \u2014 ${journal.length} total sessions</div>
         `;
     } else {
-        todayEl.innerHTML = '<p class="muted">No sessions today</p>';
+        todayEl.innerHTML = '<p class="muted">No research sessions yet</p>';
     }
 }
 
@@ -546,13 +567,14 @@ async function load() {
     ]);
 
     renderMeta(meta);
+    renderIntro(fund, research, hypotheses);
     renderFund(fund, research);
     renderLiveSignals(research);
     renderKnowledge(research);
     renderActiveNow(positions, research);
+    renderRecentTrades(positions);
     renderPipeline(research);
     initHypotheses(hypotheses);
-    renderRecentTrades(positions);
     initJournal(research);
 }
 

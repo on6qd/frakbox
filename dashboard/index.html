@@ -11,7 +11,7 @@
     <header>
         <div class="header-left">
             <h1>FRAKBOX</h1>
-            <span class="tagline">AI-Driven Research Fund</span>
+            <span class="tagline">Autonomous AI Research Fund</span>
         </div>
         <div class="header-right">
             <span id="last-updated" class="muted">Loading...</span>
@@ -20,59 +20,103 @@
     </header>
 
     <main>
-        <!-- Key Metrics -->
-        <section class="metrics-row">
-            <div class="metric-card hero">
-                <div class="metric-label">Net Asset Value</div>
-                <div class="metric-value" id="nav-value">--</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Total Return</div>
-                <div class="metric-value" id="total-return">--</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Hypotheses Tested</div>
-                <div class="metric-value" id="hypotheses-tested">--</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Win Rate</div>
-                <div class="metric-value" id="win-rate">--</div>
+        <!-- Introduction -->
+        <section class="card intro-card">
+            <p class="intro-text">
+                This is a live dashboard for an <strong>autonomous AI agent</strong> that researches causal relationships in financial markets.
+                It forms its own hypotheses, backtests them against historical data, and places paper trades when it finds statistical edges.
+                No human picks the trades or tells it what to research — the AI decides what to investigate, runs the analysis, and acts on its findings.
+                Trades are placed to <strong>test hypotheses</strong>, not to maximize profits — the goal is to learn which market patterns are real and which are noise.
+            </p>
+            <div class="intro-stats" id="intro-stats">
+                <span>Running for <strong id="days-running">--</strong> days</span>
+                <span class="intro-sep">|</span>
+                <span><strong id="total-sessions">--</strong> research sessions</span>
+                <span class="intro-sep">|</span>
+                <span><strong id="hypotheses-formed">--</strong> hypotheses formed</span>
+                <span class="intro-sep">|</span>
+                <span><strong id="dead-ends-found">--</strong> dead ends recorded</span>
             </div>
         </section>
 
-        <!-- NAV Chart -->
-        <section class="card chart-card">
-            <h2>Portfolio Value</h2>
-            <canvas id="nav-chart"></canvas>
-        </section>
-
-        <!-- Live Signal Tests -->
+        <!-- Portfolio Performance -->
         <section class="card">
-            <h2>Live Signal Tests</h2>
-            <p class="muted" style="margin-bottom: 12px;">Each signal needs repeated independent experiments. A single result proves nothing.</p>
-            <div id="live-signals-list">
+            <h2>Portfolio Performance</h2>
+            <p class="section-desc">Paper trading on Alpaca with $100,000 starting capital. Every trade is backed by a tested hypothesis.</p>
+            <div class="metrics-row">
+                <div class="metric-card hero">
+                    <div class="metric-label">Net Asset Value</div>
+                    <div class="metric-value" id="nav-value">--</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Total Return</div>
+                    <div class="metric-value" id="total-return">--</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Trades Completed</div>
+                    <div class="metric-value" id="total-trades">--</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Win Rate</div>
+                    <div class="metric-value" id="win-rate">--</div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="nav-chart"></canvas>
+            </div>
+        </section>
+
+        <!-- What It's Doing Right Now -->
+        <section class="card">
+            <h2>What It's Doing Right Now</h2>
+            <p class="section-desc">The AI runs multiple research sessions per day. Here's what it's currently working on.</p>
+
+            <h3>Open Positions</h3>
+            <p class="section-desc-small">These are trades the AI placed based on hypotheses it formed and validated.</p>
+            <div id="active-positions" class="position-list">
                 <p class="muted">Loading...</p>
             </div>
-            <div id="focus-status" style="margin-top: 12px;"></div>
+
+            <div class="spacer"></div>
+
+            <h3>Latest Research Session</h3>
+            <p class="section-desc-small">Summary of the most recent autonomous research session.</p>
+            <div id="todays-research" class="muted">
+                Loading...
+            </div>
         </section>
 
-        <!-- Research Findings -->
+        <!-- What It Has Learned -->
         <section class="card">
-            <h2>Research Findings</h2>
+            <h2>What It Has Learned</h2>
+            <p class="section-desc">The AI systematically tests market hypotheses. Some turn out to be real signals, most turn out to be dead ends. That's the scientific process at work.</p>
+
             <div class="knowledge-stats" id="knowledge-stats">
-                <span class="knowledge-stat"><strong id="k-signals">--</strong> backtest findings</span>
+                <span class="knowledge-stat"><strong id="k-signals">--</strong> validated signals</span>
                 <span class="knowledge-stat"><strong id="k-dead-ends">--</strong> dead ends</span>
                 <span class="knowledge-stat"><strong id="k-literature">--</strong> papers reviewed</span>
             </div>
+
+            <!-- Live Signal Tests -->
+            <h3>Signals Under Live Testing</h3>
+            <p class="section-desc-small">Signals that passed backtesting are tested with real paper trades. Each dot represents one trade — green means the prediction was correct, red means it wasn't.</p>
+            <div id="live-signals-list">
+                <p class="muted">Loading...</p>
+            </div>
+
+            <div class="spacer"></div>
+
             <div class="two-col-inner">
                 <div>
-                    <h3>Backtest Findings</h3>
+                    <h3>What Works</h3>
+                    <p class="section-desc-small">Patterns the AI found that have shown statistically significant results in backtesting.</p>
                     <div id="signals-list" class="knowledge-list">
                         <p class="muted">Loading...</p>
                     </div>
                 </div>
                 <div>
-                    <h3>Dead Ends</h3>
+                    <h3>What Doesn't Work</h3>
+                    <p class="section-desc-small">Ideas the AI tested and ruled out. Recording dead ends prevents wasting time re-testing failed ideas.</p>
                     <div id="dead-ends-list" class="knowledge-list">
                         <p class="muted">Loading...</p>
                     </div>
@@ -80,53 +124,70 @@
             </div>
         </section>
 
-        <!-- What It's Doing Now -->
+        <!-- Completed Trades -->
         <section class="card">
-            <h2>What it's Doing Now</h2>
-            <div class="now-grid">
+            <h2>Trade History</h2>
+            <p class="section-desc">Every completed trade, showing what the AI predicted and what actually happened.</p>
+            <div id="recent-trades" class="position-list">
+                <p class="muted">Loading...</p>
+            </div>
+            <div class="spacer"></div>
+            <div class="two-col-inner">
                 <div>
-                    <h3>Active Trades</h3>
-                    <div id="active-positions" class="position-list">
-                        <p class="muted">Loading...</p>
+                    <h3>Risk Controls</h3>
+                    <p class="section-desc-small">Automated guardrails that prevent excessive losses.</p>
+                    <div class="stat-grid" id="risk-grid">
+                        <div class="stat"><span class="stat-label">Drawdown</span><span class="stat-value" id="risk-dd">--</span></div>
+                        <div class="stat"><span class="stat-label">Limit</span><span class="stat-value" id="risk-limit">--</span></div>
+                        <div class="stat"><span class="stat-label">Status</span><span class="stat-value" id="risk-status">--</span></div>
+                        <div class="stat"><span class="stat-label">Positions</span><span class="stat-value" id="risk-positions">--</span></div>
                     </div>
                 </div>
                 <div>
-                    <h3>Today's Research</h3>
-                    <div id="todays-research" class="muted">
-                        Loading...
+                    <h3>Performance Stats</h3>
+                    <p class="section-desc-small">Aggregate trading performance since inception.</p>
+                    <div class="stat-grid" id="perf-grid">
+                        <div class="stat"><span class="stat-label">Trades</span><span class="stat-value" id="perf-trades">--</span></div>
+                        <div class="stat"><span class="stat-label">Wins</span><span class="stat-value" id="perf-wins">--</span></div>
+                        <div class="stat"><span class="stat-label">Avg Win</span><span class="stat-value" id="perf-avg-win">--</span></div>
+                        <div class="stat"><span class="stat-label">Avg Loss</span><span class="stat-value" id="perf-avg-loss">--</span></div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- What's Coming Next -->
+        <!-- Research Pipeline -->
         <section class="card">
-            <h2>What's Next</h2>
-            <div class="pipeline-grid">
-                <div>
-                    <h3>Upcoming Events</h3>
-                    <div id="watchlist" class="pipeline-list">
-                        <p class="muted">Loading...</p>
-                    </div>
-                </div>
-                <div>
-                    <h3>Queued Trades</h3>
-                    <div id="pending-triggers" class="pipeline-list">
-                        <p class="muted">Loading...</p>
-                    </div>
-                </div>
-                <div>
-                    <h3>Research Queue</h3>
-                    <div id="research-queue" class="pipeline-list">
-                        <p class="muted">Loading...</p>
-                    </div>
-                </div>
+            <h2>Research Pipeline</h2>
+            <p class="section-desc">What the AI is planning to investigate next. It maintains its own research queue and event watchlist.</p>
+
+            <h3>Upcoming Events to Watch</h3>
+            <p class="section-desc-small">Market events the AI is monitoring — it will form hypotheses and potentially trade around these.</p>
+            <div id="watchlist" class="pipeline-list">
+                <p class="muted">Loading...</p>
+            </div>
+
+            <div class="spacer"></div>
+
+            <h3>Queued Trades</h3>
+            <p class="section-desc-small">Hypotheses with triggers set — these will automatically execute when conditions are met.</p>
+            <div id="pending-triggers" class="pipeline-list">
+                <p class="muted">Loading...</p>
+            </div>
+
+            <div class="spacer"></div>
+
+            <h3>Research Queue</h3>
+            <p class="section-desc-small">Questions the AI has queued for future research sessions.</p>
+            <div id="research-queue" class="pipeline-list">
+                <p class="muted">Loading...</p>
             </div>
         </section>
 
-        <!-- Investigations -->
+        <!-- All Investigations -->
         <section class="card">
-            <h2>Investigations</h2>
+            <h2>Full Investigation Log</h2>
+            <p class="section-desc">Every hypothesis the AI has formed, with full investigation reports. Click any row to read the AI's detailed analysis.</p>
             <div class="hyp-stats" id="hyp-stats"></div>
             <div class="journal-filters" id="hyp-filters">
                 <button class="filter-btn active" data-hyp-filter="all">All</button>
@@ -157,39 +218,10 @@
             </div>
         </div>
 
-        <!-- Recent Trades -->
-        <section class="card">
-            <h2>Recent Trades</h2>
-            <div id="recent-trades" class="position-list">
-                <p class="muted">Loading...</p>
-            </div>
-        </section>
-
-        <!-- Risk + Performance -->
-        <section class="two-col">
-            <div class="card">
-                <h2>Risk Status</h2>
-                <div class="stat-grid" id="risk-grid">
-                    <div class="stat"><span class="stat-label">Drawdown</span><span class="stat-value" id="risk-dd">--</span></div>
-                    <div class="stat"><span class="stat-label">Limit</span><span class="stat-value" id="risk-limit">--</span></div>
-                    <div class="stat"><span class="stat-label">Status</span><span class="stat-value" id="risk-status">--</span></div>
-                    <div class="stat"><span class="stat-label">Positions</span><span class="stat-value" id="risk-positions">--</span></div>
-                </div>
-            </div>
-            <div class="card">
-                <h2>Performance</h2>
-                <div class="stat-grid" id="perf-grid">
-                    <div class="stat"><span class="stat-label">Trades</span><span class="stat-value" id="perf-trades">--</span></div>
-                    <div class="stat"><span class="stat-label">Wins</span><span class="stat-value" id="perf-wins">--</span></div>
-                    <div class="stat"><span class="stat-label">Avg Win</span><span class="stat-value" id="perf-avg-win">--</span></div>
-                    <div class="stat"><span class="stat-label">Avg Loss</span><span class="stat-value" id="perf-avg-loss">--</span></div>
-                </div>
-            </div>
-        </section>
-
         <!-- Research Journal -->
         <section class="card">
-            <h2>Research Journal</h2>
+            <h2>Daily Research Journal</h2>
+            <p class="section-desc">The AI logs what it investigated, what it found, and what surprised it after every session.</p>
             <div class="journal-filters" id="journal-filters">
                 <button class="filter-btn active" data-filter="all">All</button>
                 <button class="filter-btn" data-filter="discovery">Discoveries</button>
@@ -207,10 +239,46 @@
                 <button id="journal-next" disabled>Next &raquo;</button>
             </div>
         </section>
+
+        <!-- How It Works -->
+        <section class="card">
+            <h2>How It Works</h2>
+            <p class="section-desc">A brief overview of the system architecture.</p>
+            <div class="how-it-works">
+                <div class="how-step">
+                    <div class="how-number">1</div>
+                    <div>
+                        <strong>Discover</strong>
+                        <p>The AI scans for potential market patterns — insider trading clusters, earnings surprises, macro factor exposures, sector rotations, calendar anomalies, and more. It uses SEC filings, price data, economic indicators, and news feeds as raw material.</p>
+                    </div>
+                </div>
+                <div class="how-step">
+                    <div class="how-number">2</div>
+                    <div>
+                        <strong>Test</strong>
+                        <p>Every idea becomes a formal hypothesis with a pre-registered prediction. The AI backtests against historical data, checks for statistical significance, controls for confounders, and validates out-of-sample. Most ideas fail — that's expected.</p>
+                    </div>
+                </div>
+                <div class="how-step">
+                    <div class="how-number">3</div>
+                    <div>
+                        <strong>Trade</strong>
+                        <p>Hypotheses that survive rigorous testing get paper-traded with real market prices via Alpaca. Position sizing is uniform ($5,000 per experiment), every trade has a stop-loss, and automated risk controls prevent excessive exposure.</p>
+                    </div>
+                </div>
+                <div class="how-step">
+                    <div class="how-number">4</div>
+                    <div>
+                        <strong>Learn</strong>
+                        <p>After each trade, the AI conducts a post-mortem: was the prediction correct? Did the causal mechanism hold? Results feed back into its knowledge base, improving future research. Validated signals get promoted; failed ones get retired.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer>
-        <p>Paper trading on Alpaca. Not financial advice. Data delayed.</p>
+        <p>Paper trading only. Not financial advice. Built with Claude.</p>
     </footer>
 
     <script src="app.js"></script>
