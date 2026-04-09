@@ -1,0 +1,2943 @@
+{
+  "symbol": null,
+  "symbols": [
+    "APP",
+    "BEKE",
+    "CLOV",
+    "DKNG",
+    "DLO",
+    "DNMR",
+    "EHTH",
+    "ELF",
+    "FRHC",
+    "FTAI",
+    "HASI",
+    "IEP",
+    "KDNY",
+    "LMND",
+    "MPLN",
+    "NKLA",
+    "NNOX",
+    "ORA",
+    "RIDE",
+    "SMCI",
+    "SQ",
+    "XL",
+    "YY"
+  ],
+  "multi_symbol": true,
+  "benchmark": "SPY",
+  "sector_etf": null,
+  "event_timing": "unknown",
+  "regime_filter": null,
+  "regime_filtered_count": null,
+  "events_measured": 20,
+  "events_attempted": 23,
+  "events_failed": 3,
+  "drop_rate_pct": 13.0,
+  "data_quality_warning": null,
+  "errors": [
+    {
+      "date": "2021-03-12",
+      "symbol": "RIDE",
+      "error": "No data for RIDE around 2021-03-12 (tried yfinance and Tiingo)"
+    },
+    {
+      "date": "2023-03-23",
+      "symbol": "SQ",
+      "error": "No data for SQ around 2023-03-23 (tried yfinance and Tiingo)"
+    },
+    {
+      "date": "2021-03-03",
+      "symbol": "XL",
+      "error": "No data for XL around 2021-03-03 (tried yfinance and Tiingo)"
+    }
+  ],
+  "individual_impacts": [
+    {
+      "symbol": "NKLA",
+      "benchmark": "SPY",
+      "event_date": "2020-09-10",
+      "event_timing": "unknown",
+      "pre_event_price": 1165.5,
+      "entry_price_type": "open",
+      "avg_daily_volume": 874511,
+      "event_day_volume": 2210198,
+      "volume_ratio": 2.53,
+      "raw_1d": -3.29,
+      "bench_1d": -1.73,
+      "abnormal_1d": -1.56,
+      "raw_3d": -7.88,
+      "bench_3d": -0.39,
+      "abnormal_3d": -7.49,
+      "raw_5d": -14.34,
+      "bench_5d": -0.28,
+      "abnormal_5d": -14.05,
+      "raw_10d": -45.56,
+      "bench_10d": -4.67,
+      "abnormal_10d": -40.89,
+      "raw_20d": -33.8,
+      "bench_20d": 0.69,
+      "abnormal_20d": -34.49,
+      "pre_prices": [
+        {
+          "date": "2020-09-02",
+          "close": 1182.6
+        },
+        {
+          "date": "2020-09-03",
+          "close": 1083.9
+        },
+        {
+          "date": "2020-09-04",
+          "close": 1066.5
+        },
+        {
+          "date": "2020-09-08",
+          "close": 1501.5
+        },
+        {
+          "date": "2020-09-09",
+          "close": 1271.1
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2020-09-10",
+          "close": 1127.1
+        },
+        {
+          "date": "2020-09-11",
+          "close": 963.9
+        },
+        {
+          "date": "2020-09-14",
+          "close": 1073.7
+        },
+        {
+          "date": "2020-09-15",
+          "close": 984.9
+        },
+        {
+          "date": "2020-09-16",
+          "close": 998.4
+        },
+        {
+          "date": "2020-09-17",
+          "close": 1014.9
+        },
+        {
+          "date": "2020-09-18",
+          "close": 1025.7
+        },
+        {
+          "date": "2020-09-21",
+          "close": 827.4
+        },
+        {
+          "date": "2020-09-22",
+          "close": 855.3
+        },
+        {
+          "date": "2020-09-23",
+          "close": 634.5
+        },
+        {
+          "date": "2020-09-24",
+          "close": 573.0
+        },
+        {
+          "date": "2020-09-25",
+          "close": 583.8
+        },
+        {
+          "date": "2020-09-28",
+          "close": 579.0
+        },
+        {
+          "date": "2020-09-29",
+          "close": 536.4
+        },
+        {
+          "date": "2020-09-30",
+          "close": 614.4
+        },
+        {
+          "date": "2020-10-01",
+          "close": 723.3
+        },
+        {
+          "date": "2020-10-02",
+          "close": 727.5
+        },
+        {
+          "date": "2020-10-05",
+          "close": 713.4
+        },
+        {
+          "date": "2020-10-06",
+          "close": 707.1
+        },
+        {
+          "date": "2020-10-07",
+          "close": 771.6
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.289,
+        "spread_component": 0.1,
+        "impact_component": 0.189,
+        "volume_ratio": 2.53,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "CLOV",
+      "benchmark": "SPY",
+      "event_date": "2021-02-04",
+      "event_timing": "unknown",
+      "pre_event_price": 12.24,
+      "entry_price_type": "open",
+      "avg_daily_volume": 13996800,
+      "event_day_volume": 69155500,
+      "volume_ratio": 4.94,
+      "raw_1d": -0.08,
+      "bench_1d": 1.14,
+      "abnormal_1d": -1.22,
+      "raw_3d": 1.06,
+      "bench_3d": 2.27,
+      "abnormal_3d": -1.21,
+      "raw_5d": 2.12,
+      "bench_5d": 2.15,
+      "abnormal_5d": -0.03,
+      "raw_10d": -11.52,
+      "bench_10d": 2.32,
+      "abnormal_10d": -13.84,
+      "raw_20d": -40.44,
+      "bench_20d": -1.35,
+      "abnormal_20d": -39.09,
+      "pre_prices": [
+        {
+          "date": "2021-01-28",
+          "close": 14.07
+        },
+        {
+          "date": "2021-01-29",
+          "close": 13.95
+        },
+        {
+          "date": "2021-02-01",
+          "close": 13.81
+        },
+        {
+          "date": "2021-02-02",
+          "close": 13.97
+        },
+        {
+          "date": "2021-02-03",
+          "close": 13.95
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2021-02-04",
+          "close": 12.23
+        },
+        {
+          "date": "2021-02-05",
+          "close": 12.93
+        },
+        {
+          "date": "2021-02-08",
+          "close": 12.37
+        },
+        {
+          "date": "2021-02-09",
+          "close": 13.16
+        },
+        {
+          "date": "2021-02-10",
+          "close": 12.5
+        },
+        {
+          "date": "2021-02-11",
+          "close": 12.01
+        },
+        {
+          "date": "2021-02-12",
+          "close": 12.08
+        },
+        {
+          "date": "2021-02-16",
+          "close": 11.49
+        },
+        {
+          "date": "2021-02-17",
+          "close": 11.32
+        },
+        {
+          "date": "2021-02-18",
+          "close": 10.83
+        },
+        {
+          "date": "2021-02-19",
+          "close": 10.98
+        },
+        {
+          "date": "2021-02-22",
+          "close": 11.08
+        },
+        {
+          "date": "2021-02-23",
+          "close": 10.13
+        },
+        {
+          "date": "2021-02-24",
+          "close": 10.34
+        },
+        {
+          "date": "2021-02-25",
+          "close": 9.71
+        },
+        {
+          "date": "2021-02-26",
+          "close": 9.4
+        },
+        {
+          "date": "2021-03-01",
+          "close": 10.37
+        },
+        {
+          "date": "2021-03-02",
+          "close": 9.04
+        },
+        {
+          "date": "2021-03-03",
+          "close": 8.29
+        },
+        {
+          "date": "2021-03-04",
+          "close": 7.29
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.235,
+        "spread_component": 0.1,
+        "impact_component": 0.135,
+        "volume_ratio": 4.94,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "ORA",
+      "benchmark": "SPY",
+      "event_date": "2021-03-01",
+      "event_timing": "unknown",
+      "pre_event_price": 80.53,
+      "entry_price_type": "open",
+      "avg_daily_volume": 867988,
+      "event_day_volume": 2912400,
+      "volume_ratio": 3.36,
+      "raw_1d": 1.84,
+      "bench_1d": 2.42,
+      "abnormal_1d": -0.59,
+      "raw_3d": -2.28,
+      "bench_3d": 0.28,
+      "abnormal_3d": -2.56,
+      "raw_5d": -3.54,
+      "bench_5d": 0.86,
+      "abnormal_5d": -4.4,
+      "raw_10d": 5.3,
+      "bench_10d": 3.6,
+      "abnormal_10d": 1.7,
+      "raw_20d": -9.34,
+      "bench_20d": 4.45,
+      "abnormal_20d": -13.79,
+      "pre_prices": [
+        {
+          "date": "2021-02-22",
+          "close": 101.97
+        },
+        {
+          "date": "2021-02-23",
+          "close": 100.14
+        },
+        {
+          "date": "2021-02-24",
+          "close": 100.69
+        },
+        {
+          "date": "2021-02-25",
+          "close": 87.51
+        },
+        {
+          "date": "2021-02-26",
+          "close": 82.98
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2021-03-01",
+          "close": 82.01
+        },
+        {
+          "date": "2021-03-02",
+          "close": 80.38
+        },
+        {
+          "date": "2021-03-03",
+          "close": 78.69
+        },
+        {
+          "date": "2021-03-04",
+          "close": 75.74
+        },
+        {
+          "date": "2021-03-05",
+          "close": 77.68
+        },
+        {
+          "date": "2021-03-08",
+          "close": 76.71
+        },
+        {
+          "date": "2021-03-09",
+          "close": 81.67
+        },
+        {
+          "date": "2021-03-10",
+          "close": 83.05
+        },
+        {
+          "date": "2021-03-11",
+          "close": 84.61
+        },
+        {
+          "date": "2021-03-12",
+          "close": 84.8
+        },
+        {
+          "date": "2021-03-15",
+          "close": 81.66
+        },
+        {
+          "date": "2021-03-16",
+          "close": 79.78
+        },
+        {
+          "date": "2021-03-17",
+          "close": 77.09
+        },
+        {
+          "date": "2021-03-18",
+          "close": 74.62
+        },
+        {
+          "date": "2021-03-19",
+          "close": 73.74
+        },
+        {
+          "date": "2021-03-22",
+          "close": 77.58
+        },
+        {
+          "date": "2021-03-23",
+          "close": 75.25
+        },
+        {
+          "date": "2021-03-24",
+          "close": 71.93
+        },
+        {
+          "date": "2021-03-25",
+          "close": 72.27
+        },
+        {
+          "date": "2021-03-26",
+          "close": 73.01
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.264,
+        "spread_component": 0.1,
+        "impact_component": 0.164,
+        "volume_ratio": 3.36,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "DKNG",
+      "benchmark": "SPY",
+      "event_date": "2021-06-15",
+      "event_timing": "unknown",
+      "pre_event_price": 44.95,
+      "entry_price_type": "open",
+      "avg_daily_volume": 11214880,
+      "event_day_volume": 88027800,
+      "volume_ratio": 7.85,
+      "raw_1d": 7.92,
+      "bench_1d": -0.18,
+      "abnormal_1d": 8.1,
+      "raw_3d": 9.45,
+      "bench_3d": -0.78,
+      "abnormal_3d": 10.23,
+      "raw_5d": 9.01,
+      "bench_5d": -0.71,
+      "abnormal_5d": 9.72,
+      "raw_10d": 17.26,
+      "bench_10d": 0.85,
+      "abnormal_10d": 16.42,
+      "raw_20d": 6.18,
+      "bench_20d": 2.76,
+      "abnormal_20d": 3.42,
+      "pre_prices": [
+        {
+          "date": "2021-06-08",
+          "close": 55.3
+        },
+        {
+          "date": "2021-06-09",
+          "close": 54.48
+        },
+        {
+          "date": "2021-06-10",
+          "close": 53.65
+        },
+        {
+          "date": "2021-06-11",
+          "close": 53.14
+        },
+        {
+          "date": "2021-06-14",
+          "close": 50.62
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2021-06-15",
+          "close": 48.51
+        },
+        {
+          "date": "2021-06-16",
+          "close": 48.81
+        },
+        {
+          "date": "2021-06-17",
+          "close": 49.2
+        },
+        {
+          "date": "2021-06-18",
+          "close": 48.06
+        },
+        {
+          "date": "2021-06-21",
+          "close": 49.0
+        },
+        {
+          "date": "2021-06-22",
+          "close": 50.16
+        },
+        {
+          "date": "2021-06-23",
+          "close": 50.53
+        },
+        {
+          "date": "2021-06-24",
+          "close": 51.06
+        },
+        {
+          "date": "2021-06-25",
+          "close": 51.67
+        },
+        {
+          "date": "2021-06-28",
+          "close": 52.71
+        },
+        {
+          "date": "2021-06-29",
+          "close": 52.03
+        },
+        {
+          "date": "2021-06-30",
+          "close": 52.17
+        },
+        {
+          "date": "2021-07-01",
+          "close": 51.8
+        },
+        {
+          "date": "2021-07-02",
+          "close": 51.28
+        },
+        {
+          "date": "2021-07-06",
+          "close": 51.49
+        },
+        {
+          "date": "2021-07-07",
+          "close": 48.75
+        },
+        {
+          "date": "2021-07-08",
+          "close": 48.26
+        },
+        {
+          "date": "2021-07-09",
+          "close": 49.09
+        },
+        {
+          "date": "2021-07-12",
+          "close": 49.16
+        },
+        {
+          "date": "2021-07-13",
+          "close": 47.73
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.207,
+        "spread_component": 0.1,
+        "impact_component": 0.107,
+        "volume_ratio": 7.85,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "IEP",
+      "benchmark": "SPY",
+      "event_date": "2023-05-02",
+      "event_timing": "unknown",
+      "pre_event_price": 25.14,
+      "entry_price_type": "open",
+      "avg_daily_volume": 512100,
+      "event_day_volume": 17671500,
+      "volume_ratio": 34.51,
+      "raw_1d": -15.91,
+      "bench_1d": -1.13,
+      "abnormal_1d": -14.79,
+      "raw_3d": -37.31,
+      "bench_3d": -2.5,
+      "abnormal_3d": -34.81,
+      "raw_5d": -23.75,
+      "bench_5d": -0.67,
+      "abnormal_5d": -23.08,
+      "raw_10d": -28.92,
+      "bench_10d": -0.6,
+      "abnormal_10d": -28.32,
+      "raw_20d": -50.52,
+      "bench_20d": 1.12,
+      "abnormal_20d": -51.64,
+      "pre_prices": [
+        {
+          "date": "2023-04-25",
+          "close": 26.95
+        },
+        {
+          "date": "2023-04-26",
+          "close": 26.72
+        },
+        {
+          "date": "2023-04-27",
+          "close": 26.6
+        },
+        {
+          "date": "2023-04-28",
+          "close": 26.6
+        },
+        {
+          "date": "2023-05-01",
+          "close": 26.41
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2023-05-02",
+          "close": 21.14
+        },
+        {
+          "date": "2023-05-03",
+          "close": 17.06
+        },
+        {
+          "date": "2023-05-04",
+          "close": 15.76
+        },
+        {
+          "date": "2023-05-05",
+          "close": 19.97
+        },
+        {
+          "date": "2023-05-08",
+          "close": 19.17
+        },
+        {
+          "date": "2023-05-09",
+          "close": 19.88
+        },
+        {
+          "date": "2023-05-10",
+          "close": 16.87
+        },
+        {
+          "date": "2023-05-11",
+          "close": 16.58
+        },
+        {
+          "date": "2023-05-12",
+          "close": 18.54
+        },
+        {
+          "date": "2023-05-15",
+          "close": 17.87
+        },
+        {
+          "date": "2023-05-16",
+          "close": 17.92
+        },
+        {
+          "date": "2023-05-17",
+          "close": 18.16
+        },
+        {
+          "date": "2023-05-18",
+          "close": 18.17
+        },
+        {
+          "date": "2023-05-19",
+          "close": 17.91
+        },
+        {
+          "date": "2023-05-22",
+          "close": 15.96
+        },
+        {
+          "date": "2023-05-23",
+          "close": 15.36
+        },
+        {
+          "date": "2023-05-24",
+          "close": 13.3
+        },
+        {
+          "date": "2023-05-25",
+          "close": 11.46
+        },
+        {
+          "date": "2023-05-26",
+          "close": 11.48
+        },
+        {
+          "date": "2023-05-30",
+          "close": 12.44
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.151,
+        "spread_component": 0.1,
+        "impact_component": 0.051,
+        "volume_ratio": 34.51,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "FRHC",
+      "benchmark": "SPY",
+      "event_date": "2023-09-26",
+      "event_timing": "unknown",
+      "pre_event_price": 86.87,
+      "entry_price_type": "open",
+      "avg_daily_volume": 219445,
+      "event_day_volume": 78800,
+      "volume_ratio": 0.36,
+      "raw_1d": -1.89,
+      "bench_1d": -1.47,
+      "abnormal_1d": -0.42,
+      "raw_3d": -0.68,
+      "bench_3d": -0.86,
+      "abnormal_3d": 0.18,
+      "raw_5d": -2.89,
+      "bench_5d": -1.14,
+      "abnormal_5d": -1.75,
+      "raw_10d": -1.75,
+      "bench_10d": 0.01,
+      "abnormal_10d": -1.76,
+      "raw_20d": -16.55,
+      "bench_20d": -2.72,
+      "abnormal_20d": -13.83,
+      "pre_prices": [
+        {
+          "date": "2023-09-19",
+          "close": 85.99
+        },
+        {
+          "date": "2023-09-20",
+          "close": 87.87
+        },
+        {
+          "date": "2023-09-21",
+          "close": 83.17
+        },
+        {
+          "date": "2023-09-22",
+          "close": 86.45
+        },
+        {
+          "date": "2023-09-25",
+          "close": 86.83
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2023-09-26",
+          "close": 85.23
+        },
+        {
+          "date": "2023-09-27",
+          "close": 85.66
+        },
+        {
+          "date": "2023-09-28",
+          "close": 86.28
+        },
+        {
+          "date": "2023-09-29",
+          "close": 84.71
+        },
+        {
+          "date": "2023-10-02",
+          "close": 84.36
+        },
+        {
+          "date": "2023-10-03",
+          "close": 83.41
+        },
+        {
+          "date": "2023-10-04",
+          "close": 84.33
+        },
+        {
+          "date": "2023-10-05",
+          "close": 85.11
+        },
+        {
+          "date": "2023-10-06",
+          "close": 86.4
+        },
+        {
+          "date": "2023-10-09",
+          "close": 85.35
+        },
+        {
+          "date": "2023-10-10",
+          "close": 85.82
+        },
+        {
+          "date": "2023-10-11",
+          "close": 85.12
+        },
+        {
+          "date": "2023-10-12",
+          "close": 84.16
+        },
+        {
+          "date": "2023-10-13",
+          "close": 84.34
+        },
+        {
+          "date": "2023-10-16",
+          "close": 82.48
+        },
+        {
+          "date": "2023-10-17",
+          "close": 82.44
+        },
+        {
+          "date": "2023-10-18",
+          "close": 80.86
+        },
+        {
+          "date": "2023-10-19",
+          "close": 77.96
+        },
+        {
+          "date": "2023-10-20",
+          "close": 76.21
+        },
+        {
+          "date": "2023-10-23",
+          "close": 72.49
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.601,
+        "spread_component": 0.1,
+        "impact_component": 0.501,
+        "volume_ratio": 0.36,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "SMCI",
+      "benchmark": "SPY",
+      "event_date": "2024-08-27",
+      "event_timing": "unknown",
+      "pre_event_price": 51.89,
+      "entry_price_type": "open",
+      "avg_daily_volume": 73712181,
+      "event_day_volume": 116837000,
+      "volume_ratio": 1.59,
+      "raw_1d": 5.53,
+      "bench_1d": 0.14,
+      "abnormal_1d": 5.39,
+      "raw_3d": -13.51,
+      "bench_3d": -0.44,
+      "abnormal_3d": -13.07,
+      "raw_5d": -14.86,
+      "bench_5d": -1.55,
+      "abnormal_5d": -13.31,
+      "raw_10d": -20.47,
+      "bench_10d": -2.14,
+      "abnormal_10d": -18.33,
+      "raw_20d": -10.66,
+      "bench_20d": 2.19,
+      "abnormal_20d": -12.84,
+      "pre_prices": [
+        {
+          "date": "2024-08-20",
+          "close": 61.09
+        },
+        {
+          "date": "2024-08-21",
+          "close": 62.38
+        },
+        {
+          "date": "2024-08-22",
+          "close": 60.48
+        },
+        {
+          "date": "2024-08-23",
+          "close": 61.32
+        },
+        {
+          "date": "2024-08-26",
+          "close": 56.25
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2024-08-27",
+          "close": 54.76
+        },
+        {
+          "date": "2024-08-28",
+          "close": 44.35
+        },
+        {
+          "date": "2024-08-29",
+          "close": 44.88
+        },
+        {
+          "date": "2024-08-30",
+          "close": 43.77
+        },
+        {
+          "date": "2024-09-03",
+          "close": 44.18
+        },
+        {
+          "date": "2024-09-04",
+          "close": 42.35
+        },
+        {
+          "date": "2024-09-05",
+          "close": 41.46
+        },
+        {
+          "date": "2024-09-06",
+          "close": 38.65
+        },
+        {
+          "date": "2024-09-09",
+          "close": 40.99
+        },
+        {
+          "date": "2024-09-10",
+          "close": 41.27
+        },
+        {
+          "date": "2024-09-11",
+          "close": 44.54
+        },
+        {
+          "date": "2024-09-12",
+          "close": 44.21
+        },
+        {
+          "date": "2024-09-13",
+          "close": 45.72
+        },
+        {
+          "date": "2024-09-16",
+          "close": 44.91
+        },
+        {
+          "date": "2024-09-17",
+          "close": 43.94
+        },
+        {
+          "date": "2024-09-18",
+          "close": 43.69
+        },
+        {
+          "date": "2024-09-19",
+          "close": 43.72
+        },
+        {
+          "date": "2024-09-20",
+          "close": 45.73
+        },
+        {
+          "date": "2024-09-23",
+          "close": 46.59
+        },
+        {
+          "date": "2024-09-24",
+          "close": 46.36
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.338,
+        "spread_component": 0.1,
+        "impact_component": 0.238,
+        "volume_ratio": 1.59,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "EHTH",
+      "benchmark": "SPY",
+      "event_date": "2020-04-08",
+      "event_timing": "unknown",
+      "pre_event_price": 96.5,
+      "entry_price_type": "open",
+      "avg_daily_volume": 616181,
+      "event_day_volume": 8722000,
+      "volume_ratio": 14.15,
+      "raw_1d": 6.94,
+      "bench_1d": 3.36,
+      "abnormal_1d": 3.59,
+      "raw_3d": 15.89,
+      "bench_3d": 3.97,
+      "abnormal_3d": 11.91,
+      "raw_5d": 23.53,
+      "bench_5d": 4.76,
+      "abnormal_5d": 18.77,
+      "raw_10d": 23.19,
+      "bench_10d": 5.27,
+      "abnormal_10d": 17.92,
+      "raw_20d": 13.09,
+      "bench_20d": 7.21,
+      "abnormal_20d": 5.88,
+      "pre_prices": [
+        {
+          "date": "2020-04-01",
+          "close": 133.64
+        },
+        {
+          "date": "2020-04-02",
+          "close": 133.99
+        },
+        {
+          "date": "2020-04-03",
+          "close": 128.21
+        },
+        {
+          "date": "2020-04-06",
+          "close": 130.57
+        },
+        {
+          "date": "2020-04-07",
+          "close": 116.9
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2020-04-08",
+          "close": 103.2
+        },
+        {
+          "date": "2020-04-09",
+          "close": 115.01
+        },
+        {
+          "date": "2020-04-13",
+          "close": 111.83
+        },
+        {
+          "date": "2020-04-14",
+          "close": 120.79
+        },
+        {
+          "date": "2020-04-15",
+          "close": 119.21
+        },
+        {
+          "date": "2020-04-16",
+          "close": 125.0
+        },
+        {
+          "date": "2020-04-17",
+          "close": 127.86
+        },
+        {
+          "date": "2020-04-20",
+          "close": 127.27
+        },
+        {
+          "date": "2020-04-21",
+          "close": 119.52
+        },
+        {
+          "date": "2020-04-22",
+          "close": 118.88
+        },
+        {
+          "date": "2020-04-23",
+          "close": 126.25
+        },
+        {
+          "date": "2020-04-24",
+          "close": 109.31
+        },
+        {
+          "date": "2020-04-27",
+          "close": 105.62
+        },
+        {
+          "date": "2020-04-28",
+          "close": 110.42
+        },
+        {
+          "date": "2020-04-29",
+          "close": 109.12
+        },
+        {
+          "date": "2020-04-30",
+          "close": 106.7
+        },
+        {
+          "date": "2020-05-01",
+          "close": 106.43
+        },
+        {
+          "date": "2020-05-04",
+          "close": 103.28
+        },
+        {
+          "date": "2020-05-05",
+          "close": 108.15
+        },
+        {
+          "date": "2020-05-06",
+          "close": 109.13
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.18,
+        "spread_component": 0.1,
+        "impact_component": 0.08,
+        "volume_ratio": 14.15,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "NNOX",
+      "benchmark": "SPY",
+      "event_date": "2020-09-22",
+      "event_timing": "unknown",
+      "pre_event_price": 23.9,
+      "entry_price_type": "open",
+      "avg_daily_volume": 7310700,
+      "event_day_volume": 14358500,
+      "volume_ratio": 1.96,
+      "raw_1d": 25.98,
+      "bench_1d": 1.02,
+      "abnormal_1d": 24.97,
+      "raw_3d": 13.77,
+      "bench_3d": -1.06,
+      "abnormal_3d": 14.83,
+      "raw_5d": 11.13,
+      "bench_5d": 2.21,
+      "abnormal_5d": 8.92,
+      "raw_10d": 65.27,
+      "bench_10d": 3.91,
+      "abnormal_10d": 61.36,
+      "raw_20d": 38.91,
+      "bench_20d": 4.6,
+      "abnormal_20d": 34.31,
+      "pre_prices": [
+        {
+          "date": "2020-09-15",
+          "close": 38.0
+        },
+        {
+          "date": "2020-09-16",
+          "close": 36.8
+        },
+        {
+          "date": "2020-09-17",
+          "close": 28.1
+        },
+        {
+          "date": "2020-09-18",
+          "close": 34.88
+        },
+        {
+          "date": "2020-09-21",
+          "close": 28.83
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2020-09-22",
+          "close": 30.11
+        },
+        {
+          "date": "2020-09-23",
+          "close": 29.31
+        },
+        {
+          "date": "2020-09-24",
+          "close": 27.19
+        },
+        {
+          "date": "2020-09-25",
+          "close": 28.48
+        },
+        {
+          "date": "2020-09-28",
+          "close": 26.56
+        },
+        {
+          "date": "2020-09-29",
+          "close": 24.0
+        },
+        {
+          "date": "2020-09-30",
+          "close": 23.52
+        },
+        {
+          "date": "2020-10-01",
+          "close": 23.97
+        },
+        {
+          "date": "2020-10-02",
+          "close": 37.44
+        },
+        {
+          "date": "2020-10-05",
+          "close": 39.5
+        },
+        {
+          "date": "2020-10-06",
+          "close": 35.05
+        },
+        {
+          "date": "2020-10-07",
+          "close": 39.72
+        },
+        {
+          "date": "2020-10-08",
+          "close": 36.74
+        },
+        {
+          "date": "2020-10-09",
+          "close": 36.8
+        },
+        {
+          "date": "2020-10-12",
+          "close": 35.19
+        },
+        {
+          "date": "2020-10-13",
+          "close": 34.24
+        },
+        {
+          "date": "2020-10-14",
+          "close": 37.49
+        },
+        {
+          "date": "2020-10-15",
+          "close": 36.27
+        },
+        {
+          "date": "2020-10-16",
+          "close": 35.2
+        },
+        {
+          "date": "2020-10-19",
+          "close": 33.2
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.314,
+        "spread_component": 0.1,
+        "impact_component": 0.214,
+        "volume_ratio": 1.96,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "MPLN",
+      "benchmark": "SPY",
+      "event_date": "2020-11-11",
+      "event_timing": "unknown",
+      "pre_event_price": 347.6,
+      "entry_price_type": "open",
+      "avg_daily_volume": 58606,
+      "event_day_volume": 690109,
+      "volume_ratio": 11.78,
+      "raw_1d": -19.33,
+      "bench_1d": 0.74,
+      "abnormal_1d": -20.08,
+      "raw_3d": -23.01,
+      "bench_3d": 1.15,
+      "abnormal_3d": -24.16,
+      "raw_5d": -18.76,
+      "bench_5d": 1.86,
+      "abnormal_5d": -20.62,
+      "raw_10d": -14.04,
+      "bench_10d": 2.59,
+      "abnormal_10d": -16.63,
+      "raw_20d": 1.38,
+      "bench_20d": 3.62,
+      "abnormal_20d": -2.24,
+      "pre_prices": [
+        {
+          "date": "2020-11-04",
+          "close": 336.0
+        },
+        {
+          "date": "2020-11-05",
+          "close": 354.0
+        },
+        {
+          "date": "2020-11-06",
+          "close": 348.0
+        },
+        {
+          "date": "2020-11-09",
+          "close": 346.8
+        },
+        {
+          "date": "2020-11-10",
+          "close": 349.2
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2020-11-11",
+          "close": 280.4
+        },
+        {
+          "date": "2020-11-12",
+          "close": 250.8
+        },
+        {
+          "date": "2020-11-13",
+          "close": 267.6
+        },
+        {
+          "date": "2020-11-16",
+          "close": 276.4
+        },
+        {
+          "date": "2020-11-17",
+          "close": 282.4
+        },
+        {
+          "date": "2020-11-18",
+          "close": 285.2
+        },
+        {
+          "date": "2020-11-19",
+          "close": 303.2
+        },
+        {
+          "date": "2020-11-20",
+          "close": 302.4
+        },
+        {
+          "date": "2020-11-23",
+          "close": 302.4
+        },
+        {
+          "date": "2020-11-24",
+          "close": 298.8
+        },
+        {
+          "date": "2020-11-25",
+          "close": 300.0
+        },
+        {
+          "date": "2020-11-27",
+          "close": 298.8
+        },
+        {
+          "date": "2020-11-30",
+          "close": 277.6
+        },
+        {
+          "date": "2020-12-01",
+          "close": 271.2
+        },
+        {
+          "date": "2020-12-02",
+          "close": 282.0
+        },
+        {
+          "date": "2020-12-03",
+          "close": 281.2
+        },
+        {
+          "date": "2020-12-04",
+          "close": 303.6
+        },
+        {
+          "date": "2020-12-07",
+          "close": 344.4
+        },
+        {
+          "date": "2020-12-08",
+          "close": 329.6
+        },
+        {
+          "date": "2020-12-09",
+          "close": 352.4
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.187,
+        "spread_component": 0.1,
+        "impact_component": 0.087,
+        "volume_ratio": 11.78,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "YY",
+      "benchmark": "SPY",
+      "event_date": "2020-11-18",
+      "event_timing": "unknown",
+      "pre_event_price": 80.71,
+      "entry_price_type": "open",
+      "avg_daily_volume": 1558132,
+      "event_day_volume": 26438860,
+      "volume_ratio": 16.97,
+      "raw_1d": -26.19,
+      "bench_1d": -1.2,
+      "abnormal_1d": -24.99,
+      "raw_3d": -14.61,
+      "bench_3d": -1.47,
+      "abnormal_3d": -13.14,
+      "raw_5d": -11.09,
+      "bench_5d": 0.72,
+      "abnormal_5d": -11.81,
+      "raw_10d": -14.12,
+      "bench_10d": 1.71,
+      "abnormal_10d": -15.84,
+      "raw_20d": -17.2,
+      "bench_20d": 2.65,
+      "abnormal_20d": -19.84,
+      "pre_prices": [
+        {
+          "date": "2020-11-11",
+          "close": 77.96
+        },
+        {
+          "date": "2020-11-12",
+          "close": 76.03
+        },
+        {
+          "date": "2020-11-13",
+          "close": 76.11
+        },
+        {
+          "date": "2020-11-16",
+          "close": 77.3
+        },
+        {
+          "date": "2020-11-17",
+          "close": 81.02
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2020-11-18",
+          "close": 59.57
+        },
+        {
+          "date": "2020-11-19",
+          "close": 69.64
+        },
+        {
+          "date": "2020-11-20",
+          "close": 68.92
+        },
+        {
+          "date": "2020-11-23",
+          "close": 71.57
+        },
+        {
+          "date": "2020-11-24",
+          "close": 71.76
+        },
+        {
+          "date": "2020-11-25",
+          "close": 73.51
+        },
+        {
+          "date": "2020-11-27",
+          "close": 73.88
+        },
+        {
+          "date": "2020-11-30",
+          "close": 72.03
+        },
+        {
+          "date": "2020-12-01",
+          "close": 71.44
+        },
+        {
+          "date": "2020-12-02",
+          "close": 69.31
+        },
+        {
+          "date": "2020-12-03",
+          "close": 68.73
+        },
+        {
+          "date": "2020-12-04",
+          "close": 68.83
+        },
+        {
+          "date": "2020-12-07",
+          "close": 69.4
+        },
+        {
+          "date": "2020-12-08",
+          "close": 69.67
+        },
+        {
+          "date": "2020-12-09",
+          "close": 68.92
+        },
+        {
+          "date": "2020-12-10",
+          "close": 69.42
+        },
+        {
+          "date": "2020-12-11",
+          "close": 69.03
+        },
+        {
+          "date": "2020-12-14",
+          "close": 69.15
+        },
+        {
+          "date": "2020-12-15",
+          "close": 65.3
+        },
+        {
+          "date": "2020-12-16",
+          "close": 66.83
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.173,
+        "spread_component": 0.1,
+        "impact_component": 0.073,
+        "volume_ratio": 16.97,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "LMND",
+      "benchmark": "SPY",
+      "event_date": "2021-05-13",
+      "event_timing": "unknown",
+      "pre_event_price": 60.12,
+      "entry_price_type": "open",
+      "avg_daily_volume": 2905000,
+      "event_day_volume": 9167000,
+      "volume_ratio": 3.16,
+      "raw_1d": 7.65,
+      "bench_1d": 1.2,
+      "abnormal_1d": 6.45,
+      "raw_3d": 20.56,
+      "bench_3d": 2.49,
+      "abnormal_3d": 18.07,
+      "raw_5d": 22.95,
+      "bench_5d": 1.34,
+      "abnormal_5d": 21.61,
+      "raw_10d": 40.05,
+      "bench_10d": 3.37,
+      "abnormal_10d": 36.69,
+      "raw_20d": 68.6,
+      "bench_20d": 4.49,
+      "abnormal_20d": 64.11,
+      "pre_prices": [
+        {
+          "date": "2021-05-06",
+          "close": 76.13
+        },
+        {
+          "date": "2021-05-07",
+          "close": 79.11
+        },
+        {
+          "date": "2021-05-10",
+          "close": 71.06
+        },
+        {
+          "date": "2021-05-11",
+          "close": 73.85
+        },
+        {
+          "date": "2021-05-12",
+          "close": 60.17
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2021-05-13",
+          "close": 64.72
+        },
+        {
+          "date": "2021-05-14",
+          "close": 69.45
+        },
+        {
+          "date": "2021-05-17",
+          "close": 72.48
+        },
+        {
+          "date": "2021-05-18",
+          "close": 73.87
+        },
+        {
+          "date": "2021-05-19",
+          "close": 73.92
+        },
+        {
+          "date": "2021-05-20",
+          "close": 77.53
+        },
+        {
+          "date": "2021-05-21",
+          "close": 78.4
+        },
+        {
+          "date": "2021-05-24",
+          "close": 80.84
+        },
+        {
+          "date": "2021-05-25",
+          "close": 76.06
+        },
+        {
+          "date": "2021-05-26",
+          "close": 84.2
+        },
+        {
+          "date": "2021-05-27",
+          "close": 86.0
+        },
+        {
+          "date": "2021-05-28",
+          "close": 90.47
+        },
+        {
+          "date": "2021-06-01",
+          "close": 91.72
+        },
+        {
+          "date": "2021-06-02",
+          "close": 99.03
+        },
+        {
+          "date": "2021-06-03",
+          "close": 96.88
+        },
+        {
+          "date": "2021-06-04",
+          "close": 95.85
+        },
+        {
+          "date": "2021-06-07",
+          "close": 99.01
+        },
+        {
+          "date": "2021-06-08",
+          "close": 103.63
+        },
+        {
+          "date": "2021-06-09",
+          "close": 105.15
+        },
+        {
+          "date": "2021-06-10",
+          "close": 101.36
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.269,
+        "spread_component": 0.1,
+        "impact_component": 0.169,
+        "volume_ratio": 3.16,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "DNMR",
+      "benchmark": "SPY",
+      "event_date": "2021-09-15",
+      "event_timing": "unknown",
+      "pre_event_price": 682.0,
+      "entry_price_type": "open",
+      "avg_daily_volume": 42546,
+      "event_day_volume": 302740,
+      "volume_ratio": 7.12,
+      "raw_1d": -13.61,
+      "bench_1d": 0.84,
+      "abnormal_1d": -14.44,
+      "raw_3d": -2.35,
+      "bench_3d": -0.31,
+      "abnormal_3d": -2.04,
+      "raw_5d": -7.62,
+      "bench_5d": -2.06,
+      "abnormal_5d": -5.57,
+      "raw_10d": -2.46,
+      "bench_10d": -2.04,
+      "abnormal_10d": -0.42,
+      "raw_20d": -14.72,
+      "bench_20d": -2.06,
+      "abnormal_20d": -12.66,
+      "pre_prices": [
+        {
+          "date": "2021-09-08",
+          "close": 746.0
+        },
+        {
+          "date": "2021-09-09",
+          "close": 740.8
+        },
+        {
+          "date": "2021-09-10",
+          "close": 697.2
+        },
+        {
+          "date": "2021-09-13",
+          "close": 714.0
+        },
+        {
+          "date": "2021-09-14",
+          "close": 689.6
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2021-09-15",
+          "close": 589.2
+        },
+        {
+          "date": "2021-09-16",
+          "close": 662.4
+        },
+        {
+          "date": "2021-09-17",
+          "close": 666.0
+        },
+        {
+          "date": "2021-09-20",
+          "close": 633.2
+        },
+        {
+          "date": "2021-09-21",
+          "close": 630.0
+        },
+        {
+          "date": "2021-09-22",
+          "close": 633.6
+        },
+        {
+          "date": "2021-09-23",
+          "close": 697.6
+        },
+        {
+          "date": "2021-09-24",
+          "close": 680.4
+        },
+        {
+          "date": "2021-09-27",
+          "close": 722.4
+        },
+        {
+          "date": "2021-09-28",
+          "close": 665.2
+        },
+        {
+          "date": "2021-09-29",
+          "close": 650.4
+        },
+        {
+          "date": "2021-09-30",
+          "close": 653.6
+        },
+        {
+          "date": "2021-10-01",
+          "close": 669.2
+        },
+        {
+          "date": "2021-10-04",
+          "close": 606.0
+        },
+        {
+          "date": "2021-10-05",
+          "close": 612.0
+        },
+        {
+          "date": "2021-10-06",
+          "close": 606.0
+        },
+        {
+          "date": "2021-10-07",
+          "close": 611.2
+        },
+        {
+          "date": "2021-10-08",
+          "close": 600.4
+        },
+        {
+          "date": "2021-10-11",
+          "close": 594.4
+        },
+        {
+          "date": "2021-10-12",
+          "close": 581.6
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.212,
+        "spread_component": 0.1,
+        "impact_component": 0.112,
+        "volume_ratio": 7.12,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "BEKE",
+      "benchmark": "SPY",
+      "event_date": "2021-12-16",
+      "event_timing": "unknown",
+      "pre_event_price": 16.67,
+      "entry_price_type": "open",
+      "avg_daily_volume": 14099400,
+      "event_day_volume": 52181800,
+      "volume_ratio": 3.7,
+      "raw_1d": 1.92,
+      "bench_1d": -0.88,
+      "abnormal_1d": 2.8,
+      "raw_3d": -3.6,
+      "bench_3d": -2.98,
+      "abnormal_3d": -0.62,
+      "raw_5d": 7.74,
+      "bench_5d": -0.27,
+      "abnormal_5d": 8.01,
+      "raw_10d": 12.42,
+      "bench_10d": 1.54,
+      "abnormal_10d": 10.88,
+      "raw_20d": 17.4,
+      "bench_20d": -0.94,
+      "abnormal_20d": 18.34,
+      "pre_prices": [
+        {
+          "date": "2021-12-09",
+          "close": 20.84
+        },
+        {
+          "date": "2021-12-10",
+          "close": 20.52
+        },
+        {
+          "date": "2021-12-13",
+          "close": 17.38
+        },
+        {
+          "date": "2021-12-14",
+          "close": 17.75
+        },
+        {
+          "date": "2021-12-15",
+          "close": 17.34
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2021-12-16",
+          "close": 16.99
+        },
+        {
+          "date": "2021-12-17",
+          "close": 17.97
+        },
+        {
+          "date": "2021-12-20",
+          "close": 16.07
+        },
+        {
+          "date": "2021-12-21",
+          "close": 17.96
+        },
+        {
+          "date": "2021-12-22",
+          "close": 17.96
+        },
+        {
+          "date": "2021-12-23",
+          "close": 17.63
+        },
+        {
+          "date": "2021-12-27",
+          "close": 18.17
+        },
+        {
+          "date": "2021-12-28",
+          "close": 18.35
+        },
+        {
+          "date": "2021-12-29",
+          "close": 16.66
+        },
+        {
+          "date": "2021-12-30",
+          "close": 18.74
+        },
+        {
+          "date": "2021-12-31",
+          "close": 18.67
+        },
+        {
+          "date": "2022-01-03",
+          "close": 18.3
+        },
+        {
+          "date": "2022-01-04",
+          "close": 16.33
+        },
+        {
+          "date": "2022-01-05",
+          "close": 15.86
+        },
+        {
+          "date": "2022-01-06",
+          "close": 17.57
+        },
+        {
+          "date": "2022-01-07",
+          "close": 19.37
+        },
+        {
+          "date": "2022-01-10",
+          "close": 19.71
+        },
+        {
+          "date": "2022-01-11",
+          "close": 21.3
+        },
+        {
+          "date": "2022-01-12",
+          "close": 21.14
+        },
+        {
+          "date": "2022-01-13",
+          "close": 19.57
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.256,
+        "spread_component": 0.1,
+        "impact_component": 0.156,
+        "volume_ratio": 3.7,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "HASI",
+      "benchmark": "SPY",
+      "event_date": "2022-07-12",
+      "event_timing": "unknown",
+      "pre_event_price": 29.28,
+      "entry_price_type": "open",
+      "avg_daily_volume": 573570,
+      "event_day_volume": 9886200,
+      "volume_ratio": 17.24,
+      "raw_1d": -18.95,
+      "bench_1d": -0.88,
+      "abnormal_1d": -18.07,
+      "raw_3d": -13.7,
+      "bench_3d": -1.65,
+      "abnormal_3d": -12.05,
+      "raw_5d": -9.77,
+      "bench_5d": -0.59,
+      "abnormal_5d": -9.17,
+      "raw_10d": -10.66,
+      "bench_10d": 2.95,
+      "abnormal_10d": -13.61,
+      "raw_20d": 19.77,
+      "bench_20d": 7.48,
+      "abnormal_20d": 12.29,
+      "pre_prices": [
+        {
+          "date": "2022-07-05",
+          "close": 30.56
+        },
+        {
+          "date": "2022-07-06",
+          "close": 30.33
+        },
+        {
+          "date": "2022-07-07",
+          "close": 31.17
+        },
+        {
+          "date": "2022-07-08",
+          "close": 30.99
+        },
+        {
+          "date": "2022-07-11",
+          "close": 29.32
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2022-07-12",
+          "close": 23.73
+        },
+        {
+          "date": "2022-07-13",
+          "close": 24.38
+        },
+        {
+          "date": "2022-07-14",
+          "close": 25.27
+        },
+        {
+          "date": "2022-07-15",
+          "close": 25.32
+        },
+        {
+          "date": "2022-07-18",
+          "close": 26.42
+        },
+        {
+          "date": "2022-07-19",
+          "close": 27.29
+        },
+        {
+          "date": "2022-07-20",
+          "close": 27.77
+        },
+        {
+          "date": "2022-07-21",
+          "close": 27.95
+        },
+        {
+          "date": "2022-07-22",
+          "close": 26.98
+        },
+        {
+          "date": "2022-07-25",
+          "close": 26.16
+        },
+        {
+          "date": "2022-07-26",
+          "close": 25.86
+        },
+        {
+          "date": "2022-07-27",
+          "close": 26.48
+        },
+        {
+          "date": "2022-07-28",
+          "close": 29.46
+        },
+        {
+          "date": "2022-07-29",
+          "close": 29.12
+        },
+        {
+          "date": "2022-08-01",
+          "close": 29.16
+        },
+        {
+          "date": "2022-08-02",
+          "close": 29.96
+        },
+        {
+          "date": "2022-08-03",
+          "close": 30.47
+        },
+        {
+          "date": "2022-08-04",
+          "close": 30.76
+        },
+        {
+          "date": "2022-08-05",
+          "close": 32.28
+        },
+        {
+          "date": "2022-08-08",
+          "close": 35.07
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.172,
+        "spread_component": 0.1,
+        "impact_component": 0.072,
+        "volume_ratio": 17.24,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "DLO",
+      "benchmark": "SPY",
+      "event_date": "2022-11-16",
+      "event_timing": "unknown",
+      "pre_event_price": 19.77,
+      "entry_price_type": "open",
+      "avg_daily_volume": 1607445,
+      "event_day_volume": 56105400,
+      "volume_ratio": 34.9,
+      "raw_1d": -49.57,
+      "bench_1d": -0.77,
+      "abnormal_1d": -48.8,
+      "raw_3d": -38.39,
+      "bench_3d": -0.62,
+      "abnormal_3d": -37.77,
+      "raw_5d": -36.62,
+      "bench_5d": 0.35,
+      "abnormal_5d": -36.97,
+      "raw_10d": -29.59,
+      "bench_10d": 2.3,
+      "abnormal_10d": -31.89,
+      "raw_20d": -30.5,
+      "bench_20d": 0.23,
+      "abnormal_20d": -30.73,
+      "pre_prices": [
+        {
+          "date": "2022-11-09",
+          "close": 18.22
+        },
+        {
+          "date": "2022-11-10",
+          "close": 20.65
+        },
+        {
+          "date": "2022-11-11",
+          "close": 21.82
+        },
+        {
+          "date": "2022-11-14",
+          "close": 21.49
+        },
+        {
+          "date": "2022-11-15",
+          "close": 20.23
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2022-11-16",
+          "close": 9.97
+        },
+        {
+          "date": "2022-11-17",
+          "close": 10.11
+        },
+        {
+          "date": "2022-11-18",
+          "close": 12.18
+        },
+        {
+          "date": "2022-11-21",
+          "close": 13.31
+        },
+        {
+          "date": "2022-11-22",
+          "close": 12.53
+        },
+        {
+          "date": "2022-11-23",
+          "close": 13.25
+        },
+        {
+          "date": "2022-11-25",
+          "close": 13.63
+        },
+        {
+          "date": "2022-11-28",
+          "close": 12.57
+        },
+        {
+          "date": "2022-11-29",
+          "close": 12.87
+        },
+        {
+          "date": "2022-11-30",
+          "close": 13.92
+        },
+        {
+          "date": "2022-12-01",
+          "close": 11.81
+        },
+        {
+          "date": "2022-12-02",
+          "close": 12.2
+        },
+        {
+          "date": "2022-12-05",
+          "close": 12.31
+        },
+        {
+          "date": "2022-12-06",
+          "close": 11.76
+        },
+        {
+          "date": "2022-12-07",
+          "close": 11.35
+        },
+        {
+          "date": "2022-12-08",
+          "close": 12.1
+        },
+        {
+          "date": "2022-12-09",
+          "close": 12.42
+        },
+        {
+          "date": "2022-12-12",
+          "close": 12.75
+        },
+        {
+          "date": "2022-12-13",
+          "close": 13.12
+        },
+        {
+          "date": "2022-12-14",
+          "close": 13.74
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.151,
+        "spread_component": 0.1,
+        "impact_component": 0.051,
+        "volume_ratio": 34.9,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "KDNY",
+      "benchmark": "SPY",
+      "event_date": "2023-05-16",
+      "event_timing": "unknown",
+      "pre_event_price": 22.7,
+      "entry_price_type": "open",
+      "avg_daily_volume": 763075,
+      "event_day_volume": 3573563,
+      "volume_ratio": 4.68,
+      "raw_1d": -1.54,
+      "bench_1d": -0.67,
+      "abnormal_1d": -0.88,
+      "raw_3d": -5.81,
+      "bench_3d": 1.51,
+      "abnormal_3d": -7.32,
+      "raw_5d": -2.56,
+      "bench_5d": 1.4,
+      "abnormal_5d": -3.95,
+      "raw_10d": 6.83,
+      "bench_10d": 1.74,
+      "abnormal_10d": 5.09,
+      "raw_20d": 66.83,
+      "bench_20d": 5.73,
+      "abnormal_20d": 61.1,
+      "pre_prices": [
+        {
+          "date": "2023-05-09",
+          "close": 21.52
+        },
+        {
+          "date": "2023-05-10",
+          "close": 23.13
+        },
+        {
+          "date": "2023-05-11",
+          "close": 22.83
+        },
+        {
+          "date": "2023-05-12",
+          "close": 23.39
+        },
+        {
+          "date": "2023-05-15",
+          "close": 23.4
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2023-05-16",
+          "close": 22.35
+        },
+        {
+          "date": "2023-05-17",
+          "close": 21.51
+        },
+        {
+          "date": "2023-05-18",
+          "close": 21.38
+        },
+        {
+          "date": "2023-05-19",
+          "close": 21.33
+        },
+        {
+          "date": "2023-05-22",
+          "close": 22.12
+        },
+        {
+          "date": "2023-05-23",
+          "close": 21.54
+        },
+        {
+          "date": "2023-05-24",
+          "close": 21.51
+        },
+        {
+          "date": "2023-05-25",
+          "close": 21.56
+        },
+        {
+          "date": "2023-05-26",
+          "close": 23.31
+        },
+        {
+          "date": "2023-05-30",
+          "close": 24.25
+        },
+        {
+          "date": "2023-05-31",
+          "close": 24.19
+        },
+        {
+          "date": "2023-06-01",
+          "close": 24.74
+        },
+        {
+          "date": "2023-06-02",
+          "close": 25.21
+        },
+        {
+          "date": "2023-06-05",
+          "close": 25.1
+        },
+        {
+          "date": "2023-06-06",
+          "close": 24.77
+        },
+        {
+          "date": "2023-06-07",
+          "close": 23.97
+        },
+        {
+          "date": "2023-06-08",
+          "close": 23.95
+        },
+        {
+          "date": "2023-06-09",
+          "close": 23.99
+        },
+        {
+          "date": "2023-06-12",
+          "close": 37.98
+        },
+        {
+          "date": "2023-06-13",
+          "close": 37.87
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.239,
+        "spread_component": 0.1,
+        "impact_component": 0.139,
+        "volume_ratio": 4.68,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "ELF",
+      "benchmark": "SPY",
+      "event_date": "2024-11-20",
+      "event_timing": "unknown",
+      "pre_event_price": 121.4,
+      "entry_price_type": "open",
+      "avg_daily_volume": 3718527,
+      "event_day_volume": 11724100,
+      "volume_ratio": 3.15,
+      "raw_1d": -1.98,
+      "bench_1d": 0.03,
+      "abnormal_1d": -2.01,
+      "raw_3d": 4.14,
+      "bench_3d": 0.88,
+      "abnormal_3d": 3.25,
+      "raw_5d": 2.38,
+      "bench_5d": 1.75,
+      "abnormal_5d": 0.63,
+      "raw_10d": 12.36,
+      "bench_10d": 2.94,
+      "abnormal_10d": 9.42,
+      "raw_20d": 4.78,
+      "bench_20d": -0.68,
+      "abnormal_20d": 5.46,
+      "pre_prices": [
+        {
+          "date": "2024-11-13",
+          "close": 122.96
+        },
+        {
+          "date": "2024-11-14",
+          "close": 123.11
+        },
+        {
+          "date": "2024-11-15",
+          "close": 121.33
+        },
+        {
+          "date": "2024-11-18",
+          "close": 122.66
+        },
+        {
+          "date": "2024-11-19",
+          "close": 121.71
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2024-11-20",
+          "close": 119.0
+        },
+        {
+          "date": "2024-11-21",
+          "close": 122.47
+        },
+        {
+          "date": "2024-11-22",
+          "close": 126.42
+        },
+        {
+          "date": "2024-11-25",
+          "close": 129.93
+        },
+        {
+          "date": "2024-11-26",
+          "close": 124.29
+        },
+        {
+          "date": "2024-11-27",
+          "close": 127.15
+        },
+        {
+          "date": "2024-11-29",
+          "close": 129.52
+        },
+        {
+          "date": "2024-12-02",
+          "close": 130.71
+        },
+        {
+          "date": "2024-12-03",
+          "close": 127.41
+        },
+        {
+          "date": "2024-12-04",
+          "close": 136.4
+        },
+        {
+          "date": "2024-12-05",
+          "close": 131.23
+        },
+        {
+          "date": "2024-12-06",
+          "close": 139.6
+        },
+        {
+          "date": "2024-12-09",
+          "close": 140.46
+        },
+        {
+          "date": "2024-12-10",
+          "close": 137.6
+        },
+        {
+          "date": "2024-12-11",
+          "close": 138.47
+        },
+        {
+          "date": "2024-12-12",
+          "close": 131.51
+        },
+        {
+          "date": "2024-12-13",
+          "close": 140.63
+        },
+        {
+          "date": "2024-12-16",
+          "close": 140.27
+        },
+        {
+          "date": "2024-12-17",
+          "close": 134.89
+        },
+        {
+          "date": "2024-12-18",
+          "close": 127.2
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.269,
+        "spread_component": 0.1,
+        "impact_component": 0.169,
+        "volume_ratio": 3.15,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "FTAI",
+      "benchmark": "SPY",
+      "event_date": "2025-01-15",
+      "event_timing": "unknown",
+      "pre_event_price": 156.94,
+      "entry_price_type": "open",
+      "avg_daily_volume": 2169488,
+      "event_day_volume": 20029100,
+      "volume_ratio": 9.23,
+      "raw_1d": -26.88,
+      "bench_1d": 1.82,
+      "abnormal_1d": -28.7,
+      "raw_3d": -29.21,
+      "bench_3d": 2.64,
+      "abnormal_3d": -31.86,
+      "raw_5d": -42.05,
+      "bench_5d": 4.16,
+      "abnormal_5d": -46.22,
+      "raw_10d": -38.9,
+      "bench_10d": 3.37,
+      "abnormal_10d": -42.27,
+      "raw_20d": -27.74,
+      "bench_20d": 3.63,
+      "abnormal_20d": -31.38,
+      "pre_prices": [
+        {
+          "date": "2025-01-07",
+          "close": 158.08
+        },
+        {
+          "date": "2025-01-08",
+          "close": 166.85
+        },
+        {
+          "date": "2025-01-10",
+          "close": 172.03
+        },
+        {
+          "date": "2025-01-13",
+          "close": 162.68
+        },
+        {
+          "date": "2025-01-14",
+          "close": 151.53
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2025-01-15",
+          "close": 114.75
+        },
+        {
+          "date": "2025-01-16",
+          "close": 118.63
+        },
+        {
+          "date": "2025-01-17",
+          "close": 111.09
+        },
+        {
+          "date": "2025-01-21",
+          "close": 82.83
+        },
+        {
+          "date": "2025-01-22",
+          "close": 90.94
+        },
+        {
+          "date": "2025-01-23",
+          "close": 100.34
+        },
+        {
+          "date": "2025-01-24",
+          "close": 89.94
+        },
+        {
+          "date": "2025-01-27",
+          "close": 90.6
+        },
+        {
+          "date": "2025-01-28",
+          "close": 98.87
+        },
+        {
+          "date": "2025-01-29",
+          "close": 95.89
+        },
+        {
+          "date": "2025-01-30",
+          "close": 102.17
+        },
+        {
+          "date": "2025-01-31",
+          "close": 99.38
+        },
+        {
+          "date": "2025-02-03",
+          "close": 106.96
+        },
+        {
+          "date": "2025-02-04",
+          "close": 108.34
+        },
+        {
+          "date": "2025-02-05",
+          "close": 115.61
+        },
+        {
+          "date": "2025-02-06",
+          "close": 117.45
+        },
+        {
+          "date": "2025-02-07",
+          "close": 111.55
+        },
+        {
+          "date": "2025-02-10",
+          "close": 115.34
+        },
+        {
+          "date": "2025-02-11",
+          "close": 118.14
+        },
+        {
+          "date": "2025-02-12",
+          "close": 113.4
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.199,
+        "spread_component": 0.1,
+        "impact_component": 0.099,
+        "volume_ratio": 9.23,
+        "model_used": "volume_based"
+      }
+    },
+    {
+      "symbol": "APP",
+      "benchmark": "SPY",
+      "event_date": "2025-03-27",
+      "event_timing": "unknown",
+      "pre_event_price": 322.05,
+      "entry_price_type": "open",
+      "avg_daily_volume": 8871990,
+      "event_day_volume": 20188900,
+      "volume_ratio": 2.28,
+      "raw_1d": -18.74,
+      "bench_1d": -0.27,
+      "abnormal_1d": -18.47,
+      "raw_3d": -17.72,
+      "bench_3d": -1.62,
+      "abnormal_3d": -16.11,
+      "raw_5d": -9.83,
+      "bench_5d": -0.72,
+      "abnormal_5d": -9.11,
+      "raw_10d": -14.62,
+      "bench_10d": -3.51,
+      "abnormal_10d": -11.11,
+      "raw_20d": -16.82,
+      "bench_20d": -3.85,
+      "abnormal_20d": -12.97,
+      "pre_prices": [
+        {
+          "date": "2025-03-20",
+          "close": 306.74
+        },
+        {
+          "date": "2025-03-21",
+          "close": 314.03
+        },
+        {
+          "date": "2025-03-24",
+          "close": 339.72
+        },
+        {
+          "date": "2025-03-25",
+          "close": 346.29
+        },
+        {
+          "date": "2025-03-26",
+          "close": 327.62
+        }
+      ],
+      "post_prices": [
+        {
+          "date": "2025-03-27",
+          "close": 261.7
+        },
+        {
+          "date": "2025-03-28",
+          "close": 272.38
+        },
+        {
+          "date": "2025-03-31",
+          "close": 264.97
+        },
+        {
+          "date": "2025-04-01",
+          "close": 282.7
+        },
+        {
+          "date": "2025-04-02",
+          "close": 290.39
+        },
+        {
+          "date": "2025-04-03",
+          "close": 261.98
+        },
+        {
+          "date": "2025-04-04",
+          "close": 219.37
+        },
+        {
+          "date": "2025-04-07",
+          "close": 232.22
+        },
+        {
+          "date": "2025-04-08",
+          "close": 235.28
+        },
+        {
+          "date": "2025-04-09",
+          "close": 274.96
+        },
+        {
+          "date": "2025-04-10",
+          "close": 263.83
+        },
+        {
+          "date": "2025-04-11",
+          "close": 249.95
+        },
+        {
+          "date": "2025-04-14",
+          "close": 236.07
+        },
+        {
+          "date": "2025-04-15",
+          "close": 245.47
+        },
+        {
+          "date": "2025-04-16",
+          "close": 229.81
+        },
+        {
+          "date": "2025-04-17",
+          "close": 238.22
+        },
+        {
+          "date": "2025-04-21",
+          "close": 228.13
+        },
+        {
+          "date": "2025-04-22",
+          "close": 237.71
+        },
+        {
+          "date": "2025-04-23",
+          "close": 252.35
+        },
+        {
+          "date": "2025-04-24",
+          "close": 267.88
+        }
+      ],
+      "estimated_cost": {
+        "round_trip_pct": 0.299,
+        "spread_component": 0.1,
+        "impact_component": 0.199,
+        "volume_ratio": 2.28,
+        "model_used": "volume_based"
+      }
+    }
+  ],
+  "avg_raw_1d": -7.01,
+  "median_raw_1d": -1.94,
+  "positive_rate_raw_1d": 35.0,
+  "min_raw_1d": -49.57,
+  "max_raw_1d": 25.98,
+  "stdev_raw_1d": 16.71,
+  "avg_raw_3d": -7.26,
+  "median_raw_3d": -4.7,
+  "positive_rate_raw_3d": 30.0,
+  "min_raw_3d": -38.39,
+  "max_raw_3d": 20.56,
+  "stdev_raw_3d": 16.52,
+  "avg_raw_5d": -5.94,
+  "median_raw_5d": -5.58,
+  "positive_rate_raw_5d": 35.0,
+  "min_raw_5d": -42.05,
+  "max_raw_5d": 23.53,
+  "stdev_raw_5d": 17.02,
+  "avg_raw_10d": -2.5,
+  "median_raw_10d": -6.56,
+  "positive_rate_raw_10d": 40.0,
+  "min_raw_10d": -45.56,
+  "max_raw_10d": 65.27,
+  "stdev_raw_10d": 26.7,
+  "avg_raw_20d": -1.57,
+  "median_raw_20d": -10.0,
+  "positive_rate_raw_20d": 45.0,
+  "min_raw_20d": -50.52,
+  "max_raw_20d": 68.6,
+  "stdev_raw_20d": 32.33,
+  "avg_abnormal_1d": -7.19,
+  "median_abnormal_1d": -1.39,
+  "positive_rate_abnormal_1d": 30.0,
+  "min_abnormal_1d": -48.8,
+  "max_abnormal_1d": 24.97,
+  "stdev_abnormal_1d": 16.36,
+  "avg_abnormal_3d": -7.29,
+  "median_abnormal_3d": -4.94,
+  "positive_rate_abnormal_3d": 30.0,
+  "min_abnormal_3d": -37.77,
+  "max_abnormal_3d": 18.07,
+  "stdev_abnormal_3d": 15.98,
+  "avg_abnormal_5d": -6.62,
+  "median_abnormal_5d": -4.99,
+  "positive_rate_abnormal_5d": 30.0,
+  "min_abnormal_5d": -46.22,
+  "max_abnormal_5d": 21.61,
+  "stdev_abnormal_5d": 16.85,
+  "avg_abnormal_10d": -3.77,
+  "median_abnormal_10d": -6.44,
+  "positive_rate_abnormal_10d": 40.0,
+  "min_abnormal_10d": -42.27,
+  "max_abnormal_10d": 61.36,
+  "stdev_abnormal_10d": 25.44,
+  "avg_abnormal_20d": -3.53,
+  "median_abnormal_20d": -12.75,
+  "positive_rate_abnormal_20d": 40.0,
+  "min_abnormal_20d": -51.64,
+  "max_abnormal_20d": 64.11,
+  "stdev_abnormal_20d": 30.71,
+  "avg_estimated_cost_pct": 0.25,
+  "cost_model_breakdown": {
+    "volume_based": 20,
+    "event_type_default": 0
+  },
+  "entry_price_mode": "open",
+  "t_stat_abnormal_1d": -1.964,
+  "p_value_abnormal_1d": 0.0643,
+  "significant_abnormal_1d": "False",
+  "skewness_abnormal_1d": -0.6,
+  "wilcoxon_p_abnormal_1d": 0.114,
+  "t_stat_abnormal_3d": -2.04,
+  "p_value_abnormal_3d": 0.0555,
+  "significant_abnormal_3d": "False",
+  "skewness_abnormal_3d": -0.37,
+  "wilcoxon_p_abnormal_3d": 0.0696,
+  "t_stat_abnormal_5d": -1.757,
+  "p_value_abnormal_5d": 0.095,
+  "significant_abnormal_5d": "False",
+  "skewness_abnormal_5d": -0.53,
+  "wilcoxon_p_abnormal_5d": 0.0973,
+  "t_stat_abnormal_10d": -0.663,
+  "p_value_abnormal_10d": 0.5153,
+  "significant_abnormal_10d": "False",
+  "skewness_abnormal_10d": 0.7,
+  "wilcoxon_p_abnormal_10d": 0.33,
+  "t_stat_abnormal_20d": -0.514,
+  "p_value_abnormal_20d": 0.6132,
+  "significant_abnormal_20d": "False",
+  "skewness_abnormal_20d": 0.77,
+  "wilcoxon_p_abnormal_20d": 0.3488,
+  "bootstrap_ci_abnormal_1d": {
+    "point_estimate": -7.186,
+    "ci_lower": -14.4405,
+    "ci_upper": -0.4749,
+    "ci_level": 95,
+    "ci_excludes_zero": true,
+    "n_bootstrap": 10000
+  },
+  "bootstrap_ci_abnormal_3d": {
+    "point_estimate": -7.287,
+    "ci_lower": -14.2185,
+    "ci_upper": -0.5125,
+    "ci_level": 95,
+    "ci_excludes_zero": true,
+    "n_bootstrap": 10000
+  },
+  "bootstrap_ci_abnormal_5d": {
+    "point_estimate": -6.619,
+    "ci_lower": -13.9477,
+    "ci_upper": 0.5015,
+    "ci_level": 95,
+    "ci_excludes_zero": false,
+    "n_bootstrap": 10000
+  },
+  "bootstrap_ci_abnormal_10d": {
+    "point_estimate": -3.7715,
+    "ci_lower": -14.092,
+    "ci_upper": 7.3087,
+    "ci_level": 95,
+    "ci_excludes_zero": false,
+    "n_bootstrap": 10000
+  },
+  "bootstrap_ci_abnormal_20d": {
+    "point_estimate": -3.5295,
+    "ci_lower": -16.1268,
+    "ci_upper": 10.1505,
+    "ci_level": 95,
+    "ci_excludes_zero": false,
+    "n_bootstrap": 10000
+  },
+  "significant_horizons": [],
+  "num_significant_horizons": 0,
+  "passes_multiple_testing": false,
+  "multiple_testing_note": "No horizons reached significance at p<0.05.",
+  "recommended_n_abnormal_1d": 41,
+  "sample_sufficient_abnormal_1d": false,
+  "recommended_n_abnormal_3d": 38,
+  "sample_sufficient_abnormal_3d": false,
+  "recommended_n_abnormal_5d": 51,
+  "sample_sufficient_abnormal_5d": false,
+  "recommended_n_abnormal_10d": 358,
+  "sample_sufficient_abnormal_10d": false,
+  "recommended_n_abnormal_20d": 595,
+  "sample_sufficient_abnormal_20d": false
+}
