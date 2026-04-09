@@ -286,7 +286,6 @@ def check_stop_losses():
                 abnormal_ret = raw_ret
                 try:
                     from tools.yfinance_utils import safe_download
-                    # datetime and timedelta imported at module level
                     spy_at_entry = trade.get("spy_at_entry")
                     if spy_at_entry:
                         _end = datetime.now().strftime('%Y-%m-%d')
@@ -296,8 +295,8 @@ def check_stop_losses():
                             spy_now = float(spy_data["Close"].iloc[-1])
                             spy_ret = round((spy_now / spy_at_entry - 1) * 100, 2)
                             abnormal_ret = round(raw_ret - spy_ret, 2)
-                except Exception:
-                    pass
+                except Exception as e:
+                    print(f"[TRADE LOOP] WARNING: SPY fetch failed for {symbol}: {e}. Using raw return as abnormal.")
 
                 if direction == "long":
                     dir_correct = abnormal_ret > 0
