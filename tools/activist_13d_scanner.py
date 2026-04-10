@@ -4,9 +4,12 @@
 Monitors EDGAR for new SC 13D filings by known top-tier activist investors.
 When a new initial filing is detected, outputs a GO/NO-GO recommendation.
 
-Signal: Starboard Value 13D filing -> +4.1% avg abnormal at 3d (IS N=21, p=0.048, 71% pos)
-        OOS 2024 (N=3): +5.14% avg, 100% positive
-        All activists: +3.36% avg at 3d (IS N=36, p=0.034)
+Signal: Starboard Value 13D filing -> ~+4.0% avg abnormal at 3d
+        VALIDATED MULTI-PERIOD (N=32 total):
+          Pre-discovery 2020-2021 (N=8): +3.88% avg, 87.5% pos, p=0.037 (Wilcoxon 0.016)
+          In-sample 2022-2023 (N=21): +4.1% avg, 71.4% pos, p=0.048
+          OOS 2024 (N=3): +5.14% avg, 100% positive
+        All activists: +3.36% avg at 3d (IS N=36, p=0.034) — driven by Starboard
 
 Usage:
     python tools/activist_13d_scanner.py                # scan last 7 days
