@@ -1998,8 +1998,8 @@ def verify_data_integrity():
 
         # Check session_handoff hypothesis_ids
         handoff = rq.get("session_handoff", {})
-        if isinstance(handoff, str):
-            handoff = {}  # string handoffs have no structured hypothesis_ids to check
+        if isinstance(handoff, (str, list)):
+            handoff = {}  # string/list handoffs have no structured hypothesis_ids to check
         for key, hid in handoff.get("hypothesis_ids", {}).items():
             if hid not in hyp_ids:
                 issues.append(
