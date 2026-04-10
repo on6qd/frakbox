@@ -1,0 +1,157 @@
+{
+  "full": {
+    "label": "FULL 2021-2025",
+    "n": 248,
+    "1d": {
+      "avg": 0.38,
+      "pos_rate": 53.2,
+      "p": 0.1139
+    },
+    "3d": {
+      "avg": 0.33,
+      "pos_rate": 51.6,
+      "p": 0.2674
+    },
+    "5d": {
+      "avg": 0.11,
+      "pos_rate": 49.6,
+      "p": 0.8836
+    },
+    "10d": {
+      "avg": 0.54,
+      "pos_rate": 54.4,
+      "p": 0.2418
+    },
+    "20d": {
+      "avg": 0.26,
+      "pos_rate": 47.3,
+      "p": 0.9815
+    },
+    "passes_mt": false,
+    "sample_sufficient": false
+  },
+  "is": {
+    "label": "IS 2021-2023",
+    "n": 248,
+    "1d": {
+      "avg": 0.38,
+      "pos_rate": 53.2,
+      "p": 0.1139
+    },
+    "3d": {
+      "avg": 0.33,
+      "pos_rate": 51.6,
+      "p": 0.2674
+    },
+    "5d": {
+      "avg": 0.11,
+      "pos_rate": 49.6,
+      "p": 0.8836
+    },
+    "10d": {
+      "avg": 0.54,
+      "pos_rate": 54.4,
+      "p": 0.242
+    },
+    "20d": {
+      "avg": 0.26,
+      "pos_rate": 47.3,
+      "p": 0.9815
+    },
+    "passes_mt": false,
+    "sample_sufficient": false
+  },
+  "oos": {
+    "label": "OOS 2024-2025",
+    "n": 250,
+    "1d": {
+      "avg": 0.08,
+      "pos_rate": 49.6,
+      "p": 0.9481
+    },
+    "3d": {
+      "avg": -0.07,
+      "pos_rate": 51.6,
+      "p": 0.9408
+    },
+    "5d": {
+      "avg": -0.39,
+      "pos_rate": 46.0,
+      "p": 0.2566
+    },
+    "10d": {
+      "avg": -0.66,
+      "pos_rate": 42.4,
+      "p": 0.0879
+    },
+    "20d": {
+      "avg": -0.88,
+      "pos_rate": 41.7,
+      "p": 0.0474
+    },
+    "passes_mt": false,
+    "sample_sufficient": false
+  },
+  "mega_cap": {
+    "label": "MEGA-CAP >$10B",
+    "n": 250,
+    "1d": {
+      "avg": 0.15,
+      "pos_rate": 52.0,
+      "p": 0.2837
+    },
+    "3d": {
+      "avg": 0.48,
+      "pos_rate": 55.6,
+      "p": 0.0514
+    },
+    "5d": {
+      "avg": 0.27,
+      "pos_rate": 50.4,
+      "p": 0.5259
+    },
+    "10d": {
+      "avg": 0.73,
+      "pos_rate": 50.4,
+      "p": 0.2294
+    },
+    "20d": {
+      "avg": 1.15,
+      "pos_rate": 50.2,
+      "p": 0.2374
+    },
+    "passes_mt": false,
+    "sample_sufficient": false
+  },
+  "mid_cap": {
+    "label": "MID-CAP $1-10B",
+    "n": 248,
+    "1d": {
+      "avg": 0.32,
+      "pos_rate": 52.8,
+      "p": 0.4068
+    },
+    "3d": {
+      "avg": 0.07,
+      "pos_rate": 50.0,
+      "p": 0.9179
+    },
+    "5d": {
+      "avg": -0.02,
+      "pos_rate": 48.8,
+      "p": 0.825
+    },
+    "10d": {
+      "avg": -0.34,
+      "pos_rate": 48.8,
+      "p": 0.3305
+    },
+    "20d": {
+      "avg": -0.79,
+      "pos_rate": 46.0,
+      "p": 0.1497
+    },
+    "passes_mt": false,
+    "sample_sufficient": false
+  }
+}
