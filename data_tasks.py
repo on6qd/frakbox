@@ -544,8 +544,11 @@ def cmd_fetch_series(args):
             "last": round(float(s.iloc[-1]), 4),
         }
 
+    # df.to_dict() produces Timestamp keys which json.dumps rejects. Convert index to strings first.
+    df_serializable = df.copy()
+    df_serializable.index = df_serializable.index.astype(str)
     result_id = _store_result("fetch_series", {"identifiers": identifiers, "start": args.start, "end": args.end},
-                               df.to_dict(), json.dumps(summary, default=str))
+                               df_serializable.to_dict(), json.dumps(summary, default=str))
     summary["result_id"] = result_id
     print(json.dumps(summary, indent=2, default=str))
 
