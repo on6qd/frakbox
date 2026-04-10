@@ -175,10 +175,21 @@ def evaluate_candidates(deals: list[dict]) -> list[dict]:
             mc = info.get("marketCap", 0) or 0
             avg_vol = info.get("averageVolume", 0) or 0
             price = info.get("currentPrice") or info.get("regularMarketPrice", 0) or 0
+            sector = (info.get("sector") or "").lower()
+            industry = (info.get("industry") or "").lower()
 
             d["market_cap"] = mc
             d["avg_volume"] = avg_vol
             d["price"] = price
+            d["sector"] = sector
+            d["industry"] = industry
+            # Biotech/healthcare flag — see seo_biotech_vs_nonbiotech_split_2026_04_11.
+            # Biotech SEO 5d neg_rate 53.6% p=0.42 (weak) vs non-biotech 64.5% p=0.020.
+            # Not yet a hard exclusion (biotech N=28 underpowered). Flagged for tracking.
+            is_biotech = sector == "healthcare" and any(
+                k in industry for k in ["biotech", "drug", "pharma", "medical"]
+            )
+            d["is_biotech"] = is_biotech
 
             if mc < MIN_MARKET_CAP:
                 d["decision"] = f"SKIP_SMALL_CAP (${mc/1e6:.0f}M)"
@@ -187,7 +198,7 @@ def evaluate_candidates(deals: list[dict]) -> list[dict]:
             elif price < 5:
                 d["decision"] = f"SKIP_PENNY_STOCK (${price:.2f})"
             else:
-                d["decision"] = "GO"
+                d["decision"] = "GO_BIOTECH_WEAKER" if is_biotech else "GO"
                 d["position_size"] = 5000
                 d["shares_to_short"] = int(5000 / price) if price > 0 else 0
         except Exception as e:
@@ -230,11 +241,14 @@ if __name__ == "__main__":
         decision = d.get("decision", "UNEVAL")
         mc_str = f"${d.get('market_cap', 0)/1e6:.0f}M" if d.get("market_cap") else "N/A"
         ticker = d.get("ticker", "N/A")
-        print(f"  {decision:30s} | {(ticker or 'N/A'):8s} | {mc_str:>10s} | {d.get('display_name', '')[:40]}")
+        bio_tag = " [BIOTECH]" if d.get("is_biotech") else ""
+        print(f"  {decision:30s} | {(ticker or 'N/A'):8s} | {mc_str:>10s} | {d.get('display_name', '')[:40]}{bio_tag}")
         print(f"    424B4: {d['filing_date_424b4']}  8-K: {d['filing_date_8k']}  gap: {d['gap_days']}d")
-        if decision == "GO":
+        if decision.startswith("GO"):
             go_count += 1
             print(f"    -> SHORT {d['shares_to_short']} shares @ ~${d.get('price', 0):.2f}")
+            if d.get("is_biotech"):
+                print(f"    ⚠ Biotech SEO signal is weaker (N=28 5d p=0.42 vs non-biotech p=0.020). Track separately.")
 
     # JSON output for automation
     output = {

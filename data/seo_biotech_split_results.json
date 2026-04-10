@@ -1,0 +1,80 @@
+{
+  "biotech": {
+    "n_attempted": 29,
+    "stats": {
+      "label": "BIOTECH",
+      "n": 28,
+      "1d": {
+        "n": 28,
+        "mean": 0.7,
+        "median": 1.16,
+        "neg_rate": 39.3,
+        "wilcoxon_p": 0.1023,
+        "t_p": 0.5258
+      },
+      "3d": {
+        "n": 28,
+        "mean": -1.19,
+        "median": 0.92,
+        "neg_rate": 46.4,
+        "wilcoxon_p": 0.7621,
+        "t_p": 0.4177
+      },
+      "5d": {
+        "n": 28,
+        "mean": -1.8,
+        "median": -0.34,
+        "neg_rate": 53.6,
+        "wilcoxon_p": 0.4248,
+        "t_p": 0.2892
+      },
+      "10d": {
+        "n": 28,
+        "mean": -1.53,
+        "median": -1.78,
+        "neg_rate": 57.1,
+        "wilcoxon_p": 0.3386,
+        "t_p": 0.5943
+      }
+    }
+  },
+  "non_biotech": {
+    "n_attempted": 83,
+    "stats": {
+      "label": "NON-BIOTECH",
+      "n": 76,
+      "1d": {
+        "n": 76,
+        "mean": -0.84,
+        "median": -0.6,
+        "neg_rate": 57.9,
+        "wilcoxon_p": 0.2504,
+        "t_p": 0.1301
+      },
+      "3d": {
+        "n": 76,
+        "mean": -2.49,
+        "median": -0.5,
+        "neg_rate": 56.6,
+        "wilcoxon_p": 0.1002,
+        "t_p": 0.0587
+      },
+      "5d": {
+        "n": 76,
+        "mean": 11.09,
+        "median": -1.72,
+        "neg_rate": 64.5,
+        "wilcoxon_p": 0.0202,
+        "t_p": 0.4409
+      },
+      "10d": {
+        "n": 76,
+        "mean": 16.61,
+        "median": -2.5,
+        "neg_rate": 59.2,
+        "wilcoxon_p": 0.0516,
+        "t_p": 0.4219
+      }
+    }
+  }
+}
