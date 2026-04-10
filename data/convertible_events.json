@@ -1,0 +1,1157 @@
+[
+  {
+    "ticker": "NEO",
+    "file_date": "2021-01-11",
+    "entity_name": "",
+    "cik": "1077183-21-000050",
+    "market_cap": 1033342016
+  },
+  {
+    "ticker": "CLOV",
+    "file_date": "2021-01-12",
+    "entity_name": "",
+    "cik": "1193125-21-007348",
+    "market_cap": 1002114496
+  },
+  {
+    "ticker": "BBIO",
+    "file_date": "2021-01-26",
+    "entity_name": "",
+    "cik": "1193125-21-017810",
+    "market_cap": 14640523264
+  },
+  {
+    "ticker": "BSY",
+    "file_date": "2021-01-26",
+    "entity_name": "",
+    "cik": "1104659-21-007707",
+    "market_cap": 10153984000
+  },
+  {
+    "ticker": "PTON",
+    "file_date": "2021-02-09",
+    "entity_name": "",
+    "cik": "1628280-21-001650",
+    "market_cap": 2016818176
+  },
+  {
+    "ticker": "EXPE",
+    "file_date": "2021-02-16",
+    "entity_name": "",
+    "cik": "1104659-21-022876",
+    "market_cap": 28214878208
+  },
+  {
+    "ticker": "HALO",
+    "file_date": "2021-02-23",
+    "entity_name": "",
+    "cik": "1193125-21-052372",
+    "market_cap": 7947256320
+  },
+  {
+    "ticker": "GPRE",
+    "file_date": "2021-02-24",
+    "entity_name": "",
+    "cik": "1309402-21-000029",
+    "market_cap": 1062248896
+  },
+  {
+    "ticker": "DBX",
+    "file_date": "2021-02-26",
+    "entity_name": "",
+    "cik": "1193125-21-061031",
+    "market_cap": 5304934912
+  },
+  {
+    "ticker": "ENPH",
+    "file_date": "2021-03-01",
+    "entity_name": "",
+    "cik": "1104659-21-030148",
+    "market_cap": 4119566080
+  },
+  {
+    "ticker": "HALO",
+    "file_date": "2021-03-01",
+    "entity_name": "",
+    "cik": "1193125-21-063401",
+    "market_cap": 7947256320
+  },
+  {
+    "ticker": "GPRE",
+    "file_date": "2021-03-01",
+    "entity_name": "",
+    "cik": "1309402-21-000034",
+    "market_cap": 1062248896
+  },
+  {
+    "ticker": "CHEF",
+    "file_date": "2021-03-01",
+    "entity_name": "",
+    "cik": "947871-21-000276",
+    "market_cap": 2633826816
+  },
+  {
+    "ticker": "TYL",
+    "file_date": "2021-03-03",
+    "entity_name": "",
+    "cik": "860731-21-000016",
+    "market_cap": 13913494528
+  },
+  {
+    "ticker": "ITRI",
+    "file_date": "2021-03-12",
+    "entity_name": "",
+    "cik": "1193125-21-079864",
+    "market_cap": 4214813184
+  },
+  {
+    "ticker": "CENX",
+    "file_date": "2021-04-05",
+    "entity_name": "",
+    "cik": "949157-21-000058",
+    "market_cap": 6562969088
+  },
+  {
+    "ticker": "VRNT",
+    "file_date": "2021-04-07",
+    "entity_name": "",
+    "cik": "1193125-21-108115",
+    "market_cap": 1242795392
+  },
+  {
+    "ticker": "IONS",
+    "file_date": "2021-04-13",
+    "entity_name": "",
+    "cik": "1193125-21-113586",
+    "market_cap": 12625626112
+  },
+  {
+    "ticker": "GBX",
+    "file_date": "2021-04-16",
+    "entity_name": "",
+    "cik": "1193125-21-119527",
+    "market_cap": 1659546112
+  },
+  {
+    "ticker": "LCII",
+    "file_date": "2021-05-10",
+    "entity_name": "",
+    "cik": "1193125-21-155586",
+    "market_cap": 3078542848
+  },
+  {
+    "ticker": "ON",
+    "file_date": "2021-05-10",
+    "entity_name": "",
+    "cik": "1193125-21-156224",
+    "market_cap": 26986465280
+  },
+  {
+    "ticker": "INSM",
+    "file_date": "2021-05-13",
+    "entity_name": "",
+    "cik": "1140361-21-017155",
+    "market_cap": 34447843328
+  },
+  {
+    "ticker": "WT",
+    "file_date": "2021-06-09",
+    "entity_name": "",
+    "cik": "1193125-21-186720",
+    "market_cap": 2244624896
+  },
+  {
+    "ticker": "NET",
+    "file_date": "2021-08-13",
+    "entity_name": "",
+    "cik": "1193125-21-246066",
+    "market_cap": 67949797376
+  },
+  {
+    "ticker": "PI",
+    "file_date": "2021-11-05",
+    "entity_name": "",
+    "cik": "1193125-21-321745",
+    "market_cap": 3188536064
+  },
+  {
+    "ticker": "AFRM",
+    "file_date": "2021-11-18",
+    "entity_name": "",
+    "cik": "1104659-21-140874",
+    "market_cap": 16325752832
+  },
+  {
+    "ticker": "PATK",
+    "file_date": "2021-12-08",
+    "entity_name": "",
+    "cik": "76605-21-000202",
+    "market_cap": 3941304832
+  },
+  {
+    "ticker": "INVA",
+    "file_date": "2022-03-08",
+    "entity_name": "",
+    "cik": "1104659-22-031613",
+    "market_cap": 1806191232
+  },
+  {
+    "ticker": "LITE",
+    "file_date": "2022-03-08",
+    "entity_name": "",
+    "cik": "1193125-22-069350",
+    "market_cap": 63840882688
+  },
+  {
+    "ticker": "TVTX",
+    "file_date": "2022-03-11",
+    "entity_name": "",
+    "cik": "1193125-22-073387",
+    "market_cap": 2904106752
+  },
+  {
+    "ticker": "IDCC",
+    "file_date": "2022-05-27",
+    "entity_name": "",
+    "cik": "1193125-22-162442",
+    "market_cap": 8999780352
+  },
+  {
+    "ticker": "CNMD",
+    "file_date": "2022-05-31",
+    "entity_name": "",
+    "cik": "1193125-22-163991",
+    "market_cap": 1138682496
+  },
+  {
+    "ticker": "CNMD",
+    "file_date": "2022-06-02",
+    "entity_name": "",
+    "cik": "1193125-22-165792",
+    "market_cap": 1138682496
+  },
+  {
+    "ticker": "ORA",
+    "file_date": "2022-06-27",
+    "entity_name": "",
+    "cik": "1213900-22-035192",
+    "market_cap": 6993716736
+  },
+  {
+    "ticker": "CYTK",
+    "file_date": "2022-07-06",
+    "entity_name": "",
+    "cik": "1193125-22-188626",
+    "market_cap": 7955085312
+  },
+  {
+    "ticker": "RCL",
+    "file_date": "2022-08-02",
+    "entity_name": "",
+    "cik": "1104659-22-085178",
+    "market_cap": 75238785024
+  },
+  {
+    "ticker": "HALO",
+    "file_date": "2022-08-15",
+    "entity_name": "",
+    "cik": "1193125-22-220557",
+    "market_cap": 7947256320
+  },
+  {
+    "ticker": "SMTC",
+    "file_date": "2022-10-06",
+    "entity_name": "",
+    "cik": "950103-22-017445",
+    "market_cap": 8241051136
+  },
+  {
+    "ticker": "CCL",
+    "file_date": "2022-11-18",
+    "entity_name": "",
+    "cik": "950142-22-003212",
+    "market_cap": 38576136192
+  },
+  {
+    "ticker": "AXON",
+    "file_date": "2022-12-05",
+    "entity_name": "",
+    "cik": "1069183-22-000062",
+    "market_cap": 28246112256
+  },
+  {
+    "ticker": "HLF",
+    "file_date": "2022-12-05",
+    "entity_name": "",
+    "cik": "1193125-22-298436",
+    "market_cap": 1568727808
+  },
+  {
+    "ticker": "UNIT",
+    "file_date": "2022-12-06",
+    "entity_name": "",
+    "cik": "950103-22-020816",
+    "market_cap": 2550911232
+  },
+  {
+    "ticker": "CHEF",
+    "file_date": "2022-12-07",
+    "entity_name": "",
+    "cik": "1193125-22-300170",
+    "market_cap": 2633826816
+  },
+  {
+    "ticker": "NVAX",
+    "file_date": "2022-12-19",
+    "entity_name": "",
+    "cik": "1104659-22-128263",
+    "market_cap": 1391473024
+  },
+  {
+    "ticker": "LYV",
+    "file_date": "2023-01-13",
+    "entity_name": "",
+    "cik": "1335258-23-000006",
+    "market_cap": 38427684864
+  },
+  {
+    "ticker": "WT",
+    "file_date": "2023-02-09",
+    "entity_name": "",
+    "cik": "1193125-23-030052",
+    "market_cap": 2244624896
+  },
+  {
+    "ticker": "COLL",
+    "file_date": "2023-02-13",
+    "entity_name": "",
+    "cik": "1104659-23-019671",
+    "market_cap": 1142345600
+  },
+  {
+    "ticker": "ON",
+    "file_date": "2023-02-23",
+    "entity_name": "",
+    "cik": "1193125-23-045012",
+    "market_cap": 26986465280
+  },
+  {
+    "ticker": "ON",
+    "file_date": "2023-03-02",
+    "entity_name": "",
+    "cik": "1193125-23-056593",
+    "market_cap": 26986465280
+  },
+  {
+    "ticker": "LNT",
+    "file_date": "2023-03-03",
+    "entity_name": "",
+    "cik": "352541-23-000028",
+    "market_cap": 19040143360
+  },
+  {
+    "ticker": "ECPG",
+    "file_date": "2023-03-03",
+    "entity_name": "",
+    "cik": "1084961-23-000019",
+    "market_cap": 1703108736
+  },
+  {
+    "ticker": "FE",
+    "file_date": "2023-05-01",
+    "entity_name": "",
+    "cik": "1031296-23-000035",
+    "market_cap": 30024673280
+  },
+  {
+    "ticker": "DXCM",
+    "file_date": "2023-05-03",
+    "entity_name": "",
+    "cik": "1193125-23-133137",
+    "market_cap": 25616267264
+  },
+  {
+    "ticker": "GVA",
+    "file_date": "2023-05-09",
+    "entity_name": "",
+    "cik": "1437749-23-013308",
+    "market_cap": 5574080512
+  },
+  {
+    "ticker": "VECO",
+    "file_date": "2023-05-16",
+    "entity_name": "",
+    "cik": "1104659-23-061409",
+    "market_cap": 2352874496
+  },
+  {
+    "ticker": "BFH",
+    "file_date": "2023-06-08",
+    "entity_name": "",
+    "cik": "1101215-23-000107",
+    "market_cap": 3438430464
+  },
+  {
+    "ticker": "IONS",
+    "file_date": "2023-06-12",
+    "entity_name": "",
+    "cik": "1193125-23-165273",
+    "market_cap": 12625626112
+  },
+  {
+    "ticker": "LITE",
+    "file_date": "2023-06-16",
+    "entity_name": "",
+    "cik": "1193125-23-168966",
+    "market_cap": 63840882688
+  },
+  {
+    "ticker": "WKC",
+    "file_date": "2023-06-21",
+    "entity_name": "",
+    "cik": "1157523-23-001013",
+    "market_cap": 1328410368
+  },
+  {
+    "ticker": "CNP",
+    "file_date": "2023-08-04",
+    "entity_name": "",
+    "cik": "1193125-23-203904",
+    "market_cap": 28868225024
+  },
+  {
+    "ticker": "AKAM",
+    "file_date": "2023-08-14",
+    "entity_name": "",
+    "cik": "1193125-23-212343",
+    "market_cap": 16137117696
+  },
+  {
+    "ticker": "VSH",
+    "file_date": "2023-09-06",
+    "entity_name": "",
+    "cik": "103730-23-000073",
+    "market_cap": 2903124480
+  },
+  {
+    "ticker": "CSGS",
+    "file_date": "2023-09-07",
+    "entity_name": "",
+    "cik": "950170-23-046873",
+    "market_cap": 2283636992
+  },
+  {
+    "ticker": "AEIS",
+    "file_date": "2023-09-08",
+    "entity_name": "",
+    "cik": "1558370-23-015575",
+    "market_cap": 14259594240
+  },
+  {
+    "ticker": "BURL",
+    "file_date": "2023-09-18",
+    "entity_name": "",
+    "cik": "1193125-23-236947",
+    "market_cap": 21261764608
+  },
+  {
+    "ticker": "WDC",
+    "file_date": "2023-10-30",
+    "entity_name": "",
+    "cik": "1193125-23-266188",
+    "market_cap": 115520937984
+  },
+  {
+    "ticker": "WDC",
+    "file_date": "2023-11-01",
+    "entity_name": "",
+    "cik": "1193125-23-267654",
+    "market_cap": 115520937984
+  },
+  {
+    "ticker": "MMSI",
+    "file_date": "2023-12-04",
+    "entity_name": "",
+    "cik": "856982-23-000060",
+    "market_cap": 4094855424
+  },
+  {
+    "ticker": "BB",
+    "file_date": "2024-01-23",
+    "entity_name": "",
+    "cik": "1104659-24-005920",
+    "market_cap": 2254363392
+  },
+  {
+    "ticker": "GPN",
+    "file_date": "2024-02-20",
+    "entity_name": "",
+    "cik": "1104659-24-025199",
+    "market_cap": 18439897088
+  },
+  {
+    "ticker": "LYFT",
+    "file_date": "2024-02-21",
+    "entity_name": "",
+    "cik": "1759509-24-000033",
+    "market_cap": 5279452160
+  },
+  {
+    "ticker": "SMCI",
+    "file_date": "2024-02-22",
+    "entity_name": "",
+    "cik": "1375365-24-000015",
+    "market_cap": 13943189504
+  },
+  {
+    "ticker": "RUN",
+    "file_date": "2024-02-27",
+    "entity_name": "",
+    "cik": "1193125-24-047912",
+    "market_cap": 3125783552
+  },
+  {
+    "ticker": "KOS",
+    "file_date": "2024-03-04",
+    "entity_name": "",
+    "cik": "950103-24-003367",
+    "market_cap": 1512532224
+  },
+  {
+    "ticker": "LIVN",
+    "file_date": "2024-03-04",
+    "entity_name": "",
+    "cik": "1639691-24-000027",
+    "market_cap": 3465697280
+  },
+  {
+    "ticker": "SOFI",
+    "file_date": "2024-03-05",
+    "entity_name": "",
+    "cik": "1818874-24-000034",
+    "market_cap": 20748544000
+  },
+  {
+    "ticker": "IRTC",
+    "file_date": "2024-03-05",
+    "entity_name": "",
+    "cik": "1193125-24-058503",
+    "market_cap": 3818548480
+  },
+  {
+    "ticker": "MP",
+    "file_date": "2024-03-08",
+    "entity_name": "",
+    "cik": "1193125-24-062495",
+    "market_cap": 9576275968
+  },
+  {
+    "ticker": "TNDM",
+    "file_date": "2024-03-11",
+    "entity_name": "",
+    "cik": "1438133-24-000042",
+    "market_cap": 1348163328
+  },
+  {
+    "ticker": "MKSI",
+    "file_date": "2024-05-14",
+    "entity_name": "",
+    "cik": "1193125-24-137689",
+    "market_cap": 17722435584
+  },
+  {
+    "ticker": "PCRX",
+    "file_date": "2024-05-14",
+    "entity_name": "",
+    "cik": "1104659-24-061135",
+    "market_cap": 1024766784
+  },
+  {
+    "ticker": "WEC",
+    "file_date": "2024-05-22",
+    "entity_name": "",
+    "cik": "1104659-24-064070",
+    "market_cap": 38686601216
+  },
+  {
+    "ticker": "BL",
+    "file_date": "2024-05-24",
+    "entity_name": "",
+    "cik": "1193125-24-147012",
+    "market_cap": 1908353408
+  },
+  {
+    "ticker": "BE",
+    "file_date": "2024-05-29",
+    "entity_name": "",
+    "cik": "1628280-24-025635",
+    "market_cap": 45509066752
+  },
+  {
+    "ticker": "MCHP",
+    "file_date": "2024-05-31",
+    "entity_name": "",
+    "cik": "1193125-24-151726",
+    "market_cap": 38539669504
+  },
+  {
+    "ticker": "TXNM",
+    "file_date": "2024-06-03",
+    "entity_name": "",
+    "cik": "1108426-24-000052",
+    "market_cap": 6432895488
+  },
+  {
+    "ticker": "GVA",
+    "file_date": "2024-06-07",
+    "entity_name": "",
+    "cik": "1437749-24-019673",
+    "market_cap": 5574080512
+  },
+  {
+    "ticker": "ITRI",
+    "file_date": "2024-06-21",
+    "entity_name": "",
+    "cik": "1193125-24-165689",
+    "market_cap": 4214813184
+  },
+  {
+    "ticker": "WT",
+    "file_date": "2024-08-08",
+    "entity_name": "",
+    "cik": "1214659-24-014126",
+    "market_cap": 2244624896
+  },
+  {
+    "ticker": "MARA",
+    "file_date": "2024-08-13",
+    "entity_name": "",
+    "cik": "1493152-24-031450",
+    "market_cap": 3676868864
+  },
+  {
+    "ticker": "VRNS",
+    "file_date": "2024-09-10",
+    "entity_name": "",
+    "cik": "1213900-24-077377",
+    "market_cap": 2538329088
+  },
+  {
+    "ticker": "HPE",
+    "file_date": "2024-09-13",
+    "entity_name": "",
+    "cik": "1140361-24-041069",
+    "market_cap": 32994314240
+  },
+  {
+    "ticker": "UPST",
+    "file_date": "2024-09-19",
+    "entity_name": "",
+    "cik": "1193125-24-222101",
+    "market_cap": 2687859712
+  },
+  {
+    "ticker": "BOX",
+    "file_date": "2024-09-20",
+    "entity_name": "",
+    "cik": "1193125-24-222896",
+    "market_cap": 3214032384
+  },
+  {
+    "ticker": "GWRE",
+    "file_date": "2024-10-18",
+    "entity_name": "",
+    "cik": "1193125-24-239688",
+    "market_cap": 10567883776
+  },
+  {
+    "ticker": "WULF",
+    "file_date": "2024-10-23",
+    "entity_name": "",
+    "cik": "950142-24-002623",
+    "market_cap": 8070016512
+  },
+  {
+    "ticker": "APLD",
+    "file_date": "2024-10-30",
+    "entity_name": "",
+    "cik": "1493152-24-043070",
+    "market_cap": 7307126784
+  },
+  {
+    "ticker": "APLD",
+    "file_date": "2024-11-05",
+    "entity_name": "",
+    "cik": "1493152-24-043604",
+    "market_cap": 7307126784
+  },
+  {
+    "ticker": "UPST",
+    "file_date": "2024-11-15",
+    "entity_name": "",
+    "cik": "1193125-24-259803",
+    "market_cap": 2687859712
+  },
+  {
+    "ticker": "OMCL",
+    "file_date": "2024-11-18",
+    "entity_name": "",
+    "cik": "1104659-24-120206",
+    "market_cap": 1611612160
+  },
+  {
+    "ticker": "MARA",
+    "file_date": "2024-11-19",
+    "entity_name": "",
+    "cik": "1493152-24-046663",
+    "market_cap": 3676868864
+  },
+  {
+    "ticker": "MARA",
+    "file_date": "2024-12-02",
+    "entity_name": "",
+    "cik": "1493152-24-048222",
+    "market_cap": 3676868864
+  },
+  {
+    "ticker": "BILL",
+    "file_date": "2024-12-04",
+    "entity_name": "",
+    "cik": "1193125-24-270285",
+    "market_cap": 3623668736
+  },
+  {
+    "ticker": "LYV",
+    "file_date": "2024-12-06",
+    "entity_name": "",
+    "cik": "1335258-24-000181",
+    "market_cap": 38427684864
+  },
+  {
+    "ticker": "RIOT",
+    "file_date": "2024-12-09",
+    "entity_name": "",
+    "cik": "1104659-24-126515",
+    "market_cap": 6327610880
+  },
+  {
+    "ticker": "FLNC",
+    "file_date": "2024-12-11",
+    "entity_name": "",
+    "cik": "1104659-24-127400",
+    "market_cap": 2494162432
+  },
+  {
+    "ticker": "DDOG",
+    "file_date": "2024-12-12",
+    "entity_name": "",
+    "cik": "1193125-24-277122",
+    "market_cap": 38562717696
+  },
+  {
+    "ticker": "NTNX",
+    "file_date": "2024-12-16",
+    "entity_name": "",
+    "cik": "1193125-24-279708",
+    "market_cap": 9988573184
+  },
+  {
+    "ticker": "AFRM",
+    "file_date": "2024-12-16",
+    "entity_name": "",
+    "cik": "1820953-24-000064",
+    "market_cap": 16325752832
+  },
+  {
+    "ticker": "MP",
+    "file_date": "2024-12-17",
+    "entity_name": "",
+    "cik": "1801368-24-000092",
+    "market_cap": 9576275968
+  },
+  {
+    "ticker": "ASTS",
+    "file_date": "2025-01-22",
+    "entity_name": "",
+    "cik": "1493152-25-003231",
+    "market_cap": 34997530624
+  },
+  {
+    "ticker": "CAKE",
+    "file_date": "2025-02-28",
+    "entity_name": "",
+    "cik": "1104659-25-019110",
+    "market_cap": 2930218752
+  },
+  {
+    "ticker": "LCII",
+    "file_date": "2025-03-11",
+    "entity_name": "",
+    "cik": "763744-25-000041",
+    "market_cap": 3078542848
+  },
+  {
+    "ticker": "AXON",
+    "file_date": "2025-03-11",
+    "entity_name": "",
+    "cik": "1069183-25-000031",
+    "market_cap": 28246112256
+  },
+  {
+    "ticker": "ATEN",
+    "file_date": "2025-03-12",
+    "entity_name": "",
+    "cik": "1193125-25-052957",
+    "market_cap": 1771607168
+  },
+  {
+    "ticker": "LCID",
+    "file_date": "2025-04-08",
+    "entity_name": "",
+    "cik": "1104659-25-033017",
+    "market_cap": 2873790976
+  },
+  {
+    "ticker": "SEI",
+    "file_date": "2025-05-02",
+    "entity_name": "",
+    "cik": "1193125-25-111683",
+    "market_cap": 5682728960
+  },
+  {
+    "ticker": "AKAM",
+    "file_date": "2025-05-13",
+    "entity_name": "",
+    "cik": "1193125-25-118908",
+    "market_cap": 16137117696
+  },
+  {
+    "ticker": "LNT",
+    "file_date": "2025-05-15",
+    "entity_name": "",
+    "cik": "1193125-25-120808",
+    "market_cap": 19040143360
+  },
+  {
+    "ticker": "DASH",
+    "file_date": "2025-05-28",
+    "entity_name": "",
+    "cik": "1140361-25-020546",
+    "market_cap": 67140595712
+  },
+  {
+    "ticker": "DASH",
+    "file_date": "2025-06-02",
+    "entity_name": "",
+    "cik": "1140361-25-021020",
+    "market_cap": 67140595712
+  },
+  {
+    "ticker": "WEC",
+    "file_date": "2025-06-05",
+    "entity_name": "",
+    "cik": "1104659-25-056649",
+    "market_cap": 38686601216
+  },
+  {
+    "ticker": "FE",
+    "file_date": "2025-06-09",
+    "entity_name": "",
+    "cik": "1031296-25-000022",
+    "market_cap": 30024673280
+  },
+  {
+    "ticker": "NET",
+    "file_date": "2025-06-17",
+    "entity_name": "",
+    "cik": "1104659-25-060250",
+    "market_cap": 67949797376
+  },
+  {
+    "ticker": "SMCI",
+    "file_date": "2025-06-23",
+    "entity_name": "",
+    "cik": "1375365-25-000018",
+    "market_cap": 13943189504
+  },
+  {
+    "ticker": "ARRY",
+    "file_date": "2025-06-24",
+    "entity_name": "",
+    "cik": "1193125-25-145247",
+    "market_cap": 1103449216
+  },
+  {
+    "ticker": "ASTS",
+    "file_date": "2025-06-25",
+    "entity_name": "",
+    "cik": "1641172-25-016369",
+    "market_cap": 34997530624
+  },
+  {
+    "ticker": "TEM",
+    "file_date": "2025-07-03",
+    "entity_name": "",
+    "cik": "1193125-25-155545",
+    "market_cap": 7922508288
+  },
+  {
+    "ticker": "MARA",
+    "file_date": "2025-07-23",
+    "entity_name": "",
+    "cik": "950142-25-001988",
+    "market_cap": 3676868864
+  },
+  {
+    "ticker": "ASTS",
+    "file_date": "2025-07-24",
+    "entity_name": "",
+    "cik": "1493152-25-011384",
+    "market_cap": 34997530624
+  },
+  {
+    "ticker": "CELC",
+    "file_date": "2025-07-29",
+    "entity_name": "",
+    "cik": "1641172-25-021274",
+    "market_cap": 6024683520
+  },
+  {
+    "ticker": "CNP",
+    "file_date": "2025-07-31",
+    "entity_name": "",
+    "cik": "1193125-25-170585",
+    "market_cap": 28868225024
+  },
+  {
+    "ticker": "CELC",
+    "file_date": "2025-08-01",
+    "entity_name": "",
+    "cik": "1641172-25-021894",
+    "market_cap": 6024683520
+  },
+  {
+    "ticker": "COIN",
+    "file_date": "2025-08-06",
+    "entity_name": "",
+    "cik": "1679788-25-000167",
+    "market_cap": 45577527296
+  },
+  {
+    "ticker": "WT",
+    "file_date": "2025-08-11",
+    "entity_name": "",
+    "cik": "1214659-25-011803",
+    "market_cap": 2244624896
+  },
+  {
+    "ticker": "UPST",
+    "file_date": "2025-08-14",
+    "entity_name": "",
+    "cik": "1193125-25-180825",
+    "market_cap": 2687859712
+  },
+  {
+    "ticker": "DOCN",
+    "file_date": "2025-08-14",
+    "entity_name": "",
+    "cik": "1193125-25-180799",
+    "market_cap": 9060810752
+  },
+  {
+    "ticker": "WULF",
+    "file_date": "2025-08-18",
+    "entity_name": "",
+    "cik": "1104659-25-079466",
+    "market_cap": 8070016512
+  },
+  {
+    "ticker": "PI",
+    "file_date": "2025-09-02",
+    "entity_name": "",
+    "cik": "950170-25-112468",
+    "market_cap": 3188536064
+  },
+  {
+    "ticker": "JBTM",
+    "file_date": "2025-09-03",
+    "entity_name": "",
+    "cik": "1193125-25-194962",
+    "market_cap": 6727476224
+  },
+  {
+    "ticker": "LYFT",
+    "file_date": "2025-09-05",
+    "entity_name": "",
+    "cik": "1759509-25-000141",
+    "market_cap": 5279452160
+  },
+  {
+    "ticker": "AVT",
+    "file_date": "2025-09-05",
+    "entity_name": "",
+    "cik": "8858-25-000047",
+    "market_cap": 5479907328
+  },
+  {
+    "ticker": "LITE",
+    "file_date": "2025-09-08",
+    "entity_name": "",
+    "cik": "1193125-25-198329",
+    "market_cap": 63840882688
+  },
+  {
+    "ticker": "ALNY",
+    "file_date": "2025-09-10",
+    "entity_name": "",
+    "cik": "1193125-25-199686",
+    "market_cap": 42867720192
+  },
+  {
+    "ticker": "CYTK",
+    "file_date": "2025-09-22",
+    "entity_name": "",
+    "cik": "1193125-25-209437",
+    "market_cap": 7955085312
+  },
+  {
+    "ticker": "KALV",
+    "file_date": "2025-09-29",
+    "entity_name": "",
+    "cik": "1193125-25-223262",
+    "market_cap": 1021888704
+  },
+  {
+    "ticker": "IREN",
+    "file_date": "2025-10-07",
+    "entity_name": "",
+    "cik": "1140361-25-037488",
+    "market_cap": 12294994944
+  },
+  {
+    "ticker": "SEI",
+    "file_date": "2025-10-08",
+    "entity_name": "",
+    "cik": "1193125-25-234638",
+    "market_cap": 5682728960
+  },
+  {
+    "ticker": "SMTC",
+    "file_date": "2025-10-10",
+    "entity_name": "",
+    "cik": "1193125-25-237190",
+    "market_cap": 8241051136
+  },
+  {
+    "ticker": "LYV",
+    "file_date": "2025-10-10",
+    "entity_name": "",
+    "cik": "1335258-25-000137",
+    "market_cap": 38427684864
+  },
+  {
+    "ticker": "ASTS",
+    "file_date": "2025-10-21",
+    "entity_name": "",
+    "cik": "1493152-25-018802",
+    "market_cap": 34997530624
+  },
+  {
+    "ticker": "WULF",
+    "file_date": "2025-10-29",
+    "entity_name": "",
+    "cik": "1104659-25-103439",
+    "market_cap": 8070016512
+  },
+  {
+    "ticker": "BE",
+    "file_date": "2025-11-04",
+    "entity_name": "",
+    "cik": "1628280-25-049016",
+    "market_cap": 45509066752
+  },
+  {
+    "ticker": "HALO",
+    "file_date": "2025-11-05",
+    "entity_name": "",
+    "cik": "1159036-25-000047",
+    "market_cap": 7947256320
+  },
+  {
+    "ticker": "IMAX",
+    "file_date": "2025-11-06",
+    "entity_name": "",
+    "cik": "1193125-25-270049",
+    "market_cap": 2043635584
+  },
+  {
+    "ticker": "GH",
+    "file_date": "2025-11-07",
+    "entity_name": "",
+    "cik": "1193125-25-272592",
+    "market_cap": 11434127360
+  },
+  {
+    "ticker": "BWXT",
+    "file_date": "2025-11-10",
+    "entity_name": "",
+    "cik": "1104659-25-109152",
+    "market_cap": 21097308160
+  },
+  {
+    "ticker": "LCID",
+    "file_date": "2025-11-12",
+    "entity_name": "",
+    "cik": "1628280-25-051357",
+    "market_cap": 2873790976
+  },
+  {
+    "ticker": "COGT",
+    "file_date": "2025-11-13",
+    "entity_name": "",
+    "cik": "1193125-25-278679",
+    "market_cap": 6062234112
+  },
+  {
+    "ticker": "IONS",
+    "file_date": "2025-11-17",
+    "entity_name": "",
+    "cik": "1193125-25-284609",
+    "market_cap": 12625626112
+  },
+  {
+    "ticker": "PLUG",
+    "file_date": "2025-11-21",
+    "entity_name": "",
+    "cik": "1104659-25-114978",
+    "market_cap": 3819436800
+  },
+  {
+    "ticker": "IREN",
+    "file_date": "2025-12-01",
+    "entity_name": "",
+    "cik": "1140361-25-043803",
+    "market_cap": 12294994944
+  },
+  {
+    "ticker": "EXC",
+    "file_date": "2025-12-04",
+    "entity_name": "",
+    "cik": "1109357-25-000198",
+    "market_cap": 50585776128
+  },
+  {
+    "ticker": "FSLY",
+    "file_date": "2025-12-09",
+    "entity_name": "",
+    "cik": "1517413-25-000343",
+    "market_cap": 4472027648
+  },
+  {
+    "ticker": "ZTS",
+    "file_date": "2025-12-18",
+    "entity_name": "",
+    "cik": "1193125-25-324853",
+    "market_cap": 50651103232
+  }
+]
