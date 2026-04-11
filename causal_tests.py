@@ -294,12 +294,34 @@ def test_lead_lag(
         oos_sig = "confirmed" if oos_granger["best_p_value"] < 0.05 else f"p={oos_granger['best_p_value']:.3f}"
         oos_note = f" OOS: {oos_sig} at lag {oos_granger['best_lag']}."
 
+    # --- Cross-correlation sanity check (methodology rule 2026-04-12) ---
+    # Granger causality can report spurious "lead-lag" when the true relationship is
+    # CONTEMPORANEOUS. If cross-correlation at the best positive lag is tiny
+    # (|xcorr| < 0.05) but lag-0 xcorr is large, flag the test as a likely false
+    # positive — the F-test is fitting noise.
+    best_lag = is_granger["best_lag"]
+    lag0_xcorr = xcorr.get(0)
+    best_lag_xcorr = xcorr.get(best_lag)
+    spurious_granger = False
+    spurious_reason = None
+    if lag0_xcorr is not None and best_lag_xcorr is not None:
+        if abs(best_lag_xcorr) < 0.05 and abs(lag0_xcorr) > 0.15:
+            spurious_granger = True
+            spurious_reason = (
+                f"Granger false positive: xcorr at best lag {best_lag}="
+                f"{best_lag_xcorr:+.3f} (|<0.05|), but lag-0 xcorr={lag0_xcorr:+.3f} "
+                f"(|>0.15|). Relationship is contemporaneous, not predictive."
+            )
+    xcorr_note = ""
+    if spurious_granger:
+        xcorr_note = f" | XCORR WARNING: {spurious_reason}"
+
     return {
         "test_name": "granger_causality",
         "hypothesis_class": "lead_lag",
         "statistic": is_granger["best_f_stat"],
         "p_value": is_granger["best_p_value"],
-        "significant": is_granger["best_p_value"] < 0.05,
+        "significant": is_granger["best_p_value"] < 0.05 and not spurious_granger,
         "effect_size": is_granger["best_lag"],
         "n_observations": is_granger["n"],
         "confidence_interval": None,
@@ -317,11 +339,15 @@ def test_lead_lag(
             "oos_start": oos_start,
             "leader": leader_name,
             "follower": follower_name,
+            "lag0_xcorr": lag0_xcorr,
+            "best_lag_xcorr": best_lag_xcorr,
+            "spurious_granger": spurious_granger,
+            "spurious_reason": spurious_reason,
         },
         "summary": (
             f"{leader_name} Granger-causes {follower_name} at lag {is_granger['best_lag']} "
             f"(F={is_granger['best_f_stat']:.2f}, p={is_granger['best_p_value']:.4f}, "
-            f"n={is_granger['n']}).{oos_note}"
+            f"n={is_granger['n']}).{oos_note}{xcorr_note}"
         ),
     }
 
