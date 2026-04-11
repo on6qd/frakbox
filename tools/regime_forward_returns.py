@@ -134,10 +134,29 @@ def test_regime_forward(target: str, factor: str, start: str, end: str,
         oos_spread = None
         if "high" in oos_stats and "low" in oos_stats:
             oos_spread = oos_stats["high"]["mean"] - oos_stats["low"]["mean"]
-        spread_sign_match = (
+        spread_sign_match_raw = (
             is_spread is not None and oos_spread is not None and
             np.sign(is_spread) == np.sign(oos_spread) and abs(oos_spread) > 0.001
         )
+
+        # --- OOS regime coverage check (methodology rule 2026-04-11) ---
+        # Refuse sign-preservation validation if any OOS regime has <15% of OOS obs.
+        oos_counts = oos_sub["regime"].value_counts().to_dict()
+        n_oos_h = int(len(oos_sub))
+        coverage = {
+            r: {"n": int(oos_counts.get(r, 0)),
+                "pct": float(oos_counts.get(r, 0) / n_oos_h) if n_oos_h else 0.0}
+            for r in ("low", "mid", "high")
+        }
+        min_coverage_pct = min(v["pct"] for v in coverage.values())
+        coverage_ok = min_coverage_pct >= 0.15
+
+        oos_validated = bool(spread_sign_match_raw and coverage_ok)
+        validation_refused_reason = None
+        if spread_sign_match_raw and not coverage_ok:
+            validation_refused_reason = (
+                f"OOS regime coverage imbalance: min={min_coverage_pct:.1%} (<15%)."
+            )
 
         results["horizons"][h] = {
             "is_stats": is_stats,
@@ -147,7 +166,12 @@ def test_regime_forward(target: str, factor: str, start: str, end: str,
             "is_high_low_spread": float(is_spread) if is_spread is not None else None,
             "oos_high_low_spread": float(oos_spread) if oos_spread is not None else None,
             "sign_match_by_regime": sign_match,
-            "spread_sign_match": spread_sign_match,
+            "spread_sign_match_raw": spread_sign_match_raw,
+            "oos_coverage": coverage,
+            "min_coverage_pct": float(min_coverage_pct),
+            "coverage_ok": bool(coverage_ok),
+            "oos_validated": oos_validated,
+            "validation_refused_reason": validation_refused_reason,
         }
 
     return results

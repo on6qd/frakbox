@@ -417,14 +417,127 @@ def cmd_regression(args):
         result = causal_tests.test_structural_break(target_rets, factor_rets, args.break_date)
         params["break_date"] = args.break_date
     elif test_type == "regime":
-        # Regime test: factor is used as regime indicator
+        # Regime test: factor is used as regime indicator (LEVEL, not return).
+        # Rule (2026-04-11 methodology update):
+        #   - Fit tercile thresholds on IS factor LEVELS only (not full sample).
+        #   - Apply same thresholds to OOS, compute OOS regime coverage.
+        #   - Refuse sign-preservation validation if any OOS regime has <15% obs.
         from tools.timeseries import get_series
-        indicator = get_series(args.factor, args.start, args.end)
-        # Auto-label regimes by terciles
         import pandas as pd
-        labels = pd.qcut(indicator, 3, labels=["low", "mid", "high"])
-        aligned = pd.DataFrame({"returns": target_rets, "regime": labels}).dropna()
-        result = causal_tests.test_regime(aligned["returns"], aligned["regime"])
+        import numpy as np
+
+        indicator = get_series(args.factor, args.start, args.end)
+        aligned_full = pd.DataFrame({"returns": target_rets, "factor_level": indicator}).dropna()
+
+        # Auto-pick an OOS cutoff if user didn't supply one (default: last 30% of sample)
+        oos_start = args.oos_start
+        if not oos_start:
+            split_idx = int(len(aligned_full) * 0.70)
+            oos_start = str(aligned_full.index[split_idx].date())
+            params["oos_start_auto"] = oos_start
+
+        is_df = aligned_full[aligned_full.index < oos_start].copy()
+        oos_df = aligned_full[aligned_full.index >= oos_start].copy()
+
+        if len(is_df) < 60 or len(oos_df) < 30:
+            result = {
+                "test_name": "regime_comparison",
+                "hypothesis_class": "regime",
+                "error": f"Insufficient data IS={len(is_df)} OOS={len(oos_df)}",
+                "summary": f"Regime test aborted: insufficient data IS={len(is_df)} OOS={len(oos_df)}.",
+            }
+        else:
+            # Fit terciles on IS factor levels only
+            q33, q66 = is_df["factor_level"].quantile([1 / 3, 2 / 3]).values
+
+            def _label(x):
+                if pd.isna(x):
+                    return None
+                if x <= q33:
+                    return "low"
+                if x <= q66:
+                    return "mid"
+                return "high"
+
+            is_df["regime"] = is_df["factor_level"].apply(_label)
+            oos_df["regime"] = oos_df["factor_level"].apply(_label)
+
+            # Run IS regime comparison
+            result = causal_tests.test_regime(is_df["returns"], is_df["regime"])
+
+            # Compute OOS stats + coverage
+            oos_counts = oos_df["regime"].value_counts().to_dict()
+            n_oos = int(len(oos_df))
+            oos_coverage = {
+                r: {"n": int(oos_counts.get(r, 0)),
+                    "pct": float(oos_counts.get(r, 0) / n_oos) if n_oos else 0.0}
+                for r in ("low", "mid", "high")
+            }
+            min_coverage_pct = min(v["pct"] for v in oos_coverage.values())
+            coverage_ok = min_coverage_pct >= 0.15
+
+            # Per-regime OOS mean/std/n
+            oos_stats = {}
+            for r in ("low", "mid", "high"):
+                g = oos_df[oos_df["regime"] == r]["returns"]
+                if len(g) >= 5:
+                    oos_stats[r] = {
+                        "mean": float(g.mean()),
+                        "std": float(g.std()),
+                        "n": int(len(g)),
+                    }
+
+            # Sign preservation: IS high-low spread sign vs OOS high-low spread sign
+            is_regime_stats = result.get("details", {}).get("regime_stats", {})
+            is_spread = None
+            if "high" in is_regime_stats and "low" in is_regime_stats:
+                is_spread = is_regime_stats["high"]["mean"] - is_regime_stats["low"]["mean"]
+            oos_spread = None
+            if "high" in oos_stats and "low" in oos_stats:
+                oos_spread = oos_stats["high"]["mean"] - oos_stats["low"]["mean"]
+
+            spread_sign_match = (
+                is_spread is not None and oos_spread is not None
+                and np.sign(is_spread) == np.sign(oos_spread)
+                and abs(oos_spread) > 1e-6
+            )
+
+            # REFUSE sign-preservation validation if coverage fails
+            oos_validated = bool(spread_sign_match and coverage_ok)
+            validation_refused_reason = None
+            if spread_sign_match and not coverage_ok:
+                validation_refused_reason = (
+                    f"OOS regime coverage imbalance: min regime pct={min_coverage_pct:.1%} "
+                    f"(<15% threshold). Refusing sign-preservation validation."
+                )
+
+            result["oos_result"] = {
+                "oos_start": oos_start,
+                "n_oos": n_oos,
+                "coverage": oos_coverage,
+                "min_coverage_pct": float(min_coverage_pct),
+                "coverage_ok": bool(coverage_ok),
+                "oos_stats": oos_stats,
+                "is_high_low_spread": float(is_spread) if is_spread is not None else None,
+                "oos_high_low_spread": float(oos_spread) if oos_spread is not None else None,
+                "spread_sign_match_raw": bool(spread_sign_match),
+                "oos_validated": oos_validated,
+                "validation_refused_reason": validation_refused_reason,
+                "significant": oos_validated,  # For _causal_summary convenience
+            }
+            # Append coverage note to summary
+            coverage_note = (
+                f" | OOS coverage: low={oos_coverage['low']['pct']:.0%} "
+                f"mid={oos_coverage['mid']['pct']:.0%} high={oos_coverage['high']['pct']:.0%}"
+                f" (min={min_coverage_pct:.0%}, ok={coverage_ok})"
+            )
+            if validation_refused_reason:
+                coverage_note += f" | VALIDATION REFUSED: {validation_refused_reason}"
+            elif oos_validated:
+                coverage_note += " | OOS sign-preserved AND coverage ok -> VALIDATED"
+            elif is_spread is not None and oos_spread is not None:
+                coverage_note += " | OOS sign-flipped"
+            result["summary"] = (result.get("summary", "") or "") + coverage_note
     elif test_type == "network":
         spokes = args.controls.split(",") if args.controls else []
         if not spokes:
