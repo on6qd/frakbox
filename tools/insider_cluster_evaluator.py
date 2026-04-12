@@ -229,6 +229,33 @@ def evaluate_cluster(
     except Exception:
         pass  # Fail open — other checks will catch issues
 
+    # 4c. Prior stock drawdown — strongest quality predictor per N=5364 analysis
+    # CEO + VIX<25 + prior_drop>10%: avg 4.55%, pos_rate 59.6% (best subgroup)
+    prior_drawdown_pct = None
+    try:
+        from datetime import datetime, timedelta
+        _end = datetime.now().strftime('%Y-%m-%d')
+        _start = (datetime.now() - timedelta(days=40)).strftime('%Y-%m-%d')
+        hist = safe_download(ticker, _start, _end)
+        if hist is not None and len(hist) >= 10:
+            closes = hist['Close'] if 'Close' in hist.columns else hist['close']
+            peak_20d = closes.iloc[-20:].max() if len(closes) >= 20 else closes.max()
+            current_close = closes.iloc[-1]
+            prior_drawdown_pct = round((current_close - peak_20d) / peak_20d * 100, 1)
+            if prior_drawdown_pct <= -15:
+                score += 1.5
+                reasons.append(f"✓ Prior drawdown {prior_drawdown_pct}% (deep dip — insiders buying conviction)")
+            elif prior_drawdown_pct <= -10:
+                score += 1
+                reasons.append(f"✓ Prior drawdown {prior_drawdown_pct}% (meaningful dip — good conviction)")
+            elif prior_drawdown_pct <= -5:
+                score += 0.5
+                reasons.append(f"✓ Prior drawdown {prior_drawdown_pct}% (moderate dip)")
+            else:
+                reasons.append(f"○ Prior drawdown {prior_drawdown_pct}% (no significant dip — neutral)")
+    except Exception:
+        pass  # Fail open
+
     # 5. VIX regime
     if vix_tier:
         if has_csuite:
@@ -351,6 +378,7 @@ def evaluate_cluster(
             "market_cap_m": round(market_cap, 0) if market_cap else None,
             "current_price": current_price,
             "spy_vs_ma_pct": spy_info["pct_vs_ma"],
+            "prior_drawdown_pct": prior_drawdown_pct,
             "active_positions": positions,
         },
         "cluster_profile": {
