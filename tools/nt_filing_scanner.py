@@ -243,6 +243,58 @@ def to_backtest_events(filings: list[dict]) -> list[dict]:
     ]
 
 
+def tag_first_time_filers(filings: list[dict], lookback_days: int = 730) -> list[dict]:
+    """Add `is_first_time_filer` flag to each filing by looking back N days for
+    prior NT 10-K for the same ticker.
+
+    Per 2026-04-12 subgroup analysis (tools/nt_10k_first_vs_repeat.py):
+    the NT 10-K short signal is concentrated in first-time filers. Repeat
+    filers (same ticker filed NT 10-K within past 730 days) show wilcoxon
+    p>0.35 at all horizons — no tradeable signal.
+
+    Lookback is done against EDGAR EFTS: we query a 2-year window backwards
+    from each filing's file_date and check for NT 10-K filings by the same CIK.
+    """
+    # Group by CIK; fetch history once per CIK
+    by_cik: dict[str, list[dict]] = {}
+    for f in filings:
+        cik = f.get("cik")
+        if cik:
+            by_cik.setdefault(cik, []).append(f)
+
+    for cik, fs in by_cik.items():
+        # Sort by date; earliest filing gets lookback query
+        fs.sort(key=lambda x: x["file_date"])
+        earliest = fs[0]["file_date"]
+        lookback_start = (datetime.strptime(earliest, "%Y-%m-%d") - timedelta(days=lookback_days)).strftime("%Y-%m-%d")
+        lookback_end = (datetime.strptime(earliest, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
+
+        # Query EFTS for prior NT 10-K filings by this CIK
+        url = (
+            f"https://efts.sec.gov/LATEST/search-index?forms=NT%2010-K"
+            f"&dateRange=custom&startdt={lookback_start}&enddt={lookback_end}"
+            f"&ciks={cik}&from=0&size=10"
+        )
+        try:
+            resp = requests.get(url, headers=HEADERS, timeout=15)
+            time.sleep(SEC_DELAY)
+            prior_dates = []
+            if resp.status_code == 200:
+                hits = resp.json().get("hits", {}).get("hits", [])
+                prior_dates = [h.get("_source", {}).get("file_date") for h in hits if h.get("_source")]
+        except Exception:
+            prior_dates = []
+
+        # Walk forward through the group: each filing checks for priors
+        seen_dates = sorted(d for d in prior_dates if d)
+        for f in fs:
+            fd = datetime.strptime(f["file_date"], "%Y-%m-%d")
+            has_prior = any(0 < (fd - datetime.strptime(d, "%Y-%m-%d")).days <= lookback_days for d in seen_dates)
+            f["is_first_time_filer"] = not has_prior
+            seen_dates.append(f["file_date"])
+    return filings
+
+
 def main():
     parser = argparse.ArgumentParser(description="NT 10-K/10-Q Late Filing Scanner")
     parser.add_argument("--start", help="Start date (YYYY-MM-DD)")
@@ -251,6 +303,7 @@ def main():
     parser.add_argument("--no-filter", action="store_true", help="Skip large-cap filter")
     parser.add_argument("--json-events", action="store_true", help="Output as JSON events for backtest")
     parser.add_argument("--min-cap", type=float, default=MIN_MARKET_CAP, help="Min market cap (default 500M)")
+    parser.add_argument("--tag-first-time", action="store_true", help="Tag filings with is_first_time_filer flag (EDGAR lookback)")
     args = parser.parse_args()
 
     min_cap_val = args.min_cap
@@ -264,6 +317,9 @@ def main():
 
     filings = scan_nt_filings(start_date, end_date, filter_largecap=not args.no_filter, min_cap=min_cap_val)
 
+    if args.tag_first_time:
+        filings = tag_first_time_filers(filings)
+
     if args.json_events:
         events = to_backtest_events(filings)
         print(json.dumps(events))
@@ -273,7 +329,10 @@ def main():
         print(f"{'='*70}")
         for f in filings:
             cap_str = f"${f.get('market_cap', 0)/1e9:.1f}B" if f.get('market_cap') else "?"
-            print(f"  {f['file_date']}  {f['ticker']:6s}  {f['form_type']:10s}  {cap_str:>8s}  {f['display_name'][:50]}")
+            ft_tag = ""
+            if "is_first_time_filer" in f:
+                ft_tag = " [FIRST-TIME]" if f["is_first_time_filer"] else " [REPEAT - skip]"
+            print(f"  {f['file_date']}  {f['ticker']:6s}  {f['form_type']:10s}  {cap_str:>8s}  {f['display_name'][:50]}{ft_tag}")
 
         # Summary stats
         print(f"\nSummary: {len(filings)} events")
