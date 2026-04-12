@@ -726,7 +726,7 @@ def main():
                      choices=["exposure", "lead_lag", "structural_break", "regime", "network"],
                      help="Type of regression test")
     reg.add_argument("--start", default="2020-01-01", help="Start date")
-    reg.add_argument("--end", default="2026-01-01", help="End date")
+    reg.add_argument("--end", default=datetime.now().strftime("%Y-%m-%d"), help="End date")
     reg.add_argument("--oos-start", help="OOS validation start date (default: auto 70/30)")
     reg.add_argument("--max-lags", type=int, help="Max lags for lead_lag/network (default 10)")
     reg.add_argument("--break-date", help="Break date for structural_break test")
@@ -736,7 +736,7 @@ def main():
     coint.add_argument("--series-a", required=True, help="First series identifier")
     coint.add_argument("--series-b", required=True, help="Second series identifier")
     coint.add_argument("--start", default="2020-01-01")
-    coint.add_argument("--end", default="2026-01-01")
+    coint.add_argument("--end", default=datetime.now().strftime("%Y-%m-%d"))
     coint.add_argument("--oos-start", help="OOS validation start date")
 
     # threshold
@@ -747,7 +747,7 @@ def main():
     thr.add_argument("--direction", default="above", choices=["above", "below"])
     thr.add_argument("--horizons", default="5,10,20", help="Comma-separated horizons in days")
     thr.add_argument("--start", default="2015-01-01")
-    thr.add_argument("--end", default="2026-01-01")
+    thr.add_argument("--end", default=datetime.now().strftime("%Y-%m-%d"))
 
     # calendar
     cal = subparsers.add_parser("calendar", help="Calendar anomaly test")
@@ -756,13 +756,13 @@ def main():
     cal.add_argument("--pattern-month", type=int, help="Specific month to test (1-12)")
     cal.add_argument("--oos-start-year", type=int, help="Year to start OOS validation")
     cal.add_argument("--start", default="2005-01-01")
-    cal.add_argument("--end", default="2026-01-01")
+    cal.add_argument("--end", default=datetime.now().strftime("%Y-%m-%d"))
 
     # fetch-series
     fs = subparsers.add_parser("fetch-series", help="Fetch and display time series data")
     fs.add_argument("--identifiers", required=True, help="Comma-separated series identifiers")
     fs.add_argument("--start", default="2020-01-01")
-    fs.add_argument("--end", default="2026-01-01")
+    fs.add_argument("--end", default=datetime.now().strftime("%Y-%m-%d"))
 
     args = parser.parse_args()
 
