@@ -762,9 +762,18 @@ def complete_hypothesis(hypothesis_id, exit_price, actual_return_pct, post_morte
                 )
 
             # Pre-registration tamper check: verify prediction hash
+            # Include hypothesis_class and spec_json so non-event classes hash-match.
+            _stored_spec = h.get("spec_json")
+            if isinstance(_stored_spec, str):
+                try:
+                    _stored_spec = json.loads(_stored_spec)
+                except Exception:
+                    _stored_spec = None
             expected_hash = _compute_prediction_hash(
                 h["event_type"], h["expected_symbol"], h["expected_direction"],
-                h["expected_magnitude_pct"], h["expected_timeframe_days"]
+                h["expected_magnitude_pct"], h["expected_timeframe_days"],
+                hypothesis_class=h.get("hypothesis_class", "event"),
+                spec_json=_stored_spec,
             )
             if h.get("prediction_hash") and expected_hash != h["prediction_hash"]:
                 raise ValueError(
