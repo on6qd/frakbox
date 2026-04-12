@@ -50,17 +50,22 @@ ACTIVIST_CIKS = {
 
 
 def search_13d_filings(start_date: str, end_date: str) -> list[dict]:
-    """Search EDGAR EFTS for SC 13D filings in date range."""
+    """Search EDGAR EFTS for SCHEDULE 13D filings (initial only) in date range.
+
+    Fixed 2026-04-12: EDGAR form code is 'SCHEDULE 13D', not 'SC 13D'. The prior
+    'SC%2013D' form-param returned zero hits for ~60 days, hiding the validated
+    Starboard signal. We now also filter out amendments (SCHEDULE 13D/A) since
+    only INITIAL filings carry the activist-engagement signal.
+    """
     all_filings = []
 
     for cik, info in ACTIVIST_CIKS.items():
-        # Search for 13D filings mentioning this activist
+        # Search for initial 13D filings mentioning this activist
         url = (
             f"https://efts.sec.gov/LATEST/search-index"
             f"?q=%22{info['name'].replace(' ', '+')}%22"
-            f"&forms=SC%2013D"
+            f"&forms=SCHEDULE+13D"
             f"&dateRange=custom&startdt={start_date}&enddt={end_date}"
-            f"&_source=display_names,file_date,form_type"
         )
         resp = requests.get(url, headers=HEADERS, timeout=30)
         if resp.status_code != 200:
@@ -72,6 +77,10 @@ def search_13d_filings(start_date: str, end_date: str) -> list[dict]:
 
         for h in hits:
             src = h.get("_source", {})
+            form = (src.get("form") or src.get("form_type") or "").upper().strip()
+            # Filter out amendments — only INITIAL SCHEDULE 13D carries the signal
+            if form != "SCHEDULE 13D":
+                continue
             names = src.get("display_names", [])
             file_date = src.get("file_date", "")
 
@@ -91,6 +100,7 @@ def search_13d_filings(start_date: str, end_date: str) -> list[dict]:
                             "target": ticker,
                             "target_name": name[:60],
                             "file_date": file_date,
+                            "form": form,
                         })
                         break
 
