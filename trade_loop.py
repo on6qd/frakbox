@@ -262,6 +262,26 @@ def execute_pending_triggers():
         if stop_loss is None or stop_loss < MIN_STOP_LOSS_PCT:
             stop_loss = DEFAULT_STOP_LOSS_PCT
 
+        # Guard: check for existing position in the same symbol to prevent
+        # duplicate orders (bug found 2026-04-14: SPY trade doubled to $10K
+        # because both activate_vix_spy_trade.py and trade_loop placed orders).
+        try:
+            api = get_api()
+            existing_positions = {p.symbol: p for p in api.list_positions()}
+            if symbol in existing_positions:
+                pos = existing_positions[symbol]
+                actions.append({
+                    "action": "blocked",
+                    "symbol": symbol,
+                    "hypothesis_id": h["id"],
+                    "detail": f"DUPLICATE GUARD: already holding {pos.qty} shares of {symbol} (cost ${float(pos.cost_basis):.0f}). Skipping to prevent double entry.",
+                    "success": False,
+                })
+                print(f"[TRADE LOOP] DUPLICATE GUARD: {symbol} already in portfolio, skipping order")
+                continue
+        except Exception as e:
+            print(f"[TRADE LOOP] WARNING: could not check existing positions: {e}")
+
         # Place the trade (extended_hours=True for after_hours_immediate trigger)
         if use_extended_hours:
             print(f"[TRADE LOOP] after_hours_immediate trigger for {symbol} — using extended hours limit order")

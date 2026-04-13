@@ -77,6 +77,21 @@ def place_experiment(symbol, direction, notional_amount, extended_hours=False):
     api = get_api()
     side = "buy" if direction == "long" else "sell"
 
+    # Duplicate position guard: refuse to open a second position in the same symbol.
+    # Bug found 2026-04-14: SPY VIX>30 trade was doubled ($10K instead of $5K)
+    # because both activate_vix_spy_trade.py and trade_loop.py placed orders.
+    try:
+        existing = {p.symbol: p for p in api.list_positions()}
+        if symbol in existing and direction == "long":
+            pos = existing[symbol]
+            return {
+                "success": False,
+                "error": f"DUPLICATE GUARD: Already holding {pos.qty} shares of {symbol} "
+                         f"(cost ${float(pos.cost_basis):,.0f}). Close existing position first."
+            }
+    except Exception:
+        pass  # If we can't check, proceed cautiously
+
     # Validate position size against portfolio limits
     try:
         account = api.get_account()
