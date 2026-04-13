@@ -298,10 +298,15 @@ def check_stop_losses():
                 except Exception as e:
                     print(f"[TRADE LOOP] WARNING: SPY fetch failed for {symbol}: {e}. Using raw return as abnormal.")
 
+                # Direction correctness: must match expected direction AND exceed
+                # minimum threshold (0.5%) to filter noise — consistent with
+                # complete_hypothesis() in research.py
+                MIN_DIRECTION_THRESHOLD = 0.5  # pct
                 if direction == "long":
-                    dir_correct = abnormal_ret > 0
+                    dir_matches = abnormal_ret > 0
                 else:
-                    dir_correct = abnormal_ret < 0
+                    dir_matches = abnormal_ret < 0
+                dir_correct = dir_matches and abs(abnormal_ret) >= MIN_DIRECTION_THRESHOLD
                 h["result"] = {
                     "exit_price": current_price,
                     "exit_time": now.isoformat(),
@@ -312,6 +317,7 @@ def check_stop_losses():
                     "auto_closed": True,
                     "spy_at_entry": trade.get("spy_at_entry"),
                     "direction_correct": dir_correct,
+                    "direction_matches_but_below_threshold": dir_matches and not dir_correct,
                 }
                 # Update pattern tracking for this signal
                 try:
