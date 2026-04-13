@@ -126,6 +126,51 @@ def get_active_position_count() -> int:
         return 0
 
 
+def classify_trigger_class(acceptance_time_str: Optional[str] = None) -> str:
+    """
+    Classify a filing's trigger class based on EDGAR acceptanceDateTime.
+
+    Source: insider_cluster_intraday_replay_2026_04_09
+    - intraday_same_day: Filed during market hours (9:30-16:00 ET). ~17% of clusters.
+      EV: +1.87% mean, 62.2% pos rate. Same-session entry achievable.
+    - pre_open_same_day: Filed before 9:30 ET. ~8% of clusters.
+      EV: +2.52% mean, 61.1% pos rate. Open-entry achievable.
+    - after_close_same_day: Filed after 16:00 ET. ~71% of clusters.
+      EV: filing+1 5d mean +1.35%, 45.9% pos rate. MUST WAIT until next open.
+    - unknown: No acceptance time available.
+    """
+    if not acceptance_time_str:
+        return "unknown"
+
+    try:
+        from datetime import datetime
+        # EDGAR acceptanceDateTime format: "2026-04-09T14:32:15.000000-04:00" or "2026-04-09 14:32:15"
+        clean = acceptance_time_str.replace("T", " ").split(".")[0].split("-04:00")[0].split("-05:00")[0]
+        dt = datetime.strptime(clean.strip(), "%Y-%m-%d %H:%M:%S")
+        hour = dt.hour
+        minute = dt.minute
+        market_open = (9, 30)
+        market_close = (16, 0)
+
+        if (hour, minute) < market_open:
+            return "pre_open_same_day"
+        elif (hour, minute) < market_close:
+            return "intraday_same_day"
+        else:
+            return "after_close_same_day"
+    except Exception:
+        return "unknown"
+
+
+# Trigger class expected values from intraday replay analysis (April 2026)
+TRIGGER_CLASS_EV = {
+    "intraday_same_day":    {"ev_5d": 1.87, "pos_rate": 62.2, "entry": "same_session",   "tradeable": True},
+    "pre_open_same_day":    {"ev_5d": 2.52, "pos_rate": 61.1, "entry": "open_same_day",  "tradeable": True},
+    "after_close_same_day": {"ev_5d": 1.35, "pos_rate": 45.9, "entry": "next_open",      "tradeable": False},
+    "unknown":              {"ev_5d": 1.04, "pos_rate": 45.5, "entry": "unknown",         "tradeable": False},
+}
+
+
 def evaluate_cluster(
     ticker: str,
     n_insiders: int,
@@ -136,6 +181,7 @@ def evaluate_cluster(
     insiders_detail: Optional[str] = None,
     days_since_latest_filing: Optional[int] = None,
     max_trans_to_filing_lag: Optional[int] = None,
+    acceptance_time: Optional[str] = None,
 ) -> dict:
     """
     Evaluate an insider buying cluster for trade activation.
@@ -296,6 +342,9 @@ def evaluate_cluster(
     # only marginal vs round-trip costs). Only filing_day same-day intraday entry is tradeable
     # (+3.28% mean, 58.8% pos rate). Until an intraday EDGAR poller exists, t+1 entries are NO_GO.
     # ZBIO (placed pre-retirement at filing_lag=1) is grandfathered — let it run, do not open new t+1s.
+    trigger_class = classify_trigger_class(acceptance_time)
+    trigger_ev = TRIGGER_CLASS_EV.get(trigger_class, TRIGGER_CLASS_EV["unknown"])
+
     if days_since_latest_filing is not None:
         if days_since_latest_filing > 1:
             blockers.append(
@@ -309,8 +358,30 @@ def evaluate_cluster(
                 f"Build intraday scanner to capture this signal."
             )
         else:
-            score += 0.5
-            reasons.append(f"✓ Latest filing is today — same-day intraday entry possible (lag=0)")
+            # Filing is today (lag=0) — check trigger class for realistic entry timing
+            if trigger_class in ("intraday_same_day", "pre_open_same_day"):
+                score += 1.5
+                reasons.append(
+                    f"✓ Filing today, trigger={trigger_class}: same-session entry achievable "
+                    f"(EV={trigger_ev['ev_5d']}%, pos_rate={trigger_ev['pos_rate']}%)"
+                )
+            elif trigger_class == "after_close_same_day":
+                # After-close filings force next-open entry — much weaker
+                # EV +1.35%, pos_rate 45.9% — below 50% directional threshold
+                warnings.append(
+                    f"⚠ Filing today but AFTER MARKET CLOSE: must enter at next open. "
+                    f"EV={trigger_ev['ev_5d']}%, pos_rate={trigger_ev['pos_rate']}% "
+                    f"(below 50% threshold). Downgrading to WEAK_GO at best."
+                )
+                # Reduce score penalty for after-close
+                score -= 0.5
+            else:
+                # Unknown trigger class — conservative treatment
+                score += 0.5
+                warnings.append(
+                    f"⚠ Filing today but trigger class unknown — "
+                    f"cannot confirm same-session entry. Conservative EV={trigger_ev['ev_5d']}%"
+                )
     else:
         warnings.append("⚠ days_since_latest_filing unavailable — manual freshness check required")
 
@@ -327,6 +398,20 @@ def evaluate_cluster(
     # --- Decision ---
     if blockers:
         decision = "NO_GO"
+    elif trigger_class == "after_close_same_day":
+        # After-close filings: EV=+1.35%, pos_rate=45.9% — below directional threshold.
+        # Source: insider_cluster_intraday_replay_2026_04_09
+        # Cap at WEAK_GO regardless of score — pos_rate < 50% means not confidently tradeable.
+        if score >= 5 and has_csuite:
+            decision = "WEAK_GO"
+            warnings.append(
+                "↓ Capped at WEAK_GO (after-close filing, pos_rate < 50%)"
+            )
+        else:
+            decision = "NO_GO"
+            warnings.append(
+                "↓ After-close filing with insufficient score → NO_GO"
+            )
     elif score >= 7 and not warnings:
         decision = "GO"
     elif score >= 5:
@@ -340,11 +425,16 @@ def evaluate_cluster(
     trade_plan = None
     if decision in ("GO", "WEAK_GO"):
         shares = int(POSITION_SIZE / current_price) if current_price else 0
-        # Use canonical t+1 EV when scanner can only enter next-open (lag>=1d).
-        # Use the higher VIX-tier EV only if filing was today (lag=0) — same-day intraday entry possible.
-        if days_since_latest_filing is not None and days_since_latest_filing == 0:
-            ev_used = vix_ev
-            ev_basis = "vix_tier_filing_day_intraday"
+        # Use trigger-class-aware EV (from intraday replay analysis)
+        # Only intraday_same_day and pre_open_same_day get the higher filing-day EV.
+        # After-close and unknown get the weaker next-open EV.
+        if trigger_class in ("intraday_same_day", "pre_open_same_day"):
+            ev_used = trigger_ev["ev_5d"]
+            ev_basis = f"trigger_class_{trigger_class}"
+        elif days_since_latest_filing is not None and days_since_latest_filing == 0:
+            # Filing today but after close or unknown timing — use trigger class EV
+            ev_used = trigger_ev["ev_5d"]
+            ev_basis = f"trigger_class_{trigger_class}_next_open"
         else:
             ev_used = REAL_TIME_T1_EV
             ev_basis = "canonical_t_plus_1_real_time"
@@ -359,6 +449,7 @@ def evaluate_cluster(
             "hold_days": HOLD_DAYS,
             "vix_at_eval": round(vix, 1),
             "vix_tier": vix_tier,
+            "trigger_class": trigger_class,
             "expected_return_pct": ev_used,
             "expected_return_basis": ev_basis,
             "real_time_t1_pos_rate": REAL_TIME_T1_POS,
@@ -388,6 +479,8 @@ def evaluate_cluster(
             "has_cfo": has_cfo,
             "detection_price": detection_price,
         },
+        "trigger_class": trigger_class,
+        "trigger_class_ev": trigger_ev,
     }
 
 
@@ -399,6 +492,10 @@ def main():
     parser.add_argument("--has-ceo", action="store_true", help="CEO is among buyers")
     parser.add_argument("--has-cfo", action="store_true", help="CFO is among buyers")
     parser.add_argument("--detection-price", type=float, help="Price when cluster was detected")
+    parser.add_argument("--days-since-filing", type=int, help="Business days since latest Form 4 filing")
+    parser.add_argument("--max-filing-lag", type=int, help="Max business days between transaction and filing")
+    parser.add_argument("--acceptance-time", type=str,
+                        help="EDGAR acceptanceDateTime of latest Form 4 (e.g., '2026-04-09T14:32:15')")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
     args = parser.parse_args()
 
@@ -409,6 +506,9 @@ def main():
         has_ceo=args.has_ceo,
         has_cfo=args.has_cfo,
         detection_price=args.detection_price,
+        days_since_latest_filing=args.days_since_filing,
+        max_trans_to_filing_lag=args.max_filing_lag,
+        acceptance_time=args.acceptance_time,
     )
 
     if args.json:
@@ -447,6 +547,18 @@ def main():
         print(f"  LONG {tp['shares']} shares of {tp['symbol']} @ ~${tp['entry_price']:.2f} = ${tp['position_size']}")
         print(f"  Stop: {tp['stop_loss_pct']}% | TP: {tp['take_profit_pct']}% | Hold: {tp['hold_days']}d")
         print(f"  VIX: {tp['vix_at_eval']} ({tp['vix_tier']}) | Expected: +{tp['expected_return_pct']}%")
+        tc = tp.get("trigger_class", "unknown")
+        print(f"  Trigger class: {tc} | EV basis: {tp.get('expected_return_basis', '?')}")
+
+    # Trigger class summary
+    tc = result.get("trigger_class", "unknown")
+    tc_ev = result.get("trigger_class_ev", {})
+    if tc != "unknown":
+        entry_type = tc_ev.get("entry", "unknown")
+        tradeable = "YES" if tc_ev.get("tradeable") else "NO"
+        print(f"\nTrigger Class: {tc}")
+        print(f"  Entry timing: {entry_type} | Tradeable: {tradeable}")
+        print(f"  Historical EV: +{tc_ev.get('ev_5d', '?')}% | Pos rate: {tc_ev.get('pos_rate', '?')}%")
 
     print()
 
