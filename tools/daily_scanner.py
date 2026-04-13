@@ -214,6 +214,7 @@ def run_delisting_8k(days: int) -> dict:
         sys.executable, "tools/delisting_8k_scanner.py",
         "--days", str(days),
         "--json-events",
+        "--forced-only",  # Only forced delistings, not voluntary transfers
     ]
     ok, stdout = _run(cmd, label)
     if not ok:
