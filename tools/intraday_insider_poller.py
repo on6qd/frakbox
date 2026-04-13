@@ -353,6 +353,7 @@ def run_poller(
                 has_cfo=has_cfo,
                 days_since_latest_filing=c.get("days_since_latest_filing"),
                 max_trans_to_filing_lag=c.get("max_trans_to_filing_lag"),
+                acceptance_time=c.get("latest_accept_time"),
             )
         except Exception as e:
             decision = {"decision": "ERROR", "score": 0, "blockers": [str(e)], "warnings": []}

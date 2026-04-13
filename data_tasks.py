@@ -301,6 +301,7 @@ def cmd_scan_insiders_evaluate(args):
                 has_cfo=has_cfo,
                 days_since_latest_filing=c.get("days_since_latest_filing"),
                 max_trans_to_filing_lag=c.get("max_trans_to_filing_lag"),
+                acceptance_time=c.get("latest_accept_time"),
             )
             evaluated.append({
                 "ticker": ticker,
@@ -314,6 +315,7 @@ def cmd_scan_insiders_evaluate(args):
                 "latest_filing_date": c.get("latest_filing_date"),
                 "days_since_latest_filing": c.get("days_since_latest_filing"),
                 "max_trans_to_filing_lag": c.get("max_trans_to_filing_lag"),
+                "trigger_class": result.get("trigger_class", "unknown"),
                 "blockers": result["blockers"],
                 "warnings": result["warnings"],
                 "market_cap_m": result["market_data"].get("market_cap_m"),
