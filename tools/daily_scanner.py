@@ -89,6 +89,45 @@ def _count_from_text(stdout: str, pattern: str) -> int:
 # Individual scanner runners
 # ---------------------------------------------------------------------------
 
+def run_intraday_insider_poller() -> dict:
+    """Intraday insider cluster poller — checks for same-day tradeable clusters.
+
+    Must run BEFORE the regular insider scanner. Catches clusters where
+    Form 4 acceptance_datetime is during today's market hours, enabling
+    filing_day_intraday entry (the only validated cadence: +3.28% / 58.8% pos rate).
+    """
+    label = "Intraday Insider Poller"
+    poller_path = REPO_ROOT / "tools" / "intraday_insider_poller.py"
+    if not poller_path.exists():
+        return {"scanner": label, "status": "skip", "note": "poller not found", "new_clusters": []}
+
+    cmd = [sys.executable, str(poller_path)]
+    ok, stdout = _run(cmd, label)
+    if not ok:
+        return {"scanner": label, "status": "error", "new_clusters": []}
+
+    data = _extract_json(stdout)
+    if not isinstance(data, dict):
+        data = {}
+
+    new_clusters = data.get("new_clusters", [])
+    # Flag intraday-tradeable clusters
+    intraday_go = [
+        c for c in new_clusters
+        if c.get("trigger_classification") == "new_cluster_intraday"
+        and c.get("evaluator_decision", "").startswith("GO")
+    ]
+
+    return {
+        "scanner": label,
+        "status": "ok",
+        "new_clusters_found": len(new_clusters),
+        "intraday_go": len(intraday_go),
+        "clusters": new_clusters,
+        "intraday_go_clusters": intraday_go,
+    }
+
+
 def run_nt_10k(days: int) -> dict:
     """NT 10-K/10-Q scanner. Uses --json-events to get JSON list of events."""
     label = "NT 10-K"
@@ -305,6 +344,17 @@ def find_actionable_events(results: dict) -> list[dict]:
     """
     actionable = []
 
+    # Intraday insider poller — highest priority, same-day entry
+    poller = results.get("intraday_poller", {})
+    for c in poller.get("intraday_go_clusters", []):
+        actionable.append({
+            "scanner": "Intraday Insider Poller",
+            "ticker": c.get("ticker", "?"),
+            "date": c.get("latest_accept_time", ""),
+            "decision": "INTRADAY_GO",
+            "note": f"Same-day filing, validated intraday cadence. {c.get('n_insiders', '?')} insiders, ${c.get('total_value', 0):,.0f}",
+        })
+
     # Insider GO/WEAK_GO clusters
     insider = results.get("insider_clusters", {})
     for ev in insider.get("evaluated", []):
@@ -396,6 +446,11 @@ def find_actionable_events(results: dict) -> list[dict]:
 
 def build_status_line(results: dict) -> str:
     """Build brief status line: 'NT 10-K: N | 13D: N (N GO) | ...'"""
+    # Intraday poller
+    poller = results.get("intraday_poller", {})
+    poller_go = poller.get("intraday_go", 0)
+    poller_total = poller.get("new_clusters_found", 0)
+
     nt_n = results.get("nt_10k", {}).get("events_found", "ERR")
     act_n = results.get("activist_13d", {}).get("total_found", "ERR")
     act_go = results.get("activist_13d", {}).get("go_count", "")
@@ -413,15 +468,24 @@ def build_status_line(results: dict) -> str:
     seo_part = f"{seo_n}" if seo_go == "" else f"{seo_n} ({seo_go} GO)"
     sp500_part = f"{sp500_n} new" if sp500_n else "0"
 
-    return (
-        f"NT 10-K: {nt_n} events | "
-        f"13D: {act_part} filings | "
-        f"Insider: {ins_part} | "
-        f"8-K 1.05: {cyber_n} events | "
-        f"8-K 3.01: {delist_n} events | "
-        f"SEO: {seo_part} deals | "
-        f"S&P 500: {sp500_part}"
-    )
+    parts = []
+    # Only show intraday poller if it found something
+    if poller_go > 0:
+        parts.append(f"⚡ INTRADAY GO: {poller_go}")
+    elif poller_total > 0:
+        parts.append(f"Intraday: {poller_total} new (0 GO)")
+
+    parts.extend([
+        f"NT 10-K: {nt_n} events",
+        f"13D: {act_part} filings",
+        f"Insider: {ins_part}",
+        f"8-K 1.05: {cyber_n} events",
+        f"8-K 3.01: {delist_n} events",
+        f"SEO: {seo_part} deals",
+        f"S&P 500: {sp500_part}",
+    ])
+
+    return " | ".join(parts)
 
 
 # ---------------------------------------------------------------------------
@@ -451,6 +515,10 @@ def main():
 
     # Run each scanner — order matters for rate-limiting; failures are non-fatal
     results: dict = {}
+
+    # Intraday poller runs FIRST — catches same-day tradeable insider clusters
+    print("[daily_scanner] Running Intraday Insider Poller...", file=sys.stderr)
+    results["intraday_poller"] = run_intraday_insider_poller()
 
     print("[daily_scanner] Running NT 10-K scanner...", file=sys.stderr)
     results["nt_10k"] = run_nt_10k(days)
