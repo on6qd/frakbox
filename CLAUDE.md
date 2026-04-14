@@ -4,13 +4,16 @@ Discover and test any causal influence of the world on the markets. Paper tradin
 
 ## Multi-Agent Architecture
 
-The system uses three agents with model tiering to cut token costs:
+The system uses a scan/investigate loop inspired by Karpathy's AutoResearch: high-throughput screening (breadth) alternates with deep investigation (depth).
 
 | Agent | Model | Role |
 |---|---|---|
-| **Orchestrator** | Opus | Plans sessions, evaluates results, forms hypotheses, delegates work |
+| **Scanner** | Sonnet | High-throughput screening — runs 30-50 quick tests per session, queues hits |
+| **Orchestrator** | Opus | Deep investigation — full 6-step hypothesis lifecycle on promising scan hits |
 | **Reviewer** | Sonnet | Self-review, post-mortems, confidence scoring, methodology updates |
 | **Data Worker** | Haiku | Interprets SEC filings, news, text extraction (rare — most data work is pure Python) |
+
+Session rotation: every 3rd session is a scan (Sonnet, 25 min, cheap), the rest are investigations (Opus, 50 min, deep). Scanner results land in `research_queue` with `category='scan_hit'`; the orchestrator picks up the highest-priority hits.
 
 Data-heavy tasks (backtesting, scanning, price fetching) run as pure Python via `data_tasks.py` — no LLM needed.
 

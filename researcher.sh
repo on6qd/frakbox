@@ -14,7 +14,7 @@ cd "$(dirname "$0")"
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 LOCKFILE="${TMPDIR:-/tmp}/research_bot_$(id -u).lock"
-SESSION_INTERVAL=900       # 15 min between research sessions
+SESSION_INTERVAL=5400      # 90 min between research sessions (spreads 10 sessions across ~15h)
 TRADE_INTERVAL=120         # 2 min between trade loop runs
 HEALTH_INTERVAL=600        # 10 min between health checks
 EXPORT_INTERVAL=3600       # 1 hour between dashboard exports
@@ -73,14 +73,45 @@ run_session() {
     return
   fi
 
-  echo "=== Session started $(date) ===" | tee -a logs/daemon.log | tee "$logfile"
+  # Alternate between scan and investigate sessions
+  # Count today's sessions to determine mode
+  local count_file="${TMPDIR:-/tmp}/research_sessions_$(date +%Y%m%d)_$(id -u).count"
+  local session_num=1
+  if [ -f "$count_file" ]; then
+    session_num=$(cat "$count_file")
+  fi
 
+  local agent="orchestrator"
+  local mode="investigate"
+  local timeout_min=50
   local prompt
-  prompt=$(cat <<'PROMPT'
+
+  if (( session_num % 3 == 0 )); then
+    # Every 3rd session is a scan
+    agent="scanner"
+    mode="scan"
+    timeout_min=25
+    prompt=$(cat <<'PROMPT'
+High-throughput scan session. Run 30+ quick statistical tests using data_tasks.py commands.
+
+Quick context check: python3 run.py --context | head -80
+Then check what's already been scanned: python3 -c "import db; db.init_db(); rows=db.get_db().execute(\"SELECT question FROM research_queue WHERE category='scan_hit' ORDER BY rowid DESC LIMIT 10\").fetchall(); [print(r[0][:120]) for r in rows]"
+
+Pick a scan theme that hasn't been done recently. Run as many tests as possible. Queue any p<0.05 hits to research_queue.
+
+When done, log a journal entry with session_type="scan" and public_summary describing what you screened and how many hits.
+PROMPT
+    )
+  else
+    # Regular orchestrator session
+    prompt=$(cat <<'PROMPT'
 Run: python3 run.py --context
 This is your complete state — account, trades, hypotheses, knowledge, queue, journal, friction, and data integrity. Steer.md (human directions) is included. Prioritize human directions over your own queue.
 
-Do NOT dump full datasets (load_hypotheses(), load_knowledge(), load_queue()). Only query individual items (get_hypothesis_by_id, get_known_effect, db.get_recent_journal, etc.) when you need deep detail.
+Check for scan hits first: python3 -c "import db; db.init_db(); rows=db.get_db().execute(\"SELECT id, question, priority FROM research_queue WHERE category='scan_hit' AND status='pending' ORDER BY priority DESC LIMIT 5\").fetchall(); [print(f'{r[0]}: {r[1][:120]}') for r in rows]"
+If there are scan hits with priority >= 8, investigate the top one using the full 6-step investigation method.
+
+Do NOT dump full datasets (load_hypotheses(), load_knowledge(), load_queue()). Only query individual items when you need deep detail.
 
 Read API_REFERENCE.md only when you need a function signature — not at session start.
 
@@ -91,19 +122,22 @@ Do the work. When done:
 2. Log journal entry: db.append_journal_entry(date, type, investigated, findings, surprised_by, next_step, public_summary="1-2 plain-English sentences summarizing what you found, for a public audience. No jargon, no IDs, no filenames.")
 3. Commit to git
 PROMPT
-  )
+    )
+  fi
+
+  echo "=== Session started $(date) [mode=$mode agent=$agent session#$session_num] ===" | tee -a logs/daemon.log | tee "$logfile"
 
   if command -v gtimeout &>/dev/null; then
-    TIMEOUT_CMD="gtimeout 50m"
+    TIMEOUT_CMD="gtimeout ${timeout_min}m"
   elif command -v timeout &>/dev/null; then
-    TIMEOUT_CMD="timeout 50m"
+    TIMEOUT_CMD="timeout ${timeout_min}m"
   else
     TIMEOUT_CMD=""
   fi
 
   local exit_code=0
   $TIMEOUT_CMD claude \
-    --agent orchestrator \
+    --agent "$agent" \
     --dangerously-skip-permissions \
     --verbose \
     --output-format stream-json \

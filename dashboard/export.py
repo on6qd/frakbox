@@ -58,22 +58,25 @@ def export_fund():
     # NAV history from snapshots
     data["nav_history"] = db.get_nav_history()
 
-    # Performance from completed hypotheses
+    # Performance from completed hypotheses (exclude research-only completions)
     completed = db.get_hypotheses_by_status("completed")
-    if completed:
-        wins = [h for h in completed if h.get("result", {}).get("direction_correct")]
-        losses = [h for h in completed if not h.get("result", {}).get("direction_correct")]
+    traded = [h for h in completed if h.get("trade") and (h.get("trade") or {}).get("entry_price", 0) >= 0.1]
+    research_only = [h for h in completed if h not in traded]
+    if traded:
+        wins = [h for h in traded if h.get("result", {}).get("direction_correct")]
+        losses = [h for h in traded if not h.get("result", {}).get("direction_correct")]
         win_returns = [h["result"]["raw_return_pct"] for h in wins if h.get("result", {}).get("raw_return_pct") is not None]
         loss_returns = [h["result"]["raw_return_pct"] for h in losses if h.get("result", {}).get("raw_return_pct") is not None]
 
         data["performance"] = {
-            "total_trades": len(completed),
+            "total_trades": len(traded),
             "winning_trades": len(wins),
             "losing_trades": len(losses),
-            "win_rate_pct": round(len(wins) / len(completed) * 100, 1) if completed else 0,
+            "win_rate_pct": round(len(wins) / len(traded) * 100, 1) if traded else 0,
             "avg_win_pct": round(sum(win_returns) / len(win_returns), 2) if win_returns else 0,
             "avg_loss_pct": round(sum(loss_returns) / len(loss_returns), 2) if loss_returns else 0,
-            "direction_accuracy": f"{len(wins)}/{len(completed)}",
+            "direction_accuracy": f"{len(wins)}/{len(traded)}",
+            "research_only_completions": len(research_only),
         }
 
         # Total return and drawdown from NAV history
@@ -149,16 +152,18 @@ def export_positions():
             "opened_date": (h.get("trade", {}) or {}).get("entry_date", h.get("created", "")[:10]),
         })
 
-    # Recent closed trades — full results (last 10)
+    # Recent closed trades — full results (last 10, exclude research-only)
     completed = db.get_hypotheses_by_status("completed")
-    completed.sort(key=lambda h: h.get("result", {}).get("exit_time", ""), reverse=True)
-    for h in completed[:10]:
+    traded = [h for h in completed if h.get("trade") and (h.get("trade") or {}).get("entry_price", 0) >= 0.1]
+    traded.sort(key=lambda h: h.get("result", {}).get("exit_time", ""), reverse=True)
+    for h in traded[:10]:
         result = h.get("result", {}) or {}
         data["recent_closed"].append({
             "symbol": h.get("expected_symbol", ""),
             "direction": h.get("expected_direction", ""),
             "event_type": h.get("event_type", ""),
             "result_pct": result.get("raw_return_pct"),
+            "abnormal_pct": result.get("abnormal_return_pct"),
             "exit_reason": result.get("exit_reason", ""),
             "closed_date": (result.get("exit_time") or "")[:10],
             "thesis": (h.get("event_description") or "")[:120],
