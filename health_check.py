@@ -63,6 +63,8 @@ def _last_session_time():
         if not matches:
             return None
         last = matches[-1].strip()
+        # Strip any trailing bracketed metadata like [mode=scan agent=scanner session#12]
+        last = re.sub(r"\s*\[.*\]\s*$", "", last)
         # Parse the date — strip timezone name (CET, EST, etc.)
         # Format: "Sat Mar 21 18:23:25 CET 2026"
         parts = last.split()
