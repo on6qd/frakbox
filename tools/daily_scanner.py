@@ -257,6 +257,43 @@ def run_seo_scanner(days: int) -> dict:
     }
 
 
+def run_sp500_changes(days: int) -> dict:
+    """S&P 500 index change scanner. Checks EDGAR + Wikipedia for additions/deletions.
+
+    Runs with --check-now to force check regardless of announcement window.
+    Off-cycle additions happen anytime — must check daily.
+    """
+    label = "S&P 500 Changes"
+    cmd = [
+        sys.executable, "tools/sp500_change_scanner.py",
+        "--check-now",
+        "--days", str(days),
+    ]
+    ok, stdout = _run(cmd, label)
+    if not ok:
+        return {"scanner": label, "status": "error", "new_changes": 0, "changes": []}
+
+    # Scanner prints log lines, not JSON — parse new announcement count
+    new_count = 0
+    changes = []
+    for line in stdout.splitlines():
+        if "NEW potential S&P 500 change" in line:
+            try:
+                new_count = int(line.split("ALERT:")[1].split("NEW")[0].strip())
+            except (ValueError, IndexError):
+                new_count = 1
+        # Parse individual change lines: "  April 9, 2026: +CASY / -HOLX"
+        if line.strip().startswith("+") or (": +" in line and "/ -" in line):
+            changes.append(line.strip())
+
+    return {
+        "scanner": label,
+        "status": "ok",
+        "new_changes": new_count,
+        "changes": changes,
+    }
+
+
 # ---------------------------------------------------------------------------
 # Actionable event detection
 # ---------------------------------------------------------------------------
@@ -338,6 +375,18 @@ def find_actionable_events(results: dict) -> list[dict]:
             "note": "Item 3.01 delisting notice — short signal",
         })
 
+    # S&P 500 index changes (additions are long signals)
+    sp500 = results.get("sp500_changes", {})
+    if sp500.get("new_changes", 0) > 0:
+        for change_line in sp500.get("changes", []):
+            actionable.append({
+                "scanner": "S&P 500 Changes",
+                "ticker": change_line,
+                "date": "",
+                "decision": "SIGNAL",
+                "note": "S&P 500 index change — long signal for additions",
+            })
+
     return actionable
 
 
@@ -357,10 +406,12 @@ def build_status_line(results: dict) -> str:
     delist_n = results.get("delisting_8k", {}).get("events_found", "ERR")
     seo_n = results.get("seo_bought_deal", {}).get("total_found", "ERR")
     seo_go = results.get("seo_bought_deal", {}).get("go_count", "")
+    sp500_n = results.get("sp500_changes", {}).get("new_changes", 0)
 
     act_part = f"{act_n}" if act_go == "" else f"{act_n} ({act_go} GO)"
     ins_part = f"{ins_n} clusters ({ins_go} GO, {ins_wgo} WEAK_GO)"
     seo_part = f"{seo_n}" if seo_go == "" else f"{seo_n} ({seo_go} GO)"
+    sp500_part = f"{sp500_n} new" if sp500_n else "0"
 
     return (
         f"NT 10-K: {nt_n} events | "
@@ -368,7 +419,8 @@ def build_status_line(results: dict) -> str:
         f"Insider: {ins_part} | "
         f"8-K 1.05: {cyber_n} events | "
         f"8-K 3.01: {delist_n} events | "
-        f"SEO: {seo_part} deals"
+        f"SEO: {seo_part} deals | "
+        f"S&P 500: {sp500_part}"
     )
 
 
@@ -418,6 +470,9 @@ def main():
     print("[daily_scanner] Running SEO bought-deal scanner...", file=sys.stderr)
     results["seo_bought_deal"] = run_seo_scanner(days)
 
+    print("[daily_scanner] Running S&P 500 changes scanner...", file=sys.stderr)
+    results["sp500_changes"] = run_sp500_changes(days)
+
     # Aggregate
     total_events = (
         results["nt_10k"].get("events_found", 0)
@@ -426,6 +481,7 @@ def main():
         + results["cybersecurity_8k"].get("events_found", 0)
         + results["delisting_8k"].get("events_found", 0)
         + results["seo_bought_deal"].get("total_found", 0)
+        + results["sp500_changes"].get("new_changes", 0)
     )
 
     actionable = find_actionable_events(results)

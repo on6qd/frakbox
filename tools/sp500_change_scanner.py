@@ -75,104 +75,228 @@ def check_spglobal_rss():
     """
     Check S&P Global press release RSS feed for index change announcements.
     Returns list of relevant announcements.
+
+    Note: RSS feed returns 403 as of April 2026 (Akamai WAF block).
+    Falls back to S&P DJI announcements page scraping.
     """
-    # S&P Dow Jones Indices press releases RSS
-    # Note: This URL may change - verify periodically
-    rss_url = "https://www.spglobal.com/spdji/en/rss/sp-indices-news.xml"
+    import re
+
+    # Try multiple S&P Global URLs — RSS blocked since ~2026-03
+    urls_to_try = [
+        "https://www.spglobal.com/spdji/en/rss/sp-indices-news.xml",
+        "https://www.spglobal.com/spdji/en/media-center/press-releases/",
+    ]
 
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-        'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
+                       'AppleWebKit/537.36 (KHTML, like Gecko) '
+                       'Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
     }
 
-    try:
-        resp = requests.get(rss_url, headers=headers, timeout=10)
-        if resp.status_code != 200:
-            return None, f"HTTP {resp.status_code}"
+    announcements = []
+    errors = []
 
-        content = resp.text
+    for url in urls_to_try:
+        try:
+            resp = requests.get(url, headers=headers, timeout=15, allow_redirects=True)
+            if resp.status_code != 200:
+                errors.append(f"{url}: HTTP {resp.status_code}")
+                continue
 
-        # Parse for S&P 500 addition/deletion mentions
-        announcements = []
+            content = resp.text
 
-        # Simple parsing for relevant items
-        if 'S&P 500' in content and ('addition' in content.lower() or 'added to' in content.lower()
-                                      or 'removed from' in content.lower()):
-            # Extract items
-            import re
-            items = re.findall(r'<item>(.*?)</item>', content, re.DOTALL)
-            for item in items:
-                title_match = re.search(r'<title>(.*?)</title>', item)
-                date_match = re.search(r'<pubDate>(.*?)</pubDate>', item)
-                link_match = re.search(r'<link>(.*?)</link>', item)
+            # Check for S&P 500 rebalance/change keywords
+            sp500_keywords = ['S&P 500', 'S&P Composite 1500']
+            change_keywords = ['addition', 'added to', 'removed from', 'rebalanc',
+                               'change', 'recompos', 'reconstitut', 'deletion']
 
-                title = title_match.group(1) if title_match else ''
-                date = date_match.group(1) if date_match else ''
-                link = link_match.group(1) if link_match else ''
+            has_sp500 = any(k in content for k in sp500_keywords)
+            has_change = any(k in content.lower() for k in change_keywords)
 
-                if ('S&P 500' in title or 'S&P Composite' in title) and (
-                    'addition' in title.lower() or 'rebalanc' in title.lower() or
-                    'change' in title.lower() or 'recompos' in title.lower()):
-                    announcements.append({
-                        'title': title.strip(),
-                        'date': date.strip(),
-                        'link': link.strip()
-                    })
+            if has_sp500 and has_change:
+                # Try XML parsing (RSS)
+                items = re.findall(r'<item>(.*?)</item>', content, re.DOTALL)
+                for item in items:
+                    title_match = re.search(r'<title>(.*?)</title>', item)
+                    date_match = re.search(r'<pubDate>(.*?)</pubDate>', item)
+                    link_match = re.search(r'<link>(.*?)</link>', item)
 
-        return announcements, None
+                    title = title_match.group(1) if title_match else ''
+                    pub_date = date_match.group(1) if date_match else ''
+                    link = link_match.group(1) if link_match else ''
 
-    except Exception as e:
-        return None, str(e)
+                    if any(k in title for k in sp500_keywords) and \
+                       any(k in title.lower() for k in change_keywords):
+                        announcements.append({
+                            'title': title.strip(),
+                            'date': pub_date.strip(),
+                            'link': link.strip(),
+                            'source': 'spglobal_rss'
+                        })
+
+                # Try HTML parsing (press releases page)
+                if not announcements:
+                    # Look for press release links with S&P 500 mentions
+                    links = re.findall(
+                        r'<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)</a>',
+                        content, re.DOTALL
+                    )
+                    for href, text in links:
+                        text_clean = re.sub(r'<[^>]+>', '', text).strip()
+                        if any(k in text_clean for k in sp500_keywords) and \
+                           any(k in text_clean.lower() for k in change_keywords):
+                            announcements.append({
+                                'title': text_clean[:200],
+                                'date': '',
+                                'link': href if href.startswith('http') else f'https://www.spglobal.com{href}',
+                                'source': 'spglobal_web'
+                            })
+
+            if announcements:
+                return announcements, None
+
+        except Exception as e:
+            errors.append(f"{url}: {e}")
+
+    error_msg = "; ".join(errors) if errors else None
+    return announcements if announcements else None, error_msg
 
 
-def check_edgar_8k_for_sp500():
+def check_edgar_8k_for_sp500(days_back=14):
     """
     Check EDGAR for recent 8-K filings mentioning S&P 500 addition.
     Many added companies file 8-Ks about the addition.
-    Uses EDGAR full-text search.
+    Uses EDGAR full-text search (EFTS).
+
+    Searches for both "S&P 500" and "Standard & Poor's 500" in 8-K filings.
+    Also checks 8-K12B (shell company events) and 8-K/A (amendments).
     """
-    # Check EDGAR EFTS for recent 8-Ks mentioning S&P 500 addition
     headers = {
         'User-Agent': 'research-agent admin@example.com',
         'Accept-Encoding': 'gzip, deflate',
     }
 
     today = datetime.now()
-    start_date = (today - timedelta(days=7)).strftime('%Y-%m-%d')
+    start_date = (today - timedelta(days=days_back)).strftime('%Y-%m-%d')
+    end_date = today.strftime('%Y-%m-%d')
 
-    # Search for 8-Ks mentioning "added to the S&P 500"
-    params = {
-        'q': '"added to the S&P 500" OR "added to the Standard & Poor\'s 500"',
-        'dateRange': 'custom',
-        'startdt': start_date,
-        'enddt': today.strftime('%Y-%m-%d'),
-        'forms': '8-K',
-        'hits.hits.total.value': 5,
-        'hits.hits._source': 'period_of_report,entity_name,file_date,form_type'
+    # Use the proper EFTS search-index endpoint with correct params
+    search_queries = [
+        '"added to the S&P 500"',
+        '"inclusion in the S&P 500"',
+        '"S&P 500" AND "index change"',
+    ]
+
+    all_additions = []
+    seen_ids = set()
+
+    for query in search_queries:
+        try:
+            resp = requests.get(
+                'https://efts.sec.gov/LATEST/search-index',
+                params={
+                    'q': query,
+                    'dateRange': 'custom',
+                    'startdt': start_date,
+                    'enddt': end_date,
+                    'forms': '8-K,8-K12B,8-K/A',
+                },
+                headers=headers,
+                timeout=15
+            )
+
+            if resp.status_code != 200:
+                log(f"EDGAR EFTS returned HTTP {resp.status_code} for query: {query[:50]}")
+                continue
+
+            data = resp.json()
+            hits = data.get('hits', {}).get('hits', [])
+            for hit in hits[:10]:
+                doc_id = hit.get('_id', '')
+                if doc_id in seen_ids:
+                    continue
+                seen_ids.add(doc_id)
+
+                src = hit.get('_source', {})
+                # display_names is more reliable than entity_name
+                names = src.get('display_names', [])
+                company = names[0] if names else src.get('entity_name', 'Unknown')
+
+                all_additions.append({
+                    'company': company,
+                    'date': src.get('file_date', 'Unknown'),
+                    'form': src.get('form_type', '8-K'),
+                    'ciks': src.get('ciks', []),
+                    'doc_id': doc_id,
+                })
+
+            # Rate limit between EDGAR queries
+            time.sleep(0.15)
+
+        except Exception as e:
+            log(f"EDGAR EFTS query failed: {e}")
+            continue
+
+    if all_additions:
+        return all_additions, None
+    return [], None
+
+
+def check_wikipedia_sp500_changes():
+    """
+    Check Wikipedia's 'List of S&P 500 companies' page for recent changes.
+    Wikipedia maintains a 'Selected changes' table that is updated promptly.
+    Returns list of recent changes or error.
+    """
+    import re
+
+    url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (research-agent; +https://github.com/) Gecko/20100101',
     }
 
     try:
-        resp = requests.get(
-            'https://efts.sec.gov/LATEST/search-index?q=%22added+to+the+S%26P+500%22&dateRange=custom'
-            f'&startdt={start_date}&enddt={today.strftime("%Y-%m-%d")}&forms=8-K',
-            headers=headers,
-            timeout=10
+        resp = requests.get(url, headers=headers, timeout=15)
+        if resp.status_code != 200:
+            return None, f"Wikipedia HTTP {resp.status_code}"
+
+        content = resp.text
+
+        # Look for the "Selected changes" section
+        # The table has columns: Date, Added (ticker, security), Removed (ticker, security), Reason
+        changes = []
+        current_year = datetime.now().year
+
+        # Find rows in the changes table
+        # Pattern: date in YYYY-MM-DD or Month DD, YYYY format followed by ticker symbols
+        table_pattern = re.findall(
+            r'<tr>\s*<td[^>]*>(.*?)</td>\s*<td[^>]*>(.*?)</td>\s*<td[^>]*>(.*?)</td>'
+            r'\s*<td[^>]*>(.*?)</td>\s*<td[^>]*>(.*?)</td>',
+            content, re.DOTALL
         )
 
-        if resp.status_code == 200:
-            data = resp.json()
-            hits = data.get('hits', {}).get('hits', [])
-            additions = []
-            for hit in hits[:10]:
-                src = hit.get('_source', {})
-                additions.append({
-                    'company': src.get('entity_name', 'Unknown'),
-                    'date': src.get('file_date', 'Unknown'),
-                    'form': src.get('form_type', '8-K')
-                })
-            return additions, None
-        else:
-            return None, f"EDGAR HTTP {resp.status_code}"
+        for row in table_pattern:
+            date_text = re.sub(r'<[^>]+>', '', row[0]).strip()
+            # Check if this is from the current year or last 30 days
+            if str(current_year) in date_text or str(current_year - 1) in date_text:
+                added_ticker = re.sub(r'<[^>]+>', '', row[1]).strip()
+                added_name = re.sub(r'<[^>]+>', '', row[2]).strip()
+                removed_ticker = re.sub(r'<[^>]+>', '', row[3]).strip()
+                removed_name = re.sub(r'<[^>]+>', '', row[4]).strip()
+
+                if added_ticker or removed_ticker:
+                    changes.append({
+                        'date': date_text,
+                        'added_ticker': added_ticker,
+                        'added_name': added_name,
+                        'removed_ticker': removed_ticker,
+                        'removed_name': removed_name,
+                        'source': 'wikipedia'
+                    })
+
+        return changes[:20], None  # Cap at 20 most recent
 
     except Exception as e:
         return None, str(e)
@@ -221,11 +345,17 @@ def check_known_addition_tickers(tickers_to_check, days_back=14):
 
 
 def run_scan(args=None):
-    """Main scan function."""
+    """Main scan function.
+
+    Data sources (in order):
+    1. EDGAR EFTS — 8-K filings mentioning S&P 500 addition (always runs)
+    2. S&P Global website — press releases via RSS or web scraping (announcement window / forced)
+    3. Wikipedia — 'List of S&P 500 companies' recent changes table (announcement window / forced)
+    """
     log("=== S&P 500 Change Scanner ===")
 
     force_check = args and '--check-now' in args
-    days = 7
+    days = 14
     if args and '--days' in args:
         idx = args.index('--days')
         if idx + 1 < len(args):
@@ -235,65 +365,111 @@ def run_scan(args=None):
 
     in_window = is_quarterly_announcement_week()
     if in_window:
-        log(f"IN quarterly rebalance announcement window - checking S&P press releases")
+        log("IN quarterly rebalance announcement window")
     elif force_check:
-        log(f"Forced check (--check-now flag)")
+        log("Forced check (--check-now flag)")
     else:
-        log(f"Not in announcement window. Use --check-now to force scan.")
+        log("Not in announcement window. Use --check-now to force scan.")
 
     results_summary = {
         'scan_date': datetime.now().isoformat(),
         'in_window': in_window,
         'edgar_8k_additions': [],
         'spglobal_announcements': [],
-        'new_announcements': []
+        'wikipedia_changes': [],
+        'new_announcements': [],
     }
 
-    # 1. Check EDGAR for 8-K filings about S&P 500 additions
+    # 1. Always check EDGAR 8-K filings (most reliable, free, works)
     log(f"Checking EDGAR 8-K filings (last {days} days)...")
-    edgar_additions, edgar_error = check_edgar_8k_for_sp500()
+    edgar_additions, edgar_error = check_edgar_8k_for_sp500(days_back=days)
 
     if edgar_error:
         log(f"EDGAR check failed: {edgar_error}")
     elif edgar_additions:
         log(f"Found {len(edgar_additions)} potential S&P 500 addition 8-Ks:")
         for a in edgar_additions:
-            log(f"  {a['company']} ({a['date']})")
+            log(f"  {a['company']} ({a['date']}) [{a['form']}]")
         results_summary['edgar_8k_additions'] = edgar_additions
     else:
-        log("No S&P 500 addition 8-Ks found in last 7 days")
+        log(f"No S&P 500 addition 8-Ks found in last {days} days")
 
-    # 2. Check S&P Global RSS feed (when in announcement window or forced)
+    # 2. Check S&P Global website (announcement window or forced)
     if in_window or force_check:
-        log("Checking S&P Global press releases RSS...")
+        log("Checking S&P Global press releases...")
         spglobal_news, rss_error = check_spglobal_rss()
 
         if rss_error:
-            log(f"RSS check failed: {rss_error}")
+            log(f"S&P Global check failed: {rss_error}")
         elif spglobal_news:
             log(f"Found {len(spglobal_news)} relevant S&P press releases:")
             for item in spglobal_news:
-                log(f"  [{item['date']}] {item['title']}")
+                log(f"  [{item.get('date','')}] {item['title']}")
             results_summary['spglobal_announcements'] = spglobal_news
         else:
             log("No relevant S&P 500 change press releases found")
 
+    # 3. Check Wikipedia recent changes (announcement window or forced)
+    if in_window or force_check:
+        log("Checking Wikipedia S&P 500 changes table...")
+        wiki_changes, wiki_error = check_wikipedia_sp500_changes()
+
+        if wiki_error:
+            log(f"Wikipedia check failed: {wiki_error}")
+        elif wiki_changes:
+            current_year = datetime.now().year
+            recent = [c for c in wiki_changes if str(current_year) in c.get('date', '')]
+            if recent:
+                log(f"Found {len(recent)} S&P 500 changes in {current_year}:")
+                for c in recent[:5]:
+                    added = c.get('added_ticker', '')
+                    removed = c.get('removed_ticker', '')
+                    log(f"  {c['date']}: +{added} / -{removed}")
+                results_summary['wikipedia_changes'] = recent
+            else:
+                log("No current-year S&P 500 changes on Wikipedia")
+        else:
+            log("No Wikipedia S&P 500 changes parsed")
+
+    # Deduplicate: find truly new announcements not in state
+    seen = set(state.get('seen_announcements', []))
+    all_signals = []
+
+    for a in results_summary.get('edgar_8k_additions', []):
+        key = f"edgar:{a.get('doc_id', a['company'])}"
+        if key not in seen:
+            all_signals.append({**a, 'source': 'edgar', '_key': key})
+
+    for a in results_summary.get('spglobal_announcements', []):
+        key = f"spglobal:{a.get('link', a['title'])}"
+        if key not in seen:
+            all_signals.append({**a, '_key': key})
+
+    for c in results_summary.get('wikipedia_changes', []):
+        key = f"wiki:{c.get('added_ticker', '')}:{c.get('date', '')}"
+        if key not in seen:
+            all_signals.append({**c, 'source': 'wikipedia', '_key': key})
+
+    results_summary['new_announcements'] = all_signals
+
     # Update state
+    for sig in all_signals:
+        seen.add(sig['_key'])
     state['last_check'] = datetime.now().isoformat()
+    state['seen_announcements'] = list(seen)[-200:]  # Keep last 200
     save_state(state)
 
     # Summarize
     log("")
-    if results_summary['edgar_8k_additions'] or results_summary['spglobal_announcements']:
-        log("ALERT: Potential S&P 500 changes detected!")
-        log("ACTION: Review manually and set trigger on hypothesis 061ae3a8 if confirmed")
+    if all_signals:
+        log(f"ALERT: {len(all_signals)} NEW potential S&P 500 change(s) detected!")
+        log("ACTION: Review and create hypothesis if confirmed addition.")
         log("  - Enter LONG at next market open on each confirmed addition")
         log("  - $5,000 per position, 5-day hold")
-        log("  - Hypothesis ID: 061ae3a8")
     else:
-        log("No S&P 500 changes detected in current scan window.")
+        log("No new S&P 500 changes detected.")
         if in_window:
-            log("Still in announcement window - re-run tomorrow if no announcement yet.")
+            log("Still in announcement window — re-run tomorrow if no announcement yet.")
 
     return results_summary
 
