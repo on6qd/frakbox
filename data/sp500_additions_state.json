@@ -1,5 +1,5 @@
 {
-  "last_check": "2026-03-23T17:00:03.196310",
+  "last_check": "2026-04-14T03:30:00",
   "seen_press_links": [],
   "wikipedia_tickers": [
     "A",
@@ -504,7 +504,11 @@
     "YUM",
     "ZBH",
     "ZBRA",
-    "ZTS"
+    "ZTS",
+    "VRT",
+    "LITE",
+    "COHR",
+    "SATS"
   ],
   "wikipedia_dates": {
     "MMM": "1957-03-04",
@@ -1009,7 +1013,11 @@
     "YUM": "1997-10-06",
     "ZBRA": "2019-12-23",
     "ZBH": "2001-08-07",
-    "ZTS": "2013-06-21"
+    "ZTS": "2013-06-21",
+    "VRT": "2026-03-23",
+    "LITE": "2026-03-23",
+    "COHR": "2026-03-23",
+    "SATS": "2026-03-23"
   },
   "triggered_tickers": [],
   "last_triggered_hypothesis": null
