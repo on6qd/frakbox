@@ -561,6 +561,7 @@ def main():
     oos_result = None
     try:
         print("[daily_scanner] Updating OOS observations...", file=sys.stderr)
+        sys.path.insert(0, str(REPO_ROOT))
         import oos_tracker
         oos_result = oos_tracker.update_all_active()
         if oos_result.get("updated", 0) > 0 or oos_result.get("expired", 0) > 0:
