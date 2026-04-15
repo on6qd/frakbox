@@ -38,7 +38,7 @@ Data-heavy tasks (backtesting, scanning, price fetching) run as pure Python via 
 
 ## Storage
 
-SQLite `research.db` (WAL mode). Tables: hypotheses, known_effects, dead_ends, literature, research_queue, event_watchlist, session_priorities, session_handoff, task_results.
+SQLite `research.db` (WAL mode). Tables: hypotheses, known_effects, dead_ends, literature, research_queue, event_watchlist, session_priorities, session_handoff, task_results, oos_observations, oos_daily_prices.
 
 ## Standard Backtest Workflow
 
@@ -73,6 +73,30 @@ from tools.largecap_filter import filter_to_largecap      # filter >500M cap
 from tools.yfinance_utils import safe_download, get_close_prices  # ALWAYS use (not raw yf.download)
 result = market_data.measure_event_impact(event_dates=[...], entry_price="open")  # open for after-hours
 ```
+
+## OOS Observation Tracking
+
+Track out-of-sample signal observations with automated daily price tracking:
+
+```bash
+# Register a new OOS observation
+python3 data_tasks.py oos register --signal-type nt_10k_late_filing_short \
+  --symbol AAPL --entry-date 2026-04-15 --hold-days 5 --direction short \
+  --threshold -2.5 --hypothesis-id abc123
+
+# Update all active observations (run daily or after market close)
+python3 data_tasks.py oos update
+
+# Check status of all active/expired observations
+python3 data_tasks.py oos status
+python3 data_tasks.py oos status --all  # include completed
+
+# Close an observation with result
+python3 data_tasks.py oos close --id OOS-abc12345 --result validated
+python3 data_tasks.py oos close --id OOS-abc12345 --result failed
+```
+
+The `oos update` command is automatically called by `daily_scanner.py`. Observations reaching their hold period are marked "expired" for human review.
 
 ## Hypothesis Classes
 

@@ -557,6 +557,21 @@ def main():
     actionable = find_actionable_events(results)
     status_line = build_status_line(results)
 
+    # Update OOS observations
+    oos_result = None
+    try:
+        print("[daily_scanner] Updating OOS observations...", file=sys.stderr)
+        import oos_tracker
+        oos_result = oos_tracker.update_all_active()
+        if oos_result.get("updated", 0) > 0 or oos_result.get("expired", 0) > 0:
+            print(f"[daily_scanner] OOS: {oos_result.get('updated', 0)} updated, "
+                  f"{oos_result.get('expired', 0)} expired", file=sys.stderr)
+        else:
+            print("[daily_scanner] OOS: no active observations", file=sys.stderr)
+    except Exception as e:
+        print(f"[daily_scanner] OOS update failed: {e}", file=sys.stderr)
+        oos_result = {"status": "error", "error": str(e)}
+
     # Final output
     output = {
         "scan_time": scan_time,
@@ -567,6 +582,7 @@ def main():
         "status_line": status_line,
         "actionable_events": actionable,
         "scanners": results,
+        "oos_tracker": oos_result,
     }
 
     # Machine-readable JSON to stdout
