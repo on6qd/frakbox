@@ -668,6 +668,37 @@ def cmd_fetch_series(args):
     print(json.dumps(summary, indent=2, default=str))
 
 
+def cmd_oos(args):
+    """OOS observation tracker dispatcher."""
+    import oos_tracker
+
+    if args.oos_command == "register":
+        result = oos_tracker.register_observation(
+            signal_type=args.signal_type,
+            symbol=args.symbol,
+            entry_date=args.entry_date,
+            hold_days=args.hold_days,
+            direction=args.direction,
+            threshold=args.threshold,
+            benchmark=args.benchmark,
+            hypothesis_id=args.hypothesis_id,
+            notes=args.notes,
+        )
+    elif args.oos_command == "update":
+        result = oos_tracker.update_all_active()
+    elif args.oos_command == "status":
+        result = oos_tracker.get_status_summary(
+            signal_type=args.signal_type,
+            include_completed=args.show_all,
+        )
+    elif args.oos_command == "close":
+        result = oos_tracker.close_observation(args.id, args.result)
+    else:
+        result = {"status": "error", "error": f"Unknown oos command: {args.oos_command}"}
+
+    print(json.dumps(result, indent=2, default=str))
+
+
 def main():
     db.init_db()
 
@@ -766,6 +797,31 @@ def main():
     fs.add_argument("--start", default="2020-01-01")
     fs.add_argument("--end", default=datetime.now().strftime("%Y-%m-%d"))
 
+    # oos — OOS observation tracker
+    oos = subparsers.add_parser("oos", help="OOS observation tracker")
+    oos_sub = oos.add_subparsers(dest="oos_command", required=True)
+
+    oos_reg = oos_sub.add_parser("register", help="Register new OOS observation")
+    oos_reg.add_argument("--signal-type", required=True)
+    oos_reg.add_argument("--symbol", required=True)
+    oos_reg.add_argument("--entry-date", required=True, help="ISO date, e.g. 2026-04-15")
+    oos_reg.add_argument("--hold-days", type=int, default=5)
+    oos_reg.add_argument("--direction", required=True, choices=["long", "short"])
+    oos_reg.add_argument("--threshold", type=float, default=None, help="Success threshold (e.g., -2.5 for short)")
+    oos_reg.add_argument("--benchmark", default="SPY")
+    oos_reg.add_argument("--hypothesis-id", default=None)
+    oos_reg.add_argument("--notes", default=None)
+
+    oos_sub.add_parser("update", help="Update all active OOS observations with latest prices")
+
+    oos_st = oos_sub.add_parser("status", help="Show OOS observation status")
+    oos_st.add_argument("--signal-type", default=None)
+    oos_st.add_argument("--all", action="store_true", dest="show_all", help="Include completed")
+
+    oos_cl = oos_sub.add_parser("close", help="Close an OOS observation")
+    oos_cl.add_argument("--id", required=True)
+    oos_cl.add_argument("--result", required=True, choices=["validated", "failed"])
+
     args = parser.parse_args()
 
     commands = {
@@ -781,6 +837,7 @@ def main():
         "threshold": cmd_threshold,
         "calendar": cmd_calendar,
         "fetch-series": cmd_fetch_series,
+        "oos": cmd_oos,
     }
     commands[args.command](args)
 

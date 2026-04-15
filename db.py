@@ -73,6 +73,47 @@ def _run_migrations(conn):
     conn.execute("CREATE INDEX IF NOT EXISTS idx_hypotheses_class ON hypotheses(hypothesis_class)")
     conn.commit()
 
+    # Migration 3: add oos_observations and oos_daily_prices tables
+    try:
+        conn.execute("SELECT id FROM oos_observations LIMIT 1")
+    except sqlite3.OperationalError:
+        conn.executescript("""
+            CREATE TABLE IF NOT EXISTS oos_observations (
+                id TEXT PRIMARY KEY,
+                hypothesis_id TEXT,
+                signal_type TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                benchmark TEXT NOT NULL DEFAULT 'SPY',
+                direction TEXT NOT NULL,
+                entry_date TEXT NOT NULL,
+                entry_price REAL NOT NULL,
+                entry_benchmark_price REAL NOT NULL,
+                hold_days INTEGER NOT NULL DEFAULT 5,
+                success_threshold_pct REAL,
+                status TEXT NOT NULL DEFAULT 'tracking',
+                notes TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_oos_obs_status ON oos_observations(status);
+            CREATE INDEX IF NOT EXISTS idx_oos_obs_signal ON oos_observations(signal_type);
+
+            CREATE TABLE IF NOT EXISTS oos_daily_prices (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                observation_id TEXT NOT NULL REFERENCES oos_observations(id),
+                day_number INTEGER NOT NULL,
+                trade_date TEXT NOT NULL,
+                symbol_close REAL NOT NULL,
+                benchmark_close REAL NOT NULL,
+                raw_return_pct REAL NOT NULL,
+                benchmark_return_pct REAL NOT NULL,
+                abnormal_return_pct REAL NOT NULL,
+                UNIQUE(observation_id, day_number)
+            );
+            CREATE INDEX IF NOT EXISTS idx_oos_daily_obs ON oos_daily_prices(observation_id);
+        """)
+        conn.commit()
+
 
 # ---------------------------------------------------------------------------
 # Schema
@@ -301,6 +342,40 @@ CREATE TABLE IF NOT EXISTS task_results (
 );
 CREATE INDEX IF NOT EXISTS idx_task_results_type ON task_results(task_type);
 CREATE INDEX IF NOT EXISTS idx_task_results_ts ON task_results(timestamp);
+
+CREATE TABLE IF NOT EXISTS oos_observations (
+    id TEXT PRIMARY KEY,
+    hypothesis_id TEXT,
+    signal_type TEXT NOT NULL,
+    symbol TEXT NOT NULL,
+    benchmark TEXT NOT NULL DEFAULT 'SPY',
+    direction TEXT NOT NULL,
+    entry_date TEXT NOT NULL,
+    entry_price REAL NOT NULL,
+    entry_benchmark_price REAL NOT NULL,
+    hold_days INTEGER NOT NULL DEFAULT 5,
+    success_threshold_pct REAL,
+    status TEXT NOT NULL DEFAULT 'tracking',
+    notes TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_oos_obs_status ON oos_observations(status);
+CREATE INDEX IF NOT EXISTS idx_oos_obs_signal ON oos_observations(signal_type);
+
+CREATE TABLE IF NOT EXISTS oos_daily_prices (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    observation_id TEXT NOT NULL REFERENCES oos_observations(id),
+    day_number INTEGER NOT NULL,
+    trade_date TEXT NOT NULL,
+    symbol_close REAL NOT NULL,
+    benchmark_close REAL NOT NULL,
+    raw_return_pct REAL NOT NULL,
+    benchmark_return_pct REAL NOT NULL,
+    abnormal_return_pct REAL NOT NULL,
+    UNIQUE(observation_id, day_number)
+);
+CREATE INDEX IF NOT EXISTS idx_oos_daily_obs ON oos_daily_prices(observation_id);
 """
 
 # ---------------------------------------------------------------------------
@@ -1558,4 +1633,115 @@ def get_recent_task_results(task_type=None, limit=20):
             "ORDER BY timestamp DESC LIMIT ?",
             (limit,),
         ).fetchall()
+    return [dict(r) for r in rows]
+
+
+# ---------------------------------------------------------------------------
+# OOS Observations CRUD
+# ---------------------------------------------------------------------------
+
+def create_oos_observation(obs_id, signal_type, symbol, benchmark, direction,
+                            entry_date, entry_price, entry_benchmark_price,
+                            hold_days, success_threshold_pct=None,
+                            hypothesis_id=None, notes=None):
+    """Create a new OOS observation. Returns the inserted dict."""
+    conn = get_db()
+    init_db()
+    now = datetime.now().isoformat()
+    conn.execute(
+        """INSERT INTO oos_observations
+           (id, hypothesis_id, signal_type, symbol, benchmark, direction,
+            entry_date, entry_price, entry_benchmark_price, hold_days,
+            success_threshold_pct, status, notes, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'tracking', ?, ?, ?)""",
+        (obs_id, hypothesis_id, signal_type, symbol, benchmark, direction,
+         entry_date, entry_price, entry_benchmark_price, hold_days,
+         success_threshold_pct, notes, now, now),
+    )
+    conn.commit()
+    return get_oos_observation(obs_id)
+
+
+def get_oos_observation(obs_id):
+    """Fetch a single OOS observation by ID."""
+    conn = get_db()
+    init_db()
+    row = conn.execute("SELECT * FROM oos_observations WHERE id = ?", (obs_id,)).fetchone()
+    return dict(row) if row else None
+
+
+def get_active_oos_observations():
+    """Get all OOS observations with status='tracking'."""
+    conn = get_db()
+    init_db()
+    rows = conn.execute(
+        "SELECT * FROM oos_observations WHERE status = 'tracking' ORDER BY entry_date",
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_oos_observations(status=None, signal_type=None):
+    """Get OOS observations with optional filters."""
+    conn = get_db()
+    init_db()
+    query = "SELECT * FROM oos_observations WHERE 1=1"
+    params = []
+    if status:
+        query += " AND status = ?"
+        params.append(status)
+    if signal_type:
+        query += " AND signal_type = ?"
+        params.append(signal_type)
+    query += " ORDER BY entry_date DESC"
+    rows = conn.execute(query, params).fetchall()
+    return [dict(r) for r in rows]
+
+
+def update_oos_status(obs_id, status):
+    """Update the status of an OOS observation."""
+    conn = get_db()
+    init_db()
+    now = datetime.now().isoformat()
+    conn.execute(
+        "UPDATE oos_observations SET status = ?, updated_at = ? WHERE id = ?",
+        (status, now, obs_id),
+    )
+    conn.commit()
+
+
+def upsert_oos_daily_price(observation_id, day_number, trade_date,
+                            symbol_close, benchmark_close,
+                            raw_return_pct, benchmark_return_pct,
+                            abnormal_return_pct):
+    """Insert or update a daily price record for an OOS observation."""
+    conn = get_db()
+    init_db()
+    conn.execute(
+        """INSERT INTO oos_daily_prices
+           (observation_id, day_number, trade_date, symbol_close,
+            benchmark_close, raw_return_pct, benchmark_return_pct,
+            abnormal_return_pct)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+           ON CONFLICT(observation_id, day_number) DO UPDATE SET
+            trade_date = excluded.trade_date,
+            symbol_close = excluded.symbol_close,
+            benchmark_close = excluded.benchmark_close,
+            raw_return_pct = excluded.raw_return_pct,
+            benchmark_return_pct = excluded.benchmark_return_pct,
+            abnormal_return_pct = excluded.abnormal_return_pct""",
+        (observation_id, day_number, trade_date, symbol_close,
+         benchmark_close, raw_return_pct, benchmark_return_pct,
+         abnormal_return_pct),
+    )
+    conn.commit()
+
+
+def get_oos_daily_prices(observation_id):
+    """Get all daily prices for an OOS observation, ordered by day_number."""
+    conn = get_db()
+    init_db()
+    rows = conn.execute(
+        "SELECT * FROM oos_daily_prices WHERE observation_id = ? ORDER BY day_number",
+        (observation_id,),
+    ).fetchall()
     return [dict(r) for r in rows]
