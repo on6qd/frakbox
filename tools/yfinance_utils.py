@@ -262,9 +262,44 @@ def get_current_price(ticker: str) -> float:
         price = get_current_price("SPY")    # e.g. 512.34
         vix   = get_current_price("^VIX")   # e.g. 18.7
     """
-    hist = yf.Ticker(ticker).history(period="5d")
+    # Use yf.download() (Ticker.history can hang indefinitely)
+    from datetime import datetime, timedelta
+    hist = pd.DataFrame()
+    end_dt = datetime.now() + timedelta(days=1)
+    start_dt = end_dt - timedelta(days=10)
+    try:
+        hist = yf.download(
+            ticker,
+            start=start_dt.strftime("%Y-%m-%d"),
+            end=end_dt.strftime("%Y-%m-%d"),
+            progress=False,
+            auto_adjust=True,
+        )
+        hist = flatten_yfinance_columns(hist, ticker=ticker)
+    except Exception:
+        hist = pd.DataFrame()
 
-    if hist.empty:
+    if hist is None or hist.empty:
+        # Third fallback: try Tiingo
+        import os, requests
+        tiingo_key = os.environ.get("TIINGO_API_KEY", "")
+        if tiingo_key:
+            try:
+                from datetime import datetime, timedelta
+                end_d = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+                start_d = (datetime.now() - timedelta(days=10)).strftime("%Y-%m-%d")
+                headers = {"Content-Type": "application/json",
+                           "Authorization": f"Token {tiingo_key}"}
+                url = f"https://api.tiingo.com/tiingo/daily/{ticker}/prices"
+                r = requests.get(url, params={"startDate": start_d, "endDate": end_d},
+                                 headers=headers, timeout=10)
+                if r.status_code == 200:
+                    data = r.json()
+                    if data:
+                        return float(data[-1].get("adjClose", data[-1].get("close", 0)))
+            except Exception:
+                pass
+
         raise ValueError(
             f"No price data available for {ticker!r}. "
             "Ticker may be delisted, invalid, or the market may be closed."

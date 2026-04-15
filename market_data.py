@@ -122,7 +122,13 @@ def _fetch_history_tiingo(symbol, start_str, end_str):
 
 def _fetch_stock_data(symbol, start_str, end_str):
     """Fetch stock data from yfinance, falling back to Tiingo for delisted tickers."""
-    df = yf.Ticker(symbol).history(start=start_str, end=end_str, interval="1d")
+    try:
+        # Use yf.download (more reliable than Ticker.history which can return None)
+        from tools.yfinance_utils import safe_download
+        df = safe_download(symbol, start=start_str, end=end_str)
+    except (ValueError, TypeError, Exception) as e:
+        print(f"[yfinance] safe_download failed for {symbol}: {e}", file=sys.stderr)
+        df = pd.DataFrame()
     if df.empty:
         df = _fetch_history_tiingo(symbol, start_str, end_str)
     return df
