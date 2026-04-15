@@ -253,7 +253,9 @@ def run_delisting_8k(days: int) -> dict:
         sys.executable, "tools/delisting_8k_scanner.py",
         "--days", str(days),
         "--json-events",
-        "--forced-only",  # Only forced delistings, not voluntary transfers
+        # NOTE: --forced-only REMOVED 2026-04-15. Original backtest (n=97) was on ALL
+        # 3.01 filings (classifier bug labeled all as forced). Signal validated on combined
+        # set. Forced-only restricts to ~2/year (untradeable). All filings: ~28/year.
     ]
     ok, stdout = _run(cmd, label)
     if not ok:
