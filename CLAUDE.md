@@ -26,6 +26,7 @@ Data-heavy tasks (backtesting, scanning, price fetching) run as pure Python via 
 | `market_data.py` | Prices, event impact, power analysis |
 | `causal_tests.py` | Statistical engines for non-event hypotheses (regression, cointegration, Granger, etc.) |
 | `data_tasks.py` | CLI dispatcher — runs backtests/scans/regressions without LLM, stores results in SQLite |
+| `oos_tracker.py` | Automated OOS observation tracking — register, update daily prices, compute abnormal returns |
 | `self_review.py` | Confidence scoring, methodology |
 | `research_queue.py` | Task queue, watchlist, handoffs (uses db.py) |
 | `trader.py` | Paper trades via Alpaca |
