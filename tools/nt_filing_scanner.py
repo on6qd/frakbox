@@ -119,8 +119,31 @@ def search_nt_filings(start_date: str, end_date: str, form_type: str = "NT 10-K"
     return results
 
 
+_MC_CACHE = None
+
+def _load_mc_cache() -> dict:
+    """Load the persistent market cap cache."""
+    global _MC_CACHE
+    if _MC_CACHE is not None:
+        return _MC_CACHE
+    import os
+    cache_path = os.path.join(os.path.dirname(__file__), "..", "data", "ticker_cache", "market_cap_cache.json")
+    try:
+        with open(cache_path, "r") as f:
+            _MC_CACHE = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        _MC_CACHE = {}
+    return _MC_CACHE
+
 def get_market_cap(ticker: str) -> float | None:
-    """Get current market cap for a ticker using yfinance."""
+    """Get market cap for a ticker, checking persistent cache first."""
+    # Check persistent cache first (in millions)
+    cache = _load_mc_cache()
+    if ticker in cache:
+        val = cache[ticker]
+        if val and val > 0:
+            return val * 1_000_000  # cache stores in millions, return raw
+    # Fall back to yfinance
     if not yf:
         return None
     try:
@@ -237,7 +260,7 @@ def scan_nt_filings(start_date: str, end_date: str, filter_largecap: bool = True
 def to_backtest_events(filings: list[dict]) -> list[dict]:
     """Convert filings to backtest event format."""
     return [
-        {"symbol": f["ticker"], "date": f["file_date"]}
+        {"symbol": f["ticker"], "date": f["file_date"], "form_type": f.get("form_type", "")}
         for f in filings
         if f["ticker"] and f["file_date"]
     ]
