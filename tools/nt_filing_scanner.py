@@ -258,12 +258,17 @@ def scan_nt_filings(start_date: str, end_date: str, filter_largecap: bool = True
 
 
 def to_backtest_events(filings: list[dict]) -> list[dict]:
-    """Convert filings to backtest event format."""
-    return [
-        {"symbol": f["ticker"], "date": f["file_date"], "form_type": f.get("form_type", "")}
-        for f in filings
-        if f["ticker"] and f["file_date"]
-    ]
+    """Convert filings to backtest event format.
+    Includes is_first_time_filer flag when available (from --tag-first-time)."""
+    events = []
+    for f in filings:
+        if not f["ticker"] or not f["file_date"]:
+            continue
+        evt = {"symbol": f["ticker"], "date": f["file_date"], "form_type": f.get("form_type", "")}
+        if "is_first_time_filer" in f:
+            evt["is_first_time_filer"] = f["is_first_time_filer"]
+        events.append(evt)
+    return events
 
 
 def tag_first_time_filers(filings: list[dict], lookback_days: int = 730) -> list[dict]:

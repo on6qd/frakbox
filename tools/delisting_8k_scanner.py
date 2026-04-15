@@ -52,6 +52,37 @@ MIN_MARKET_CAP = 500_000_000  # $500M
 EFTS_PAGE_SIZE = 100
 
 # Text patterns that indicate a VOLUNTARY exchange transfer (neutral/positive signal)
+# Going-private / M&A patterns — stock ceases trading, UNTRADEABLE
+# NOTE: patterns are matched against LOWERCASED text. Order matters —
+# check these BEFORE voluntary patterns since M&A delistings often also
+# match voluntary withdrawal language.
+GOING_PRIVATE_PATTERNS = [
+    "completion of the merger",          # most common M&A delisting phrase
+    "completion of the acquisition",
+    "completion of the tender offer",
+    "completion of the transaction",
+    "in connection with the merger",     # sometimes without "completion of"
+    "in connection with the acquisition",
+    "as a result of the merger",
+    "following the merger",
+    "pursuant to the merger",
+    "pursuant to the acquisition",
+    "as a result of the completion",
+    "converted into the right to receive",
+    "each share was converted",
+    "shares were cancelled",
+    "going private",
+    "rule 13e-3",                        # SEC going-private rule
+    "short-form merger",
+    "squeeze-out merger",
+    "merger was completed",
+    "acquisition was completed",
+    "merger has been completed",
+    "consummation of the merger",
+    "consummation of the acquisition",
+]
+
+# Voluntary transfer/withdrawal patterns — stock may continue trading
 VOLUNTARY_PATTERNS = [
     "acting pursuant to authorization from its board",
     "intention to voluntarily withdraw",
@@ -69,12 +100,6 @@ VOLUNTARY_PATTERNS = [
     "approved for listing",
     "new listing application",
     "effective date of the listing",
-    "in connection with the merger",     # delisting due to M&A completion
-    "in connection with the acquisition",
-    "as a result of the merger",
-    "following completion of the merger",
-    "pursuant to the merger",
-    "as a result of the completion",
 ]
 
 # Text patterns that indicate a FORCED delisting warning (negative signal — our target)
@@ -139,12 +164,17 @@ def classify_filing_content(text: str) -> str:
     snippet = text[idx: idx + 1500]
     snippet_clean = re.sub(r"<[^>]+>", " ", snippet).lower()
 
-    # Check voluntary first (many forced notices also mention "transfer" generically)
+    # Check going-private FIRST — these are untradeable (stock ceases trading)
+    for pat in GOING_PRIVATE_PATTERNS:
+        if pat in snippet_clean:
+            return "going_private"
+
+    # Check voluntary transfer/withdrawal (may continue trading on OTC)
     for pat in VOLUNTARY_PATTERNS:
         if pat in snippet_clean:
             return "voluntary"
 
-    # Then check forced
+    # Then check forced (non-compliance — our primary trade target)
     for pat in FORCED_PATTERNS:
         if pat in snippet_clean:
             return "forced"
@@ -553,7 +583,12 @@ def main():
         print(f"  {e['ticker']} {e['file_date']}{mcap_str}{ft_str}: {e['display_name'][:55]}")
 
     if args.json_events:
-        json_events = [{"symbol": e["ticker"], "date": e["file_date"]} for e in events]
+        json_events = []
+        for e in events:
+            evt = {"symbol": e["ticker"], "date": e["file_date"]}
+            if e.get("filing_type"):
+                evt["filing_type"] = e["filing_type"]
+            json_events.append(evt)
         print(json.dumps(json_events))
 
     if args.backtest and events:

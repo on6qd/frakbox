@@ -145,14 +145,16 @@ def run_nt_10k(days: int) -> dict:
     if not isinstance(events, list):
         events = []
 
-    # Note: when --json-events is combined with --tag-first-time, the JSON list only
-    # carries {symbol, date} — first-time tag info is in stderr diagnostic text.
-    # The event count is still accurate.
+    # JSON events now include is_first_time_filer flag when --tag-first-time is used.
+    # Filter: only first-time filers are tradeable (repeat filers show no signal).
+    first_time = [e for e in events if e.get("is_first_time_filer", True)]
+    repeat = [e for e in events if not e.get("is_first_time_filer", True)]
     return {
         "scanner": label,
         "status": "ok",
-        "events_found": len(events),
-        "events": events,
+        "events_found": len(first_time),
+        "events": first_time,
+        "repeat_filers_skipped": len(repeat),
     }
 
 
@@ -247,15 +249,13 @@ def run_cybersecurity_8k(days: int) -> dict:
 
 
 def run_delisting_8k(days: int) -> dict:
-    """Delisting 8-K Item 3.01 scanner. Uses --json-events to get JSON list."""
+    """Delisting 8-K Item 3.01 scanner. Uses --json-events + --classify."""
     label = "Delisting 8-K (3.01)"
     cmd = [
         sys.executable, "tools/delisting_8k_scanner.py",
         "--days", str(days),
         "--json-events",
-        # NOTE: --forced-only REMOVED 2026-04-15. Original backtest (n=97) was on ALL
-        # 3.01 filings (classifier bug labeled all as forced). Signal validated on combined
-        # set. Forced-only restricts to ~2/year (untradeable). All filings: ~28/year.
+        "--classify",  # Classify filing type to filter going-private (untradeable)
     ]
     ok, stdout = _run(cmd, label)
     if not ok:
@@ -265,11 +265,16 @@ def run_delisting_8k(days: int) -> dict:
     if not isinstance(events, list):
         events = []
 
+    # Filter out going_private events (stock ceases trading, untradeable)
+    tradeable = [e for e in events if e.get("filing_type") != "going_private"]
+    going_private = [e for e in events if e.get("filing_type") == "going_private"]
+
     return {
         "scanner": label,
         "status": "ok",
-        "events_found": len(events),
-        "events": events,
+        "events_found": len(tradeable),
+        "events": tradeable,
+        "going_private_filtered": len(going_private),
     }
 
 
