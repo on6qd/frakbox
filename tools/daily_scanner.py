@@ -292,6 +292,123 @@ def evaluate_nt10k_events(events: list[dict]) -> list[dict]:
     return evaluated
 
 
+def evaluate_8k_signal_events(events: list[dict], signal_name: str,
+                               hypothesis_id: str, expected_return: str,
+                               hold_days: str) -> list[dict]:
+    """Generic evaluator for 8-K signal events (cybersecurity, delisting, etc.).
+
+    GO criteria:
+    1. Large-cap (already filtered upstream)
+    2. Filing within 2 business days (alpha decays)
+    3. No prior >30% drawdown from 60-day peak (contamination)
+    4. Not already queued in research_queue
+
+    GO events are auto-queued into research_queue as scan_hits (priority 10).
+    """
+    if not events:
+        return []
+
+    from datetime import timedelta
+    import numpy as np
+
+    signal_label = signal_name.replace("_", " ").upper()
+    evaluated = []
+
+    for ev in events:
+        ticker = ev.get("symbol", ev.get("ticker", ""))
+        file_date = ev.get("date", ev.get("file_date", ""))
+
+        result = {
+            "ticker": ticker,
+            "date": file_date,
+            "decision": "GO",
+            "blockers": [],
+            "warnings": [],
+        }
+
+        # Check: filing recency (within 2 business days)
+        try:
+            from datetime import datetime as dt
+            filed = dt.strptime(file_date, "%Y-%m-%d")
+            now = dt.now()
+            bdays = int(np.busday_count(filed.date(), now.date()))
+            result["filing_age_bdays"] = bdays
+            if bdays > 2:
+                result["decision"] = "NO_GO"
+                result["blockers"].append(
+                    f"Filing is {bdays} business days old (>2bd — alpha decayed)"
+                )
+        except Exception:
+            result["warnings"].append("Could not parse filing date for recency check")
+
+        # Check: pre-event contamination (>30% drawdown from 60-day peak)
+        if result["decision"] == "GO" and ticker:
+            try:
+                sys.path.insert(0, str(REPO_ROOT))
+                from tools.yfinance_utils import safe_download
+                from datetime import datetime as dt
+                start_dt = (dt.strptime(file_date, "%Y-%m-%d") - timedelta(days=90)).strftime("%Y-%m-%d")
+                df = safe_download(ticker, start_dt, file_date)
+                if df is not None and len(df) > 10:
+                    close = df["Close"].values if "Close" in df.columns else None
+                    if close is not None and len(close) > 0:
+                        peak = float(np.max(close[-60:] if len(close) >= 60 else close))
+                        last = float(close[-1])
+                        if peak > 0:
+                            drawdown_pct = (last - peak) / peak * 100
+                            result["drawdown_from_peak_pct"] = round(drawdown_pct, 1)
+                            if drawdown_pct < -30:
+                                result["decision"] = "NO_GO"
+                                result["blockers"].append(
+                                    f"Pre-event drawdown {drawdown_pct:.1f}% from 60d peak (>30% contamination rule)"
+                                )
+            except Exception as exc:
+                result["warnings"].append(f"Drawdown check failed: {exc}")
+
+        # Check: not already queued
+        if result["decision"] == "GO" and ticker:
+            try:
+                sys.path.insert(0, str(REPO_ROOT))
+                import db
+                db.init_db()
+                existing = db.get_db().execute(
+                    "SELECT id FROM research_queue WHERE question LIKE ? AND status='pending'",
+                    (f"%{ticker}%{signal_name.split('_')[0]}%",),
+                ).fetchone()
+                if existing:
+                    result["decision"] = "ALREADY_QUEUED"
+                    result["blockers"].append(f"Already queued: {existing[0][:12]}")
+            except Exception:
+                pass
+
+        # Auto-queue GO events
+        if result["decision"] == "GO":
+            try:
+                sys.path.insert(0, str(REPO_ROOT))
+                import db
+                db.init_db()
+                question = (
+                    f"{signal_label} AUTO-DETECTED: {ticker} on {file_date}. "
+                    f"VALIDATED SIGNAL: short for {hold_days} hold, expected {expected_return} abnormal return. "
+                    f"Action: Clone hypothesis {hypothesis_id}, set trigger='next_market_open', "
+                    f"expected_symbol='{ticker}', position_size=$5000, stop_loss=10%."
+                )
+                db.add_research_task(
+                    category="scan_hit",
+                    question=question,
+                    priority=10,
+                    reasoning=f"{signal_label} auto-detected by daily scanner.",
+                )
+                result["queued"] = True
+                print(f"[daily_scanner] {signal_label} GO: {ticker} ({file_date}) auto-queued as P0 scan hit", file=sys.stderr)
+            except Exception as exc:
+                result["warnings"].append(f"Auto-queue failed: {exc}")
+
+        evaluated.append(result)
+
+    return evaluated
+
+
 def run_activist_13d(days: int) -> dict:
     """Activist 13D scanner. Always emits JSON summary at end of stdout."""
     label = "Activist 13D"
@@ -366,7 +483,8 @@ def run_cybersecurity_8k(days: int) -> dict:
     ]
     ok, stdout = _run(cmd, label)
     if not ok:
-        return {"scanner": label, "status": "error", "events_found": 0, "events": []}
+        return {"scanner": label, "status": "error", "events_found": 0, "events": [],
+                "go_count": 0, "evaluated": []}
 
     events = _extract_json(stdout)
     if not isinstance(events, list):
@@ -374,11 +492,23 @@ def run_cybersecurity_8k(days: int) -> dict:
         n = _count_from_text(stdout, "Final events: ")
         events = []
 
+    # Auto-evaluate and queue GO events
+    evaluated = evaluate_8k_signal_events(
+        events,
+        signal_name="cybersecurity_8k_item_105_short",
+        hypothesis_id="8844b439",
+        expected_return="-3.0%",
+        hold_days="5d",
+    )
+    go_events = [e for e in evaluated if e.get("decision") == "GO"]
+
     return {
         "scanner": label,
         "status": "ok",
         "events_found": len(events),
         "events": events,
+        "go_count": len(go_events),
+        "evaluated": evaluated,
     }
 
 
@@ -393,7 +523,8 @@ def run_delisting_8k(days: int) -> dict:
     ]
     ok, stdout = _run(cmd, label)
     if not ok:
-        return {"scanner": label, "status": "error", "events_found": 0, "events": []}
+        return {"scanner": label, "status": "error", "events_found": 0, "events": [],
+                "go_count": 0, "evaluated": []}
 
     events = _extract_json(stdout)
     if not isinstance(events, list):
@@ -403,12 +534,24 @@ def run_delisting_8k(days: int) -> dict:
     tradeable = [e for e in events if e.get("filing_type") != "going_private"]
     going_private = [e for e in events if e.get("filing_type") == "going_private"]
 
+    # Auto-evaluate and queue GO events
+    evaluated = evaluate_8k_signal_events(
+        tradeable,
+        signal_name="delisting_notice_8k_301_short",
+        hypothesis_id="995a7465",
+        expected_return="-3.92%",
+        hold_days="10d",
+    )
+    go_events = [e for e in evaluated if e.get("decision") == "GO"]
+
     return {
         "scanner": label,
         "status": "ok",
         "events_found": len(tradeable),
         "events": tradeable,
         "going_private_filtered": len(going_private),
+        "go_count": len(go_events),
+        "evaluated": evaluated,
     }
 
 
@@ -554,27 +697,35 @@ def find_actionable_events(results: dict) -> list[dict]:
                 "note": f"NT 10-K — {'; '.join(ev.get('blockers', ['no detail']))}",
             })
 
-    # Cybersecurity 8-K events
+    # Cybersecurity 8-K events — use evaluated GO/NO_GO when available
     cyber = results.get("cybersecurity_8k", {})
-    for ev in cyber.get("events", []):
-        actionable.append({
-            "scanner": "Cybersecurity 8-K",
-            "ticker": ev.get("symbol", "?"),
-            "date": ev.get("date", ""),
-            "decision": "SIGNAL",
-            "note": "Item 1.05 material cybersecurity incident — short signal",
-        })
+    for ev in cyber.get("evaluated", cyber.get("events", [])):
+        decision = ev.get("decision", "SIGNAL")
+        if decision in ("GO", "NO_GO", "SIGNAL"):
+            actionable.append({
+                "scanner": "Cybersecurity 8-K",
+                "ticker": ev.get("ticker", ev.get("symbol", "?")),
+                "date": ev.get("date", ""),
+                "decision": decision,
+                "note": f"Item 1.05 — {'; '.join(ev.get('blockers', ['short signal']))}" if decision == "NO_GO"
+                        else "Item 1.05 material cybersecurity incident — short signal (auto-queued)" if decision == "GO"
+                        else "Item 1.05 material cybersecurity incident — short signal",
+            })
 
-    # Delisting 8-K events
+    # Delisting 8-K events — use evaluated GO/NO_GO when available
     delisting = results.get("delisting_8k", {})
-    for ev in delisting.get("events", []):
-        actionable.append({
-            "scanner": "Delisting 8-K",
-            "ticker": ev.get("symbol", "?"),
-            "date": ev.get("date", ""),
-            "decision": "SIGNAL",
-            "note": "Item 3.01 delisting notice — short signal",
-        })
+    for ev in delisting.get("evaluated", delisting.get("events", [])):
+        decision = ev.get("decision", "SIGNAL")
+        if decision in ("GO", "NO_GO", "SIGNAL"):
+            actionable.append({
+                "scanner": "Delisting 8-K",
+                "ticker": ev.get("ticker", ev.get("symbol", "?")),
+                "date": ev.get("date", ""),
+                "decision": decision,
+                "note": f"Item 3.01 — {'; '.join(ev.get('blockers', ['short signal']))}" if decision == "NO_GO"
+                        else "Item 3.01 delisting notice — short signal (auto-queued)" if decision == "GO"
+                        else "Item 3.01 delisting notice — short signal",
+            })
 
     # S&P 500 index changes (additions are long signals)
     sp500 = results.get("sp500_changes", {})
