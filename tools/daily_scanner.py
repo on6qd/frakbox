@@ -571,12 +571,45 @@ def run_seo_scanner(days: int) -> dict:
     if not isinstance(data, dict):
         data = {}
 
+    # Auto-queue GO candidates into research_queue
+    candidates = data.get("candidates", [])
+    for c in candidates:
+        if (c.get("decision") or "").startswith("GO"):
+            ticker = c.get("ticker", "?")
+            file_date = c.get("filing_date_424b4", "")
+            try:
+                sys.path.insert(0, str(REPO_ROOT))
+                import db
+                db.init_db()
+                question = (
+                    f"SEO BOUGHT DEAL AUTO-DETECTED: {ticker} on {file_date}. "
+                    f"VALIDATED SIGNAL: short for 3-5d hold, expected -2.5% abnormal return. "
+                    f"Action: Clone hypothesis 673aaa32, set trigger='next_market_open', "
+                    f"expected_symbol='{ticker}', position_size=$5000, stop_loss=10%."
+                )
+                # Check not already queued
+                existing = db.get_db().execute(
+                    "SELECT id FROM research_queue WHERE question LIKE ? AND status='pending'",
+                    (f"%{ticker}%SEO%BOUGHT%DEAL%",),
+                ).fetchone()
+                if not existing:
+                    db.add_research_task(
+                        category="scan_hit",
+                        question=question,
+                        priority=10,
+                        reasoning=f"SEO bought deal auto-detected. Signal validated: MNR OOS -3.54% (threshold -2.5%).",
+                    )
+                    c["queued"] = True
+                    print(f"[daily_scanner] SEO GO: {ticker} ({file_date}) auto-queued as P0 scan hit", file=sys.stderr)
+            except Exception as exc:
+                print(f"[daily_scanner] SEO auto-queue failed: {exc}", file=sys.stderr)
+
     return {
         "scanner": label,
         "status": "ok",
         "total_found": data.get("total_found", 0),
         "go_count": data.get("go_count", 0),
-        "candidates": data.get("candidates", []),
+        "candidates": candidates,
     }
 
 
