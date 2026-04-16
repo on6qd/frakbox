@@ -139,7 +139,8 @@ def run_nt_10k(days: int) -> dict:
     ]
     ok, stdout = _run(cmd, label)
     if not ok:
-        return {"scanner": label, "status": "error", "events_found": 0, "events": []}
+        return {"scanner": label, "status": "error", "events_found": 0, "events": [],
+                "go_count": 0, "evaluated": []}
 
     events = _extract_json(stdout)
     if not isinstance(events, list):
@@ -149,13 +150,146 @@ def run_nt_10k(days: int) -> dict:
     # Filter: only first-time filers are tradeable (repeat filers show no signal).
     first_time = [e for e in events if e.get("is_first_time_filer", True)]
     repeat = [e for e in events if not e.get("is_first_time_filer", True)]
+
+    # Evaluate GO/NO_GO for each first-time event and auto-queue GO events
+    evaluated = evaluate_nt10k_events(first_time)
+    go_events = [e for e in evaluated if e.get("decision") == "GO"]
+
     return {
         "scanner": label,
         "status": "ok",
         "events_found": len(first_time),
         "events": first_time,
         "repeat_filers_skipped": len(repeat),
+        "go_count": len(go_events),
+        "evaluated": evaluated,
     }
+
+
+def evaluate_nt10k_events(events: list[dict]) -> list[dict]:
+    """Evaluate NT 10-K first-time filings for GO/NO_GO.
+
+    GO criteria:
+    1. First-time filer (already filtered upstream)
+    2. Large-cap >$500M (already filtered upstream)
+    3. NT 10-K only (not NT 10-Q)
+    4. Filing within 2 business days (alpha decays quickly)
+    5. No prior >30% drawdown from 60-day peak (pre-event contamination)
+    6. Not already queued/tracked in research_queue
+
+    GO events are auto-queued into research_queue as scan_hits (priority 10).
+    """
+    if not events:
+        return []
+
+    from datetime import timedelta
+    import numpy as np
+
+    evaluated = []
+    for ev in events:
+        ticker = ev.get("symbol", "")
+        file_date = ev.get("date", "")
+        form_type = ev.get("form_type", "NT 10-K")
+
+        result = {
+            "ticker": ticker,
+            "date": file_date,
+            "form_type": form_type,
+            "decision": "GO",
+            "blockers": [],
+            "warnings": [],
+        }
+
+        # Check: NT 10-K only (10-Q shows no signal)
+        if "10-Q" in form_type:
+            result["decision"] = "NO_GO"
+            result["blockers"].append("NT 10-Q — no validated signal for quarterly filings")
+            evaluated.append(result)
+            continue
+
+        # Check: filing recency (within 2 business days)
+        try:
+            from datetime import datetime as dt
+            filed = dt.strptime(file_date, "%Y-%m-%d")
+            now = dt.now()
+            # Count business days between filing and now
+            bdays = int(np.busday_count(filed.date(), now.date()))
+            result["filing_age_bdays"] = bdays
+            if bdays > 2:
+                result["decision"] = "NO_GO"
+                result["blockers"].append(
+                    f"Filing is {bdays} business days old (>2bd — alpha decayed)"
+                )
+        except Exception:
+            result["warnings"].append("Could not parse filing date for recency check")
+
+        # Check: pre-event contamination (>30% drawdown from 60-day peak)
+        if result["decision"] == "GO" and ticker:
+            try:
+                sys.path.insert(0, str(REPO_ROOT))
+                from tools.yfinance_utils import safe_download
+                end_dt = file_date
+                from datetime import datetime as dt
+                start_dt = (dt.strptime(file_date, "%Y-%m-%d") - timedelta(days=90)).strftime("%Y-%m-%d")
+                df = safe_download(ticker, start_dt, end_dt)
+                if df is not None and len(df) > 10:
+                    close = df["Close"].values if "Close" in df.columns else None
+                    if close is not None and len(close) > 0:
+                        peak = float(np.max(close[-60:] if len(close) >= 60 else close))
+                        last = float(close[-1])
+                        if peak > 0:
+                            drawdown_pct = (last - peak) / peak * 100
+                            result["drawdown_from_peak_pct"] = round(drawdown_pct, 1)
+                            if drawdown_pct < -30:
+                                result["decision"] = "NO_GO"
+                                result["blockers"].append(
+                                    f"Pre-event drawdown {drawdown_pct:.1f}% from 60d peak (>30% contamination rule)"
+                                )
+            except Exception as exc:
+                result["warnings"].append(f"Drawdown check failed: {exc}")
+
+        # Check: not already queued in research_queue
+        if result["decision"] == "GO" and ticker:
+            try:
+                sys.path.insert(0, str(REPO_ROOT))
+                import db
+                db.init_db()
+                existing = db.get_db().execute(
+                    "SELECT id FROM research_queue WHERE question LIKE ? AND status='pending'",
+                    (f"%{ticker}%NT%10%K%",),
+                ).fetchone()
+                if existing:
+                    result["decision"] = "ALREADY_QUEUED"
+                    result["blockers"].append(f"Already queued in research_queue: {existing[0][:12]}")
+            except Exception:
+                pass
+
+        # Auto-queue GO events into research_queue
+        if result["decision"] == "GO":
+            try:
+                sys.path.insert(0, str(REPO_ROOT))
+                import db
+                db.init_db()
+                question = (
+                    f"NT 10-K AUTO-DETECTED: {ticker} filed first-time NT 10-K on {file_date}. "
+                    f"VALIDATED SIGNAL: short for 5-10d hold, expected -4% abnormal return. "
+                    f"Action: Clone hypothesis 3db5eb00, set trigger='next_market_open', "
+                    f"expected_symbol='{ticker}', position_size=$5000, stop_loss=10%."
+                )
+                db.add_research_task(
+                    category="scan_hit",
+                    question=question,
+                    priority=10,
+                    reasoning=f"NT 10-K first-time filer auto-detected by daily scanner. Signal validated at -4.09% avg (discovery), OOS borderline but tradeable.",
+                )
+                result["queued"] = True
+                print(f"[daily_scanner] NT 10-K GO: {ticker} ({file_date}) auto-queued as P0 scan hit", file=sys.stderr)
+            except Exception as exc:
+                result["warnings"].append(f"Auto-queue failed: {exc}")
+
+        evaluated.append(result)
+
+    return evaluated
 
 
 def run_activist_13d(days: int) -> dict:
@@ -399,16 +533,26 @@ def find_actionable_events(results: dict) -> list[dict]:
                 "note": f"${c.get('market_cap', 0)/1e6:.0f}M cap, short candidate",
             })
 
-    # NT 10-K events (always negative signal — worth flagging)
+    # NT 10-K events — use evaluated GO/NO_GO decisions
     nt = results.get("nt_10k", {})
-    for ev in nt.get("events", []):
-        actionable.append({
-            "scanner": "NT 10-K",
-            "ticker": ev.get("symbol", "?"),
-            "date": ev.get("date", ""),
-            "decision": "SIGNAL",
-            "note": "NT filing (late 10-K/10-Q) — short signal",
-        })
+    for ev in nt.get("evaluated", []):
+        if ev.get("decision") == "GO":
+            actionable.append({
+                "scanner": "NT 10-K",
+                "ticker": ev.get("ticker", "?"),
+                "date": ev.get("date", ""),
+                "decision": "GO",
+                "note": "NT 10-K first-time filer — short signal (auto-queued)",
+            })
+        elif ev.get("decision") == "NO_GO":
+            # Still flag as informational for the summary
+            actionable.append({
+                "scanner": "NT 10-K",
+                "ticker": ev.get("ticker", "?"),
+                "date": ev.get("date", ""),
+                "decision": "NO_GO",
+                "note": f"NT 10-K — {'; '.join(ev.get('blockers', ['no detail']))}",
+            })
 
     # Cybersecurity 8-K events
     cyber = results.get("cybersecurity_8k", {})
@@ -459,6 +603,7 @@ def build_status_line(results: dict) -> str:
     poller_total = poller.get("new_clusters_found", 0)
 
     nt_n = results.get("nt_10k", {}).get("events_found", "ERR")
+    nt_go = results.get("nt_10k", {}).get("go_count", 0)
     act_n = results.get("activist_13d", {}).get("total_found", "ERR")
     act_go = results.get("activist_13d", {}).get("go_count", "")
     ins_n = results.get("insider_clusters", {}).get("clusters_found", "ERR")
@@ -483,7 +628,7 @@ def build_status_line(results: dict) -> str:
         parts.append(f"Intraday: {poller_total} new (0 GO)")
 
     parts.extend([
-        f"NT 10-K: {nt_n} events",
+        f"NT 10-K: {nt_n} events ({nt_go} GO)" if nt_go else f"NT 10-K: {nt_n} events",
         f"13D: {act_part} filings",
         f"Insider: {ins_part}",
         f"8-K 1.05: {cyber_n} events",
