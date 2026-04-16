@@ -224,6 +224,8 @@ def evaluate_nt10k_events(events: list[dict]) -> list[dict]:
             result["warnings"].append("Could not parse filing date for recency check")
 
         # Check: pre-event contamination (>30% drawdown from 60-day peak)
+        # AND pre-event 30-day raw return gate: only trade when -20% to -5%
+        # (per knowledge entry nt_10k_pre_event_drawdown_refinement_2026_04_16)
         if result["decision"] == "GO" and ticker:
             try:
                 sys.path.insert(0, str(REPO_ROOT))
@@ -245,8 +247,33 @@ def evaluate_nt10k_events(events: list[dict]) -> list[dict]:
                                 result["blockers"].append(
                                     f"Pre-event drawdown {drawdown_pct:.1f}% from 60d peak (>30% contamination rule)"
                                 )
+
+                        # Pre-event 30-day raw return gate (refinement 2026-04-16)
+                        # Knowledge: nt_10k_pre_event_drawdown_refinement_2026_04_16
+                        # - moderate (-20% to -5%): STRONGEST signal, TRADE
+                        # - deep (<-20%): mean-reverts, SKIP
+                        # - flat (-5% to +5%): weak, SKIP
+                        # - up (>+5%): reverses OOS, SKIP
+                        # Need ~21 trading days of data to look back 30 calendar days
+                        if result["decision"] == "GO" and len(close) >= 22:
+                            # t-21 trading days ~= 30 calendar days prior
+                            price_30d_ago = float(close[-22])
+                            ret_30d_pct = (last - price_30d_ago) / price_30d_ago * 100
+                            result["pre_event_30d_return_pct"] = round(ret_30d_pct, 2)
+                            if ret_30d_pct < -20:
+                                result["decision"] = "NO_GO"
+                                result["blockers"].append(
+                                    f"Pre-event 30d return {ret_30d_pct:.1f}% (<-20% — deep drawdown mean-reverts OOS, see nt_10k_pre_event_drawdown_refinement_2026_04_16)"
+                                )
+                            elif ret_30d_pct > -5:
+                                result["decision"] = "NO_GO"
+                                result["blockers"].append(
+                                    f"Pre-event 30d return {ret_30d_pct:.1f}% (>-5% — signal only tradeable in moderate bucket -20% to -5%)"
+                                )
+                            else:
+                                result["pre_event_bucket"] = "moderate"
             except Exception as exc:
-                result["warnings"].append(f"Drawdown check failed: {exc}")
+                result["warnings"].append(f"Drawdown/pre-event check failed: {exc}")
 
         # Check: not already queued in research_queue
         if result["decision"] == "GO" and ticker:
@@ -270,9 +297,12 @@ def evaluate_nt10k_events(events: list[dict]) -> list[dict]:
                 sys.path.insert(0, str(REPO_ROOT))
                 import db
                 db.init_db()
+                ret_note = ""
+                if "pre_event_30d_return_pct" in result:
+                    ret_note = f" Pre-event 30d return: {result['pre_event_30d_return_pct']:.1f}% (moderate bucket)."
                 question = (
-                    f"NT 10-K AUTO-DETECTED: {ticker} filed first-time NT 10-K on {file_date}. "
-                    f"VALIDATED SIGNAL: short for 5-10d hold, expected -4% abnormal return. "
+                    f"NT 10-K AUTO-DETECTED: {ticker} filed first-time NT 10-K on {file_date}.{ret_note} "
+                    f"VALIDATED SIGNAL (moderate-predraw subgroup): short for 10d hold, expected -6% abnormal return. "
                     f"Action: Clone hypothesis 3db5eb00, set trigger='next_market_open', "
                     f"expected_symbol='{ticker}', position_size=$5000, stop_loss=10%."
                 )
@@ -280,7 +310,7 @@ def evaluate_nt10k_events(events: list[dict]) -> list[dict]:
                     category="scan_hit",
                     question=question,
                     priority=10,
-                    reasoning=f"NT 10-K first-time filer auto-detected by daily scanner. Signal validated at -4.09% avg (discovery), OOS borderline but tradeable.",
+                    reasoning=f"NT 10-K first-time filer auto-detected, passed moderate pre-event drawdown gate (-20% to -5%). Discovery 10d=-6.48% p=0.0043, OOS 10d=-5.04% (n=6).",
                 )
                 result["queued"] = True
                 print(f"[daily_scanner] NT 10-K GO: {ticker} ({file_date}) auto-queued as P0 scan hit", file=sys.stderr)
