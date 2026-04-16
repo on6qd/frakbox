@@ -12,15 +12,33 @@ Work exists if any of:
 - Session handoff has a specific next_step
 - Trade loop reported actions in the last hour
 - It's been > 6 hours since last session (minimum daily presence)
+
+Also hard-blocks sessions during Anthropic's peak-throttle window (05:00-11:00 PT
+weekdays) — quota drains faster there and capacity is rationed. Set
+SKIP_PEAK_HOURS=0 in the environment to override.
 """
 
 import sys
 import os
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import db
+
+PEAK_TZ = ZoneInfo("America/Los_Angeles")
+PEAK_HOUR_START = 5
+PEAK_HOUR_END = 11
+
+
+def in_peak_hours(now=None):
+    if os.environ.get("SKIP_PEAK_HOURS", "1") == "0":
+        return False
+    now_pt = (now or datetime.now(PEAK_TZ)).astimezone(PEAK_TZ)
+    if now_pt.weekday() >= 5:
+        return False
+    return PEAK_HOUR_START <= now_pt.hour < PEAK_HOUR_END
 
 def should_run():
     db.init_db()
@@ -116,6 +134,10 @@ def should_run():
 
 
 if __name__ == "__main__":
+    if in_peak_hours():
+        now_pt = datetime.now(PEAK_TZ)
+        print(f"  [idle] Anthropic peak hours ({now_pt.strftime('%a %H:%M')} PT) — skipping to preserve quota")
+        sys.exit(1)
     reasons = should_run()
     if reasons:
         for r in reasons:
