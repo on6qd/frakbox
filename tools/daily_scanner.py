@@ -324,14 +324,17 @@ def evaluate_nt10k_events(events: list[dict]) -> list[dict]:
 
 def evaluate_8k_signal_events(events: list[dict], signal_name: str,
                                hypothesis_id: str, expected_return: str,
-                               hold_days: str) -> list[dict]:
+                               hold_days: str,
+                               min_market_cap_b: float | None = None) -> list[dict]:
     """Generic evaluator for 8-K signal events (cybersecurity, delisting, etc.).
 
     GO criteria:
-    1. Large-cap (already filtered upstream)
-    2. Filing within 2 business days (alpha decays)
-    3. No prior >30% drawdown from 60-day peak (contamination)
-    4. Not already queued in research_queue
+    1. Large-cap (already filtered upstream to >$500M)
+    2. Optional: min_market_cap_b in $B for signal-specific tier refinements
+       (e.g. cybersec 8-K tightened to >$10B per cybersec_8k_megacap_only_2026_04_16)
+    3. Filing within 2 business days (alpha decays)
+    4. No prior >30% drawdown from 60-day peak (contamination)
+    5. Not already queued in research_queue
 
     GO events are auto-queued into research_queue as scan_hits (priority 10).
     """
@@ -355,6 +358,26 @@ def evaluate_8k_signal_events(events: list[dict], signal_name: str,
             "blockers": [],
             "warnings": [],
         }
+
+        # Check: signal-specific market cap floor (refinement gate)
+        if min_market_cap_b is not None:
+            mcap = ev.get("market_cap") or ev.get("market_cap_m", 0)
+            # Normalize: market_cap is raw dollars, market_cap_m is in millions
+            if "market_cap_m" in ev and "market_cap" not in ev:
+                mcap_b = float(mcap) / 1_000.0
+            else:
+                mcap_b = float(mcap) / 1_000_000_000.0
+            result["market_cap_b"] = round(mcap_b, 2)
+            if mcap_b > 0 and mcap_b < min_market_cap_b:
+                result["decision"] = "NO_GO"
+                result["blockers"].append(
+                    f"Market cap ${mcap_b:.1f}B < ${min_market_cap_b:.0f}B tier floor "
+                    f"(signal-specific refinement — see knowledge base)"
+                )
+            elif mcap_b == 0:
+                result["warnings"].append(
+                    "Market cap unknown — cannot verify tier floor, proceeding with caution"
+                )
 
         # Check: filing recency (within 2 business days)
         try:
@@ -523,12 +546,16 @@ def run_cybersecurity_8k(days: int) -> dict:
         events = []
 
     # Auto-evaluate and queue GO events
+    # REFINEMENT (cybersec_8k_megacap_only_2026_04_16): tighten from >$500M to >$10B.
+    # Mid-cap ($500M-$10B) contributes noise (mid_high tier OOS directionally wrong).
+    # Mega-cap only: OOS 5d=-4.92% (86% neg), OOS 10d=-7.73% (83% neg).
     evaluated = evaluate_8k_signal_events(
         events,
         signal_name="cybersecurity_8k_item_105_short",
         hypothesis_id="8844b439",
-        expected_return="-3.0%",
+        expected_return="-4.9%",
         hold_days="5d",
+        min_market_cap_b=10.0,
     )
     go_events = [e for e in evaluated if e.get("decision") == "GO"]
 
