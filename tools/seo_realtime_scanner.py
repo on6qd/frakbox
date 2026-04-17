@@ -28,8 +28,20 @@ try:
 except ImportError:
     yf = None
 
+try:
+    import pandas as pd
+    _pd_has_ts = True
+except ImportError:
+    pd = None
+    _pd_has_ts = False
+
 HEADERS = {"User-Agent": "financial-researcher research@example.com"}
 MIN_MARKET_CAP = 500_000_000  # $500M
+# IPO filter: SEO bought-deal signal was validated on SEASONED offerings (companies
+# already public). Fresh IPOs that file 424B4 on IPO day get miscategorised as SEOs.
+# Require at least this many trading days of history before the filing to qualify.
+# See: seo_bought_deal_ipo_false_positive_2026_04_18.
+MIN_TRADING_DAYS_BEFORE_FILING = 20
 
 
 def search_efts(form_type: str, start_date: str, end_date: str) -> list[dict]:
@@ -191,12 +203,36 @@ def evaluate_candidates(deals: list[dict]) -> list[dict]:
             )
             d["is_biotech"] = is_biotech
 
+            # IPO filter: check trading history depth before filing date.
+            filing_dt = d.get("filing_date_424b4") or d.get("filing_date_8k")
+            is_ipo = False
+            history_days = None
+            try:
+                if filing_dt:
+                    hist = yf.Ticker(ticker).history(period="60d")
+                    if hist is not None and len(hist) > 0:
+                        # trading days strictly before filing date
+                        filing_ts = pd.Timestamp(filing_dt).tz_localize(None) if _pd_has_ts else None
+                        if filing_ts is not None:
+                            hist_before = hist[hist.index.tz_localize(None) < filing_ts]
+                            history_days = len(hist_before)
+                            if history_days < MIN_TRADING_DAYS_BEFORE_FILING:
+                                is_ipo = True
+                    else:
+                        is_ipo = True
+            except Exception:
+                pass
+            d["history_days_before_filing"] = history_days
+            d["is_ipo"] = is_ipo
+
             if mc < MIN_MARKET_CAP:
                 d["decision"] = f"SKIP_SMALL_CAP (${mc/1e6:.0f}M)"
             elif avg_vol < 100_000:
                 d["decision"] = f"SKIP_LOW_VOLUME ({avg_vol:,})"
             elif price < 5:
                 d["decision"] = f"SKIP_PENNY_STOCK (${price:.2f})"
+            elif is_ipo:
+                d["decision"] = f"SKIP_IPO ({history_days}d history)"
             else:
                 d["decision"] = "GO_BIOTECH_WEAKER" if is_biotech else "GO"
                 d["position_size"] = 5000
