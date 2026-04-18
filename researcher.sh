@@ -99,6 +99,8 @@ Then check what's already been scanned: python3 -c "import db; db.init_db(); row
 
 Pick a scan theme that hasn't been done recently. Run as many tests as possible. Queue any p<0.05 hits to research_queue.
 
+Tool-call budget: ~60 calls. Track roughly — after ~50 calls, stop scanning, write the journal entry, and exit. Do not keep running tests past budget. Writing handoff for the next session is cheaper than a bloated session.
+
 When done, log a journal entry with session_type="scan" and public_summary describing what you screened and how many hits.
 PROMPT
     )
@@ -115,7 +117,9 @@ Do NOT dump full datasets (load_hypotheses(), load_knowledge(), load_queue()). O
 
 Read API_REFERENCE.md only when you need a function signature — not at session start.
 
-You have ~50 minutes. Commit to git after each significant finding.
+You have ~50 minutes AND a tool-call budget of ~120 calls. Each tool call re-reads the full cached context, so long sessions are disproportionately expensive. Pick ONE investigation per session. Only chain a second if the first resolved in under 60 calls. After ~100 calls, stop new work: write the handoff, log the journal entry, commit, and exit. A deferred next_step is cheaper than a 250-call monster session.
+
+Commit to git after each significant finding.
 
 Do the work. When done:
 1. Update research_queue with handoff for the next session
