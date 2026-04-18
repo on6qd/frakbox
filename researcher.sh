@@ -84,6 +84,7 @@ run_session() {
   local agent="orchestrator"
   local mode="investigate"
   local timeout_min=50
+  local model=""
   local prompt
 
   if (( session_num % 3 == 0 )); then
@@ -91,6 +92,7 @@ run_session() {
     agent="scanner"
     mode="scan"
     timeout_min=25
+    model="claude-haiku-4-5-20251001"
     prompt=$(cat <<'PROMPT'
 High-throughput scan session. Run 30+ quick statistical tests using data_tasks.py commands.
 
@@ -129,7 +131,7 @@ PROMPT
     )
   fi
 
-  echo "=== Session started $(date) [mode=$mode agent=$agent session#$session_num] ===" | tee -a logs/daemon.log | tee "$logfile"
+  echo "=== Session started $(date) [mode=$mode agent=$agent model=${model:-default} session#$session_num] ===" | tee -a logs/daemon.log | tee "$logfile"
 
   if command -v gtimeout &>/dev/null; then
     TIMEOUT_CMD="gtimeout ${timeout_min}m"
@@ -142,6 +144,7 @@ PROMPT
   local exit_code=0
   $TIMEOUT_CMD claude \
     --agent "$agent" \
+    ${model:+--model "$model"} \
     --dangerously-skip-permissions \
     --verbose \
     --output-format stream-json \
