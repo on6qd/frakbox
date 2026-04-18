@@ -581,7 +581,15 @@ def cmd_cointegration(args):
 
 
 def cmd_threshold(args):
-    """Run threshold-triggered event study."""
+    """Run threshold-triggered event study.
+
+    When the raw test is significant (p<0.05), automatically runs a canonical
+    retest using first-close cluster-buffered event counting + SPY-adjusted
+    abnormal returns on two samples (pooled + post-2020 recency). This guards
+    against raw-crossing inflation and regime-specific signals.
+
+    See threshold_scan_hit_canonical_retest_rule_2026_04_18.
+    """
     from tools.timeseries import get_series, get_returns
     import causal_tests
 
@@ -599,6 +607,57 @@ def cmd_threshold(args):
               "direction": args.direction, "horizons": horizons, "start": args.start, "end": args.end}
 
     summary = _causal_summary(result)
+
+    # Auto-run canonical retest when raw test is significant (unless explicitly skipped)
+    skip_canonical = getattr(args, "skip_canonical", False)
+    raw_sig = result.get("p_value") is not None and result.get("p_value") < 0.05
+    if raw_sig and not skip_canonical:
+        canonical_horizons = sorted(set([1, 3] + horizons))
+        canonical = causal_tests.canonical_retest_threshold(
+            trigger_identifier=args.trigger,
+            target_symbol=args.target,
+            threshold=args.threshold_value,
+            direction=args.direction,
+            horizons=canonical_horizons,
+            start=args.start or "2010-01-01",
+            end=args.end,
+        )
+        # Keep the canonical result inside `result` for storage, and expose a compact
+        # summary on the top-level summary so scanners can gate on `canonical_passes`.
+        result["canonical_retest"] = canonical
+        if "error" in canonical:
+            summary["canonical_passes"] = False
+            summary["canonical_error"] = canonical["error"]
+        else:
+            summary["canonical_passes"] = canonical.get("passes", False)
+            summary["canonical_fail_reason"] = canonical.get("fail_reason")
+            summary["canonical_n_pooled"] = canonical.get("n_events_pooled")
+            summary["canonical_n_recent"] = canonical.get("n_events_recent")
+            pooled = canonical.get("pooled", {})
+            recent = canonical.get("recent", {})
+            if pooled.get("best_horizon"):
+                bh = pooled["best_horizon"]
+                hs = pooled["horizons"][bh]
+                summary["canonical_pooled_best"] = {
+                    "horizon": bh,
+                    "mean": hs["abnormal_mean"],
+                    "p_value": hs["p_value"],
+                    "positive_rate": hs["positive_rate"],
+                }
+            if recent.get("best_horizon"):
+                bh = recent["best_horizon"]
+                hs = recent["horizons"][bh]
+                summary["canonical_recent_best"] = {
+                    "horizon": bh,
+                    "mean": hs["abnormal_mean"],
+                    "p_value": hs["p_value"],
+                    "positive_rate": hs["positive_rate"],
+                }
+            summary["canonical_summary"] = canonical.get("summary")
+    elif not raw_sig:
+        summary["canonical_passes"] = False
+        summary["canonical_skipped"] = "raw_not_significant"
+
     result_id = _store_result("threshold", params, result, json.dumps(summary, default=str))
     summary["result_id"] = result_id
     print(json.dumps(summary, indent=2, default=str))
@@ -781,6 +840,8 @@ def main():
     thr.add_argument("--horizons", default="5,10,20", help="Comma-separated horizons in days")
     thr.add_argument("--start", default="2015-01-01")
     thr.add_argument("--end", default=datetime.now().strftime("%Y-%m-%d"))
+    thr.add_argument("--skip-canonical", action="store_true",
+                     help="Skip auto-canonical-retest (for debugging / raw-only runs)")
 
     # calendar
     cal = subparsers.add_parser("calendar", help="Calendar anomaly test")

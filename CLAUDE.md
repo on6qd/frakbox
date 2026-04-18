@@ -131,6 +131,13 @@ python3 data_tasks.py regression --target XLI --factor HG=F --test-type lead_lag
 python3 data_tasks.py cointegration --series-a GLD --series-b GDX --oos-start 2024-01-01
 
 # Threshold: VIX > 30 mean-reversion
+#   Auto-runs canonical retest when raw test is significant. Summary includes:
+#     - canonical_passes (bool) — PASS = first-close cluster-buffered + SPY-adjusted
+#       passes p<0.05 AND |mean|>=1% in BOTH pooled (2010+) AND recent (2020+) samples
+#     - canonical_fail_reason — pooled_sample_fails | recency_subset_fails_regime_dependent |
+#       sign_flip_between_samples
+#   ONLY queue threshold scan hits where canonical_passes=True. If False, record as
+#   DEAD_END_CANONICAL_FAILED. See threshold_scan_hit_canonical_retest_rule_2026_04_18.
 python3 data_tasks.py threshold --trigger "^VIX" --target SPY --threshold-value 30 --direction above
 
 # Calendar: January effect

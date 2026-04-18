@@ -723,6 +723,209 @@ def test_threshold(
     }
 
 
+def identify_first_close_events(
+    trigger_series: pd.Series,
+    threshold: float,
+    direction: str = "above",
+    cluster_days: int = 30,
+) -> list:
+    """
+    Identify first-close threshold events with cluster buffering.
+
+    Returns date strings (YYYY-MM-DD) for each cluster-buffered event — only the
+    first close past the threshold is kept; subsequent in-cluster crossings
+    within `cluster_days` are suppressed.
+
+    This is the canonical methodology for threshold-triggered event studies.
+    Raw threshold crossings (including in-cluster duplicates) systematically
+    overstate effect size by 40-60% vs first-close cluster-buffered counting.
+
+    See: threshold_scan_hit_canonical_retest_rule_2026_04_18.
+    """
+    events = []
+    last_event = None
+    for dt, v in trigger_series.dropna().items():
+        trips = (direction == "above" and v > threshold) or (
+            direction == "below" and v < threshold
+        )
+        if not trips:
+            continue
+        if last_event is None or (dt - last_event).days > cluster_days:
+            events.append(dt.strftime("%Y-%m-%d") if hasattr(dt, "strftime") else str(dt))
+            last_event = dt
+        else:
+            last_event = dt
+    return events
+
+
+def _measure_horizon_stats(impact: dict, horizons: list[int]) -> dict:
+    """Extract per-horizon abnormal-return stats from a measure_event_impact result."""
+    horizon_stats = {}
+    for h in horizons:
+        h_label = f"{h}d"
+        avg = impact.get(f"avg_abnormal_{h_label}")
+        if avg is None:
+            continue
+        horizon_stats[h_label] = {
+            "abnormal_mean": avg,
+            "median": impact.get(f"median_abnormal_{h_label}"),
+            "positive_rate": impact.get(f"positive_rate_abnormal_{h_label}"),
+            "p_value": impact.get(f"p_value_abnormal_{h_label}"),
+            "n": impact.get("events_measured"),
+        }
+    return horizon_stats
+
+
+def _pick_best_horizon(horizon_stats: dict, require_mean_pct: float = 1.0, p_threshold: float = 0.05):
+    """Pick the horizon with lowest p_value that meets p<thresh and |mean|>=require_mean_pct."""
+    best_horizon = None
+    best_p = 1.0
+    for h_label, hs in horizon_stats.items():
+        p = hs.get("p_value")
+        mean = hs.get("abnormal_mean")
+        if p is None or mean is None:
+            continue
+        if p < p_threshold and abs(mean) >= require_mean_pct and p < best_p:
+            best_p = p
+            best_horizon = h_label
+    return best_horizon, best_p if best_horizon else None
+
+
+def canonical_retest_threshold(
+    trigger_identifier: str,
+    target_symbol: str,
+    threshold: float,
+    direction: str = "above",
+    cluster_days: int = 30,
+    horizons: list[int] | None = None,
+    start: str = "2010-01-01",
+    end: str | None = None,
+    benchmark: str = "SPY",
+    recency_split: str = "2020-01-01",
+) -> dict:
+    """
+    Canonical re-test of a threshold-triggered hypothesis.
+
+    Methodology (per threshold_scan_hit_canonical_retest_rule_2026_04_18):
+    1. Identify first-close cluster-buffered events (not raw crossings)
+    2. Measure SPY-benchmarked abnormal returns with entry_price="open"
+       (VIX closes after market → entry at next-day open is realistic)
+    3. Evaluate on TWO samples: pooled (full range) + recency subset (post-split)
+    4. Require both samples to pass p<0.05 AND |mean|>=1% AND sign consistency
+       (same direction). This guards against regime-specific signals like XLK/XLF.
+
+    Used to validate threshold-mode scan hits before queueing them.
+    """
+    from tools.timeseries import get_series
+    import market_data
+
+    if horizons is None:
+        horizons = [1, 3, 5, 10, 20]
+
+    # Fetch trigger series
+    try:
+        trigger = get_series(trigger_identifier, start, end)
+    except Exception as e:
+        return {"error": f"Could not fetch trigger {trigger_identifier}: {e}"}
+
+    # Identify cluster-buffered events (full sample)
+    events = identify_first_close_events(trigger, threshold, direction, cluster_days)
+
+    if len(events) < 3:
+        return {
+            "error": f"Only {len(events)} first-close events (need >= 3)",
+            "n_events": len(events),
+            "method": f"first_close_cluster_buffered_{cluster_days}d",
+            "event_dates": events,
+        }
+
+    # Split into pooled (all events) and recency (post-split events)
+    recent_events = [d for d in events if d >= recency_split]
+
+    def _measure(event_list, label):
+        if len(event_list) < 3:
+            return {
+                "label": label,
+                "n_events": len(event_list),
+                "error": f"Only {len(event_list)} events (need >=3)",
+                "horizons": {},
+                "passes": False,
+            }
+        event_entries = [{"symbol": target_symbol, "date": d} for d in event_list]
+        try:
+            impact = market_data.measure_event_impact(
+                event_dates=event_entries,
+                benchmark=benchmark,
+                entry_price="open",
+                check_factors=False,
+                check_seasonal=False,
+            )
+        except Exception as e:
+            return {"label": label, "error": f"measure_event_impact failed: {e}", "horizons": {}, "passes": False}
+        if "error" in impact:
+            return {"label": label, "error": impact["error"], "horizons": {}, "passes": False}
+
+        h_stats = _measure_horizon_stats(impact, horizons)
+        best_h, best_p = _pick_best_horizon(h_stats)
+        return {
+            "label": label,
+            "n_events": len(event_list),
+            "events_measured": impact.get("events_measured"),
+            "horizons": h_stats,
+            "best_horizon": best_h,
+            "best_p_value": best_p,
+            "passes": best_h is not None,
+        }
+
+    pooled = _measure(events, f"pooled_{start[:4]}_to_{(end or 'now')[:4]}")
+    recent = _measure(recent_events, f"recency_{recency_split[:4]}_plus")
+
+    # Overall pass requires BOTH periods to pass AND signs to agree on best horizon
+    both_pass = pooled.get("passes") and recent.get("passes")
+    sign_agrees = False
+    if both_pass:
+        p_bh = pooled.get("best_horizon")
+        r_bh = recent.get("best_horizon")
+        if p_bh and r_bh:
+            p_mean = pooled["horizons"][p_bh]["abnormal_mean"]
+            r_mean = recent["horizons"][r_bh]["abnormal_mean"]
+            sign_agrees = (p_mean >= 0) == (r_mean >= 0)
+
+    passes = both_pass and sign_agrees
+
+    # Failure reason
+    if not pooled.get("passes"):
+        fail_reason = "pooled_sample_fails"
+    elif not recent.get("passes"):
+        fail_reason = "recency_subset_fails_regime_dependent"
+    elif not sign_agrees:
+        fail_reason = "sign_flip_between_samples"
+    else:
+        fail_reason = None
+
+    return {
+        "method": f"first_close_cluster_buffered_{cluster_days}d_SPY_adjusted_dual_sample",
+        "trigger": trigger_identifier,
+        "target": target_symbol,
+        "threshold": threshold,
+        "direction": direction,
+        "cluster_days": cluster_days,
+        "benchmark": benchmark,
+        "n_events_pooled": pooled.get("n_events"),
+        "n_events_recent": recent.get("n_events"),
+        "pooled": pooled,
+        "recent": recent,
+        "passes": passes,
+        "fail_reason": fail_reason,
+        "event_dates": events,
+        "summary": (
+            f"Canonical retest {trigger_identifier}{'>' if direction == 'above' else '<'}{threshold} "
+            f"-> {target_symbol}: pooled n={pooled.get('n_events')}, recent n={recent.get('n_events')}, "
+            f"{'PASS (both samples)' if passes else 'FAIL (' + str(fail_reason) + ')'}"
+        ),
+    }
+
+
 # ---------------------------------------------------------------------------
 # 7. Network propagation
 # ---------------------------------------------------------------------------
