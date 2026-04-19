@@ -11,6 +11,13 @@ Signal: Starboard Value 13D filing -> ~+4.0% avg abnormal at 3d
           OOS 2024 (N=3): +5.14% avg, 100% positive
         All activists: +3.36% avg at 3d (IS N=36, p=0.034) — driven by Starboard
 
+DEFINITIVE FINDING (activist_13d_starboard_only_finding, 2026-04): individual
+backtests of ALL 7 monitored activists (2020-2024) showed ONLY Starboard Value
+produces tradeable 13D alpha. Elliott (N=25, p=0.85), Icahn (N=79, p=0.51),
+Third Point, Trian, JANA, Pershing — all DEAD_END. Scanner continues to
+monitor all 7 for situational awareness, but issues GO only for Starboard.
+Other activist filings are tagged MONITOR (non-tradeable signal).
+
 Usage:
     python tools/activist_13d_scanner.py                # scan last 7 days
     python tools/activist_13d_scanner.py --days 14      # scan last 14 days
@@ -36,16 +43,17 @@ except ImportError:
 HEADERS = {"User-Agent": "financial-researcher research@example.com"}
 MIN_MARKET_CAP = 500_000_000  # $500M
 
-# Top-tier activist investors and their CIKs
-# Signal is strongest for Starboard (tier 1), then Icahn/Elliott (tier 2)
+# Top-tier activist investors and their CIKs.
+# tradeable=True ONLY for Starboard per activist_13d_starboard_only_finding
+# (2026-04) DEFINITIVE_FINDING. All other activists are MONITOR-only.
 ACTIVIST_CIKS = {
-    "1517137": {"name": "Starboard Value", "tier": 1},
-    "1791786": {"name": "Elliott Investment Management", "tier": 1},
-    "921669": {"name": "Carl Icahn", "tier": 1},
-    "1040273": {"name": "Third Point", "tier": 2},
-    "1998597": {"name": "JANA Partners", "tier": 2},
-    "1345471": {"name": "Trian Fund Management", "tier": 2},
-    "1336528": {"name": "Pershing Square", "tier": 2},
+    "1517137": {"name": "Starboard Value", "tier": 1, "tradeable": True},
+    "1791786": {"name": "Elliott Investment Management", "tier": 1, "tradeable": False},
+    "921669": {"name": "Carl Icahn", "tier": 1, "tradeable": False},
+    "1040273": {"name": "Third Point", "tier": 2, "tradeable": False},
+    "1998597": {"name": "JANA Partners", "tier": 2, "tradeable": False},
+    "1345471": {"name": "Trian Fund Management", "tier": 2, "tradeable": False},
+    "1336528": {"name": "Pershing Square", "tier": 2, "tradeable": False},
 }
 
 
@@ -97,6 +105,7 @@ def search_13d_filings(start_date: str, end_date: str) -> list[dict]:
                             "activist": info["name"],
                             "activist_cik": cik,
                             "tier": info["tier"],
+                            "tradeable": info.get("tradeable", False),
                             "target": ticker,
                             "target_name": name[:60],
                             "file_date": file_date,
@@ -155,6 +164,15 @@ def evaluate_candidate(filing: dict) -> dict:
     elif price < 3:
         result["decision"] = "NO_GO"
         result["reason"] = f"Price ${price:.2f} < $3 minimum (penny stock risk)"
+    elif not filing.get("tradeable", False):
+        # Activist monitored but not validated individually. Emit MONITOR (not GO)
+        # per activist_13d_starboard_only_finding (2026-04) DEFINITIVE_FINDING.
+        result["decision"] = "MONITOR"
+        result["reason"] = (
+            f"{filing['activist']} filings individually backtested as DEAD_END "
+            f"(see activist_13d_starboard_only_finding). Only Starboard validates — "
+            f"observing this filing for situational awareness only. Do NOT trade."
+        )
     else:
         result["decision"] = "GO"
         position_size = 5000
@@ -205,6 +223,7 @@ def main():
 
     go_count = sum(1 for c in candidates if c.get("decision") == "GO")
     nogo_count = sum(1 for c in candidates if c.get("decision") == "NO_GO")
+    monitor_count = sum(1 for c in candidates if c.get("decision") == "MONITOR")
 
     print(f"\n{'=' * 60}")
     print(f"ACTIVIST 13D CANDIDATES ({len(candidates)} found)")
@@ -223,6 +242,7 @@ def main():
         "total_found": len(candidates),
         "go_count": go_count,
         "nogo_count": nogo_count,
+        "monitor_count": monitor_count,
         "candidates": candidates,
     }
     print(json.dumps(result, indent=2))
