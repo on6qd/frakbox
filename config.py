@@ -46,6 +46,37 @@ MAX_CONCURRENT_EXPERIMENTS = 10        # more concurrent experiments = faster si
 MAX_ACTIVE_SIGNAL_TYPES = 20           # raised 3→5→20 on 2026-03-30; see methodology_changelog. Cap was preventing deployment of validated signals. Real scatter protection is via session priorities.
 MAX_CONCURRENT_PER_SIGNAL = 2          # max positions on same signal (correlated = 1 bet)
 
+# Signal-family budgets — enforce when multiple pre-registered hypotheses share a
+# parent trigger (e.g. VIX>30 fires 6 sibling sector-basket hypotheses at once).
+# Without a family cap, $5K × 6 = $30K of exposure to one shared systemic signal.
+# See knowledge: vix30_basket_internal_correlation_concentration_risk_2026_04_19.
+#
+# Format: family_id -> {
+#   "max_total_usd": hard cap on total deployed across all family members,
+#   "preferred_symbols": list — fill these first (orthogonal core),
+#   "diversifier_max_count": N — only take top-N from non-preferred members,
+# }
+SIGNAL_FAMILY_BUDGETS = {
+    "vix30_basket": {
+        "max_total_usd": 10000,
+        "preferred_symbols": ["XLB", "EFA"],     # orthogonal core per 2026-04-19 audit
+        "diversifier_max_count": 1,              # pick 1 of {EEM,HYG,XME,SMH} — all correlate 0.67-0.76 pairwise
+    },
+}
+
+
+def classify_signal_family(signal_type: str | None) -> str | None:
+    """Map a hypothesis.signal_type to a family id, or None if no family.
+
+    Centralized so trade_loop and any activator share the same logic.
+    """
+    if not signal_type:
+        return None
+    s = signal_type.lower()
+    if s.startswith("vix30_"):
+        return "vix30_basket"
+    return None
+
 # Transaction cost assumptions
 ESTIMATED_ROUND_TRIP_COST_PCT = 0.10   # default round-trip cost (spread + impact)
 MIN_NET_RETURN_AFTER_COSTS_PCT = 1.0   # minimum expected net return to be viable

@@ -176,19 +176,80 @@ def _send_trade_email(subject, actions):
         print(f"Email failed: {e}", file=sys.stderr)
 
 
+def _hypothesis_signal_type(h):
+    """Return the canonical signal_type string for family classification."""
+    return (h.get("signal_type") or h.get("event_type") or "").lower()
+
+
+def _initial_family_deployed(hypotheses, alpaca_positions):
+    """Compute already-deployed $ per signal family before this cycle.
+
+    Counts dollars from currently-active hypotheses with a known family AND their
+    symbol is held in Alpaca (treats cost_basis as the deployed amount).
+    """
+    from config import classify_signal_family
+    deployed = {}
+    active_syms_cost = {}
+    try:
+        for p in alpaca_positions:
+            try:
+                active_syms_cost[p.symbol] = abs(float(p.cost_basis))
+            except Exception:
+                pass
+    except Exception:
+        return deployed
+    for h in hypotheses:
+        if h.get("status") != "active":
+            continue
+        fam = classify_signal_family(_hypothesis_signal_type(h))
+        if not fam:
+            continue
+        sym = h.get("expected_symbol")
+        cost = active_syms_cost.get(sym)
+        if cost is None:
+            # Fall back to trade record
+            tr = h.get("trade") or {}
+            cost = float(tr.get("position_size") or 0)
+        deployed[fam] = deployed.get(fam, 0.0) + cost
+    return deployed
+
+
+def _family_sort_key(h):
+    """Sort key so family-preferred symbols fire before diversifiers in the same cycle.
+
+    Lower tuple = earlier execution. Non-family hypotheses get a default (keeps existing order).
+    """
+    from config import classify_signal_family, SIGNAL_FAMILY_BUDGETS
+    fam = classify_signal_family(_hypothesis_signal_type(h))
+    if not fam:
+        return (1, 0, h.get("created", ""))
+    cfg = SIGNAL_FAMILY_BUDGETS.get(fam, {})
+    preferred = cfg.get("preferred_symbols", [])
+    sym = h.get("expected_symbol", "")
+    if sym in preferred:
+        # Preferred: sort by position in preferred list
+        return (0, preferred.index(sym), h.get("created", ""))
+    # Diversifier: after all preferred in the family
+    return (0, 1000, h.get("created", ""))
+
+
 def execute_pending_triggers():
     """Check all pending hypotheses for ready triggers and execute trades."""
     from trader import place_experiment, check_portfolio_drawdown, get_current_price
-    from config import DEFAULT_STOP_LOSS_PCT, DEFAULT_TAKE_PROFIT_PCT, MIN_STOP_LOSS_PCT, MAX_CONCURRENT_EXPERIMENTS
+    from config import (
+        DEFAULT_STOP_LOSS_PCT, DEFAULT_TAKE_PROFIT_PCT, MIN_STOP_LOSS_PCT,
+        MAX_CONCURRENT_EXPERIMENTS, SIGNAL_FAMILY_BUDGETS, classify_signal_family,
+    )
 
     hypotheses = _load_hypotheses()
     hyp_active_count = sum(1 for h in hypotheses if h.get("status") == "active")
 
     # Also count actual Alpaca positions (catches untracked positions like CTAS)
     # Take the max to prevent silent capacity overflow
+    alpaca_positions = []
     try:
         from trader import get_api
-        alpaca_positions = get_api().list_positions()
+        alpaca_positions = list(get_api().list_positions())
         alpaca_count = len(alpaca_positions)
     except Exception:
         alpaca_count = 0
@@ -196,9 +257,19 @@ def execute_pending_triggers():
     if alpaca_count > hyp_active_count:
         print(f"[TRADE LOOP] WARNING: Alpaca has {alpaca_count} positions but only {hyp_active_count} active in hypothesis DB — untracked positions detected. Using {active_count} for capacity check.")
 
+    # Signal-family budget tracker: pre-load $ already deployed to each family
+    # (from currently-active positions), then increment as we activate trades this cycle.
+    family_deployed = _initial_family_deployed(hypotheses, alpaca_positions)
+    family_diversifier_count = {}  # family -> count of non-preferred symbols allocated this cycle
+
     actions = []
 
-    for h in hypotheses:
+    # Sort so family-preferred symbols fire before diversifiers inside the same cycle.
+    # This ensures the orthogonal core (e.g. XLB, EFA for vix30_basket) gets funded
+    # before the correlated cluster consumes the family budget.
+    ordered_hypotheses = sorted(hypotheses, key=_family_sort_key)
+
+    for h in ordered_hypotheses:
         if h.get("status") != "pending":
             continue
 
@@ -234,6 +305,42 @@ def execute_pending_triggers():
 
         direction = h.get("expected_direction", "long")
         position_size = h.get("trigger_position_size", 5000)
+
+        # Signal-family budget enforcement (see config.SIGNAL_FAMILY_BUDGETS).
+        # Prevents N sibling hypotheses sharing one parent trigger from aggregating into
+        # N*$5K of exposure to the same systemic signal (see vix30_basket_internal_correlation
+        # _concentration_risk_2026_04_19).
+        fam = classify_signal_family(_hypothesis_signal_type(h))
+        if fam and fam in SIGNAL_FAMILY_BUDGETS:
+            cfg = SIGNAL_FAMILY_BUDGETS[fam]
+            max_total = cfg.get("max_total_usd", float("inf"))
+            preferred = cfg.get("preferred_symbols", [])
+            div_cap = cfg.get("diversifier_max_count", None)
+            used = family_deployed.get(fam, 0.0)
+            is_preferred = symbol in preferred
+            # Diversifier cap: only take top-N from non-preferred symbols
+            if not is_preferred and div_cap is not None:
+                div_so_far = family_diversifier_count.get(fam, 0)
+                if div_so_far >= div_cap:
+                    actions.append({
+                        "action": "blocked",
+                        "symbol": symbol,
+                        "hypothesis_id": h["id"],
+                        "detail": f"Signal family {fam}: diversifier cap {div_cap} reached (correlated cluster saturated)",
+                        "success": False,
+                    })
+                    continue
+            # Budget cap: deployed + this position must not exceed max_total
+            if used + position_size > max_total:
+                remaining = max_total - used
+                actions.append({
+                    "action": "blocked",
+                    "symbol": symbol,
+                    "hypothesis_id": h["id"],
+                    "detail": f"Signal family {fam}: budget ${max_total:.0f} exhausted (already deployed ${used:.0f}; remaining ${remaining:.0f})",
+                    "success": False,
+                })
+                continue
 
         # Insider cluster signal: cap at $2,500 until intraday EDGAR scanner is built.
         # Canonical benchmark (insider_cluster_canonical_benchmark_2026_04_08) shows
@@ -313,6 +420,14 @@ def execute_pending_triggers():
             # Save THIS hypothesis only (avoids bulk overwrite race condition)
             _db.save_hypothesis(h)
             active_count += 1
+
+            # Increment family budget tracker
+            if fam and fam in SIGNAL_FAMILY_BUDGETS:
+                family_deployed[fam] = family_deployed.get(fam, 0.0) + position_size
+                cfg = SIGNAL_FAMILY_BUDGETS[fam]
+                preferred = cfg.get("preferred_symbols", [])
+                if symbol not in preferred:
+                    family_diversifier_count[fam] = family_diversifier_count.get(fam, 0) + 1
 
             actions.append({
                 "action": "activated",
