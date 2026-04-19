@@ -853,10 +853,18 @@ def canonical_retest_threshold(
             }
         event_entries = [{"symbol": target_symbol, "date": d} for d in event_list]
         try:
+            # event_timing="after_hours" aligns target entry at T+1 open with
+            # benchmark reference at T close, preventing look-ahead bias. Threshold
+            # signals fire at close of T (e.g. VIX closes >30) so first tradable
+            # entry is T+1 open. Prior bug: default event_timing entered target at
+            # open of T (before signal) while bench referenced close of T-1,
+            # inflating abnormal by ~2-3% per VIX30-style event.
+            # See: canonical_retest_lookahead_bias_bug_2026_04_19.
             impact = market_data.measure_event_impact(
                 event_dates=event_entries,
                 benchmark=benchmark,
                 entry_price="open",
+                event_timing="after_hours",
                 check_factors=False,
                 check_seasonal=False,
             )
