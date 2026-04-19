@@ -366,7 +366,7 @@ def _causal_summary(result):
     """Extract compact summary from any causal_tests result."""
     if "error" in result:
         return {"status": "error", "error": result["error"]}
-    return {
+    summary = {
         "status": "ok",
         "test_name": result.get("test_name"),
         "hypothesis_class": result.get("hypothesis_class"),
@@ -377,6 +377,133 @@ def _causal_summary(result):
         "n_observations": result.get("n_observations"),
         "oos_significant": result.get("oos_result", {}).get("significant") if result.get("oos_result") else None,
         "summary": result.get("summary"),
+    }
+    # Propagate scan-artifact suppression flags to the summary so orchestrator
+    # can see them without re-reading full result.
+    if result.get("scan_artifact_check") is not None:
+        summary["scan_artifact_check"] = result["scan_artifact_check"]
+        summary["scan_artifact_suppressed"] = result.get("scan_artifact_suppressed", False)
+        summary["scan_artifact_reason"] = result.get("scan_artifact_reason")
+    return summary
+
+
+# ---------------------------------------------------------------------------
+# Scan-artifact auto-suppression
+# (dgs10_structural_break_scan_artifact_rule_2026_04_19,
+#  dgs10_granger_lead_lag_systematic_dead_end,
+#  dgs30_granger_lead_lag_extends_systematic_dead_end_2026_04_19)
+# ---------------------------------------------------------------------------
+
+# Rate-sensitive ETFs where DGS10/DGS30 breaks/lead-lag are known secular drift.
+_RATE_SENSITIVE_ETFS = {
+    "XLRE", "IYR", "VNQ",                       # REITs
+    "HYG", "JNK", "LQD", "TLT", "IEF",          # bonds
+    "GLD", "GDX", "GDXJ", "SLV",                # precious metals
+    "XLE", "XOP",                               # energy
+    "XLU",                                      # utilities
+    "XLI", "IWM",                               # industrials / smallcap
+    "EEM", "VWO", "FXI",                        # EM
+    "XLV", "IBB", "XBI",                        # healthcare
+    "KRE", "KBE", "XLF",                        # banks / financials
+    "XLB", "XME",                               # materials
+    "XHB", "ITB",                               # homebuilders
+    "XLK", "SMH",                               # tech
+}
+
+_DGS_FACTORS = {"FRED:DGS10", "FRED:DGS30", "FRED:DGS2", "FRED:DGS5"}
+
+# Canonical 2020-2024 rate-normalization break date where most scan hits cluster.
+_DGS_CANONICAL_BREAK = "2022-03-16"
+
+
+def _is_dgs_rate_sensitive_pair(factor, target):
+    """Return True if this is a DGS rate -> rate-sensitive ETF pair where
+    scan hits are known systematic artifacts."""
+    return factor in _DGS_FACTORS and target.upper() in _RATE_SENSITIVE_ETFS
+
+
+def _check_dgs_structural_break_artifact(target_rets, factor_rets, target, factor,
+                                          break_date, target_f_stat):
+    """Auto-run alt-date falsification for DGS -> rate-sensitive ETF structural breaks.
+    Per dgs10_structural_break_scan_artifact_rule_2026_04_19: the target-date F-statistic
+    must be >= 3x the max of alt-date F-stats for the break to be a genuine regime
+    change (rather than secular drift detected by Chow at any date).
+    Returns a dict of diagnostic info, or None if the check doesn't apply.
+    """
+    if not _is_dgs_rate_sensitive_pair(factor, target):
+        return None
+
+    # Only apply when break date is near the canonical 2022 break window.
+    import pandas as pd
+    try:
+        bd = pd.Timestamp(break_date)
+        canonical = pd.Timestamp(_DGS_CANONICAL_BREAK)
+        if abs((bd - canonical).days) > 120:
+            return None
+    except Exception:
+        return None
+
+    import causal_tests
+    alt_dates = ["2020-06-15", "2024-01-15"]
+    alt_results = {}
+    for alt in alt_dates:
+        try:
+            r = causal_tests.test_structural_break(target_rets, factor_rets, alt)
+            if "error" not in r:
+                alt_results[alt] = {"f_stat": float(r.get("statistic", 0.0)),
+                                    "p_value": float(r.get("p_value", 1.0))}
+        except Exception as e:
+            alt_results[alt] = {"error": str(e)}
+
+    valid_alt_fs = [v["f_stat"] for v in alt_results.values() if "f_stat" in v]
+    if not valid_alt_fs:
+        return {"check": "dgs_structural_break_alt_date_falsification",
+                "alt_dates": alt_dates, "alt_results": alt_results,
+                "target_f_stat": target_f_stat,
+                "error": "no alt-date results succeeded"}
+
+    max_alt_f = max(valid_alt_fs)
+    ratio = target_f_stat / max_alt_f if max_alt_f > 0 else float("inf")
+    suppressed = ratio < 3.0  # canonical 3x threshold per rule
+
+    return {
+        "check": "dgs_structural_break_alt_date_falsification",
+        "rule": "dgs10_structural_break_scan_artifact_rule_2026_04_19",
+        "target_f_stat": float(target_f_stat),
+        "alt_dates": alt_dates,
+        "alt_results": alt_results,
+        "max_alt_f": float(max_alt_f),
+        "ratio_target_over_max_alt": float(ratio),
+        "threshold_ratio": 3.0,
+        "suppressed": bool(suppressed),
+        "reason": (
+            f"Target F={target_f_stat:.2f} vs max alt-date F={max_alt_f:.2f} "
+            f"(ratio={ratio:.2f}x). "
+            + ("BELOW 3x threshold -> likely secular drift, not discrete break."
+               if suppressed else "ABOVE 3x threshold -> meaningful break at target date.")
+        ),
+    }
+
+
+def _check_dgs_leadlag_artifact(factor, target):
+    """Flag DGS -> rate-sensitive ETF lead-lag tests as known-systematic artifacts.
+    Per dgs10_granger_lead_lag_systematic_dead_end + dgs30 extension.
+    Returns a warning dict, or None if the check doesn't apply.
+    """
+    if not _is_dgs_rate_sensitive_pair(factor, target):
+        return None
+    return {
+        "check": "dgs_leadlag_systematic_artifact_warning",
+        "rule": "dgs10_granger_lead_lag_systematic_dead_end "
+                "+ dgs30_granger_lead_lag_extends_systematic_dead_end_2026_04_19",
+        "suppressed": True,
+        "reason": (
+            f"DGS rate -> {target.upper()} lead-lag is a documented systematic artifact. "
+            "Full-window Granger significance reflects secular drift 2020-2024, not true "
+            "lead-lag. Regime-restricted retest (start >= 2022-04-01, oos >= 2024-01-01) "
+            "has repeatedly shown lag wandering + OOS non-significance. DO NOT queue as "
+            "scan hit without explicit regime-restricted IS/OOS validation."
+        ),
     }
 
 
@@ -412,12 +539,39 @@ def cmd_regression(args):
         max_lags = args.max_lags or 10
         result = causal_tests.test_lead_lag(factor_rets, target_rets, max_lags=max_lags, oos_start=args.oos_start)
         params["max_lags"] = max_lags
+        # Auto-suppression: DGS10/DGS30 -> rate-sensitive ETF lead-lag is a documented
+        # systematic artifact (secular drift 2020-2024, not true lead-lag).
+        artifact = _check_dgs_leadlag_artifact(args.factor, args.target)
+        if artifact is not None:
+            result["scan_artifact_check"] = artifact
+            result["scan_artifact_suppressed"] = artifact.get("suppressed", False)
+            result["scan_artifact_reason"] = artifact.get("reason")
+            # Tag the summary so the orchestrator sees the warning inline.
+            if artifact.get("suppressed"):
+                result["summary"] = (result.get("summary", "") or "") + \
+                    " | SCAN_ARTIFACT_SUPPRESSED: " + artifact["reason"]
     elif test_type == "structural_break":
         if not args.break_date:
             print(json.dumps({"status": "error", "error": "--break-date required for structural_break test"}))
             return
         result = causal_tests.test_structural_break(target_rets, factor_rets, args.break_date)
         params["break_date"] = args.break_date
+        # Auto-suppression: DGS10/DGS30 -> rate-sensitive ETF structural breaks near
+        # 2022-03-16 are recurring scan artifacts. Run alt-date falsification and
+        # require target-F >= 3x max(alt-F) or flag as likely secular drift.
+        if "error" not in result:
+            target_f = result.get("statistic", 0.0)
+            artifact = _check_dgs_structural_break_artifact(
+                target_rets, factor_rets, args.target, args.factor,
+                args.break_date, target_f,
+            )
+            if artifact is not None:
+                result["scan_artifact_check"] = artifact
+                result["scan_artifact_suppressed"] = artifact.get("suppressed", False)
+                result["scan_artifact_reason"] = artifact.get("reason")
+                if artifact.get("suppressed"):
+                    result["summary"] = (result.get("summary", "") or "") + \
+                        " | SCAN_ARTIFACT_SUPPRESSED: " + artifact["reason"]
     elif test_type == "regime":
         # Regime test: factor is used as regime indicator (LEVEL, not return).
         # Rule (2026-04-11 methodology update):
