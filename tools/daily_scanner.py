@@ -707,6 +707,29 @@ def run_sp500_changes(days: int) -> dict:
     }
 
 
+def run_vix_monitor() -> dict:
+    """VIX first-close-above-30 monitor.
+
+    When VIX closes above 30 (first close in a 30-day cluster window) it sets
+    trigger=next_market_open on:
+      - SPY parent hypothesis (b63a0168)
+      - All pending vix30_* family hypotheses (sector basket)
+    trade_loop.py then enforces the $10K family budget cap.
+    """
+    label = "VIX Monitor"
+    cmd = [sys.executable, "tools/vix_monitor.py"]
+    ok, stdout = _run(cmd, label)
+    if not ok:
+        return {"scanner": label, "status": "error", "fired": False}
+    fired = "ACTIVATED:" in stdout or "activated" in stdout
+    return {
+        "scanner": label,
+        "status": "ok",
+        "fired": fired,
+        "summary": stdout.splitlines()[-5:] if stdout else [],
+    }
+
+
 # ---------------------------------------------------------------------------
 # Actionable event detection
 # ---------------------------------------------------------------------------
@@ -933,6 +956,9 @@ def main():
 
     print("[daily_scanner] Running S&P 500 changes scanner...", file=sys.stderr)
     results["sp500_changes"] = run_sp500_changes(days)
+
+    print("[daily_scanner] Running VIX monitor...", file=sys.stderr)
+    results["vix_monitor"] = run_vix_monitor()
 
     # Aggregate
     total_events = (

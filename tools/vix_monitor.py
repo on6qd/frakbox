@@ -3,8 +3,15 @@ vix_monitor.py - Monitor VIX for first-close-above-30 signal.
 
 Checks whether VIX has closed above 30 and, if so, whether this is the FIRST
 close above 30 in a 30-calendar-day window (no prior >30 close in last 30 days).
-If the condition fires and hypothesis b63a0168 is still pending with no trigger set,
-it activates the hypothesis by setting trigger='next_market_open'.
+
+When the condition fires:
+  1. Activates the SPY hypothesis (b63a0168) — the parent signal.
+  2. Activates ALL pending vix30_* family hypotheses (the sector basket).
+
+Position sizing for the basket is enforced by trade_loop.py's signal-family
+budget cap (config.SIGNAL_FAMILY_BUDGETS['vix30_basket'] = $10K total,
+preferred symbols XLB/EFA, diversifier cap 1). See knowledge:
+vix30_basket_internal_correlation_concentration_risk_2026_04_19.
 
 Usage:
     python tools/vix_monitor.py
@@ -22,7 +29,31 @@ from datetime import datetime, timedelta
 
 VIX_THRESHOLD = 30.0
 CLUSTER_WINDOW_DAYS = 30
-HYPOTHESIS_ID = 'b63a0168'
+HYPOTHESIS_ID = 'b63a0168'  # SPY parent hypothesis
+
+
+def _activate_vix30_basket():
+    """Activate all pending vix30_* family hypotheses with trigger=next_market_open.
+
+    Returns a list of (hyp_id, symbol, action) tuples for logging.
+    The trade_loop signal-family budget cap ensures total basket exposure <= $10K.
+    """
+    import config
+    actions = []
+    hyps = db.get_hypotheses_by_status('pending')
+    for h in hyps:
+        sig = (h.get('signal_type') or h.get('event_type') or '').lower()
+        fam = config.classify_signal_family(sig)
+        if fam != 'vix30_basket':
+            continue
+        if h.get('id') == HYPOTHESIS_ID:
+            continue  # handled separately
+        if h.get('trigger') is not None:
+            actions.append((h['id'], h.get('expected_symbol'), f"already_triggered ({h['trigger']})"))
+            continue
+        db.update_hypothesis_fields(h['id'], trigger='next_market_open')
+        actions.append((h['id'], h.get('expected_symbol'), "activated"))
+    return actions
 
 
 def run():
@@ -112,6 +143,17 @@ def run():
         print(f"Hypothesis already has trigger='{hyp['trigger']}' — no action needed.")
     else:
         print(f"Hypothesis status is '{hyp['status']}' — no activation required.")
+
+    # Activate the VIX>30 sector basket. trade_loop enforces $10K family budget.
+    print()
+    print("--- Activating VIX>30 basket hypotheses ---")
+    basket_actions = _activate_vix30_basket()
+    if not basket_actions:
+        print("  (no pending vix30_* family hypotheses found)")
+    for hyp_id, sym, action in basket_actions:
+        print(f"  {hyp_id[:8]} {sym}: {action}")
+    print(f"  trade_loop will apply family budget cap (${10000} total across the basket)")
+    print()
 
 
 if __name__ == '__main__':
