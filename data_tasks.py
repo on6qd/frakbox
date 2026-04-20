@@ -658,13 +658,38 @@ def cmd_regression(args):
                 and abs(oos_spread) > 1e-6
             )
 
-            # REFUSE sign-preservation validation if coverage fails
-            oos_validated = bool(spread_sign_match and coverage_ok)
+            # GATE: require IS significance AND meaningful effect size before
+            # accepting sign-preservation as validation. Sign-match on a null
+            # IS result (p>0.05 Kruskal-Wallis) is meaningless — you are just
+            # preserving noise. Require raw IS p<0.05 AND |IS spread| >= 0.05%/day
+            # (~12.5%/year) before sign-preservation can validate.
+            # (regime_validation_is_gate_rule_2026_04_20)
+            is_significant = bool(result.get("significant"))
+            is_spread_meaningful = (
+                is_spread is not None and abs(is_spread) >= 0.05
+            )
+
+            # REFUSE sign-preservation validation if coverage fails OR IS not significant
+            oos_validated = bool(
+                spread_sign_match and coverage_ok
+                and is_significant and is_spread_meaningful
+            )
             validation_refused_reason = None
             if spread_sign_match and not coverage_ok:
                 validation_refused_reason = (
                     f"OOS regime coverage imbalance: min regime pct={min_coverage_pct:.1%} "
                     f"(<15% threshold). Refusing sign-preservation validation."
+                )
+            elif spread_sign_match and coverage_ok and not is_significant:
+                validation_refused_reason = (
+                    f"IS Kruskal-Wallis p={result.get('p_value'):.4f} >= 0.05. "
+                    f"Sign-preservation without IS significance is noise-matching. "
+                    f"Refusing validation."
+                )
+            elif spread_sign_match and coverage_ok and is_significant and not is_spread_meaningful:
+                validation_refused_reason = (
+                    f"IS spread {is_spread:.3f}%/day below 0.05%/day minimum effect. "
+                    f"Refusing validation."
                 )
 
             result["oos_result"] = {
