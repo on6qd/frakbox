@@ -612,6 +612,51 @@ def run_delisting_8k(days: int) -> dict:
     }
 
 
+def run_item_302_pipe(days: int) -> dict:
+    """8-K Item 3.02 PIPE / private placement scanner. Uses --json-events.
+
+    Scanner already applies cap>=$500M and price>=$5 filters (canonical
+    liquidity floor from item_302_pipe_private_placement_short_validated_canonical_2026_04_20).
+    Evaluator adds recency + drawdown + dedup-in-queue checks.
+
+    Tradeable cell: short at next open, hold 10d, expected -5.21% SPY-adj,
+    65% neg rate. Hypothesis 84f218f0.
+    """
+    label = "Item 3.02 PIPE 8-K"
+    cmd = [
+        sys.executable, "tools/item_302_pipe_scanner.py",
+        "--days", str(days),
+        "--json-events",
+    ]
+    ok, stdout = _run(cmd, label)
+    if not ok:
+        return {"scanner": label, "status": "error", "events_found": 0, "events": [],
+                "go_count": 0, "evaluated": []}
+
+    events = _extract_json(stdout)
+    if not isinstance(events, list):
+        events = []
+
+    # Auto-evaluate and queue GO events. Scanner pre-filtered to >$500M & >$5.
+    evaluated = evaluate_8k_signal_events(
+        events,
+        signal_name="item_302_pipe_short",
+        hypothesis_id="84f218f0",
+        expected_return="-5.2%",
+        hold_days="10d",
+    )
+    go_events = [e for e in evaluated if e.get("decision") == "GO"]
+
+    return {
+        "scanner": label,
+        "status": "ok",
+        "events_found": len(events),
+        "events": events,
+        "go_count": len(go_events),
+        "evaluated": evaluated,
+    }
+
+
 def run_seo_scanner(days: int) -> dict:
     """SEO bought-deal scanner. Always emits JSON summary at end of stdout."""
     label = "SEO Bought Deal"
@@ -825,6 +870,25 @@ def find_actionable_events(results: dict) -> list[dict]:
                         else "Item 1.05 material cybersecurity incident — short signal",
             })
 
+    # Item 3.02 PIPE events
+    pipe = results.get("item_302_pipe", {})
+    for ev in pipe.get("evaluated", pipe.get("events", [])):
+        decision = ev.get("decision", "SIGNAL")
+        if decision in ("GO", "NO_GO", "SIGNAL"):
+            actionable.append({
+                "scanner": "Item 3.02 PIPE",
+                "ticker": ev.get("ticker", ev.get("symbol", "?")),
+                "date": ev.get("date", ""),
+                "decision": decision,
+                "note": (
+                    f"Item 3.02 — {'; '.join(ev.get('blockers', ['short signal']))}"
+                    if decision == "NO_GO"
+                    else "Item 3.02 PIPE / private placement — short signal (auto-queued)"
+                    if decision == "GO"
+                    else "Item 3.02 PIPE / private placement — short signal"
+                ),
+            })
+
     # Delisting 8-K events — use evaluated GO/NO_GO when available
     delisting = results.get("delisting_8k", {})
     for ev in delisting.get("evaluated", delisting.get("events", [])):
@@ -875,6 +939,8 @@ def build_status_line(results: dict) -> str:
     ins_wgo = results.get("insider_clusters", {}).get("weak_go_count", 0)
     cyber_n = results.get("cybersecurity_8k", {}).get("events_found", "ERR")
     delist_n = results.get("delisting_8k", {}).get("events_found", "ERR")
+    pipe_n = results.get("item_302_pipe", {}).get("events_found", "ERR")
+    pipe_go = results.get("item_302_pipe", {}).get("go_count", 0)
     seo_n = results.get("seo_bought_deal", {}).get("total_found", "ERR")
     seo_go = results.get("seo_bought_deal", {}).get("go_count", "")
     sp500_n = results.get("sp500_changes", {}).get("new_changes", 0)
@@ -897,6 +963,7 @@ def build_status_line(results: dict) -> str:
         f"Insider: {ins_part}",
         f"8-K 1.05: {cyber_n} events",
         f"8-K 3.01: {delist_n} events",
+        f"8-K 3.02: {pipe_n} events" + (f" ({pipe_go} GO)" if pipe_go else ""),
         f"SEO: {seo_part} deals",
         f"S&P 500: {sp500_part}",
     ])
@@ -951,6 +1018,9 @@ def main():
     print("[daily_scanner] Running Delisting 8-K scanner...", file=sys.stderr)
     results["delisting_8k"] = run_delisting_8k(days)
 
+    print("[daily_scanner] Running Item 3.02 PIPE 8-K scanner...", file=sys.stderr)
+    results["item_302_pipe"] = run_item_302_pipe(days)
+
     print("[daily_scanner] Running SEO bought-deal scanner...", file=sys.stderr)
     results["seo_bought_deal"] = run_seo_scanner(days)
 
@@ -967,6 +1037,7 @@ def main():
         + results["insider_clusters"].get("clusters_found", 0)
         + results["cybersecurity_8k"].get("events_found", 0)
         + results["delisting_8k"].get("events_found", 0)
+        + results["item_302_pipe"].get("events_found", 0)
         + results["seo_bought_deal"].get("total_found", 0)
         + results["sp500_changes"].get("new_changes", 0)
     )
