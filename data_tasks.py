@@ -416,10 +416,69 @@ _DGS_FACTORS = {"FRED:DGS10", "FRED:DGS30", "FRED:DGS2", "FRED:DGS5"}
 _DGS_CANONICAL_BREAK = "2022-03-16"
 
 
+# Commodity futures where Granger lead-lag on sector/industry ETFs is a
+# documented systematic dead end per commodity_sector_granger_leadlag_systematic_dead_end_2026_04_20.
+# Granger significance is artifact of contemporaneous exposure with volatility clustering.
+_COMMODITY_FUTURES = {
+    "CL=F", "BZ=F",           # crude oil (WTI, Brent)
+    "HG=F",                   # copper
+    "GC=F", "SI=F",           # precious metals (gold, silver)
+    "NG=F",                   # natural gas
+    "ZS=F", "ZW=F", "ZC=F",   # grains (soybeans, wheat, corn)
+    "KC=F", "SB=F",           # softs (coffee, sugar)
+    "PL=F", "PA=F",           # industrial precious (platinum, palladium)
+    "LE=F", "HE=F",           # livestock (cattle, hogs)
+}
+
+# Sector/industry ETFs where commodity Granger lead-lag has been tested and
+# repeatedly failed canonical threshold backtest.
+_COMMODITY_SENSITIVE_ETFS = {
+    "XLE", "XOP", "OIH",      # energy
+    "XLB", "XME", "GDX", "GDXJ", "SIL",  # materials / miners
+    "MOO", "DBA",             # agribusiness / agriculture
+    "XLP", "XLI",             # consumer staples / industrials (food processing, fertilizer)
+    "AAL", "DAL", "UAL", "LUV",  # airlines (crude exposure)
+}
+
+
 def _is_dgs_rate_sensitive_pair(factor, target):
     """Return True if this is a DGS rate -> rate-sensitive ETF pair where
     scan hits are known systematic artifacts."""
     return factor in _DGS_FACTORS and target.upper() in _RATE_SENSITIVE_ETFS
+
+
+def _is_commodity_sector_pair(factor, target):
+    """Return True if factor is a commodity future and target is a
+    commodity-sensitive ETF/stock. Granger lead-lag on these pairs is
+    a documented systematic dead end."""
+    return factor in _COMMODITY_FUTURES and target.upper() in _COMMODITY_SENSITIVE_ETFS
+
+
+def _check_commodity_sector_leadlag_artifact(factor, target):
+    """Flag commodity futures -> sector ETF lead-lag tests as known-systematic
+    artifacts per commodity_sector_granger_leadlag_systematic_dead_end_2026_04_20.
+    7+ confirmations across HG=F->XLB, GC=F->XLB, CL=F->XLE, CL=F->AAL,
+    HG=F->XME, GC=F->GDX, ZS=F->MOO. Granger 'significance' is artifact of
+    contemporaneous exposure + volatility clustering; threshold backtests show
+    mean abnormal returns consistently <1% (below methodology floor).
+    """
+    if not _is_commodity_sector_pair(factor, target):
+        return None
+    return {
+        "check": "commodity_sector_leadlag_systematic_artifact_warning",
+        "rule": "commodity_sector_granger_leadlag_systematic_dead_end_2026_04_20",
+        "suppressed": True,
+        "reason": (
+            f"Commodity future {factor} -> {target.upper()} Granger lead-lag is a "
+            "documented systematic artifact (7+ confirmations). The relationship is "
+            "contemporaneous exposure (beta test) with volatility clustering that "
+            "produces spurious Granger significance. Threshold backtests of the "
+            "lead-lag direction consistently yield mean abnormal returns <1% (below "
+            "the methodology magnitude floor). DO NOT queue as scan hit; treat as "
+            "informational only unless scan-claimed magnitude exceeds 0.5%/day or "
+            "scan pair is not in the documented dead-end set."
+        ),
+    }
 
 
 def _check_dgs_structural_break_artifact(target_rets, factor_rets, target, factor,
@@ -542,6 +601,9 @@ def cmd_regression(args):
         # Auto-suppression: DGS10/DGS30 -> rate-sensitive ETF lead-lag is a documented
         # systematic artifact (secular drift 2020-2024, not true lead-lag).
         artifact = _check_dgs_leadlag_artifact(args.factor, args.target)
+        if artifact is None:
+            # Fall through to commodity -> sector check.
+            artifact = _check_commodity_sector_leadlag_artifact(args.factor, args.target)
         if artifact is not None:
             result["scan_artifact_check"] = artifact
             result["scan_artifact_suppressed"] = artifact.get("suppressed", False)
