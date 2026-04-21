@@ -20,3 +20,7 @@ data/edgar_form4_cache_v2/
 data/intraday_poller_state.json
 data/intraday_poller_alerts.jsonl
 data/intraday_poller_accept_cache.json
+canonical_retest*.log
+canonical_retest*.txt
+tools/item_302_raw_events.json
+tools/item_302_canonical_retest_events.json
