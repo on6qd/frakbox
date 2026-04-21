@@ -613,47 +613,26 @@ def run_delisting_8k(days: int) -> dict:
 
 
 def run_item_302_pipe(days: int) -> dict:
-    """8-K Item 3.02 PIPE / private placement scanner. Uses --json-events.
+    """8-K Item 3.02 PIPE / private placement scanner.
 
-    Scanner already applies cap>=$500M and price>=$5 filters (canonical
-    liquidity floor from item_302_pipe_private_placement_short_validated_canonical_2026_04_20).
-    Evaluator adds recency + drawdown + dedup-in-queue checks.
+    DISABLED 2026-04-21: Classifier v1 inverts signal direction. Canonical retest
+    showed that high/med confidence 'dilutive_pipe' filings are predominantly
+    investor-led biotech PIPEs with POSITIVE +9% 5d abnormal returns (opposite
+    of short thesis). Hypothesis 84f218f0 retired. See knowledge
+    item_302_classifier_inverts_direction_2026_04_21.
 
-    Tradeable cell: short at next open, hold 10d, expected -5.21% SPY-adj,
-    65% neg rate. Hypothesis 84f218f0.
+    Scanner stays no-op until classifier v2 (distressed-marker based, or Haiku NLP)
+    is built and the canonical retest passes.
     """
-    label = "Item 3.02 PIPE 8-K"
-    cmd = [
-        sys.executable, "tools/item_302_pipe_scanner.py",
-        "--days", str(days),
-        "--json-events",
-    ]
-    ok, stdout = _run(cmd, label)
-    if not ok:
-        return {"scanner": label, "status": "error", "events_found": 0, "events": [],
-                "go_count": 0, "evaluated": []}
-
-    events = _extract_json(stdout)
-    if not isinstance(events, list):
-        events = []
-
-    # Auto-evaluate and queue GO events. Scanner pre-filtered to >$500M & >$5.
-    evaluated = evaluate_8k_signal_events(
-        events,
-        signal_name="item_302_pipe_short",
-        hypothesis_id="84f218f0",
-        expected_return="-5.2%",
-        hold_days="10d",
-    )
-    go_events = [e for e in evaluated if e.get("decision") == "GO"]
-
+    label = "Item 3.02 PIPE 8-K (DISABLED)"
     return {
         "scanner": label,
-        "status": "ok",
-        "events_found": len(events),
-        "events": events,
-        "go_count": len(go_events),
-        "evaluated": evaluated,
+        "status": "disabled",
+        "events_found": 0,
+        "events": [],
+        "go_count": 0,
+        "evaluated": [],
+        "disabled_reason": "classifier_v1_inverts_direction_2026_04_21",
     }
 
 
