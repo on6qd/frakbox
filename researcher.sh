@@ -208,6 +208,10 @@ while true; do
     if python3 should_run.py >> logs/daemon.log 2>&1; then
       run_session &
     else
+      # Heartbeat proves the daemon is alive to the watchdog even when skipping
+      # (peak hours, no work, or daily cap) — otherwise health_check.py alerts
+      # after 2h of skips.
+      echo "=== Heartbeat $(date) ===" >> logs/daemon.log
       echo "$(date): No actionable work — skipping session." >> logs/daemon.log
     fi
     last_session=$(now)
