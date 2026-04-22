@@ -611,6 +611,28 @@ def log_opportunity(cluster: dict, market_cap_m: float, position_52w: dict,
     buyer_titles = cluster.get('buyer_titles', [])
     pct_from_high = position_52w.get('pct_from_52w_high', 0) or 0
 
+    # Filing-lag gate: per insider_cluster_t_plus_1_retirement_2026_04_08,
+    # T+1 entry is HARD BLOCKED in the evaluator. If the latest filing is
+    # already >1 business day old, the alpha has decayed — downgrade to
+    # informational priority so we don't queue stale entries as P0.
+    bd_since_latest_filing = None
+    try:
+        import pandas as pd
+        today = pd.Timestamp.now(tz='US/Eastern').normalize().tz_localize(None)
+        filed = pd.Timestamp(filing_date).normalize()
+        bd_since_latest_filing = int(pd.bdate_range(filed, today).size - 1)
+    except Exception:
+        bd_since_latest_filing = None
+
+    is_stale = bd_since_latest_filing is not None and bd_since_latest_filing > 1
+    stale_note = ""
+    if is_stale:
+        stale_note = (
+            f" STALE: {bd_since_latest_filing} business days since latest filing "
+            f"(>1bd hard block per insider_cluster_filing_lag_drift + t_plus_1_retirement). "
+            f"NO_GO; logging at low priority for informational review only."
+        )
+
     # Build regime-aware action recommendation (n_insiders-aware)
     action_note = get_vix_action_recommendation(vix_regime, n_insiders, total_value_k)
 
@@ -625,6 +647,8 @@ def log_opportunity(cluster: dict, market_cap_m: float, position_52w: dict,
         )
 
     vix_str = f"{vix_level:.1f}" if vix_level is not None else "N/A"
+    qual_line = "QUALIFYING for hypothesis 1cb6140f (3d hold)." if not is_stale else \
+                "NOT QUALIFYING (filing lag > 1bd, see evaluator hard block)."
     description = (
         f"AUTO-DETECTED insider cluster: {ticker} ({company}). "
         f"{n_insiders} insiders filed {filing_date}. "
@@ -632,24 +656,29 @@ def log_opportunity(cluster: dict, market_cap_m: float, position_52w: dict,
         f"Price: ${price:.2f} ({pct_from_high:.1f}% from 52W high). "
         f"Market cap: ${market_cap_m:.0f}M. "
         f"VIX={vix_str} -> {vix_label}. "
-        f"QUALIFYING for hypothesis 1cb6140f (3d hold).{ceo_cfo_note} "
-        f"{action_note}"
-    )
+        f"{qual_line}{ceo_cfo_note}{stale_note} "
+        f"{action_note if not is_stale else ''}"
+    ).strip()
 
     if dry_run:
         print(f"  DRY RUN: Would log to research queue: {description[:100]}...")
         return
 
+    # Stale clusters: log at P5 (informational); fresh at P0 (actionable).
+    queue_priority = 5 if is_stale else 0
+    reasoning_text = (
+        f"Auto-detected cluster with {n_insiders} insiders, ${total_value_k/1000:.1f}M total. "
+        f"{'NO_GO (stale, lag>' + str(bd_since_latest_filing) + 'bd)' if is_stale else 'Qualifying for 1cb6140f'}. "
+        f"Filed {filing_date}. "
+        f"{'Would have expired - logged for review only.' if is_stale else 'Must act before 3d window expires.'} "
+        f"VIX regime: {vix_label}. {action_note if not is_stale else ''}"
+        + (f" CEO/CFO present: also tag hypothesis {CEO_CFO_HYPOTHESIS_ID}." if has_ceo_cfo else "")
+    )
     research_queue.add_research_task(
         category="insider_buying_cluster",
         question=description,
-        priority=0,  # Highest priority
-        reasoning=(
-            f"Auto-detected cluster with {n_insiders} insiders, ${total_value_k/1000:.1f}M total. "
-            f"Qualifying for 1cb6140f. Filed {filing_date}. Must act before 3d window expires. "
-            f"VIX regime: {vix_label}. {action_note}"
-            + (f" CEO/CFO present: also tag hypothesis {CEO_CFO_HYPOTHESIS_ID}." if has_ceo_cfo else "")
-        )
+        priority=queue_priority,
+        reasoning=reasoning_text,
     )
 
     # Also log to scanner_signals so the signal continuation pipeline can find it
