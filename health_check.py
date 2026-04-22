@@ -92,16 +92,34 @@ def _has_active_positions():
 
 
 def _restart_daemon():
-    """Restart the research daemon."""
+    """Restart the research daemon via start.sh (guards against duplicates)."""
     try:
-        # Log the restart
+        # Re-check right before spawning: _daemon_is_alive may have been
+        # called seconds ago, and a concurrent health_check tick could have
+        # already restarted the daemon. Without this, we've seen three
+        # researcher.sh copies end up alive from stacked restarts.
+        alive = subprocess.run(
+            ["pgrep", "-f", "researcher.sh"],
+            capture_output=True, text=True, timeout=5,
+        )
+        if alive.returncode == 0:
+            with open(DAEMON_LOG, "a") as f:
+                pids = alive.stdout.strip().replace("\n", ",")
+                f.write(
+                    f"\n=== health_check restart aborted at {datetime.now()}: "
+                    f"daemon already alive (pids {pids}) ===\n"
+                )
+            return False
+
         with open(DAEMON_LOG, "a") as f:
             f.write(f"\n=== Daemon restarted by health_check.py at {datetime.now()} ===\n")
 
+        # Use start.sh so it applies its own pgrep guard and nohup redirection
+        # (single source of truth for daemon startup).
         subprocess.Popen(
-            ["nohup", str(BASE_DIR / "researcher.sh")],
-            stdout=open(DAEMON_LOG, "a"),
-            stderr=subprocess.STDOUT,
+            [str(BASE_DIR / "start.sh")],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
             stdin=subprocess.DEVNULL,
             cwd=str(BASE_DIR),
             start_new_session=True,
