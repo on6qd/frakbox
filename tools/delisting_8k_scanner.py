@@ -153,16 +153,34 @@ def classify_filing_content(text: str) -> str:
     Classify Item 3.01 filing as 'forced', 'voluntary', or 'unknown'
     by inspecting the text around the Item 3.01 section.
 
-    Returns: 'forced' | 'voluntary' | 'unknown'
+    Returns: 'forced' | 'voluntary' | 'unknown' | 'going_private'
     """
     import re
-    idx = text.lower().find("3.01")
+    # Work on a cleaned lowercase version so entity-encoded headers
+    # (e.g. "Item&#8201;3.01") still match Item-number structural checks.
+    text_clean_full = re.sub(r"<[^>]+>", " ", text)
+    text_clean_full = re.sub(r"&#\d+;", " ", text_clean_full)
+    text_lower = text_clean_full.lower()
+
+    # Structural co-occurrence filter (added 2026-04-22 for HTBK gap):
+    # Item 3.01 co-occurring with Item 2.01 (Completion of Acquisition) OR
+    # Item 5.01 (Changes in Control of Registrant) OR Item 3.03 (Material
+    # Modification to Rights of Security Holders) is definitively a
+    # going-private / merger-completion event — stock ceases trading.
+    # This catches M&A filings where the Item 3.01 snippet references
+    # merger sections without direct merger-language matches.
+    has_201 = re.search(r"\bitem\s*2\.01\b", text_lower) is not None
+    has_501 = re.search(r"\bitem\s*5\.01\b", text_lower) is not None
+    has_303 = re.search(r"\bitem\s*3\.03\b", text_lower) is not None
+    if has_201 or has_501 or has_303:
+        return "going_private"
+
+    idx = text_lower.find("3.01")
     if idx < 0:
         return "unknown"
 
     # Extract ~1500 chars after the section header
-    snippet = text[idx: idx + 1500]
-    snippet_clean = re.sub(r"<[^>]+>", " ", snippet).lower()
+    snippet_clean = text_lower[idx: idx + 1500]
 
     # Check going-private FIRST — these are untradeable (stock ceases trading)
     for pat in GOING_PRIVATE_PATTERNS:
