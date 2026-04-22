@@ -415,6 +415,26 @@ _DGS_FACTORS = {"FRED:DGS10", "FRED:DGS30", "FRED:DGS2", "FRED:DGS5"}
 # Canonical 2020-2024 rate-normalization break date where most scan hits cluster.
 _DGS_CANONICAL_BREAK = "2022-03-16"
 
+# Commodity factors where 2025 Liberation Day / Trump-inauguration window break
+# dates are frequently scanner artifacts. Per
+# commodity_factor_liberation_day_structural_break_scan_artifact_rule_2026_04_22,
+# the underlying 2022 Russia-Ukraine commodity regime break dominates.
+_COMMODITY_FACTORS_FOR_LIBERATION_DAY = {
+    "CL=F", "BZ=F",           # crude oil (WTI, Brent)
+    "HG=F",                   # copper
+    "GC=F", "SI=F",           # precious metals (gold, silver)
+    "NG=F",                   # natural gas
+    "ZS=F", "ZW=F", "ZC=F",   # grains (soybeans, wheat, corn)
+}
+
+# Liberation-Day / Trump-inauguration window (2025-01-01..2025-06-01) where
+# Chow tests cluster due to elevated volatility, not a discrete regime break.
+_LIBERATION_DAY_WINDOW_START = "2025-01-01"
+_LIBERATION_DAY_WINDOW_END = "2025-06-01"
+# Canonical 2022 Russia-Ukraine commodity regime break anchor for alt-date
+# falsification.
+_COMMODITY_2022_BREAK = "2022-01-03"
+
 
 # Commodity futures where Granger lead-lag on sector/industry ETFs is a
 # documented systematic dead end per commodity_sector_granger_leadlag_systematic_dead_end_2026_04_20.
@@ -452,6 +472,21 @@ def _is_commodity_sector_pair(factor, target):
     commodity-sensitive ETF/stock. Granger lead-lag on these pairs is
     a documented systematic dead end."""
     return factor in _COMMODITY_FUTURES and target.upper() in _COMMODITY_SENSITIVE_ETFS
+
+
+def _is_commodity_liberation_day_break(factor, break_date):
+    """Return True if this pair+date matches the Liberation Day commodity
+    break pattern (commodity factor + break date in 2025-01-01..2025-06-01).
+    """
+    if factor not in _COMMODITY_FACTORS_FOR_LIBERATION_DAY:
+        return False
+    try:
+        import pandas as pd
+        bd = pd.Timestamp(break_date)
+        return (pd.Timestamp(_LIBERATION_DAY_WINDOW_START) <= bd
+                <= pd.Timestamp(_LIBERATION_DAY_WINDOW_END))
+    except Exception:
+        return False
 
 
 def _check_commodity_sector_leadlag_artifact(factor, target):
@@ -544,6 +579,71 @@ def _check_dgs_structural_break_artifact(target_rets, factor_rets, target, facto
     }
 
 
+def _check_commodity_liberation_day_structural_break_artifact(
+        target_rets, factor_rets, target, factor, break_date, target_f_stat):
+    """Auto-run alt-date falsification for commodity-factor structural breaks at
+    Liberation Day-era dates.
+
+    Per commodity_factor_liberation_day_structural_break_scan_artifact_rule_2026_04_22:
+    Chow-test breaks on <equity/sector> ~ <commodity factor> at dates within
+    2025-01-01..2025-06-01 are frequently scanner artifacts dominated by the
+    2022 Russia-Ukraine commodity regime break. Require target-F >= 3x the
+    2022-01-03 alt-date F, else flag as likely scan artifact.
+
+    Evidence motivating the rule (2026-04-22):
+      - airline_oil Liberation Day break: 0.56-1.19x (suppressed)
+      - energy_oil Liberation Day break:  0.14-0.17x (suppressed)
+      - copper_sector Liberation Day break: 0.08-0.96x (suppressed)
+
+    Returns a diagnostic dict, or None if the pair/date doesn't match.
+    """
+    if not _is_commodity_liberation_day_break(factor, break_date):
+        return None
+
+    import causal_tests
+    alt_dates = [_COMMODITY_2022_BREAK]
+    alt_results = {}
+    for alt in alt_dates:
+        try:
+            r = causal_tests.test_structural_break(target_rets, factor_rets, alt)
+            if "error" not in r:
+                alt_results[alt] = {"f_stat": float(r.get("statistic", 0.0)),
+                                    "p_value": float(r.get("p_value", 1.0))}
+        except Exception as e:
+            alt_results[alt] = {"error": str(e)}
+
+    valid_alt_fs = [v["f_stat"] for v in alt_results.values() if "f_stat" in v]
+    if not valid_alt_fs:
+        return {"check": "commodity_liberation_day_structural_break_alt_date_falsification",
+                "alt_dates": alt_dates, "alt_results": alt_results,
+                "target_f_stat": target_f_stat,
+                "error": "no alt-date results succeeded"}
+
+    max_alt_f = max(valid_alt_fs)
+    ratio = target_f_stat / max_alt_f if max_alt_f > 0 else float("inf")
+    suppressed = ratio < 3.0  # canonical 3x threshold shared across rules
+
+    return {
+        "check": "commodity_liberation_day_structural_break_alt_date_falsification",
+        "rule": "commodity_factor_liberation_day_structural_break_scan_artifact_rule_2026_04_22",
+        "target_f_stat": float(target_f_stat),
+        "alt_dates": alt_dates,
+        "alt_results": alt_results,
+        "max_alt_f": float(max_alt_f),
+        "ratio_target_over_max_alt": float(ratio),
+        "threshold_ratio": 3.0,
+        "suppressed": bool(suppressed),
+        "reason": (
+            f"Target F={target_f_stat:.2f} at {break_date} vs 2022-01-03 alt-date "
+            f"F={max_alt_f:.2f} (ratio={ratio:.2f}x). "
+            + ("BELOW 3x threshold -> Liberation Day break is dominated by the 2022 "
+               "Russia-Ukraine commodity regime break. Likely scan artifact."
+               if suppressed else "ABOVE 3x threshold -> break at target date is "
+               "meaningfully stronger than 2022 commodity regime break.")
+        ),
+    }
+
+
 def _check_dgs_leadlag_artifact(factor, target):
     """Flag DGS -> rate-sensitive ETF lead-lag tests as known-systematic artifacts.
     Per dgs10_granger_lead_lag_systematic_dead_end + dgs30 extension.
@@ -627,6 +727,13 @@ def cmd_regression(args):
                 target_rets, factor_rets, args.target, args.factor,
                 args.break_date, target_f,
             )
+            if artifact is None:
+                # Commodity factor + Liberation Day window -> alt-date check
+                # against 2022 Russia-Ukraine commodity regime break.
+                artifact = _check_commodity_liberation_day_structural_break_artifact(
+                    target_rets, factor_rets, args.target, args.factor,
+                    args.break_date, target_f,
+                )
             if artifact is not None:
                 result["scan_artifact_check"] = artifact
                 result["scan_artifact_suppressed"] = artifact.get("suppressed", False)
